@@ -3,30 +3,58 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { VadalIcon1, VadalIcon2, type MarkColors } from "../marks";
+import { VadalIcon1, VadalIcon2, VadalIcon3, VadalIcon4, VadalIcon5, type MarkColors } from "../marks";
 
 /* ── content ────────────────────────────────────────────────────── */
 
-const ORIGINAL: MarkColors = { from: "#8DA2FF", to: "#5D63E1", accent: "#FB4B43" };
+const PERIWINKLE: MarkColors = { from: "#8DA2FF", to: "#5D63E1", accent: "#FB4B43" };
 
-const EXPERIMENTS: ({ name: string } & MarkColors)[] = [
-  { name: "Periwinkle signal", ...ORIGINAL },
+/* re-tint options offered on every study, after that study's originals */
+const SHARED_EXPERIMENTS: ({ name: string } & MarkColors)[] = [
+  { name: "Periwinkle signal", ...PERIWINKLE },
   { name: "Human pulse", from: "#F6A14B", to: "#F2705B", accent: "#33B28A" },
   { name: "Evergreen", from: "#5EEAD4", to: "#1E9E6A", accent: "#EFD24A" },
   { name: "Volt lime", from: "#E5FF8A", to: "#A8D911", accent: "#FF452E" },
   { name: "Ticker gold", from: "#FFE08A", to: "#F5C518", accent: "#FF452E" },
 ];
 
+type ColorStory = { swatch: string[]; name: string; hex: string; why: string };
+
 type Study = {
   num: string;
   codename: string;
   Icon: typeof VadalIcon1;
   lockup: string;
+  /* marks 3–5 are standalone symbols — the wordmark is set in HTML */
+  wordless?: boolean;
+  original: MarkColors;
   tagline: string;
   symbolLede: string;
   anatomy: { part: string; reads: string }[];
   connections: { feature: string; how: string }[];
+  colorStory: ColorStory[];
 };
+
+const PERIWINKLE_STORY: ColorStory[] = [
+  {
+    swatch: ["#8DA2FF", "#5D63E1"],
+    name: "Periwinkle, light to deep",
+    hex: "#8DA2FF → #5D63E1",
+    why: "Vadal's buyer is a CHRO defending workforce decisions to a board — the brand has to read banking-calm, not wellness-app. Periwinkle carries that fintech-grade trust. The gradient runs light to deep deliberately: a signal arriving faint and becoming decision-grade.",
+  },
+  {
+    swatch: ["#FB4B43"],
+    name: "Signal red",
+    hex: "#FB4B43",
+    why: "One warm interruption, reserved for the human moment — the flight-risk alert, the recognition pop, the AI insight. It's never decoration; scarcity is what keeps it meaningful, in the logo exactly as in the product.",
+  },
+  {
+    swatch: ["#FFFFFF", "#0A0A0C"],
+    name: "White on near-black",
+    hex: "#FFFFFF on #0A0A0C",
+    why: "The wordmark is set in white on near-black — the mission-control register of the leader surface. Calm authority by default, with colour spent only where meaning lives.",
+  },
+];
 
 const STUDIES: Record<string, Study> = {
   "1": {
@@ -34,6 +62,8 @@ const STUDIES: Record<string, Study> = {
     codename: "Signal",
     Icon: VadalIcon1,
     lockup: "/branding/logo-1.svg",
+    original: PERIWINKLE,
+    colorStory: PERIWINKLE_STORY,
     tagline: "A flag planted, an eye open, a spark held in reserve.",
     symbolLede:
       "The mark is a V planted like a flag — Vadal arriving with intent. But it isn't solid: a lens-shaped aperture is carved through its heart, the open eye of a platform whose first job is to listen. From that aperture the form tapers to a single point, because every signal inside Vadal ends the same way — at one person, one conversation, one action.",
@@ -79,6 +109,8 @@ const STUDIES: Record<string, Study> = {
     codename: "Orbit",
     Icon: VadalIcon2,
     lockup: "/branding/logo-2.svg",
+    original: PERIWINKLE,
+    colorStory: PERIWINKLE_STORY,
     tagline: "The organization as a living loop — pulse in, action out.",
     symbolLede:
       "Here the organization is drawn as a circle — a continuous loop, because engagement isn't a quarterly event at Vadal, it's always on. Through the circle runs a line that is two things at once: a pulse wave (the heartbeat of the workforce) and a checkmark (the loop actually closing). And the ring doesn't quite seal at the lower left — an inlet stays open, because a listening system must never close itself off.",
@@ -119,36 +151,221 @@ const STUDIES: Record<string, Study> = {
       },
     ],
   },
+  "3": {
+    num: "03",
+    codename: "Weave",
+    Icon: VadalIcon3,
+    lockup: "/branding/logo-3.svg",
+    wordless: true,
+    original: { from: "#8DA2FF", to: "#5266EB", accent: "#00A165" },
+    colorStory: [
+      {
+        swatch: ["#8DA2FF", "#5266EB"],
+        name: "Trust blue",
+        hex: "#8DA2FF → #5266EB",
+        why: "The same periwinkle family the product wears — the thread of credibility that runs through every Vadal surface. Here it forms the figure itself: trust is the body of the brand.",
+      },
+      {
+        swatch: ["#C5F2C9", "#00A165"],
+        name: "Growth green",
+        hex: "#C5F2C9 → #00A165",
+        why: "Green is what the platform is for — people thriving. It wraps around the blue figure like support around a person, and it matches the product's semantic green for healthy scores.",
+      },
+      {
+        swatch: ["#8DA2FF", "#C5F2C9"],
+        name: "Translucent overlaps",
+        hex: "blend, not opaque",
+        why: "The strokes are deliberately see-through. Where voices cross, nothing is hidden — the overlaps deepen instead of covering. Honesty, drawn as a rendering choice.",
+      },
+    ],
+    tagline: "One figure, woven from many strands.",
+    symbolLede:
+      "Look once and it's a person — head up, arms crossed over the heart. Look again and the person isn't drawn with an outline at all: they're woven from translucent strands that cross and deepen wherever they meet. That's the whole thesis of Vadal in one figure — an organization is thousands of individual strands, and culture is what happens where they overlap.",
+    anatomy: [
+      {
+        part: "The figure",
+        reads: "One employee, standing at the centre of everything — the platform's unit of care is always a single person.",
+      },
+      {
+        part: "The strands",
+        reads: "Individual voices. Each keeps its own colour and direction even while forming something bigger.",
+      },
+      {
+        part: "The overlaps",
+        reads: "Where strands cross, the colour deepens — exactly how Vadal's AI works: one comment is noise, a thousand overlapping ones are a signal.",
+      },
+      {
+        part: "The embrace",
+        reads: "The green arcs wrap the blue figure like arms — support that comes from the org around you, not from a dashboard.",
+      },
+    ],
+    connections: [
+      {
+        feature: "Listening & surveys",
+        how: "Every strand is a voice. The mark literally cannot exist without many of them — same as the intelligence.",
+      },
+      {
+        feature: "AI-clustered themes",
+        how: "Deepening overlaps are clustering, drawn: separate comments crossing into one visible theme.",
+      },
+      {
+        feature: "Recognition & culture",
+        how: "The green embrace is recognition's job in the product — the org visibly holding its people.",
+      },
+      {
+        feature: "Workforce health",
+        how: "The figure stands because the strands hold together. Pull voices out and the person falls apart — attrition, in geometry.",
+      },
+    ],
+  },
+  "4": {
+    num: "04",
+    codename: "Compass",
+    Icon: VadalIcon4,
+    lockup: "/branding/logo-4.svg",
+    wordless: true,
+    original: { from: "#CED1FF", to: "#343883", accent: "#FB4B43" },
+    colorStory: [
+      {
+        swatch: ["#CED1FF", "#343883"],
+        name: "Indigo depth",
+        hex: "#CED1FF → #343883",
+        why: "The deepest arc carries the deepest colour — the data underneath every decision. It anchors the whole mark the way the analytics layer anchors the platform.",
+      },
+      {
+        swatch: ["#FB4B43"],
+        name: "Signal red",
+        hex: "#FB4B43",
+        why: "Vadal's one interruption colour, here as a full quadrant: when something needs attention, it isn't a footnote — it bends the whole shape around it.",
+      },
+      {
+        swatch: ["#FFF2B2", "#F5D119"],
+        name: "Daylight yellow",
+        hex: "#FFF2B2 → #F5D119",
+        why: "Optimism and recognition — the mornings-side of the mark. Paired with the parchment quadrant it keeps the compass human, not clinical.",
+      },
+    ],
+    tagline: "Four directions bending toward one spark.",
+    symbolLede:
+      "This mark is drawn by what it leaves out. Four curved quadrants — yellow, red, parchment, indigo — bend around an empty centre, and the emptiness has a shape: Vadal's four-point spark. Nothing paints the insight on; it appears where the parts meet. That's the honest description of what the AI does — intelligence emerging from the space between signals.",
+    anatomy: [
+      {
+        part: "The negative-space spark",
+        reads: "Insight isn't an overlay, it's what becomes visible when the surrounding pieces are arranged right. The AI moment, drawn as absence.",
+      },
+      {
+        part: "Four quadrants",
+        reads: "Listen, act, recognise, grow — the four motions of the platform, each with its own colour and weather.",
+      },
+      {
+        part: "The bend",
+        reads: "Straight grids are org charts. These arcs bend — structure flexing around people instead of people around structure.",
+      },
+      {
+        part: "The corner ember",
+        reads: "A small yellow arc escaping at the edge: the next signal already arriving. The compass never claims to be finished.",
+      },
+    ],
+    connections: [
+      {
+        feature: "AI Assistant — Ask HR",
+        how: "The spark at the centre is the product's AI glyph, found in negative space — the brand's cleverest handshake with the UI.",
+      },
+      {
+        feature: "Analytics & insights",
+        how: "Emergence is the analytics promise: no single survey shows the picture; the arrangement of all of them does.",
+      },
+      {
+        feature: "Communication & campaigns",
+        how: "Four directions radiating from one centre — one message, every audience, each in its own register.",
+      },
+      {
+        feature: "Attrition & risk",
+        how: "The red quadrant is risk given real estate: a quarter of the mark, never the whole story.",
+      },
+    ],
+  },
+  "5": {
+    num: "05",
+    codename: "Huddle",
+    Icon: VadalIcon5,
+    lockup: "/branding/logo-5.svg",
+    wordless: true,
+    original: { from: "#9AAAFF", to: "#4D67F3", accent: "#FF9C30" },
+    colorStory: [
+      {
+        swatch: ["#9AAAFF", "#4D67F3"],
+        name: "Trust blue",
+        hex: "#9AAAFF → #4D67F3",
+        why: "The leader register — the same blue family as the product's calm surfaces. One of the three people wears it; notably, not bigger than the others.",
+      },
+      {
+        swatch: ["#FEDEBA", "#FF9C30"],
+        name: "Energy orange",
+        hex: "#FEDEBA → #FF9C30",
+        why: "Warmth and momentum — the colour of recognition moments and small wins. It sits shoulder-to-shoulder with blue, not beneath it.",
+      },
+      {
+        swatch: ["#C5F2C9", "#00A165"],
+        name: "Growth green",
+        hex: "#C5F2C9 → #00A165",
+        why: "The smallest figure wears growth green — the newest person in the room, already in the huddle. No colour outranks another; that's the point.",
+      },
+    ],
+    tagline: "Three people, one huddle.",
+    symbolLede:
+      "The simplest of the five: three figures — a head, a body — leaning toward each other in three different colours. It's a team huddle seen from across the room. Nobody is larger, nobody is centred, and the small green figure is already inside the circle. If Vadal's promise is belonging you can measure, this is belonging you can draw.",
+    anatomy: [
+      {
+        part: "The figures",
+        reads: "People, reduced to the friendliest possible geometry — a dot and a soft triangle. Instantly human at any size.",
+      },
+      {
+        part: "Three colours",
+        reads: "Different roles, generations, functions — blue, orange, green, with no hierarchy of size or position.",
+      },
+      {
+        part: "The lean",
+        reads: "Each figure tilts toward the centre. Orientation is the message: attention pointed at each other, not at the org chart.",
+      },
+      {
+        part: "The gap",
+        reads: "The figures never touch. Belonging without uniformity — the space between people is respected, not erased.",
+      },
+    ],
+    connections: [
+      {
+        feature: "Recognition & culture",
+        how: "A huddle is what peer recognition builds — the 58/42 peer-to-manager split says most of Vadal's warmth flows sideways, like this mark.",
+      },
+      {
+        feature: "Manager Hub",
+        how: "The blue figure isn't above the others — exactly the manager posture the product coaches: in the huddle, not over it.",
+      },
+      {
+        feature: "Employee feed",
+        how: "Three colours, one cluster: the feed's job is making a 12,000-person company feel this small.",
+      },
+      {
+        feature: "Listening & surveys",
+        how: "The lean is participation. People answer when the brand looks like someone listening back.",
+      },
+    ],
+  },
 };
-
-const COLOR_STORY = [
-  {
-    swatch: ["#8DA2FF", "#5D63E1"],
-    name: "Periwinkle, light to deep",
-    hex: "#8DA2FF → #5D63E1",
-    why: "Vadal's buyer is a CHRO defending workforce decisions to a board — the brand has to read banking-calm, not wellness-app. Periwinkle carries that fintech-grade trust. The gradient runs light to deep deliberately: a signal arriving faint and becoming decision-grade.",
-  },
-  {
-    swatch: ["#FB4B43"],
-    name: "Signal red",
-    hex: "#FB4B43",
-    why: "One warm interruption, reserved for the human moment — the flight-risk alert, the recognition pop, the AI insight. It's never decoration; scarcity is what keeps it meaningful, in the logo exactly as in the product.",
-  },
-  {
-    swatch: ["#FFFFFF", "#0A0A0C"],
-    name: "White on near-black",
-    hex: "#FFFFFF on #0A0A0C",
-    why: "The wordmark is set in white on near-black — the mission-control register of the leader surface. Calm authority by default, with colour spent only where meaning lives.",
-  },
-];
 
 /* ── page ───────────────────────────────────────────────────────── */
 
 export function BrandStudy({ id }: { id: string }) {
   const study = STUDIES[id];
-  const other = id === "1" ? "2" : "1";
+  const ids = Object.keys(STUDIES);
+  const other = ids[(ids.indexOf(id) + 1) % ids.length];
+  const experiments = [
+    { name: "Original colours", ...study.original },
+    ...SHARED_EXPERIMENTS.filter((e) => e.from !== study.original.from),
+  ];
   const [pi, setPi] = useState(0);
-  const exp = EXPERIMENTS[pi];
+  const exp = experiments[pi];
   const { Icon } = study;
   const serif = { fontFamily: "var(--font-serif), serif" } as const;
   const grotesk = { fontFamily: "var(--font-grotesk), sans-serif" } as const;
@@ -179,8 +396,19 @@ export function BrandStudy({ id }: { id: string }) {
           <p className="text-[11px] font-bold uppercase tracking-[0.22em]" style={{ color: "#8DA2FF" }}>
             Brand case study · Identity {study.num}
           </p>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={study.lockup} alt={`vadal — identity ${study.num}`} className="mx-auto mt-10 h-[88px] w-auto sm:h-[110px]" />
+          <div className="mt-10 flex items-center justify-center gap-5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={study.lockup}
+              alt={`vadal — identity ${study.num}`}
+              className={study.wordless ? "h-[110px] w-auto sm:h-[130px]" : "h-[88px] w-auto sm:h-[110px]"}
+            />
+            {study.wordless && (
+              <span className="text-[64px] font-bold tracking-tight text-white sm:text-[76px]" style={{ letterSpacing: "-0.04em" }}>
+                vadal
+              </span>
+            )}
+          </div>
           <p className="mx-auto mt-10 max-w-xl text-[22px] leading-snug" style={{ ...serif, color: "rgba(244,243,240,0.85)" }}>
             <em>“{study.tagline}”</em>
           </p>
@@ -196,7 +424,13 @@ export function BrandStudy({ id }: { id: string }) {
               className="mt-7 grid aspect-square w-full max-w-[300px] place-items-center rounded-[28px]"
               style={{ background: "linear-gradient(165deg, #191731 0%, #0c0b14 60%)", border: "1px solid rgba(255,255,255,0.08)" }}
             >
-              <Icon {...ORIGINAL} id={`why-${id}`} className="h-36 w-auto max-w-[70%]" />
+              {study.wordless ? (
+                /* multi-colour originals — show the real vector untouched */
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={study.lockup} alt="" className="h-40 w-auto max-w-[72%]" />
+              ) : (
+                <Icon {...study.original} id={`why-${id}`} className="h-36 w-auto max-w-[70%]" />
+              )}
             </div>
           </div>
           <div>
@@ -243,7 +477,7 @@ export function BrandStudy({ id }: { id: string }) {
             Why these <em style={{ ...serif, color: "#FB4B43" }}>colours.</em>
           </h2>
           <div className="mt-8 space-y-4">
-            {COLOR_STORY.map((c) => (
+            {study.colorStory.map((c) => (
               <div key={c.name} className="grid items-start gap-5 rounded-2xl p-5 sm:grid-cols-[140px_1fr]" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div>
                   <div className="flex h-12 overflow-hidden rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.12)" }}>
@@ -281,7 +515,7 @@ export function BrandStudy({ id }: { id: string }) {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            {EXPERIMENTS.map((p, i) => (
+            {experiments.map((p, i) => (
               <button
                 key={p.name}
                 onClick={() => setPi(i)}
@@ -331,7 +565,7 @@ export function BrandStudy({ id }: { id: string }) {
             </div>
           </div>
           <p className="mt-4 text-[12px]" style={{ color: "rgba(244,243,240,0.4)" }}>
-            Current pick: {exp.name} · {exp.from} → {exp.to}, accent {exp.accent}. The shipped identity uses Periwinkle signal.
+            Current pick: {exp.name} · {exp.from} → {exp.to}, accent {exp.accent}. “Original colours” is the drawn direction.
           </p>
         </section>
 

@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { BrandStudy } from "./study";
 
+const IDS = ["1", "2", "3", "4", "5"];
+
 export function generateStaticParams() {
-  return [{ id: "1" }, { id: "2" }];
+  return IDS.map((id) => ({ id }));
 }
 
 export default async function BrandingPage({
@@ -11,6 +13,6 @@ export default async function BrandingPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  if (id !== "1" && id !== "2") notFound();
+  if (!IDS.includes(id)) notFound();
   return <BrandStudy id={id} />;
 }

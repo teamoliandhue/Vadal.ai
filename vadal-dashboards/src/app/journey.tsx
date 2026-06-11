@@ -129,8 +129,11 @@ const DIRECTIONS: Direction[] = [
 /* ── branding identities — sealed cards → /branding/[id] case studies ── */
 
 const IDENTITY_CARDS = [
-  { id: "1", num: "01", teaser: "The first symbol system — why it exists, how it connects to the product, and the colour logic behind it." },
-  { id: "2", num: "02", teaser: "The second symbol system — a different geometry for the same conviction. Open it to see the thinking." },
+  { id: "1", num: "01", teaser: "A flag planted, an eye open — why the symbol exists and the colour logic behind it." },
+  { id: "2", num: "02", teaser: "The organization as a living loop — a different geometry for the same conviction." },
+  { id: "3", num: "03", teaser: "One figure, woven from many strands — culture as what overlaps between people." },
+  { id: "4", num: "04", teaser: "Four directions bending toward one spark — insight drawn in negative space." },
+  { id: "5", num: "05", teaser: "Three people, one huddle — belonging you can draw at any size." },
 ];
 
 type Style = {
@@ -228,48 +231,45 @@ function BrandingSlide() {
           </h2>
         </div>
         <p className="hidden max-w-[250px] text-[13px] leading-relaxed md:block" style={{ color: "var(--st-muted)" }}>
-          Two symbol systems for Vadal. The marks stay sealed here — open a
+          Five symbol systems for Vadal. The marks stay sealed here — open a
           case study to see the symbol, the reasoning and the colours.
         </p>
       </div>
 
-      <div className="mt-10 grid gap-5 lg:grid-cols-2">
+      <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {IDENTITY_CARDS.map((c) => (
           <Link
             key={c.id}
             href={`/branding/${c.id}`}
-            className="st-card group relative flex min-h-[320px] flex-col justify-between overflow-hidden p-8"
+            className="st-card group relative flex min-h-[218px] flex-col justify-between overflow-hidden p-6"
           >
             <span
-              className="st-bignum pointer-events-none absolute -right-4 -top-10 text-[180px] leading-none"
+              className="st-bignum pointer-events-none absolute -right-3 -top-8 text-[130px] leading-none"
               style={{ color: "var(--st-line)", opacity: 0.55 }}
             >
               {c.num}
             </span>
             <div className="relative">
               <Eyebrow accent>Brand case study</Eyebrow>
-              <h3 className="st-display mt-3 text-[clamp(1.6rem,3vw,2.3rem)]">
+              <h3 className="st-display mt-2 text-[21px]">
                 Brand Identity {c.num}
               </h3>
-              <p className="st-serif-it mt-4 max-w-sm text-[17px] leading-snug" style={{ color: "var(--st-muted)" }}>
+              <p className="st-serif-it mt-2.5 max-w-sm text-[14.5px] leading-snug" style={{ color: "var(--st-muted)" }}>
                 {c.teaser}
               </p>
             </div>
-            <span className="relative mt-8 inline-flex items-center gap-2 text-[13.5px] font-semibold" style={{ color: "var(--st-ink)" }}>
+            <span className="relative mt-5 inline-flex items-center gap-2 text-[12.5px] font-semibold" style={{ color: "var(--st-ink)" }}>
               Open the case study
               <span
-                className="grid h-9 w-9 place-items-center rounded-full transition-transform duration-300 group-hover:translate-x-1"
+                className="grid h-8 w-8 place-items-center rounded-full transition-transform duration-300 group-hover:translate-x-1"
                 style={{ background: "var(--st-accent)", color: "#fff" }}
               >
-                <ArrowRight size={14} />
+                <ArrowRight size={13} />
               </span>
             </span>
           </Link>
         ))}
       </div>
-      <p className="mt-5 text-[12.5px]" style={{ color: "var(--st-faint)" }}>
-        A third identity is in the works — it will appear here as another card.
-      </p>
     </Slide>
   );
 }
