@@ -152,7 +152,7 @@ export default function RecommendationPage() {
         <Link href="/" className="flex items-center gap-2 text-[13.5px] font-semibold transition-opacity hover:opacity-70">
           <ArrowLeft size={15} /> Back to the deck
         </Link>
-        <span className="reco-eyebrow" style={{ color: "var(--rc-faint)" }}>
+        <span className="reco-eyebrow hidden sm:block" style={{ color: "var(--rc-faint)" }}>
           Oli&amp;Hue × Vadal — June 2026
         </span>
       </header>

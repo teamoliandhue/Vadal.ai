@@ -164,13 +164,15 @@ const SLIDE_LABELS = [
 ];
 const TOTAL = SLIDE_LABELS.length;
 
+/* full-screen snap slides on desktop; on mobile each slide grows with its
+   content and the page scrolls naturally (snap traps tall content) */
 function Slide({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <section
-      className={`relative h-screen w-full flex-none snap-start overflow-hidden ${className}`}
+      className={`relative min-h-screen w-full flex-none overflow-visible lg:h-screen lg:snap-start lg:overflow-hidden ${className}`}
       style={{ background: "var(--st-canvas)" }}
     >
-      <div className="mx-auto flex h-full w-full max-w-[1280px] flex-col justify-center px-8 pb-24 pt-20 sm:px-14">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col justify-center px-5 pb-28 pt-20 sm:px-14 lg:h-full lg:min-h-0 lg:pb-24">
         {children}
       </div>
     </section>
@@ -395,7 +397,7 @@ export default function Journey() {
   return (
     <div className="studio-root relative h-screen overflow-hidden">
       {/* ── chrome ─────────────────────────────────────────────── */}
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
+      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 bg-[#f1eee7]/85 backdrop-blur-md lg:bg-transparent lg:backdrop-blur-none">
         <div className="mx-auto flex h-[64px] w-full max-w-[1280px] items-center justify-between px-8 sm:px-14">
           <button onClick={() => go(0)} className="pointer-events-auto flex items-center gap-2.5">
             <VadalMark className="h-6 w-6" />
@@ -403,20 +405,20 @@ export default function Journey() {
               vadal<span style={{ color: "var(--st-accent)" }}>.ai</span>
             </span>
           </button>
-          <span className="st-eyebrow">Design foundation — June 2026</span>
+          <span className="st-eyebrow hidden sm:block">Design foundation — June 2026</span>
         </div>
       </header>
 
       <footer className="pointer-events-none fixed inset-x-0 bottom-0 z-50">
         <div className="mx-auto flex h-[76px] w-full max-w-[1280px] items-center justify-between px-8 sm:px-14">
-          <div className="st-bignum flex items-baseline gap-1 text-[15px]" style={{ color: "var(--st-ink)" }}>
+          <div className="st-bignum hidden items-baseline gap-1 text-[15px] lg:flex" style={{ color: "var(--st-ink)" }}>
             <span>{String(slide + 1).padStart(2, "0")}</span>
             <span style={{ color: "var(--st-faint)" }}>/ {String(TOTAL).padStart(2, "0")}</span>
             <span className="ml-4 hidden text-[12px] font-medium sm:inline" style={{ color: "var(--st-faint)" }}>
               {SLIDE_LABELS[slide]}
             </span>
           </div>
-          <div className="pointer-events-auto flex items-center gap-2">
+          <div className="pointer-events-auto hidden items-center gap-2 lg:flex">
             <button
               onClick={() => go(Math.max(0, slide - 1))}
               aria-label="Previous slide"
@@ -554,7 +556,7 @@ export default function Journey() {
       )}
 
       {/* ── slides ─────────────────────────────────────────────── */}
-      <div ref={deckRef} className="h-screen snap-y snap-mandatory overflow-y-auto">
+      <div ref={deckRef} className="h-screen overflow-y-auto lg:snap-y lg:snap-mandatory">
         {/* 01 · COVER — minimal */}
         <Slide>
           <div className="flex flex-col items-center text-center">
