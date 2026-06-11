@@ -83,7 +83,6 @@ const DIRECTIONS: Direction[] = [
     palette: ["#171B2C", "#5266EB", "#8DA2FF", "#F6F6F4", "#1E9E6A"],
     maps: "Fintech calm",
     mapsSlug: "fintech",
-    recommended: true,
   },
   {
     num: "02",
@@ -103,6 +102,7 @@ const DIRECTIONS: Direction[] = [
     palette: ["#2E2436", "#F2705B", "#F6A14B", "#FBF7EF", "#33B28A"],
     maps: "Lumen",
     mapsSlug: "lumen",
+    recommended: true,
   },
   {
     num: "03",
@@ -122,7 +122,6 @@ const DIRECTIONS: Direction[] = [
     palette: ["#0D0D0F", "#F2F2F4", "#5D63E1", "#EFD24A", "#E8584C"],
     maps: "GenAlpha",
     mapsSlug: "genalpha",
-    recommended: true,
   },
 ];
 
@@ -275,37 +274,37 @@ function BrandingSlide() {
 }
 
 
-/* ── our ideal recommendation — positioning + identity + dashboard ── */
+/* ── our ideal recommendation — links to /recommendation ──────────── */
 
-/* tiny CSS rendition of the Fintech-calm dashboard */
-function FintechMini() {
+/* miniature Lumen — editorial light, charcoal rail, warm gradient */
+function LumenMini() {
   return (
-    <div className="w-full overflow-hidden rounded-xl" style={{ background: "#f6f6f4", border: "1px solid rgba(255,255,255,0.14)" }}>
-      <div className="flex items-center gap-1.5 px-3 py-2" style={{ background: "#fff", borderBottom: "1px solid #ececea" }}>
-        <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#5266EB" }} />
-        <span className="text-[7.5px] font-bold" style={{ color: "#1a1d27" }}>vadal · people workspace</span>
-        <span className="ml-auto h-2.5 w-2.5 rounded-full" style={{ background: "#e8e8f5" }} />
+    <div className="flex overflow-hidden rounded-xl" style={{ background: "#fff", border: "1px solid rgba(255,255,255,0.14)" }}>
+      <div className="w-[38px] flex-none py-2.5" style={{ background: "#241f1b" }}>
+        <div className="mx-auto h-6 w-6 rounded-md" style={{ background: "linear-gradient(135deg,#f2705b,#f6a14b)" }} />
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="mx-auto mt-2 h-1 w-4 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }} />
+        ))}
       </div>
-      <div className="grid grid-cols-[1.4fr_1fr] gap-2 p-2.5">
-        <div className="rounded-lg bg-white p-2.5" style={{ border: "1px solid #ececea" }}>
-          <p className="text-[6.5px] font-semibold" style={{ color: "#9a9fab" }}>Workforce health</p>
-          <p className="mt-0.5 text-[15px] font-bold tabular-nums" style={{ color: "#1a1d27" }}>
-            82<span className="text-[8px]" style={{ color: "#9a9fab" }}>/100</span>
+      <div className="flex-1 p-3">
+        <div className="rounded-lg p-2.5" style={{ background: "linear-gradient(120deg,#fdeae6,#fdf3e3)", border: "1px solid #eadfd2" }}>
+          <p className="text-[7px] font-semibold" style={{ color: "#6d645c" }}>Workforce health</p>
+          <p className="text-[16px] font-bold tabular-nums" style={{ color: "#241f1b" }}>
+            82<span className="text-[8px]" style={{ color: "#a89e94" }}>/100</span>
           </p>
-          <svg viewBox="0 0 120 30" className="mt-1 block w-full" aria-hidden>
-            <path d="M0 24 C 15 22, 22 18, 34 19 S 56 14, 68 13 S 92 8, 104 6 L 120 4" fill="none" stroke="#5266EB" strokeWidth="2" strokeLinecap="round" />
-            <path d="M0 18 C 20 17, 40 16, 60 15 S 100 14, 120 14" fill="none" stroke="#d8d8d4" strokeWidth="1.4" strokeDasharray="3 3" />
+          <svg viewBox="0 0 160 26" className="mt-1 block w-full" aria-hidden>
+            <path d="M0 22 C 20 20, 36 16, 56 17 S 96 11, 120 8 L 160 5" fill="none" stroke="#f2705b" strokeWidth="2" strokeLinecap="round" />
           </svg>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="mt-2 grid grid-cols-2 gap-2">
           {[
-            { l: "Participation", v: "74%", c: "#d94f46" },
-            { l: "Recognitions", v: "2,840", c: "#1e9e6a" },
+            { l: "Mood today", v: "Warm", c: "#f6a14b" },
+            { l: "Recognitions", v: "2,840", c: "#33b28a" },
           ].map((s) => (
-            <div key={s.l} className="flex-1 rounded-lg bg-white p-2" style={{ border: "1px solid #ececea" }}>
-              <p className="text-[6.5px] font-semibold" style={{ color: "#9a9fab" }}>{s.l}</p>
-              <p className="mt-0.5 text-[10px] font-bold tabular-nums" style={{ color: "#1a1d27" }}>
-                {s.v} <span className="text-[6.5px]" style={{ color: s.c }}>●</span>
+            <div key={s.l} className="rounded-lg px-2 py-1.5" style={{ border: "1px solid #eadfd2" }}>
+              <p className="text-[6.5px] font-semibold" style={{ color: "#a89e94" }}>{s.l}</p>
+              <p className="text-[9.5px] font-bold" style={{ color: "#241f1b" }}>
+                {s.v} <span style={{ color: s.c }}>●</span>
               </p>
             </div>
           ))}
@@ -315,27 +314,7 @@ function FintechMini() {
   );
 }
 
-const RECO_PROOF = [
-  {
-    t: "One periwinkle thread",
-    d: "The mark's gradient (#8DA2FF → #5D63E1), the positioning palette and the dashboard's #5266EB are the same colour family. Brand and product already speak one language — nothing needs retrofitting.",
-  },
-  {
-    t: "Matched to who signs",
-    d: "A CHRO defends crore-level decisions to a board. Quiet authority is the register that wins that room, and Fintech calm is that register rendered as product.",
-  },
-  {
-    t: "Red means something",
-    d: "Signal red #FB4B43 appears exactly twice in the system — the spark in the mark, and risk alerts in the product. Scarcity is what keeps it credible.",
-  },
-  {
-    t: "Nothing here is a mock",
-    d: "The positioning is written, the identity is drawn, the dashboard is a live build. Every piece of this recommendation can be clicked into right now.",
-  },
-];
-
 function RecommendationSlide() {
-  const [open, setOpen] = useState(false);
   return (
     <Slide>
       <div className="flex flex-col items-center text-center">
@@ -344,132 +323,52 @@ function RecommendationSlide() {
           When everything <span style={{ color: "var(--st-accent)" }}>clicks.</span>
         </h2>
         <p className="st-serif-it mt-3 max-w-lg text-[17px]" style={{ color: "var(--st-muted)" }}>
-          One positioning, one mark, one product surface — chosen because they
-          were already speaking the same language.
+          One positioning, one mark, one design style — chosen because they
+          were already telling the same story.
         </p>
 
-        {/* the clickable card */}
-        <button
-          onClick={() => setOpen(true)}
+        {/* the clickable card → /recommendation */}
+        <Link
+          href="/recommendation"
           className="group relative mt-8 w-full max-w-[880px] overflow-hidden rounded-[28px] text-left transition-transform duration-300 hover:scale-[1.01]"
           style={{
             background:
-              "radial-gradient(90% 80% at 85% -20%, rgba(93,99,225,0.45) 0%, transparent 60%), radial-gradient(60% 50% at 0% 110%, rgba(251,75,67,0.25) 0%, transparent 55%), linear-gradient(165deg, #16142a 0%, #0b0a12 60%)",
-            boxShadow: "0 30px 60px -30px rgba(23,27,44,0.55)",
+              "radial-gradient(90% 80% at 85% -20%, rgba(242,112,91,0.4) 0%, transparent 60%), radial-gradient(60% 50% at 0% 110%, rgba(246,161,75,0.3) 0%, transparent 55%), linear-gradient(165deg, #2c2521 0%, #16120f 60%)",
+            boxShadow: "0 30px 60px -30px rgba(44,37,33,0.6)",
           }}
         >
           <div className="grid items-center gap-6 p-8 sm:grid-cols-[1.15fr_1fr] sm:p-10">
             <div>
-              <p className="text-[10.5px] font-bold uppercase tracking-[0.22em]" style={{ color: "#8DA2FF" }}>
-                Positioning · Identity · Product
+              <p className="text-[10.5px] font-bold uppercase tracking-[0.22em]" style={{ color: "#f6a14b" }}>
+                Positioning · Identity · Design style
               </p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/branding/logo-1.svg" alt="vadal — identity 01" className="mt-5 h-[52px] w-auto" />
+              <div className="mt-5 flex items-center gap-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/branding/logo-5.svg" alt="The Huddle mark" className="h-[58px] w-auto" />
+                <span className="text-[34px] font-bold tracking-tight text-white" style={{ letterSpacing: "-0.04em" }}>
+                  vadal
+                </span>
+              </div>
               <p className="mt-5 text-[20px] leading-snug text-white" style={{ fontFamily: "var(--font-serif), serif" }}>
-                The quiet authority, wearing the <em style={{ color: "#8DA2FF" }}>Signal</em> mark,
-                <br className="hidden sm:block" /> living in <em style={{ color: "#8DA2FF" }}>Fintech calm.</em>
+                The human pulse, wearing the <em style={{ color: "#f6a14b" }}>Huddle</em> mark,
+                <br className="hidden sm:block" /> designed in <em style={{ color: "#f6a14b" }}>Lumen.</em>
               </p>
               <span className="mt-6 inline-flex items-center gap-2 text-[13px] font-semibold text-white">
-                Open the final result
-                <span className="grid h-9 w-9 place-items-center rounded-full transition-transform duration-300 group-hover:translate-x-1" style={{ background: "#5D63E1" }}>
+                Read the full recommendation
+                <span className="grid h-9 w-9 place-items-center rounded-full transition-transform duration-300 group-hover:translate-x-1" style={{ background: "#f2705b" }}>
                   <ArrowRight size={14} />
                 </span>
               </span>
             </div>
             <div className="hidden sm:block">
-              <FintechMini />
-              <p className="mt-2 text-center text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-                Fintech calm — live build
+              <LumenMini />
+              <p className="mt-2 text-center text-[10px]" style={{ color: "rgba(255,255,255,0.45)" }}>
+                Lumen — live build
               </p>
             </div>
           </div>
-        </button>
+        </Link>
       </div>
-
-      {/* the final result overlay */}
-      {open && (
-        <div
-          className="fixed inset-0 z-[60] grid place-items-center p-6"
-          style={{ background: "rgba(10,10,14,0.6)", backdropFilter: "blur(10px)" }}
-          onClick={() => setOpen(false)}
-        >
-          <div
-            className="relative max-h-[88vh] w-full max-w-[1020px] overflow-y-auto rounded-[28px] p-8 sm:p-10"
-            style={{ background: "linear-gradient(170deg, #141222 0%, #0b0a12 55%)", color: "#f4f3f0" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setOpen(false)}
-              aria-label="Close"
-              className="absolute right-6 top-6 grid h-10 w-10 place-items-center rounded-full transition hover:scale-105"
-              style={{ border: "1px solid rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.7)" }}
-            >
-              <X size={16} />
-            </button>
-
-            <p className="text-[10.5px] font-bold uppercase tracking-[0.22em]" style={{ color: "#8DA2FF" }}>
-              The final result
-            </p>
-            <h3 className="st-display mt-3 max-w-2xl text-[clamp(1.7rem,3.4vw,2.6rem)] !text-white">
-              People intelligence you can take to the board.
-            </h3>
-
-            {/* the three pieces */}
-            <div className="mt-8 grid gap-4 lg:grid-cols-3">
-              <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "#8DA2FF" }}>The positioning</p>
-                <p className="st-display mt-2 text-[19px] !text-white">The quiet authority</p>
-                <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: "rgba(244,243,240,0.65)" }}>
-                  For CHROs making crore-level workforce decisions — the calm
-                  precision of a private bank, not the noise of an HR tool.
-                </p>
-              </div>
-              <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "#8DA2FF" }}>The identity</p>
-                <div className="mt-2 flex items-center gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/branding/icon-1.svg" alt="" className="h-9 w-auto" />
-                  <p className="st-display text-[19px] !text-white">“Signal”</p>
-                </div>
-                <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: "rgba(244,243,240,0.65)" }}>
-                  A flag planted, an eye open, the spark held for the human
-                  moment — drawn in the same periwinkle the product wears.
-                </p>
-              </div>
-              <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "#8DA2FF" }}>The product</p>
-                <p className="st-display mt-2 text-[19px] !text-white">Fintech calm</p>
-                <div className="mt-3">
-                  <FintechMini />
-                </div>
-              </div>
-            </div>
-
-            {/* why it locks together */}
-            <div className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2">
-              {RECO_PROOF.map((p) => (
-                <div key={p.t} className="border-t pt-3.5" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
-                  <p className="text-[13.5px] font-semibold text-white">{p.t}</p>
-                  <p className="mt-1 text-[12.5px] leading-relaxed" style={{ color: "rgba(244,243,240,0.6)" }}>{p.d}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* CTAs */}
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link href="/fintech" className="flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-bold" style={{ background: "#5D63E1", color: "#fff" }}>
-                Open the live dashboard <ArrowUpRight size={14} />
-              </Link>
-              <Link href="/branding/1" className="flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-semibold" style={{ border: "1px solid rgba(255,255,255,0.2)", color: "#fff" }}>
-                The identity case study <ArrowUpRight size={14} />
-              </Link>
-              <Link href="/casestudy/fintech" className="flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-semibold" style={{ border: "1px solid rgba(255,255,255,0.2)", color: "#fff" }}>
-                The design case study <ArrowUpRight size={14} />
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
     </Slide>
   );
 }
@@ -794,7 +693,7 @@ export default function Journey() {
 
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {[
-              { n: "01", t: "Pick the lead territory", d: "Quiet authority is our vote — the buyer signs in this register." },
+              { n: "01", t: "Pick the lead territory", d: "The human pulse is our vote — warmth is what makes people open up." },
               { n: "02", t: "Develop one brand sheet", d: "Logo, imagery, voice, do/don't from the chosen mark." },
               { n: "03", t: "Pressure-test on the build", d: "Lock the palette against the live dashboards." },
             ].map((s) => (
@@ -807,8 +706,8 @@ export default function Journey() {
           </div>
 
           <div className="mt-12 flex flex-wrap items-center gap-3">
-            <Link href="/casestudy/fintech" className="st-pill st-pill-ink">
-              Read the case study <ArrowUpRight size={17} />
+            <Link href="/recommendation" className="st-pill st-pill-ink">
+              Read the full recommendation <ArrowUpRight size={17} />
             </Link>
             <button onClick={() => go(0)} className="st-pill st-pill-ghost">
               Restart the deck

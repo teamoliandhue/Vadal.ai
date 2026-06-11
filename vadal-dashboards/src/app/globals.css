@@ -1770,3 +1770,119 @@ html:not(.dark)[data-glbg-light="dawn"] .glass-mesh-blobs {
   border-right: 5.5px solid transparent;
   border-bottom: 7px solid var(--tk-ink);
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   RECOMMENDATION page — scoped to .reco-root
+   The human pulse + Huddle + Lumen, presented warm and editorial:
+   cream canvas, coral/amber glows, serif display, gentle motion.
+   ══════════════════════════════════════════════════════════════════ */
+.reco-root {
+  --rc-canvas: #faf6ee;
+  --rc-card: #ffffff;
+  --rc-ink: #241f1b;
+  --rc-muted: #6d645c;
+  --rc-faint: #a89e94;
+  --rc-line: #eadfd2;
+  --rc-coral: #f2705b;
+  --rc-amber: #f6a14b;
+  --rc-green: #33b28a;
+  --rc-blue: #4d67f3;
+  --rc-coral-soft: #fdeae6;
+  color: var(--rc-ink);
+  background:
+    radial-gradient(60% 38% at 85% -5%, rgba(246, 161, 75, 0.16) 0%, transparent 60%),
+    radial-gradient(55% 35% at 8% 12%, rgba(242, 112, 91, 0.13) 0%, transparent 55%),
+    var(--rc-canvas);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.reco-display {
+  font-family: var(--font-grotesk), sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+.reco-serif {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+}
+.reco-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.reco-card {
+  background: var(--rc-card);
+  border: 1px solid var(--rc-line);
+  border-radius: 24px;
+  box-shadow: 0 2px 6px rgba(83, 60, 36, 0.04), 0 22px 48px -30px rgba(83, 60, 36, 0.18);
+}
+
+/* dark proof band */
+.reco-band {
+  background:
+    radial-gradient(70% 60% at 90% 0%, rgba(242, 112, 91, 0.22) 0%, transparent 55%),
+    radial-gradient(50% 50% at 5% 100%, rgba(246, 161, 75, 0.16) 0%, transparent 55%),
+    #241f1b;
+  color: #f7f1e8;
+}
+
+/* pill links */
+.reco-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 26px;
+  border-radius: 99px;
+  font-size: 14.5px;
+  font-weight: 650;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.reco-pill:hover { transform: translateY(-2px); }
+.reco-pill-coral {
+  background: var(--rc-coral);
+  color: #fff;
+  box-shadow: 0 14px 30px -12px rgba(242, 112, 91, 0.55);
+}
+.reco-pill-ghost { border: 1.5px solid var(--rc-line); color: var(--rc-ink); background: var(--rc-card); }
+.reco-pill-dark { background: var(--rc-ink); color: #f7f1e8; }
+
+/* entrance + float + heartbeat draw */
+@keyframes reco-rise {
+  from { opacity: 0; transform: translateY(26px); }
+  to { opacity: 1; transform: none; }
+}
+.reco-rise { animation: reco-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.reco-rise-1 { animation-delay: 0.08s; }
+.reco-rise-2 { animation-delay: 0.18s; }
+.reco-rise-3 { animation-delay: 0.3s; }
+
+@keyframes reco-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(-1.2deg); }
+}
+.reco-float { animation: reco-float 7s ease-in-out infinite; }
+
+@keyframes reco-draw {
+  from { stroke-dashoffset: 1200; }
+  to { stroke-dashoffset: 0; }
+}
+.reco-draw {
+  stroke-dasharray: 1200;
+  animation: reco-draw 2.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
+}
+
+@keyframes reco-beat {
+  0%, 100% { transform: scale(1); }
+  12% { transform: scale(1.06); }
+  24% { transform: scale(1); }
+}
+.reco-beat { animation: reco-beat 2.2s ease-in-out infinite; transform-origin: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reco-rise, .reco-float, .reco-draw, .reco-beat { animation: none; }
+}
