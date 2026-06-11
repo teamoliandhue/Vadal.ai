@@ -53,8 +53,10 @@ type Direction = {
   name: string;
   promise: string;
   img: string;
-  positioning: string;
-  why: string;
+  plain: string; // the whole idea in everyday words
+  picture: string; // instant-decode comparison
+  whyBullets: string[]; // short reasons to bet on it
+  risk: string; // the honest trade-off
   taglines: string[];
   palette: string[];
   maps: string;
@@ -68,10 +70,15 @@ const DIRECTIONS: Direction[] = [
     name: "The quiet authority",
     promise: "People intelligence you can take to the board",
     img: "/deck/territory-01.jpg",
-    positioning:
-      "For CHROs making crore-level workforce decisions, Vadal turns employee signals into board-grade decisions — the calm precision of a private bank, not the noise of an HR tool.",
-    why:
-      "Vadal's contract is signed by a CHRO who has to defend workforce decisions to a board. Authority, calm and decision-grade data are what win that room — and none of the noisy HR competitors occupy it. This territory matches who actually pays.",
+    plain:
+      "Make Vadal feel like a serious, financial-grade tool — so calm and precise that a CHRO can put it on the boardroom screen without a second thought.",
+    picture: "Feels like Mercury or a private bank. Not a fun HR app with confetti.",
+    whyBullets: [
+      "The person who pays — the CHRO — has to defend people decisions to a board. This brand makes them look credible in that room.",
+      "Every competitor sounds friendly and playful. Nobody sounds authoritative. That seat is empty.",
+      "Enterprise deals are signed on trust, and calm is what trust looks like.",
+    ],
+    risk: "Played too cold it can feel distant — the employee-facing side would need its warmth from somewhere else.",
     taglines: ["Know your people. Early.", "People decisions, decision-grade."],
     palette: ["#171B2C", "#5266EB", "#8DA2FF", "#F6F6F4", "#1E9E6A"],
     maps: "Fintech calm",
@@ -83,10 +90,15 @@ const DIRECTIONS: Direction[] = [
     name: "The human pulse",
     promise: "Keeping companies human at scale",
     img: "/deck/territory-02.jpg",
-    positioning:
-      "For organizations that believe engagement is human before it is metric, Vadal listens, notices, and nudges care before people burn out or walk out.",
-    why:
-      "Engagement is an emotional problem before it is a data problem, and warmth differentiates against dashboard-first tools. The risk: the wellness aesthetic is crowded (Culture Amp, Lattice) — this territory only wins if the AI-prediction story stays in front.",
+    plain:
+      "Make Vadal feel warm and human — a brand that cares about people first, and proves it with AI that notices when someone is struggling before they burn out or quit.",
+    picture: "Headspace or Airbnb warmth — applied to the workplace.",
+    whyBullets: [
+      "Engagement is about feelings before it is about numbers. A warm brand is what makes employees actually open up.",
+      "It gives the AI a heart: “we notice early, so you can care early.”",
+      "Warmth is memorable in a category full of cold dashboards.",
+    ],
+    risk: "The warm-wellness look is crowded (Culture Amp, Lattice). This only stands out if the AI-prediction story stays front and centre.",
     taglines: ["The heartbeat of your workplace.", "Listen at scale. Act in time."],
     palette: ["#2E2436", "#F2705B", "#F6A14B", "#FBF7EF", "#33B28A"],
     maps: "Lumen",
@@ -97,10 +109,15 @@ const DIRECTIONS: Direction[] = [
     name: "The daily ritual",
     promise: "The people app teams actually open",
     img: "/deck/territory-03.jpg",
-    positioning:
-      "For workforces where Gen Z is the majority, Vadal makes engagement a daily habit — streaks, missions, recognition — while leaders get the intelligence underneath.",
-    why:
-      "Engagement data is only as good as participation, and participation is a habit problem. Streaks and missions are how consumer apps win daily opens — bringing that to the employee surface keeps the data alive. The risk: boldness can undercut buyer trust, so it can't be the only register.",
+    plain:
+      "Make Vadal feel like a consumer app people open every day — streaks, missions, recognition, small wins — so engagement becomes a habit instead of an annual survey.",
+    picture: "Duolingo energy, inside a work tool.",
+    whyBullets: [
+      "Engagement data is only as good as participation — and participation is a habit problem, not a survey problem.",
+      "A majority-Gen-Z workforce expects app-grade fun. Meet them where they already are.",
+      "Daily opens keep the data alive, which keeps the AI sharp.",
+    ],
+    risk: "Too playful can scare the enterprise buyer. This works as the employee face of the brand — not the boardroom face.",
     taglines: ["Engagement, daily.", "Work, but make it a streak."],
     palette: ["#0D0D0F", "#F2F2F4", "#5D63E1", "#EFD24A", "#E8584C"],
     maps: "GenAlpha",
@@ -579,31 +596,58 @@ export default function Journey() {
                 </button>
               </div>
 
-              <p className="mt-5 text-[13.5px] leading-relaxed" style={{ color: "var(--st-muted)" }}>
-                {openDir.positioning}
+              {/* in plain words */}
+              <p className="st-eyebrow mt-6" style={{ color: "var(--st-faint)" }}>In plain words</p>
+              <p className="mt-2 text-[14.5px] leading-relaxed" style={{ color: "var(--st-ink)" }}>
+                {openDir.plain}
               </p>
 
+              {/* picture it */}
               <div className="mt-4 rounded-2xl p-4" style={{ background: "var(--st-accent-soft)" }}>
-                <p className="st-eyebrow" style={{ color: "var(--st-accent)" }}>Why this positioning</p>
-                <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: "var(--st-ink)" }}>{openDir.why}</p>
+                <p className="st-eyebrow" style={{ color: "var(--st-accent)" }}>Picture it</p>
+                <p className="st-serif-it mt-1.5 text-[16px] leading-snug" style={{ color: "var(--st-ink)" }}>
+                  {openDir.picture}
+                </p>
               </div>
 
-              <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2">
+              {/* why we'd bet on it */}
+              <p className="st-eyebrow mt-5" style={{ color: "var(--st-faint)" }}>Why we&apos;d bet on it</p>
+              <ul className="mt-2 space-y-2">
+                {openDir.whyBullets.map((b) => (
+                  <li key={b} className="flex gap-2.5 text-[13.5px] leading-relaxed" style={{ color: "var(--st-muted)" }}>
+                    <span className="mt-[7px] h-1.5 w-1.5 flex-none rounded-full" style={{ background: "var(--st-accent)" }} />
+                    {b}
+                  </li>
+                ))}
+              </ul>
+
+              {/* the honest risk */}
+              <p className="mt-4 border-l-2 pl-3 text-[12.5px] leading-relaxed" style={{ borderColor: "var(--st-line)", color: "var(--st-faint)" }}>
+                <span className="font-semibold" style={{ color: "var(--st-muted)" }}>The honest risk: </span>
+                {openDir.risk}
+              </p>
+
+              {/* how it sounds */}
+              <p className="st-eyebrow mt-5" style={{ color: "var(--st-faint)" }}>How it sounds</p>
+              <div className="mt-1.5 flex flex-wrap gap-x-6 gap-y-1.5">
                 {openDir.taglines.map((t) => (
-                  <p key={t} className="text-[13px] font-medium" style={{ color: "var(--st-ink)" }}>— {t}</p>
+                  <p key={t} className="text-[13px] font-medium" style={{ color: "var(--st-ink)" }}>— “{t}”</p>
                 ))}
               </div>
 
-              <div className="mt-5 flex gap-1.5">
+              {/* how it looks */}
+              <p className="st-eyebrow mt-5" style={{ color: "var(--st-faint)" }}>How it looks</p>
+              <div className="mt-2 flex gap-1.5">
                 {openDir.palette.map((c) => (
                   <div key={c} className="h-8 flex-1 rounded-lg" style={{ background: c, border: "1px solid var(--st-line)" }} />
                 ))}
               </div>
-              <p className="mt-3 text-[12px]" style={{ color: "var(--st-faint)" }}>
-                Lives as the{" "}
+              <p className="mt-2.5 text-[12px]" style={{ color: "var(--st-faint)" }}>
+                See it as a working product — the{" "}
                 <Link href={`/${openDir.mapsSlug}`} className="font-semibold underline-offset-2 hover:underline" style={{ color: "var(--st-muted)" }}>
                   {openDir.maps} dashboard
-                </Link>
+                </Link>{" "}
+                is this territory, built.
               </p>
             </div>
           </div>
@@ -673,6 +717,7 @@ export default function Journey() {
                     <span className="st-bignum text-[13px]" style={{ color: "var(--st-faint)" }}>{d.num}</span>
                   </div>
                   <p className="st-serif-it mt-1 text-[15px]" style={{ color: "var(--st-accent)" }}>{d.promise}</p>
+                  <p className="mt-2 text-[12.5px] leading-snug" style={{ color: "var(--st-muted)" }}>{d.picture}</p>
                   <span className="mt-4 inline-flex items-center gap-1.5 text-[12.5px] font-semibold" style={{ color: "var(--st-muted)" }}>
                     Why this positioning{" "}
                     <ArrowRight size={13} className="transition-transform duration-300 group-hover:translate-x-0.5" />
