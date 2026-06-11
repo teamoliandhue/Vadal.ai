@@ -197,11 +197,11 @@ const STUDIES: Record<string, Study> = {
     ],
     tagline: "One figure, woven from many strands.",
     symbolLede:
-      "Look once and it's a person — head up, arms crossed over the heart. Look again and the person isn't drawn with an outline at all: they're woven from translucent strands that cross and deepen wherever they meet. That's the whole thesis of Vadal in one figure — an organization is thousands of individual strands, and culture is what happens where they overlap.",
+      "Look once and it's a person — arms crossed over the heart, and where the head would be, Vadal's four-point AI spark. Look again and the person isn't drawn with an outline at all: they're woven from translucent strands that cross and deepen wherever they meet. That's the whole thesis of Vadal in one figure — an organization is thousands of individual strands, culture is what happens where they overlap, and intelligence sits right on top.",
     anatomy: [
       {
         part: "The figure",
-        reads: "One employee, standing at the centre of everything — the platform's unit of care is always a single person.",
+        reads: "One employee, standing at the centre of everything — crowned by the same four-point spark the product uses for its AI moments.",
       },
       {
         part: "The strands",
