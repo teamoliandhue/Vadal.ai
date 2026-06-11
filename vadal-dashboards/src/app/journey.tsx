@@ -13,9 +13,9 @@ import {
 /* ════════════════════════════════════════════════════════════════════
    VADAL.AI — the design-foundation deck
    6 full-screen snap slides, light only.
-   01 Cover · 02 Positioning (clickable, image-led) ·
-   03 Branding Identities (sealed cards → /branding/[id] case studies) ·
-   04 Design styles · 05 Our pick (→ case study route) · 06 Next steps
+   01 Cover · 02 Branding Identities (sealed cards → /branding/[id]) ·
+   03 Design styles · 04 Positioning (clickable, image-led) ·
+   05 Our Ideal Recommendation · 06 Next steps
    ════════════════════════════════════════════════════════════════════ */
 
 /* ── brand marks ──────────────────────────────────────────────────── */
@@ -154,9 +154,9 @@ const STYLES: Style[] = [
 
 const SLIDE_LABELS = [
   "Cover",
-  "Positioning",
   "Branding Identities",
   "Design styles",
+  "Positioning",
   "Our Ideal Recommendation",
   "Next steps",
 ];
@@ -678,7 +678,58 @@ export default function Journey() {
           </div>
         </Slide>
 
-        {/* 02 · POSITIONING — image-led, clickable */}
+        {/* 02 · BRANDING IDENTITIES */}
+        <BrandingSlide />
+
+        {/* 03 · DESIGN STYLES */}
+        <Slide>
+          <div className="flex items-end justify-between gap-6">
+            <div>
+              <Eyebrow>The product</Eyebrow>
+              <h2 className="st-display mt-4 text-[clamp(2rem,4.4vw,3.6rem)]">
+                Let&apos;s select a{" "}
+                <span style={{ color: "var(--st-accent)" }}>design style</span>{" "}
+                for our brand.
+              </h2>
+            </div>
+            <p className="hidden max-w-[240px] text-[13px] leading-relaxed md:block" style={{ color: "var(--st-muted)" }}>
+              The same dashboard, five design languages — every one a live,
+              working build.
+            </p>
+          </div>
+
+          <div className="mt-9 border-t" style={{ borderColor: "var(--st-line)" }}>
+            {STYLES.map((s, i) => (
+              <Link
+                key={s.slug}
+                href={`/${s.slug}`}
+                className="group flex items-center gap-5 border-b py-[18px]"
+                style={{ borderColor: "var(--st-line)" }}
+              >
+                <span className="st-bignum w-9 flex-none text-[14px]" style={{ color: "var(--st-faint)" }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="st-display flex-none text-[clamp(1.4rem,3vw,2.1rem)] transition-transform duration-300 group-hover:translate-x-1">
+                  {s.name}
+                </h3>
+                <span className="hidden flex-1 truncate text-right text-[12.5px] md:block" style={{ color: "var(--st-muted)" }}>
+                  {s.feel} <span style={{ color: "var(--st-faint)" }}>· {s.refs}</span>
+                </span>
+                <span
+                  className="grid h-10 w-10 flex-none place-items-center rounded-full transition-all duration-300 group-hover:scale-105"
+                  style={{ border: "1px solid var(--st-line)", color: "var(--st-muted)" }}
+                >
+                  <ArrowUpRight size={15} />
+                </span>
+              </Link>
+            ))}
+          </div>
+          <p className="mt-5 text-[12.5px]" style={{ color: "var(--st-faint)" }}>
+            Each row opens the live dashboard — come back with the browser back button.
+          </p>
+        </Slide>
+
+        {/* 04 · POSITIONING — image-led, clickable */}
         <Slide>
           <div className="flex items-end justify-between gap-6">
             <div>
@@ -726,57 +777,6 @@ export default function Journey() {
               </button>
             ))}
           </div>
-        </Slide>
-
-        {/* 03 · BRANDING IDENTITIES */}
-        <BrandingSlide />
-
-        {/* 04 · DESIGN STYLES */}
-        <Slide>
-          <div className="flex items-end justify-between gap-6">
-            <div>
-              <Eyebrow>The product</Eyebrow>
-              <h2 className="st-display mt-4 text-[clamp(2rem,4.4vw,3.6rem)]">
-                Let&apos;s select a{" "}
-                <span style={{ color: "var(--st-accent)" }}>design style</span>{" "}
-                for our brand.
-              </h2>
-            </div>
-            <p className="hidden max-w-[240px] text-[13px] leading-relaxed md:block" style={{ color: "var(--st-muted)" }}>
-              The same dashboard, five design languages — every one a live,
-              working build.
-            </p>
-          </div>
-
-          <div className="mt-9 border-t" style={{ borderColor: "var(--st-line)" }}>
-            {STYLES.map((s, i) => (
-              <Link
-                key={s.slug}
-                href={`/${s.slug}`}
-                className="group flex items-center gap-5 border-b py-[18px]"
-                style={{ borderColor: "var(--st-line)" }}
-              >
-                <span className="st-bignum w-9 flex-none text-[14px]" style={{ color: "var(--st-faint)" }}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="st-display flex-none text-[clamp(1.4rem,3vw,2.1rem)] transition-transform duration-300 group-hover:translate-x-1">
-                  {s.name}
-                </h3>
-                <span className="hidden flex-1 truncate text-right text-[12.5px] md:block" style={{ color: "var(--st-muted)" }}>
-                  {s.feel} <span style={{ color: "var(--st-faint)" }}>· {s.refs}</span>
-                </span>
-                <span
-                  className="grid h-10 w-10 flex-none place-items-center rounded-full transition-all duration-300 group-hover:scale-105"
-                  style={{ border: "1px solid var(--st-line)", color: "var(--st-muted)" }}
-                >
-                  <ArrowUpRight size={15} />
-                </span>
-              </Link>
-            ))}
-          </div>
-          <p className="mt-5 text-[12.5px]" style={{ color: "var(--st-faint)" }}>
-            Each row opens the live dashboard — come back with the browser back button.
-          </p>
         </Slide>
 
         {/* 05 · OUR IDEAL RECOMMENDATION */}
