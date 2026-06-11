@@ -33,6 +33,8 @@ type Study = {
   anatomy: { part: string; reads: string }[];
   connections: { feature: string; how: string }[];
   colorStory: ColorStory[];
+  /* photography mockups — signage first (rendered full-width) */
+  mockups: { src: string; label: string }[];
 };
 
 const PERIWINKLE_STORY: ColorStory[] = [
@@ -64,6 +66,11 @@ const STUDIES: Record<string, Study> = {
     lockup: "/branding/logo-1.svg",
     original: PERIWINKLE,
     colorStory: PERIWINKLE_STORY,
+    mockups: [
+      { src: "/branding/mockups/1-1.jpg", label: "Storefront signage" },
+      { src: "/branding/mockups/1-2.jpg", label: "App icon, in the wild" },
+      { src: "/branding/mockups/1-3.jpg", label: "The business card" },
+    ],
     tagline: "A flag planted, an eye open, a spark held in reserve.",
     symbolLede:
       "The mark is a V planted like a flag — Vadal arriving with intent. But it isn't solid: a lens-shaped aperture is carved through its heart, the open eye of a platform whose first job is to listen. From that aperture the form tapers to a single point, because every signal inside Vadal ends the same way — at one person, one conversation, one action.",
@@ -111,6 +118,11 @@ const STUDIES: Record<string, Study> = {
     lockup: "/branding/logo-2.svg",
     original: PERIWINKLE,
     colorStory: PERIWINKLE_STORY,
+    mockups: [
+      { src: "/branding/mockups/2-1.jpg", label: "Storefront signage" },
+      { src: "/branding/mockups/2-2.jpg", label: "App icon, in the wild" },
+      { src: "/branding/mockups/2-3.jpg", label: "The business card" },
+    ],
     tagline: "The organization as a living loop — pulse in, action out.",
     symbolLede:
       "Here the organization is drawn as a circle — a continuous loop, because engagement isn't a quarterly event at Vadal, it's always on. Through the circle runs a line that is two things at once: a pulse wave (the heartbeat of the workforce) and a checkmark (the loop actually closing). And the ring doesn't quite seal at the lower left — an inlet stays open, because a listening system must never close itself off.",
@@ -177,6 +189,11 @@ const STUDIES: Record<string, Study> = {
         hex: "blend, not opaque",
         why: "The strokes are deliberately see-through. Where voices cross, nothing is hidden — the overlaps deepen instead of covering. Honesty, drawn as a rendering choice.",
       },
+    ],
+    mockups: [
+      { src: "/branding/mockups/3-3.jpg", label: "Storefront signage" },
+      { src: "/branding/mockups/3-2.jpg", label: "App icon, light & dark" },
+      { src: "/branding/mockups/3-1.jpg", label: "The business card" },
     ],
     tagline: "One figure, woven from many strands.",
     symbolLede:
@@ -245,6 +262,12 @@ const STUDIES: Record<string, Study> = {
         why: "Optimism and recognition — the mornings-side of the mark. Paired with the parchment quadrant it keeps the compass human, not clinical.",
       },
     ],
+    mockups: [
+      { src: "/branding/mockups/4-3.jpg", label: "Storefront signage" },
+      { src: "/branding/mockups/4-2.jpg", label: "App icon, in the wild" },
+      { src: "/branding/mockups/4-1.jpg", label: "Business card, dark" },
+      { src: "/branding/mockups/4-4.jpg", label: "Business card, light" },
+    ],
     tagline: "Four directions bending toward one spark.",
     symbolLede:
       "This mark is drawn by what it leaves out. Four curved quadrants — yellow, red, parchment, indigo — bend around an empty centre, and the emptiness has a shape: Vadal's four-point spark. Nothing paints the insight on; it appears where the parts meet. That's the honest description of what the AI does — intelligence emerging from the space between signals.",
@@ -311,6 +334,11 @@ const STUDIES: Record<string, Study> = {
         hex: "#C5F2C9 → #00A165",
         why: "The smallest figure wears growth green — the newest person in the room, already in the huddle. No colour outranks another; that's the point.",
       },
+    ],
+    mockups: [
+      { src: "/branding/mockups/5-3.jpg", label: "Storefront signage" },
+      { src: "/branding/mockups/5-2.jpg", label: "App icon, in the wild" },
+      { src: "/branding/mockups/5-1.jpg", label: "The business card" },
     ],
     tagline: "Three people, one huddle.",
     symbolLede:
@@ -498,6 +526,43 @@ export function BrandStudy({ id }: { id: string }) {
                   </p>
                 </div>
               </div>
+            ))}
+          </div>
+        </section>
+
+        {/* in the world — photography mockups */}
+        <section className="mt-24">
+          <h2 className="text-[30px] font-semibold tracking-tight" style={grotesk}>
+            The mark, <em style={{ ...serif, color: "#8DA2FF" }}>in the world.</em>
+          </h2>
+          <p className="mt-3 max-w-xl text-[14px] leading-relaxed" style={{ color: "rgba(244,243,240,0.55)" }}>
+            A logo isn&apos;t chosen on a whiteboard — it&apos;s chosen on a building, a
+            phone and a handshake. Here is “{study.codename}” doing all three.
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {study.mockups.map((m, i) => (
+              <figure
+                key={m.src}
+                className={`group overflow-hidden rounded-2xl ${i === 0 ? "sm:col-span-2" : ""}`}
+                style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={m.src}
+                  alt={`${study.codename} — ${m.label}`}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                />
+                <figcaption
+                  className="flex items-center justify-between px-4 py-3 text-[12px]"
+                  style={{ background: "rgba(255,255,255,0.04)", color: "rgba(244,243,240,0.65)" }}
+                >
+                  {m.label}
+                  <span style={{ color: "rgba(244,243,240,0.35)" }}>
+                    {String(i + 1).padStart(2, "0")} / {String(study.mockups.length).padStart(2, "0")}
+                  </span>
+                </figcaption>
+              </figure>
             ))}
           </div>
         </section>
