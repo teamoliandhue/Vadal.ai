@@ -175,11 +175,11 @@ function AiButton({
 
 /* ════════════════════════ rail (dark charcoal — both themes) ════════════════════════ */
 
-type RailItem = { label: string; icon: LucideIcon; active?: boolean; count?: string };
+type RailItem = { label: string; icon: LucideIcon; active?: boolean; count?: string; href?: string };
 
 const RAIL: RailItem[][] = [
   [
-    { label: "Home", icon: House },
+    { label: "Home", icon: House, href: "/product/home" },
     { label: "Pulse", icon: Gauge, active: true },
     { label: "Analytics", icon: BarChart3 },
   ],
@@ -249,7 +249,7 @@ function Rail() {
             {group.map((it) => (
               <a
                 key={it.label}
-                href="#"
+                href={it.href ?? "#"}
                 className={`group mb-0.5 flex items-center gap-2.5 rounded-[10px] px-2.5 py-[8.5px] text-[13px] transition ${
                   it.active
                     ? "bg-soft font-semibold text-ink dark:bg-white/[0.09] dark:text-white"

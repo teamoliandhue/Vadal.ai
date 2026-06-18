@@ -421,3 +421,56 @@ export const impact = {
   topVsBottom: { top: 91, bottom: 58 },
   insight: "Lifting the bottom-quartile teams by 10 pts could save ~₹1.6 Cr a year and add ~4% to delivery throughput.",
 } as const;
+
+/* ════════════════════════════════════════════════════════════════════
+   HOME — the personalized employee daily workspace (route /product/home).
+   Everything here is "me" (Priya's own view), not org analytics — the
+   doc's "HR dashboard → employee daily workspace" shift.
+   ════════════════════════════════════════════════════════════════════ */
+
+export const me = {
+  name: "Priya",
+  greeting: "Good morning",
+  role: "Product Designer · Design",
+  img: "/avatars/user-8.svg",
+  streak: 12,
+  points: 4180,
+  rank: 7,
+  nextBadge: { name: "Voice champion", left: 2 },
+};
+
+export const moods = [
+  { label: "Great", emoji: "😄", color: "#22b873" },
+  { label: "Good", emoji: "🙂", color: "#8b7cf8" },
+  { label: "Okay", emoji: "😐", color: "#e0a020" },
+  { label: "Struggling", emoji: "😔", color: "#e0708a" },
+] as const;
+
+export const myDay = [
+  { title: "Pulse survey · 6 quick questions", meta: "Closes Friday · 2 min", tag: "Survey", accent: "#8b7cf8", action: "Start" },
+  { title: "1:1 with Anita", meta: "Today · 3:00 PM", tag: "Meeting", accent: "#33b28a", action: "Prep" },
+  { title: "Recognise a teammate", meta: "You haven’t this week", tag: "Recognition", accent: "#f2884d", action: "Give" },
+  { title: "Micro-learning · Giving feedback", meta: "5 min · earns 50 pts", tag: "Learning", accent: "#e0a3c8", action: "Resume" },
+] as const;
+
+export const myRecognition = [
+  { from: "Anita Desai", text: "Brilliant work on the onboarding flow — clean and shipped on time.", value: "Ownership", time: "1d", img: "/avatars/user-5.svg" },
+  { from: "Rahul Verma", text: "Thanks for jumping into the Sales dashboard review.", value: "Collaboration", time: "3d", img: "/avatars/user-1.svg" },
+] as const;
+
+export const communities = [
+  { name: "Design Guild", members: 184, color: "#8b7cf8", fresh: 3 },
+  { name: "Women in Tech", members: 412, color: "#ef7faf", fresh: 7 },
+  { name: "Sales Floor", members: 268, color: "#33b28a", fresh: 0 },
+  { name: "New Joiners", members: 96, color: "#f2884d", fresh: 2 },
+] as const;
+
+export const poll = {
+  q: "Which wellbeing perk would you use most?",
+  votes: 1820,
+  options: [
+    { label: "Flexible hours", pct: 44 },
+    { label: "Mental-health days", pct: 33 },
+    { label: "Gym / fitness", pct: 23 },
+  ],
+} as const;
