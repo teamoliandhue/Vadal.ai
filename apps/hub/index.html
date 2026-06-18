@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vadal.ai — Project Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css"
+    />
+    <style>
+      :root {
+        --bg: #fafafb;
+        --card: #ffffff;
+        --ink: #0b0b0f;
+        --muted: #6b6e78;
+        --faint: #9b9ea8;
+        --line: #ececf1;
+        --line-2: #e3e3ea;
+        --brand: #5d63e1;
+        --brand-light: #8da2ff;
+        --brand-soft: #f1effd;
+        --signal: #fb4b43;
+        --green: #17a35e;
+        --green-soft: #e7f6ee;
+        --grad: linear-gradient(135deg, #8da2ff 0%, #5d63e1 100%);
+        --shadow-sm: 0 1px 2px rgba(20, 22, 40, 0.04);
+        --shadow-lg: 0 22px 48px -26px rgba(40, 44, 92, 0.4);
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        color: var(--ink);
+        font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background:
+          radial-gradient(820px 420px at 14% -140px, rgba(141, 162, 255, 0.22), transparent 60%),
+          radial-gradient(640px 360px at 102% -60px, rgba(251, 75, 67, 0.07), transparent 55%),
+          var(--bg);
+        background-attachment: fixed;
+      }
+      body::before {
+        content: ""; position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 10;
+        background: linear-gradient(90deg, #8da2ff, #5d63e1 42%, #fb4b43);
+      }
+      .grotesk { font-family: "Space Grotesk", "Inter", sans-serif; }
+      .wrap { width: 100%; max-width: 980px; margin: 0 auto; padding: 46px 28px 40px; flex: 1; }
+
+      /* ── hero ── */
+      .hero { position: relative; margin-bottom: 8px; }
+      .hero-content { max-width: 640px; }
+      .eyebrow { font-family: "Space Grotesk", sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--brand); }
+      .h-title { font-family: "Space Grotesk", sans-serif; font-size: clamp(26px, 4.4vw, 33px); font-weight: 700; letter-spacing: -0.02em; margin-top: 13px; line-height: 1.04; }
+      .h-title .ai { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .h-title .arw { color: var(--faint); font-weight: 400; margin: 0 4px; }
+      .lede { margin-top: 14px; color: var(--muted); font-size: 15.5px; line-height: 1.55; }
+      .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+      .chip { display: inline-flex; align-items: center; gap: 7px; font-family: "Space Grotesk", sans-serif; font-size: 12.5px; font-weight: 500; color: #3c3d46; background: var(--card); border: 1px solid var(--line); padding: 6px 12px 6px 10px; border-radius: 999px; box-shadow: var(--shadow-sm); }
+      .chip .d { width: 7px; height: 7px; border-radius: 50%; }
+      .heroart { position: absolute; right: 6px; top: 44%; transform: translateY(-50%); width: 116px; height: 116px; }
+      .heroart svg { width: 100%; height: 100%; display: block; }
+      .heroart::before { content: ""; position: absolute; inset: -34%; z-index: -1; background: radial-gradient(circle, rgba(141, 162, 255, 0.38), transparent 64%); }
+
+      /* ── section labels ── */
+      .seclabel { display: flex; align-items: center; gap: 13px; margin: 42px 0 16px; }
+      .seclabel span { font-family: "Space Grotesk", sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2em; color: var(--faint); white-space: nowrap; }
+      .seclabel .rule { flex: 1; height: 1px; background: linear-gradient(90deg, var(--line-2), transparent); }
+
+      /* ── resources ── */
+      .resgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+      @media (max-width: 720px) { .resgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+      @media (max-width: 460px) { .resgrid { grid-template-columns: 1fr; } }
+      .res {
+        position: relative; border: 1px solid var(--line); border-radius: 18px; padding: 20px;
+        background: var(--card); min-height: 138px; box-shadow: var(--shadow-sm);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      }
+      .res:hover { transform: translateY(-3px); border-color: rgba(93, 99, 225, 0.34); box-shadow: 0 16px 34px -22px rgba(93, 99, 225, 0.5); }
+      .res:hover .ico { transform: scale(1.06); }
+      .ico { width: 40px; height: 40px; border-radius: 12px; background: var(--grad); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; box-shadow: 0 6px 14px -6px rgba(93, 99, 225, 0.6); transition: transform 0.18s ease; }
+      .res h3 { font-family: "Space Grotesk", sans-serif; font-size: 15px; font-weight: 600; margin-top: 16px; color: #2c2d36; }
+      .skel { margin-top: 12px; display: flex; flex-direction: column; gap: 7px; }
+      .skel i { height: 7px; border-radius: 999px; background: #eef0f4; display: block; }
+      .skel i:nth-child(1) { width: 82%; }
+      .skel i:nth-child(2) { width: 54%; }
+      .soon { position: absolute; top: 16px; right: 16px; font-family: "Space Grotesk", sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); background: #f4f4f7; padding: 3px 9px; border-radius: 999px; }
+
+      /* ── journey timeline ── */
+      .timeline { position: relative; }
+      .timeline::before { content: ""; position: absolute; left: 19px; top: 34px; bottom: 34px; width: 2px; background: linear-gradient(var(--brand-light), var(--line-2)); }
+      .tl-item { display: grid; grid-template-columns: 40px 1fr; gap: 20px; align-items: center; }
+      .tl-item + .tl-item { margin-top: 14px; }
+      .node { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--line); position: relative; z-index: 1; box-shadow: var(--shadow-sm); }
+      .node.active { border: 2px solid var(--signal); }
+      .node.active .core { width: 12px; height: 12px; border-radius: 50%; background: var(--signal); }
+      .node.active::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid var(--signal); opacity: 0.45; animation: pulse 2.1s ease-out infinite; }
+      .node.done { background: var(--green-soft); border-color: transparent; color: var(--green); font-size: 19px; }
+      .stage { display: flex; align-items: center; gap: 16px; text-decoration: none; color: inherit; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 19px 22px; box-shadow: var(--shadow-sm); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
+      .stage:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--line-2); }
+      .stage .no { font-family: "Space Grotesk", sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); min-width: 56px; }
+      .stage .body { flex: 1; }
+      .stage .body h3 { font-family: "Space Grotesk", sans-serif; font-size: 17.5px; font-weight: 600; letter-spacing: -0.01em; }
+      .stage .body p { color: var(--muted); font-size: 13px; margin-top: 3px; }
+      .pill { font-family: "Space Grotesk", sans-serif; font-size: 11.5px; font-weight: 600; padding: 4px 11px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+      .pill .dot { width: 6px; height: 6px; border-radius: 50%; }
+      .pill.done { background: var(--green-soft); color: var(--green); }
+      .pill.done .dot { background: var(--green); }
+      .pill.live { background: var(--brand-soft); color: var(--brand); }
+      .pill.live .dot { background: var(--signal); animation: blink 1.8s ease-in-out infinite; }
+      .stage .chev { color: var(--faint); font-size: 20px; transition: transform 0.18s ease, color 0.18s ease; }
+      .stage:hover .chev { transform: translateX(3px); color: var(--brand); }
+
+      footer { color: var(--faint); font-size: 12px; padding: 22px 28px; text-align: center; border-top: 1px solid var(--line); }
+      footer code { font-family: "Space Grotesk", sans-serif; color: var(--muted); }
+
+      @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+      @keyframes pulse { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.5); opacity: 0; } }
+      @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+      .rise { animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+      @media (max-width: 600px) {
+        .heroart { display: none; }
+        .stage .no { min-width: 0; }
+        .stage .body p { display: none; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::after { animation: none !important; transition: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero rise">
+        <div class="heroart" aria-hidden="true">
+          <svg viewBox="0 0 153 133" fill="none">
+            <defs>
+              <linearGradient id="vg" x1="0" y1="5" x2="76" y2="131" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#8DA2FF" />
+                <stop offset="0.56" stop-color="#5D63E1" />
+                <stop offset="0.83" stop-color="#5D63E1" />
+              </linearGradient>
+            </defs>
+            <path d="M57.6699 62.6073L48.3723 58.5663C41.5715 55.593 41.5715 46.1804 48.3723 43.2235L57.6699 39.1825C74.1211 32.0849 87.3146 19.0789 94.6471 2.73105C95.2182 1.44683 94.2782 0 92.8727 0L17.3847 0C7.44054 0 2.46843 0 0.612305 3.22783C-1.24383 6.45567 1.25715 10.753 6.25909 19.3476L64.9864 120.256C69.9301 128.751 72.4019 132.998 76.1005 133C79.799 133.002 82.276 128.758 87.2299 120.269L94.1224 108.459C95.0963 106.79 95.5833 105.956 95.8058 105.063C96.0038 104.269 96.0485 103.444 95.9374 102.633C95.8126 101.722 95.4186 100.839 94.6306 99.0752C87.3055 82.7241 74.1179 69.7123 57.6699 62.6073Z" fill="url(#vg)" />
+            <path d="M137.823 0L122.584 0C121.533 0 120.831 1.08169 121.259 2.04109C123.962 8.04778 127.453 13.601 131.604 18.5751C134.361 21.879 135.739 23.5309 137.971 23.9735C139.049 24.1873 140.506 24.0624 141.531 23.6683C143.655 22.8523 144.882 20.7316 147.335 16.4901C150.804 10.4932 152.538 7.49474 152.001 5.05329C151.716 3.75806 151.037 2.58248 150.059 1.68732C148.214 0 144.751 0 137.823 0Z" fill="url(#vg)" />
+            <path d="M84.5542 54.1881L88.2402 55.7901C94.7608 58.6068 99.9888 63.7652 102.893 70.2474L105.1 75.1902C105.376 75.7898 105.818 76.2978 106.374 76.6539C106.93 77.01 107.576 77.1993 108.236 77.1993C108.896 77.1993 109.542 77.01 110.098 76.6539C110.654 76.2978 111.096 75.7898 111.372 75.1902L113.449 70.5209C116.436 63.8757 121.857 58.6291 128.597 55.8618L132.576 54.2142C133.192 53.9722 133.721 53.5501 134.094 53.003C134.467 52.4559 134.667 51.809 134.667 51.1469C134.667 50.4847 134.467 49.8379 134.094 49.2908C133.721 48.7437 133.192 48.3216 132.576 48.0796L128.603 46.432C121.863 43.6676 116.439 38.4233 113.449 31.7794L111.365 27.1036C111.089 26.5058 110.647 25.9996 110.092 25.6448C109.537 25.2901 108.892 25.1016 108.233 25.1016C107.574 25.1016 106.929 25.2901 106.374 25.6448C105.819 25.9996 105.377 26.5058 105.1 27.1036L102.899 32.0529C99.9924 38.5338 94.7621 43.6899 88.2402 46.5036L84.5542 48.1057C81.8582 49.2779 81.8582 53.0094 84.5542 54.1881Z" fill="#FB4B43" />
+          </svg>
+        </div>
+        <div class="hero-content">
+          <div class="eyebrow">Oli&amp;Hue × Vadal.ai</div>
+          <h1 class="h-title">vadal<span class="ai">.ai</span><span class="arw">→</span>Project Dashboard</h1>
+          <p class="lede">Everything we're building for Vadal, in one place.</p>
+          <div class="chips">
+            <span class="chip"><span class="d" style="background:#5d63e1"></span>01 Signal</span>
+            <span class="chip"><span class="d" style="background:#f6a14b"></span>Lumen style</span>
+            <span class="chip"><span class="d" style="background:#fb4b43"></span>Human pulse × Daily ritual</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="seclabel rise" style="animation-delay:.06s"><span>Resources</span><span class="rule"></span></div>
+      <div class="resgrid">
+        <div class="res rise" style="animation-delay:.10s"><span class="soon">Soon</span><div class="ico"><i class="ti ti-layout-grid" aria-hidden="true"></i></div><h3>Design system</h3><div class="skel"><i></i><i></i></div></div>
+        <div class="res rise" style="animation-delay:.14s"><span class="soon">Soon</span><div class="ico"><i class="ti ti-device-laptop" aria-hidden="true"></i></div><h3>Prototype</h3><div class="skel"><i></i><i></i></div></div>
+        <div class="res rise" style="animation-delay:.18s"><span class="soon">Soon</span><div class="ico"><i class="ti ti-download" aria-hidden="true"></i></div><h3>Assets &amp; downloads</h3><div class="skel"><i></i><i></i></div></div>
+        <div class="res rise" style="animation-delay:.22s"><span class="soon">Soon</span><div class="ico"><i class="ti ti-book-2" aria-hidden="true"></i></div><h3>Brand guidelines</h3><div class="skel"><i></i><i></i></div></div>
+        <div class="res rise" style="animation-delay:.26s"><span class="soon">Soon</span><div class="ico"><i class="ti ti-news" aria-hidden="true"></i></div><h3>Updates</h3><div class="skel"><i></i><i></i></div></div>
+        <div class="res rise" style="animation-delay:.30s"><span class="soon">Soon</span><div class="ico"><i class="ti ti-target-arrow" aria-hidden="true"></i></div><h3>Strategy &amp; positioning</h3><div class="skel"><i></i><i></i></div></div>
+      </div>
+
+      <div class="seclabel rise" style="animation-delay:.20s"><span>The journey</span><span class="rule"></span></div>
+      <div class="timeline">
+        <div class="tl-item rise" style="animation-delay:.24s">
+          <div class="node active"><span class="core"></span></div>
+          <a class="stage" href="http://localhost:3001">
+            <span class="no">Stage 2</span>
+            <div class="body">
+              <h3>Identity &amp; build</h3>
+              <p>Logo system, brand foundations and the product it lives in.</p>
+            </div>
+            <span class="pill live"><span class="dot"></span>In progress</span>
+            <i class="ti ti-chevron-right chev" aria-hidden="true"></i>
+          </a>
+        </div>
+        <div class="tl-item rise" style="animation-delay:.30s">
+          <div class="node done"><i class="ti ti-check" aria-hidden="true"></i></div>
+          <a class="stage" href="http://localhost:3000">
+            <span class="no">Stage 1</span>
+            <div class="body">
+              <h3>Design foundation</h3>
+              <p>The exploration deck the chosen direction came from.</p>
+            </div>
+            <span class="pill done"><span class="dot"></span>Complete</span>
+            <i class="ti ti-chevron-right chev" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Stage 1 in <code>apps/deck</code> · Stage 2 in <code>apps/product</code> · dashboard in <code>apps/hub</code>
+    </footer>
+  </body>
+</html>

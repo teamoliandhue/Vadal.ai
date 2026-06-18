@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* surfaces */
+  --background: #ffffff;
+  --canvas: #fcfcfd;
+  --card: #ffffff;
+  --soft: #f5f5f8;
+  --line: #ececf1;
+  /* type */
+  --ink: #0a0a0c; /* Signal near-black */
+  --muted: #6b6e78;
+  --faint: #9b9ea8;
+  /* Signal identity (brand identity 01) */
+  --brand: #5d63e1; /* periwinkle, deep */
+  --brand-light: #8da2ff; /* periwinkle, light */
+  --brand-soft: #f1effd;
+  --signal: #fb4b43; /* the spark — one warm interruption */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-canvas: var(--canvas);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-soft: var(--soft);
+  --color-brand: var(--brand);
+  --color-brand-light: var(--brand-light);
+  --color-brand-soft: var(--brand-soft);
+  --color-signal: var(--signal);
+  --font-sans: var(--font-inter);
+  --font-grotesk: var(--font-grotesk);
+  --font-serif: var(--font-serif);
+}
+
+* {
+  border-color: var(--line);
+}
+
+html,
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* gradient text that slowly flows — used on the big wordmarks */
+@keyframes vadalSweep {
+  to {
+    background-position: -200% center;
+  }
+}
+.gradient-flow {
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: vadalSweep 9s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gradient-flow {
+    animation: none;
+  }
+}
