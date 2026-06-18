@@ -67,3 +67,77 @@ body {
     animation: none;
   }
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   Lumen product dashboard (route /product) — ported from the deck.
+   Fully scoped under .lumen so it never affects the brand pages.
+   ════════════════════════════════════════════════════════════════════ */
+@theme inline {
+  --color-foreground: var(--foreground);
+  --color-lav: var(--lav);
+  --color-vpurple: var(--purple);
+  --color-vpurple-deep: var(--purple-deep);
+  --color-vgreen: var(--green);
+  --color-vgreen-soft: var(--green-soft);
+  --color-vred: var(--red);
+  --color-vred-soft: var(--red-soft);
+  --color-vamber: var(--amber);
+  --color-vamber-soft: var(--amber-soft);
+  --color-vorange: var(--orange);
+  --color-cream: var(--cream);
+  --color-cream-ring: var(--cream-ring);
+  --color-cream-ink: var(--cream-ink);
+}
+
+.lumen {
+  --background: #ffffff; --canvas: #fcfcfd; --card: #ffffff; --soft: #f6f6f8; --line: #ebebef;
+  --foreground: #1a1b1f; --ink: #1a1b1f; --muted: #6b6e78; --faint: #9b9ea8;
+  --lav: #f1effd; --purple: #6d5df0; --purple-deep: #5747e0;
+  --green: #17a35e; --green-soft: #e6f7ee; --red: #d44a50; --red-soft: #fdeceb;
+  --amber: #e08c1f; --amber-soft: #fdf3e0; --orange: #f25b1c;
+  --cream: #fbf7ef; --cream-ring: #f3e8d3; --cream-ink: #7a6437;
+  --bench: #c9c9d4; --gauge-track: #efeff3;
+  background: var(--canvas);
+  color: var(--foreground);
+}
+.dark .lumen {
+  --background: #0d0d11; --canvas: #0d0d11; --card: #17171d; --soft: #22222a; --line: #26262e;
+  --foreground: #ecedf1; --ink: #ecedf1; --muted: #9d9fab; --faint: #6c6e7a;
+  --lav: #232136; --purple: #a99df9; --purple-deep: #beb4fb;
+  --green: #4ade80; --green-soft: rgba(74, 222, 128, 0.12); --red: #f87171; --red-soft: rgba(248, 113, 113, 0.12);
+  --amber: #fbbf24; --amber-soft: rgba(251, 191, 36, 0.12); --orange: #fb923c;
+  --cream: rgba(251, 191, 36, 0.08); --cream-ring: rgba(251, 191, 36, 0.18); --cream-ink: #dcb96e;
+  --bench: #43434e; --gauge-track: #26262e;
+}
+
+.lumen .card-lift { transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease, background-color 300ms ease; }
+.lumen .card-lift:hover { transform: translateY(-2px); box-shadow: 0 12px 32px -12px rgba(26, 27, 31, 0.12); border-color: #dddde4; }
+.dark .lumen .card-lift, .dark .lumen .card-elev { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 120px); box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.6), 0 10px 26px -18px rgba(0, 0, 0, 0.8); }
+.dark .lumen .card-lift:hover { border-color: #3b3b47; box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.09), 0 20px 46px -16px rgba(0, 0, 0, 0.75), 0 0 30px -10px rgba(139, 124, 248, 0.18); }
+.lumen .btn-ai { position: relative; background-image: linear-gradient(105deg, #2dd4bf 0%, #818cf8 32%, #a855f7 62%, #f472b6 100%); background-size: 170% 170%; background-position: 0% 50%; color: #fff; box-shadow: 0 4px 18px -4px rgba(129, 140, 248, 0.55), 0 2px 8px -2px rgba(244, 114, 182, 0.35); transition: background-position 500ms ease, box-shadow 300ms ease, transform 200ms ease; }
+.lumen .btn-ai:hover { background-position: 95% 50%; box-shadow: 0 8px 28px -6px rgba(129, 140, 248, 0.75), 0 4px 14px -2px rgba(244, 114, 182, 0.5); transform: translateY(-1px); }
+.dark .lumen .btn-ai { box-shadow: 0 4px 22px -4px rgba(129, 140, 248, 0.45), 0 2px 10px -2px rgba(244, 114, 182, 0.3); }
+.lumen .btn-ai::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%); background-size: 250% 100%; background-position: 120% 0; opacity: 0; transition: background-position 700ms ease, opacity 300ms ease; pointer-events: none; }
+.lumen .btn-ai:hover::after { opacity: 1; background-position: -60% 0; }
+.lumen .ai-aura { animation: aura 2.6s ease-in-out infinite; }
+.lumen .canvas-glow { position: absolute; inset: 0 0 auto 0; height: 420px; pointer-events: none; background: radial-gradient(560px 300px at 22% -8%, rgba(246, 161, 75, 0.08), transparent 64%), radial-gradient(640px 320px at 78% -12%, rgba(139, 124, 248, 0.08), transparent 64%); }
+.dark .lumen .canvas-glow { height: 520px; background: radial-gradient(640px 360px at 18% -12%, rgba(45, 212, 191, 0.13), transparent 64%), radial-gradient(720px 380px at 60% -16%, rgba(168, 85, 247, 0.17), transparent 66%), radial-gradient(560px 320px at 94% -10%, rgba(244, 114, 182, 0.12), transparent 62%); }
+.lumen .animate-floaty { animation: floaty 7s ease-in-out infinite; }
+.lumen .animate-floaty2 { animation: floaty2 9s ease-in-out infinite; }
+.lumen .ring-animate { animation: ring-in 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+.lumen .draw-animate { stroke-dasharray: 1600; animation: draw-in 1.8s cubic-bezier(0.45, 0, 0.2, 1) 0.2s both; }
+.lumen .rise { animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.lumen .rise-1 { animation-delay: 0.05s; }
+.lumen .rise-2 { animation-delay: 0.12s; }
+.lumen .rise-3 { animation-delay: 0.2s; }
+.lumen .rise-4 { animation-delay: 0.28s; }
+.lumen .rise-5 { animation-delay: 0.36s; }
+@keyframes aura { 0%, 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.35); } 50% { box-shadow: 0 0 0 7px rgba(168, 85, 247, 0); } }
+@keyframes floaty { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+@keyframes floaty2 { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(7px); } }
+@keyframes ring-in { from { stroke-dashoffset: var(--ring-circ); } }
+@keyframes draw-in { from { stroke-dashoffset: 1600; } to { stroke-dashoffset: 0; } }
+@keyframes rise-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .lumen .rise, .lumen .ring-animate, .lumen .draw-animate, .lumen .animate-floaty, .lumen .animate-floaty2, .lumen .ai-aura { animation: none; }
+}

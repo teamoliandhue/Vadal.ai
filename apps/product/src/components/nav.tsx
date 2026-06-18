@@ -1,14 +1,21 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Mark, IRIS_PICK } from "./mark";
 
-/* Top nav for the product app.
+/* Top nav for the product app's brand pages.
    Dashboard → the project dashboard (the hub, where design system, assets,
    docs and the journey live). DS Doc / Assets / Project Doc are not built
-   yet — shown greyed with a "Soon" tag. Journey lives in the dashboard. */
+   yet — shown greyed with a "Soon" tag. Journey lives in the dashboard.
+   Hidden on /product (the full-screen Lumen dashboard has its own chrome). */
 const DASHBOARD_URL = "https://vadal-hub.vercel.app";
 const SOON = ["DS Doc", "Assets", "Project Doc"];
 
 export function Nav() {
+  const path = usePathname();
+  if (path?.startsWith("/product")) return null;
+
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4 px-6 py-3 sm:px-10">
