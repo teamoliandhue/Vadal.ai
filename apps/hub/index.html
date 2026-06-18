@@ -92,6 +92,10 @@
       .skel i:nth-child(1) { width: 82%; }
       .skel i:nth-child(2) { width: 54%; }
       .soon { position: absolute; top: 16px; right: 16px; font-family: "Space Grotesk", sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); background: #f4f4f7; padding: 3px 9px; border-radius: 999px; }
+      .res.live { border-color: rgba(93, 99, 225, 0.3); display: block; text-decoration: none; color: inherit; }
+      .livebadge { position: absolute; top: 16px; right: 16px; font-family: "Space Grotesk", sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green); background: var(--green-soft); padding: 3px 9px 3px 7px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; }
+      .livebadge .ldot { width: 5px; height: 5px; border-radius: 999px; background: var(--green); }
+      .res .ressub { margin-top: 9px; font-family: "Space Grotesk", sans-serif; font-size: 12.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; }
 
       /* ── journey timeline ── */
       .timeline { position: relative; }
@@ -168,7 +172,7 @@
       <div class="seclabel rise" style="animation-delay:.06s"><span>Resources</span><span class="rule"></span></div>
       <div class="resgrid">
         <div class="res rise" style="animation-delay:.10s"><span class="soon">Soon</span><div class="ico"><i class="ti ti-layout-grid" aria-hidden="true"></i></div><h3>Design system</h3><div class="skel"><i></i><i></i></div></div>
-        <div class="res rise" style="animation-delay:.14s"><span class="soon">Soon</span><div class="ico"><i class="ti ti-device-laptop" aria-hidden="true"></i></div><h3>Prototype</h3><div class="skel"><i></i><i></i></div></div>
+        <a class="res live rise" style="animation-delay:.14s" href="https://vadal-dashboards.vercel.app/lumen" target="_blank" rel="noopener"><span class="livebadge"><span class="ldot"></span>Live</span><div class="ico"><i class="ti ti-layout-dashboard" aria-hidden="true"></i></div><h3>View Project</h3><p class="ressub">The Lumen dashboard <i class="ti ti-arrow-up-right"></i></p></a>
         <div class="res rise" style="animation-delay:.18s"><span class="soon">Soon</span><div class="ico"><i class="ti ti-download" aria-hidden="true"></i></div><h3>Assets &amp; downloads</h3><div class="skel"><i></i><i></i></div></div>
         <div class="res rise" style="animation-delay:.22s"><span class="soon">Soon</span><div class="ico"><i class="ti ti-book-2" aria-hidden="true"></i></div><h3>Brand guidelines</h3><div class="skel"><i></i><i></i></div></div>
         <div class="res rise" style="animation-delay:.26s"><span class="soon">Soon</span><div class="ico"><i class="ti ti-news" aria-hidden="true"></i></div><h3>Updates</h3><div class="skel"><i></i><i></i></div></div>
