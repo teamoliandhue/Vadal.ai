@@ -88,17 +88,7 @@ function WordPlate({ id, font, size = 44, fs = "clamp(1.5rem,2.6vw,2.1rem)" }: {
 export default function Home() {
   return (
     <main className="mx-auto max-w-[1180px] px-6 sm:px-10">
-      <header className="flex items-center justify-between py-7">
-        <div className="flex items-center gap-2.5">
-          <Mark id="nav" from={FLAG.light.from} to={FLAG.light.to} star={PICK.light} size={26} />
-          <span className="font-grotesk text-[15px] font-semibold tracking-tight">
-            vadal<span style={{ color: "#0a7ae0" }}>.ai</span>
-          </span>
-        </div>
-        <span className="font-grotesk text-[11px] font-medium uppercase tracking-[0.22em] text-faint">Stage 2 — Identity</span>
-      </header>
-
-      <section className="pt-12 pb-16 sm:pt-16 sm:pb-20">
+      <section className="pt-14 pb-16 sm:pt-20 sm:pb-20">
         <p className="font-grotesk text-[11px] font-semibold uppercase tracking-[0.24em] text-[#0a7ae0]">Oli&amp;Hue × Vadal.ai</p>
         <h1 className="mt-5 max-w-[16ch] font-grotesk text-[clamp(2.6rem,7.5vw,5.2rem)] font-bold leading-[0.97] tracking-[-0.035em]">
           Brand directions.

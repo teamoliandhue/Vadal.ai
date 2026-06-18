@@ -11,6 +11,7 @@ import {
   Hanken_Grotesk,
 } from "next/font/google";
 import "./globals.css";
+import { Nav } from "@/components/nav";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -87,7 +88,10 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${grotesk.variable} ${serif.variable} ${fraunces.variable} ${jakarta.variable} ${geist.variable} ${mono.variable} ${bricolage.variable} ${hanken.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <Nav />
+        {children}
+      </body>
     </html>
   );
 }
