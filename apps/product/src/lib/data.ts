@@ -297,3 +297,127 @@ export const departments = [
   { name: "Night shift", score: 58 },
   { name: "Logistics", score: 69 },
 ] as const;
+
+/* ════════════════════════════════════════════════════════════════════
+   Sections from the requirement doc not yet on the dashboard:
+   Attrition detail, Manager Effectiveness, Gamification, Knowledge Hub,
+   AI assistant usage, Business Impact, Employee Experience Feed.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* 2 · Attrition & Risk Intelligence — detail */
+export const attrition = {
+  predicted: "4.8%",
+  predictedDelta: "+0.9",
+  segmentation: [
+    { level: "High", count: 38, color: "#f26b66" },
+    { level: "Medium", count: 124, color: "#fccc4d" },
+    { level: "Low", count: 150, color: "#22b873" },
+  ],
+  drivers: [
+    { label: "Manager relationship", pct: 34 },
+    { label: "Workload & burnout", pct: 27 },
+    { label: "Pay & growth", pct: 22 },
+    { label: "Role clarity", pct: 17 },
+  ],
+  flightTrend: [262, 270, 280, 288, 298, 306, 312],
+} as const;
+
+/* 3 · Employee Voice — extras (top concerns, escalations, anon split) */
+export const voiceExtra = {
+  concerns: [
+    "Workload after the reorg",
+    "Slow appraisal feedback",
+    "Limited growth paths",
+    "Night-shift fatigue",
+    "Tooling friction",
+  ],
+  escalations: 4,
+  anon: 58,
+  identified: 42,
+} as const;
+
+/* 4 · Recognition & Culture — extras */
+export const recognitionExtra = {
+  peer: 72,
+  manager: 28,
+  themes: [
+    { name: "Ownership", pct: 34 },
+    { name: "Collaboration", pct: 26 },
+    { name: "Innovation", pct: 22 },
+    { name: "Customer focus", pct: 18 },
+  ],
+  topTeams: ["Design", "Sales · West", "Support"],
+  lowZones: ["Night shift", "Plant Ops", "Logistics"],
+} as const;
+
+/* 6 · Manager Effectiveness */
+export const managerSummary = { index: 78, closureRate: 71, withActions: 5 };
+export const managers = [
+  { name: "Rahul Verma", team: "Sales · West", score: 86, grade: "A", closure: 92, atRisk: 2, recognition: 38, img: "/avatars/user-1.svg" },
+  { name: "Anita Desai", team: "Design", score: 84, grade: "A", closure: 88, atRisk: 1, recognition: 42, img: "/avatars/user-5.svg" },
+  { name: "Meera Pillai", team: "Support", score: 79, grade: "B", closure: 74, atRisk: 3, recognition: 24, img: "/avatars/user-7.svg" },
+  { name: "Imran Shaikh", team: "Engineering", score: 71, grade: "C", closure: 61, atRisk: 6, recognition: 12, img: "/avatars/user-2.svg" },
+  { name: "Karan Joshi", team: "Plant Ops", score: 62, grade: "D", closure: 48, atRisk: 9, recognition: 6, img: "/avatars/user-4.svg" },
+] as const;
+
+/* 7 · Employee Experience Feed (content layer — the biggest gap) */
+export const experience = { dau: "8.1K", wau: "11.2K", dauPct: 65, views: "42K", reactions: "9.3K", comments: "2.1K" };
+export const feed = [
+  { kind: "Leadership", author: "Pradeep K.", role: "CEO", img: "/avatars/user-6.svg", text: "Q2 wrapped strong — thank you for the energy. Watch for the new wellbeing campaign next week.", time: "2h", likes: 312, comments: 48, accent: "#8b7cf8" },
+  { kind: "Recognition", author: "Neha R.", role: "→ Design team", img: "/avatars/user-5.svg", text: "Shoutout to the team for shipping the onboarding flow ahead of schedule. Ownership at its best.", time: "5h", likes: 186, comments: 22, accent: "#33b28a" },
+  { kind: "Announcement", author: "People Team", role: "Company-wide", img: "/avatars/user-8.svg", text: "The annual engagement survey opens Monday. Your voice shapes the next quarter.", time: "1d", likes: 94, comments: 12, accent: "#f2884d" },
+] as const;
+
+/* 9 · Gamification & Participation */
+export const gamification = {
+  points: "1.2M",
+  streaks: 3840,
+  leaders: [
+    { name: "Neha R.", team: "Design", points: 4820, medal: "#f6b026" },
+    { name: "Arjun T.", team: "Sales", points: 4510, medal: "#b8c0cc" },
+    { name: "Sara M.", team: "Support", points: 4180, medal: "#cd7f4e" },
+  ],
+  badges: [
+    { name: "Top recogniser", count: 142 },
+    { name: "Streak master", count: 318 },
+    { name: "Voice champion", count: 96 },
+    { name: "Team helper", count: 254 },
+  ],
+  drop: "Night shift −14%",
+} as const;
+
+/* 10 · Knowledge & Communication Hub + AI assistant usage */
+export const knowledge = {
+  views: "18.4K",
+  searchSuccess: 84,
+  topQueries: [
+    { q: "Leave policy", n: 412 },
+    { q: "Reimbursement process", n: 286 },
+    { q: "WFH guidelines", n: 224 },
+    { q: "Appraisal cycle", n: 198 },
+  ],
+  gaps: ["Parental leave — no doc", "Relocation policy outdated"],
+} as const;
+export const aiUsage = {
+  questions: "6,240",
+  resolved: 78,
+  topics: [
+    { topic: "Leave & time-off", pct: 31 },
+    { topic: "Payroll & benefits", pct: 24 },
+    { topic: "Career & growth", pct: 19 },
+    { topic: "Policies", pct: 16 },
+    { topic: "Wellbeing", pct: 10 },
+  ],
+  signal: "Spike in “appraisal timeline” questions from Engineering — an anxiety signal ahead of the review cycle.",
+} as const;
+
+/* 11 · Business Impact Correlation (the strategic differentiator) */
+export const impact = {
+  attritionCorr: "−0.74",
+  productivityCorr: "+0.61",
+  revenueCorr: "+0.52",
+  attritionCost: "₹4.2 Cr",
+  roi: "3.4×",
+  topVsBottom: { top: 91, bottom: 58 },
+  insight: "Lifting the bottom-quartile teams by 10 pts could save ~₹1.6 Cr a year and add ~4% to delivery throughput.",
+} as const;

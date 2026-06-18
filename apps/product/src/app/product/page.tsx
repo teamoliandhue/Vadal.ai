@@ -22,6 +22,13 @@ import {
   Sparkles,
   Trophy,
   UsersRound,
+  Flame,
+  FileText,
+  Heart,
+  MessageCircle,
+  MessageSquare,
+  TrendingUp,
+  AlertTriangle,
   type LucideIcon,
 } from "lucide-react";
 import { ArcGauge, Sparkline, TrendChart } from "@/components/charts";
@@ -39,6 +46,15 @@ import {
   org,
   recognitionBoard,
   voice,
+  attrition,
+  managers,
+  managerSummary,
+  experience,
+  feed,
+  gamification,
+  knowledge,
+  aiUsage,
+  impact,
 } from "@/lib/data";
 import { PeriodPills } from "./period-pills";
 import { ThemeToggle } from "./theme-toggle";
@@ -75,6 +91,25 @@ export default function LumenDashboard() {
           <section className="rise rise-5 mt-5 grid grid-cols-1 gap-5 xl:grid-cols-12">
             <RecognitionCard className="xl:col-span-5" />
             <DepartmentsCard className="xl:col-span-7" />
+          </section>
+          {/* Row E — manager effectiveness + attrition intelligence */}
+          <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-12">
+            <ManagerEffectivenessCard className="xl:col-span-7" />
+            <AttritionCard className="xl:col-span-5" />
+          </section>
+          {/* Row F — employee feed (content layer) + AI assistant usage */}
+          <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-12">
+            <FeedCard className="xl:col-span-7" />
+            <AiUsageCard className="xl:col-span-5" />
+          </section>
+          {/* Row G — gamification + knowledge hub */}
+          <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-12">
+            <GamificationCard className="xl:col-span-5" />
+            <KnowledgeHubCard className="xl:col-span-7" />
+          </section>
+          {/* Row H — business impact correlation */}
+          <section className="mt-5">
+            <BusinessImpactCard />
           </section>
         </main>
       </div>
@@ -908,5 +943,325 @@ function AiDock() {
         </span>
       </span>
     </button>
+  );
+}
+
+/* ════════════════════════ shared mini stat ════════════════════════ */
+
+function MiniStat({ value, label }: { value: React.ReactNode; label: string }) {
+  return (
+    <div className="rounded-2xl bg-soft px-3 py-3">
+      <div className="text-[19px] font-bold tracking-tight">{value}</div>
+      <div className="mt-0.5 text-[10.5px] leading-tight text-faint">{label}</div>
+    </div>
+  );
+}
+
+/* ════════════════════════ Row E — manager effectiveness ════════════════════════ */
+
+const GRADE_COLOR: Record<string, string> = {
+  A: "var(--green)",
+  B: "var(--purple)",
+  C: "var(--amber)",
+  D: "var(--red)",
+};
+
+function ManagerEffectivenessCard({ className = "" }: { className?: string }) {
+  return (
+    <div className={`card-lift rounded-3xl border border-line bg-card p-7 ${className}`}>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-[15.5px] font-bold tracking-tight">Manager effectiveness</h3>
+          <p className="mt-0.5 text-[12px] text-faint">Which leaders are driving engagement</p>
+        </div>
+        <span className="rounded-full bg-soft px-2.5 py-1 text-[11px] font-semibold text-muted">Index {managerSummary.index}</span>
+      </div>
+      <div className="mt-5 grid grid-cols-3 gap-3">
+        <MiniStat value={managerSummary.index} label="Effectiveness index" />
+        <MiniStat value={`${managerSummary.closureRate}%`} label="Action closure" />
+        <MiniStat value={managerSummary.withActions} label="Need actions" />
+      </div>
+      <div className="mt-5">
+        <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 px-2 pb-1 text-[10px] font-semibold uppercase tracking-wide text-faint">
+          <span>Manager</span>
+          <span className="w-12 text-right">Score</span>
+          <span className="w-14 text-right">Closure</span>
+          <span className="w-12 text-right">At-risk</span>
+        </div>
+        {managers.map((m) => (
+          <div key={m.name} className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-soft">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <Image src={m.img} alt={m.name} width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
+              <div className="min-w-0">
+                <div className="truncate text-[12.5px] font-semibold">{m.name}</div>
+                <div className="truncate text-[10.5px] text-faint">{m.team}</div>
+              </div>
+            </div>
+            <span className="flex w-12 items-center justify-end gap-1.5">
+              <span className="text-[13px] font-bold">{m.score}</span>
+              <span className="grid h-4 w-4 place-items-center rounded text-[9px] font-bold text-white" style={{ background: GRADE_COLOR[m.grade] }}>{m.grade}</span>
+            </span>
+            <span className="w-14 text-right text-[12px] font-semibold text-muted">{m.closure}%</span>
+            <span className={`w-12 text-right text-[12px] font-bold ${m.atRisk >= 5 ? "text-vred" : "text-muted"}`}>{m.atRisk}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AttritionCard({ className = "" }: { className?: string }) {
+  const total = attrition.segmentation.reduce((s, x) => s + x.count, 0);
+  return (
+    <div className={`card-lift flex flex-col rounded-3xl border border-line bg-card p-7 ${className}`}>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-[15.5px] font-bold tracking-tight">Attrition intelligence</h3>
+          <p className="mt-0.5 text-[12px] text-faint">Who might leave, and why</p>
+        </div>
+        <span className="flex items-center gap-1 rounded-full bg-vred-soft px-2.5 py-1 text-[11px] font-bold text-vred">
+          <TrendingUp className="h-3 w-3" /> {attrition.predicted} predicted
+        </span>
+      </div>
+      <div className="mt-5">
+        <div className="flex h-2.5 w-full gap-1 overflow-hidden">
+          {attrition.segmentation.map((s) => (
+            <span key={s.level} className="h-full rounded-full" style={{ width: `${(s.count / total) * 100}%`, background: s.color }} />
+          ))}
+        </div>
+        <div className="mt-2.5 flex justify-between">
+          {attrition.segmentation.map((s) => (
+            <span key={s.level} className="flex items-center gap-1.5 text-[10.5px] font-medium text-muted">
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.color }} />
+              {s.level} {s.count}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="mt-5 space-y-2.5">
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-faint">Key risk drivers</div>
+        {attrition.drivers.map((d) => (
+          <div key={d.label}>
+            <div className="flex items-center justify-between text-[12px]">
+              <span className="font-medium">{d.label}</span>
+              <span className="font-bold text-muted">{d.pct}%</span>
+            </div>
+            <div className="mt-1 h-[3px] w-full overflow-hidden rounded-full bg-soft">
+              <span className="block h-full rounded-full" style={{ width: `${d.pct}%`, background: "var(--purple)" }} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-auto flex items-center justify-between gap-3 pt-5">
+        <span className="text-[11px] text-faint">Flight-risk · last 6 mo</span>
+        <div className="w-28">
+          <Sparkline values={[...attrition.flightTrend]} color="#e0708a" height={28} id="attr-trend" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════ Row F — feed + AI usage ════════════════════════ */
+
+function FeedCard({ className = "" }: { className?: string }) {
+  return (
+    <div className={`card-lift flex flex-col rounded-3xl border border-line bg-card p-7 ${className}`}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="text-[15.5px] font-bold tracking-tight">Employee feed</h3>
+          <p className="mt-0.5 text-[12px] text-faint">News · recognition · leadership</p>
+        </div>
+        <div className="flex items-center gap-3.5 text-[11px] font-medium text-muted">
+          <span><b className="text-ink">{experience.dau}</b> DAU</span>
+          <span><b className="text-ink">{experience.views}</b> views</span>
+          <span><b className="text-ink">{experience.reactions}</b> reactions</span>
+        </div>
+      </div>
+      <div className="mt-4 space-y-3">
+        {feed.map((p) => (
+          <div key={p.text} className="rounded-2xl border border-line p-4">
+            <div className="flex items-center gap-2.5">
+              <Image src={p.img} alt={p.author} width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 text-[12.5px]">
+                  <span className="font-semibold">{p.author}</span>
+                  <span className="truncate text-faint">{p.role}</span>
+                </div>
+                <div className="text-[10.5px] text-faint">{p.time} ago</div>
+              </div>
+              <span className="rounded-full px-2 py-0.5 text-[9.5px] font-semibold uppercase tracking-wide" style={{ background: `${p.accent}1f`, color: p.accent }}>{p.kind}</span>
+            </div>
+            <p className="mt-2.5 text-[12.5px] leading-relaxed text-muted">{p.text}</p>
+            <div className="mt-2.5 flex items-center gap-4 text-[11px] text-faint">
+              <span className="flex items-center gap-1"><Heart className="h-3.5 w-3.5" /> {p.likes}</span>
+              <span className="flex items-center gap-1"><MessageSquare className="h-3.5 w-3.5" /> {p.comments}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <button className="mt-4 flex items-center justify-center gap-2 rounded-full border border-line py-2.5 text-[12.5px] font-semibold transition hover:bg-soft">
+        <MessageCircle className="h-4 w-4" /> Create post · Report issue · Suggest idea
+      </button>
+    </div>
+  );
+}
+
+function AiUsageCard({ className = "" }: { className?: string }) {
+  const maxTopic = Math.max(...aiUsage.topics.map((t) => t.pct));
+  return (
+    <div className={`card-lift flex flex-col rounded-3xl border border-line bg-card p-7 ${className}`}>
+      <div className="flex items-center gap-2.5">
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#2dd4bf] via-[#818cf8] to-[#f472b6]">
+          <Sparkles className="h-4 w-4 text-white" />
+        </span>
+        <div>
+          <h3 className="text-[15.5px] font-bold tracking-tight">Ask HR · AI</h3>
+          <p className="text-[11px] text-faint">What people ask the assistant</p>
+        </div>
+      </div>
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        <MiniStat value={aiUsage.questions} label="Questions / month" />
+        <MiniStat value={`${aiUsage.resolved}%`} label="Self-resolved" />
+      </div>
+      <div className="mt-5 space-y-2.5">
+        {aiUsage.topics.map((t) => (
+          <div key={t.topic}>
+            <div className="flex items-center justify-between text-[12px]">
+              <span className="font-medium">{t.topic}</span>
+              <span className="font-bold text-muted">{t.pct}%</span>
+            </div>
+            <div className="mt-1 h-[3px] w-full overflow-hidden rounded-full bg-soft">
+              <span className="block h-full rounded-full" style={{ width: `${(t.pct / maxTopic) * 100}%`, background: "linear-gradient(90deg,#818cf8,#f472b6)" }} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-5 flex items-start gap-2.5 rounded-2xl bg-cream px-4 py-3 ring-1 ring-cream-ring">
+        <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#e89b3c]" />
+        <p className="text-[12px] font-medium leading-relaxed text-cream-ink">{aiUsage.signal}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════ Row G — gamification + knowledge ════════════════════════ */
+
+function GamificationCard({ className = "" }: { className?: string }) {
+  return (
+    <div className={`card-lift flex flex-col rounded-3xl border border-line bg-card p-7 ${className}`}>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-[15.5px] font-bold tracking-tight">Gamification</h3>
+          <p className="mt-0.5 text-[12px] text-faint">Behavioral participation · {gamification.points} pts</p>
+        </div>
+        <span className="flex items-center gap-1 rounded-full bg-soft px-2.5 py-1 text-[11px] font-semibold text-muted">
+          <Flame className="h-3 w-3 text-[#f2884d]" /> {gamification.streaks.toLocaleString()}
+        </span>
+      </div>
+      <div className="mt-5 space-y-2">
+        {gamification.leaders.map((l, i) => (
+          <div key={l.name} className="flex items-center gap-3 rounded-xl bg-soft px-3 py-2.5">
+            <span className="grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold text-white" style={{ background: l.medal }}>{i + 1}</span>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[12.5px] font-semibold">{l.name}</div>
+              <div className="text-[10.5px] text-faint">{l.team}</div>
+            </div>
+            <span className="text-[13px] font-bold">{l.points.toLocaleString()}</span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        {gamification.badges.map((b) => (
+          <div key={b.name} className="flex items-center justify-between rounded-xl border border-line px-3 py-2 text-[11px]">
+            <span className="truncate font-medium text-muted">{b.name}</span>
+            <span className="font-bold">{b.count}</span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 flex items-center gap-2 rounded-xl bg-vamber-soft px-3 py-2.5 text-[11.5px] font-semibold text-vamber">
+        <AlertTriangle className="h-3.5 w-3.5" /> Participation drop · {gamification.drop}
+      </div>
+    </div>
+  );
+}
+
+function KnowledgeHubCard({ className = "" }: { className?: string }) {
+  return (
+    <div className={`card-lift rounded-3xl border border-line bg-card p-7 ${className}`}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="text-[15.5px] font-bold tracking-tight">Knowledge hub</h3>
+          <p className="mt-0.5 text-[12px] text-faint">Self-service & smart search</p>
+        </div>
+        <div className="flex items-center gap-3.5 text-[11px] font-medium text-muted">
+          <span><b className="text-ink">{knowledge.views}</b> views</span>
+          <span><b className="text-ink">{knowledge.searchSuccess}%</b> search success</span>
+        </div>
+      </div>
+      <div className="mt-5 grid gap-5 sm:grid-cols-2">
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-faint">Top queries</div>
+          <ul className="mt-2.5 space-y-2.5">
+            {knowledge.topQueries.map((q) => (
+              <li key={q.q} className="flex items-center justify-between gap-3">
+                <span className="flex min-w-0 items-center gap-2 text-[12.5px]">
+                  <FileText className="h-3.5 w-3.5 shrink-0 text-faint" />
+                  <span className="truncate">{q.q}</span>
+                </span>
+                <span className="text-[11px] font-semibold text-muted">{q.n}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-faint">Content gaps</div>
+          <ul className="mt-2.5 space-y-2">
+            {knowledge.gaps.map((g) => (
+              <li key={g} className="flex items-center gap-2 rounded-xl bg-vred-soft px-3 py-2 text-[11.5px] font-medium text-vred">
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0" /> {g}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════ Row H — business impact ════════════════════════ */
+
+function BusinessImpactCard() {
+  return (
+    <div className="card-elev rounded-3xl border border-line bg-card p-7">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="text-[15.5px] font-bold tracking-tight">Business impact correlation</h3>
+          <p className="mt-0.5 text-[12px] text-faint">Is engagement driving outcomes? — the strategic differentiator</p>
+        </div>
+        <span className="flex items-center gap-1 rounded-full bg-vgreen-soft px-2.5 py-1 text-[11px] font-bold text-vgreen">
+          <TrendingUp className="h-3 w-3" /> ROI {impact.roi}
+        </span>
+      </div>
+      <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-6">
+        <ImpactStat value={impact.attritionCorr} label="↔ attrition" />
+        <ImpactStat value={impact.productivityCorr} label="↔ productivity" />
+        <ImpactStat value={impact.revenueCorr} label="↔ revenue" />
+        <ImpactStat value={impact.attritionCost} label="cost of attrition / yr" />
+        <ImpactStat value={impact.roi} label="ROI of programs" />
+        <div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[22px] font-bold tracking-tight text-vgreen">{impact.topVsBottom.top}</span>
+            <span className="text-[12px] text-faint">vs</span>
+            <span className="text-[22px] font-bold tracking-tight text-vred">{impact.topVsBottom.bottom}</span>
+          </div>
+          <div className="text-[10.5px] text-faint">top vs bottom quartile output</div>
+        </div>
+      </div>
+      <div className="mt-5 flex items-start gap-2.5 rounded-2xl bg-cream px-4 py-3 ring-1 ring-cream-ring">
+        <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#e89b3c]" />
+        <p className="text-[12.5px] font-medium leading-relaxed text-cream-ink">{impact.insight}</p>
+      </div>
+    </div>
   );
 }
