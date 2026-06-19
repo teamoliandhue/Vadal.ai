@@ -1,37 +1,44 @@
 import * as React from 'react';
 
-/** Mirrors the Figma `Avatar` component set (Size × Type × Status) — bound to the same avatar/* tokens. */
-export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+/** Mirrors the Figma `Avatar` component set (Size × Type) + Status/Ring/Notification toggles — bound to avatar/* tokens.
+ *  Type (Photo / Initials / Icon) is resolved from the content props: `src` → `name` initials → `icon`. */
+export type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
 export type AvatarStatus = 'online' | 'busy' | 'away' | 'offline';
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
-  /** Photo URL. Falls back to initials, then icon, then a generic person glyph. */
+  /** Photo URL (Photo type). Falls back to initials, then icon, then a generic person glyph. */
   src?: string;
   alt?: string;
-  /** Used to derive initials and as the image alt when `alt` is unset. */
+  /** Used to derive initials (Initials type) and as the image alt when `alt` is unset. */
   name?: string;
   size?: AvatarSize;
   status?: AvatarStatus;
-  /** Icon fallback when there's no `src`/`name`. */
+  /** Icon fallback (Icon type) when there's no `src`/`name`. */
   icon?: React.ReactNode;
-  /** Brand ring — for the active / AI-attributed person. */
+  /** Aurora "posted a status / active story" ring. */
   ring?: boolean;
+  /** Unseen-activity notification dot (top-right). */
+  notification?: boolean;
 }
 
+// sizes reconciled to the size/avatar-* tokens: sm 24 · md 32 · lg 40 · xl 56
 const BOX: Record<AvatarSize, string> = {
-  xs: 'h-6 w-6 text-[10px]',
-  sm: 'h-8 w-8 text-xs',
-  md: 'h-10 w-10 text-sm',
-  lg: 'h-12 w-12 text-base',
-  xl: 'h-16 w-16 text-xl',
+  sm: 'h-6 w-6 text-xs',
+  md: 'h-8 w-8 text-sm',
+  lg: 'h-10 w-10 text-base',
+  xl: 'h-14 w-14 text-xl',
 };
-// status dot size + position, scaled per avatar size
 const DOT: Record<AvatarSize, string> = {
-  xs: 'h-2 w-2',
-  sm: 'h-2.5 w-2.5',
-  md: 'h-3 w-3',
-  lg: 'h-3.5 w-3.5',
-  xl: 'h-4 w-4',
+  sm: 'h-2 w-2',
+  md: 'h-2.5 w-2.5',
+  lg: 'h-3 w-3',
+  xl: 'h-[18px] w-[18px]',
+};
+const NOTIF: Record<AvatarSize, string> = {
+  sm: 'h-2 w-2',
+  md: 'h-2.5 w-2.5',
+  lg: 'h-3 w-3',
+  xl: 'h-3.5 w-3.5',
 };
 const STATUS_BG: Record<AvatarStatus, string> = {
   online: 'bg-[var(--avatar-status-online)]',
@@ -56,7 +63,7 @@ const PersonIcon = (
 );
 
 export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
-  { src, alt, name, size = 'md', status, icon, ring, className = '', style, ...rest },
+  { src, alt, name, size = 'md', status, icon, ring, notification, className = '', style, ...rest },
   ref,
 ) {
   const [broken, setBroken] = React.useState(false);
@@ -69,7 +76,8 @@ export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(function Av
       className={[
         'relative inline-flex shrink-0 items-center justify-center rounded-full font-semibold',
         'bg-[var(--avatar-bg)] text-[var(--avatar-label)] overflow-visible',
-        ring ? 'ring-2 ring-[var(--brand)] ring-offset-2 ring-offset-[var(--avatar-ring)]' : '',
+        // Aurora "posted" ring
+        ring ? 'ring-2 ring-offset-2 ring-offset-[var(--avatar-ring)] [--tw-ring-color:var(--grad-via)]' : '',
         BOX[size],
         className,
       ].join(' ')}
@@ -79,12 +87,7 @@ export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(function Av
       <span className="absolute inset-0 grid place-items-center overflow-hidden rounded-full">
         {showImg ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={src}
-            alt={alt ?? name ?? ''}
-            className="h-full w-full object-cover"
-            onError={() => setBroken(true)}
-          />
+          <img src={src} alt={alt ?? name ?? ''} className="h-full w-full object-cover" onError={() => setBroken(true)} />
         ) : ini ? (
           <span aria-hidden>{ini}</span>
         ) : (
@@ -93,12 +96,15 @@ export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(function Av
       </span>
       {status && (
         <span
-          className={[
-            'absolute bottom-0 right-0 rounded-full ring-2 ring-[var(--avatar-status-ring)]',
-            DOT[size],
-            STATUS_BG[status],
-          ].join(' ')}
+          className={['absolute bottom-0 right-0 rounded-full ring-2 ring-[var(--avatar-status-ring)]', DOT[size], STATUS_BG[status]].join(' ')}
           aria-label={status}
+          role="img"
+        />
+      )}
+      {notification && (
+        <span
+          className={['absolute top-0 right-0 rounded-full bg-[var(--accent-signal,var(--signal))] ring-2 ring-[var(--avatar-status-ring)]', NOTIF[size]].join(' ')}
+          aria-label="unread activity"
           role="img"
         />
       )}
@@ -124,22 +130,13 @@ export const AvatarGroup = React.forwardRef<HTMLDivElement, AvatarGroupProps>(fu
   return (
     <div ref={ref} className={['flex items-center', className].join(' ')} {...rest}>
       {shown.map((child, i) => (
-        <span
-          key={i}
-          className="-ml-2 rounded-full ring-2 ring-[var(--avatar-ring)] first:ml-0"
-        >
-          {React.isValidElement<AvatarProps>(child)
-            ? React.cloneElement(child, { size: child.props.size ?? size })
-            : child}
+        <span key={i} className="-ml-2 rounded-full ring-2 ring-[var(--avatar-ring)] first:ml-0">
+          {React.isValidElement<AvatarProps>(child) ? React.cloneElement(child, { size: child.props.size ?? size }) : child}
         </span>
       ))}
       {overflow > 0 && (
         <span
-          className={[
-            '-ml-2 inline-flex items-center justify-center rounded-full font-semibold',
-            'bg-[var(--avatar-bg)] text-[var(--avatar-label)] ring-2 ring-[var(--avatar-ring)]',
-            BOX[size],
-          ].join(' ')}
+          className={['-ml-2 inline-flex items-center justify-center rounded-full font-semibold', 'bg-[var(--avatar-bg)] text-[var(--avatar-label)] ring-2 ring-[var(--avatar-ring)]', BOX[size]].join(' ')}
           aria-label={`${overflow} more`}
         >
           +{overflow}
