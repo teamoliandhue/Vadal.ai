@@ -1,0 +1,23 @@
+{
+  "name": "@vadal/design-system",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Vadal design system — DTCG tokens, React components, and Figma↔code sync. Source of truth for tokens lives in tokens/; Figma variables and code are both generated/kept in sync from here.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./dist/tokens.css",
+    "./tailwind-preset": "./dist/tailwind-preset.js",
+    "./tokens": "./dist/tokens.ts"
+  },
+  "scripts": {
+    "build:tokens": "node build.mjs",
+    "figma:pull": "node scripts/figma-sync.mjs pull",
+    "figma:push": "node scripts/figma-sync.mjs push",
+    "storybook": "storybook dev -p 6006",
+    "build:storybook": "storybook build"
+  },
+  "dependencies": {
+    "style-dictionary": "^4.3.0"
+  }
+}
