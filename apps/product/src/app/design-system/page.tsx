@@ -97,16 +97,18 @@ function Badge({ tone, children, dot }: { tone: keyof typeof BADGE; children: st
   );
 }
 
-/* ---- Avatar (mirrors @vadal/design-system Avatar — photo/initials, status, group) ---- */
-const AV_PX = { sm: 32, md: 40, lg: 48 } as const;
-function Avatar({ initials, photo, size = "md", status, ring }: { initials?: string; photo?: string; size?: keyof typeof AV_PX; status?: "online" | "busy" | "away" | "offline"; ring?: boolean }) {
+/* ---- Avatar (mirrors @vadal/design-system Avatar — photo/initials, status, ring, notification) ---- */
+const AV_PX = { sm: 24, md: 32, lg: 40, xl: 56 } as const; // size/avatar-* tokens
+function Avatar({ initials, photo, size = "md", status, ring, notification }: { initials?: string; photo?: string; size?: keyof typeof AV_PX; status?: "online" | "busy" | "away" | "offline"; ring?: boolean; notification?: boolean }) {
   const px = AV_PX[size];
-  const dot = Math.round(px * 0.28);
+  const dot = Math.round(px * 0.3);
+  const fs = size === "sm" ? 12 : size === "md" ? 14 : size === "lg" ? 16 : 20;
   return (
     <span className="relative inline-flex shrink-0 items-center justify-center rounded-full font-semibold"
-      style={{ width: px, height: px, background: "var(--avatar-bg)", color: "var(--avatar-label)", fontSize: size === "sm" ? 12 : size === "lg" ? 16 : 14, backgroundImage: photo, boxShadow: ring ? "0 0 0 2px var(--avatar-ring), 0 0 0 4px var(--brand)" : undefined }}>
+      style={{ width: px, height: px, background: "var(--avatar-bg)", color: "var(--avatar-label)", fontSize: fs, backgroundImage: photo, boxShadow: ring ? "0 0 0 2px var(--avatar-ring), 0 0 0 4px var(--grad-via)" : undefined }}>
       {!photo && initials}
       {status && <span className="absolute bottom-0 right-0 rounded-full" style={{ width: dot, height: dot, background: `var(--avatar-status-${status})`, boxShadow: "0 0 0 2px var(--avatar-status-ring)" }} />}
+      {notification && <span className="absolute top-0 right-0 rounded-full" style={{ width: Math.round(px * 0.26), height: Math.round(px * 0.26), background: "var(--signal)", boxShadow: "0 0 0 2px var(--avatar-status-ring)" }} />}
     </span>
   );
 }

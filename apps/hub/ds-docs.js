@@ -271,7 +271,7 @@
     return `<div class="eyebrow">Components</div><h1>Avatar</h1>
     <p class="lede">A circular portrait with a graceful fallback chain — photo → initials → icon — plus an optional status dot, brand ring and overlapping group. Bound to <code>avatar/*</code> tokens.</p>
     <h2>Sizes</h2>
-    <div class="example"><div class="avatars">${["xs", "sm", "md", "lg", "xl"].map((s) => ini(s, "JS")).join("")}</div></div>
+    <div class="example"><div class="avatars">${["sm", "md", "lg", "xl"].map((s) => ini(s, "JS")).join("")}</div></div>
     <h2>Fallbacks</h2>
     <div class="example"><div class="avatars">
       ${photo("lg", p1)}
@@ -291,7 +291,7 @@
     </div>
     <h2>Props</h2>
     <table class="tbl"><thead><tr><th>Prop</th><th>Type</th><th>Default</th></tr></thead><tbody>
-      <tr><td>size</td><td>xs · sm · md · lg · xl</td><td>md</td></tr>
+      <tr><td>size</td><td>sm · md · lg · xl</td><td>md</td></tr>
       <tr><td>src · name · icon</td><td>photo → initials → icon fallback chain</td><td>—</td></tr>
       <tr><td>status</td><td>online · busy · away · offline</td><td>—</td></tr>
       <tr><td>ring</td><td>boolean — brand ring for the active / AI person</td><td>false</td></tr></tbody></table>
