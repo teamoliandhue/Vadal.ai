@@ -176,6 +176,10 @@
   --size-icon-sm: 16px;
   --size-icon-md: 20px;
   --size-icon-lg: 24px;
+  --size-avatar-sm: 24px;
+  --size-avatar-md: 32px;
+  --size-avatar-lg: 40px;
+  --size-avatar-xl: 56px;
   --text-11: 11px;
   --text-12: 12px;
   --text-13: 13px;

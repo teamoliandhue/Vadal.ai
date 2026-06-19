@@ -26,6 +26,10 @@
   "size-icon-sm": { "$type": "dimension", "$value": "16px" },
   "size-icon-md": { "$type": "dimension", "$value": "20px" },
   "size-icon-lg": { "$type": "dimension", "$value": "24px" },
+  "size-avatar-sm": { "$type": "dimension", "$value": "24px" },
+  "size-avatar-md": { "$type": "dimension", "$value": "32px" },
+  "size-avatar-lg": { "$type": "dimension", "$value": "40px" },
+  "size-avatar-xl": { "$type": "dimension", "$value": "56px" },
 
   "text-11": { "$type": "dimension", "$value": "11px" },
   "text-12": { "$type": "dimension", "$value": "12px" },

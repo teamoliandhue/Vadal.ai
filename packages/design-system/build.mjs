@@ -90,3 +90,19 @@ await fs.rm('dist/_dark.css');
 await fs.rm('dist/_light.scoped.css');
 await fs.rm('dist/_dark.scoped.css');
 console.log('✓ wrote dist/tokens.css, dist/tokens.scoped.css, dist/theme.css, dist/tokens.ts');
+
+// One source of truth → fan the scoped token CSS out to the apps that consume it,
+// so a build:tokens run leaves hub + product in sync (no manual copy step).
+const scopedCss = await fs.readFile('dist/tokens.scoped.css', 'utf8');
+const SYNC_TARGETS = [
+  '../../apps/hub/ds-tokens.css',
+  '../../apps/product/src/app/design-system/tokens.scoped.css',
+];
+for (const target of SYNC_TARGETS) {
+  try {
+    await fs.writeFile(target, scopedCss);
+    console.log('✓ synced →', target);
+  } catch (err) {
+    console.warn('⚠ skipped sync →', target, '(' + err.message + ')');
+  }
+}
