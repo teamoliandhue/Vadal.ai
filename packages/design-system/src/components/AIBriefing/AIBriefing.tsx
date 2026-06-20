@@ -10,7 +10,7 @@ export interface AIBriefingProps extends React.ButtonHTMLAttributes<HTMLButtonEl
 }
 
 const Spark = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
     <path d="M12 2.3c.5 4.8 2.4 6.7 7.2 7.2-4.8.5-6.7 2.4-7.2 7.2-.5-4.8-2.4-6.7-7.2-7.2C9.6 9 11.5 7.1 12 2.3Z" />
   </svg>
 );
@@ -41,11 +41,11 @@ export const AIBriefing = React.forwardRef<HTMLButtonElement, AIBriefingProps>(f
       ].join(' ')}
       {...rest}
     >
-      <span className="relative grid size-7 shrink-0 place-items-center rounded-lg text-[var(--ai-briefing-spark)] [background-image:linear-gradient(135deg,var(--grad-from),var(--grad-via),var(--grad-to))]">
+      <span className="relative grid size-8 shrink-0 place-items-center rounded-[10px] text-[var(--ai-briefing-spark)] [background-image:linear-gradient(135deg,var(--grad-from),var(--grad-via),var(--grad-to))]">
         <Spark />
         {isNew && (
           <span
-            className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-[var(--ai-briefing-dot)] ring-2 ring-[var(--ai-briefing-bg)]"
+            className="absolute -right-px -top-px size-[7px] rounded-full bg-[var(--ai-briefing-dot)] ring-[1.5px] ring-[var(--ai-briefing-bg)]"
             aria-label="unread"
             role="img"
           />

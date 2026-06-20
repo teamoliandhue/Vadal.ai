@@ -7,6 +7,8 @@ export interface HealthProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   value: string | number;
   label?: string;
   trend?: { direction?: TrendDirection; value: string };
+  /** Render as a link (e.g. to the Pulse health view) instead of a button. */
+  href?: string;
 }
 
 const Pulse = () => (
@@ -16,29 +18,37 @@ const Pulse = () => (
 );
 
 export const Health = React.forwardRef<HTMLButtonElement, HealthProps>(function Health(
-  { value, label = 'Health', trend, className = '', ...rest },
+  { value, label = 'Health', trend, href, className = '', ...rest },
   ref,
 ) {
-  return (
-    <button
-      ref={ref}
-      type="button"
-      className={[
-        'flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-left outline-none',
-        'bg-[var(--health-bg)] ring-1 ring-[var(--health-border)]',
-        'transition-colors duration-[var(--duration-fast)]',
-        'hover:bg-[var(--card-hover)] active:bg-[var(--soft)]',
-        'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
-        className,
-      ].join(' ')}
-      {...rest}
-    >
+  const cls = [
+    'flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-left outline-none',
+    'bg-[var(--health-bg)] ring-1 ring-[var(--health-border)]',
+    'transition-colors duration-[var(--duration-fast)]',
+    'hover:bg-[var(--card-hover)] active:bg-[var(--soft)]',
+    'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
+    className,
+  ].join(' ');
+  const inner = (
+    <>
       <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-[var(--health-chip-bg)] text-[var(--health-chip-icon)]" aria-hidden>
         <Pulse />
       </span>
       <span className="flex-1 text-sm font-medium text-[var(--health-label)]">{label}</span>
       <span className="text-[15px] font-bold text-[var(--health-value)]">{value}</span>
       {trend && <Trend direction={trend.direction} value={trend.value} />}
+    </>
+  );
+  if (href) {
+    return (
+      <a href={href} className={cls}>
+        {inner}
+      </a>
+    );
+  }
+  return (
+    <button ref={ref} type="button" className={cls} {...rest}>
+      {inner}
     </button>
   );
 });

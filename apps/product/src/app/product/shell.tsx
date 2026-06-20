@@ -1,31 +1,20 @@
-import Image from "next/image";
-import Link from "next/link";
-import {
-  BarChart3,
-  BookOpen,
-  ClipboardList,
-  FolderKanban,
-  Gauge,
-  HeartHandshake,
-  House,
-  Megaphone,
-  Newspaper,
-  Radio,
-  Settings,
-  Smile,
-  UsersRound,
-  type LucideIcon,
-} from "lucide-react";
-import { Sidebar, NavGroup, NavItem, WorkspaceSwitcher, AIBriefing, Health } from "@vadal/design-system";
-import { org, health } from "@/lib/data";
 import { AiDock } from "./ai-dock";
 import { TopBar } from "./header/TopBar";
 import { Toaster } from "./Toaster";
+import { Rail } from "./Rail";
 
 /* ════════════════════════ shared product shell ════════════════════════
-   The Lumen app chrome — sidebar rail, top bar, AI dock — used by both
-   Home (the employee daily workspace) and Pulse (people intelligence).
-   `active` highlights the current nav item; `breadcrumb` labels the bar. */
+   The Lumen app chrome — sidebar rail (./Rail, client), top bar, AI dock —
+   used by every product page. `active` highlights the current nav item;
+   `breadcrumb` labels the bar. */
+
+/* left-hand domain label per section (top-bar breadcrumb root) */
+const DOMAIN: Record<string, string> = {
+  Home: "My workspace", Pulse: "People intelligence", Analytics: "People intelligence",
+  Surveys: "Listening", Sentiment: "Listening", "Always-on listening": "Listening",
+  Recognition: "Engage", Campaigns: "Engage", Feed: "Engage",
+  "Manager hub": "Operations", Cases: "Operations", Knowledge: "Workspace", Settings: "Account",
+};
 
 export function Shell({
   active,
@@ -52,104 +41,6 @@ export function Shell({
   );
 }
 
-/* ── identity mark ── */
-function Mark({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 120" className={className} aria-hidden>
-      <defs>
-        <linearGradient id="shL" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#f6b26b" />
-          <stop offset="0.5" stopColor="#f08fb5" />
-          <stop offset="1" stopColor="#8b7cf8" />
-        </linearGradient>
-        <linearGradient id="shR" x1="1" y1="0" x2="0.2" y2="1">
-          <stop offset="0" stopColor="#8b7cf8" />
-          <stop offset="1" stopColor="#f08fb5" />
-        </linearGradient>
-      </defs>
-      <g transform="rotate(-24 47 60)">
-        <rect x="29" y="20" width="36" height="80" rx="17" fill="url(#shL)" />
-      </g>
-      <g transform="rotate(24 73 60)">
-        <rect x="55" y="20" width="36" height="80" rx="17" fill="url(#shR)" fillOpacity="0.92" />
-      </g>
-    </svg>
-  );
-}
-
-type RailItem = { label: string; icon: LucideIcon; href?: string; count?: string };
-
-const RAIL: RailItem[][] = [
-  [
-    { label: "Home", icon: House, href: "/product/home" },
-    { label: "Pulse", icon: Gauge, href: "/product" },
-    { label: "Analytics", icon: BarChart3, href: "/product/analytics" },
-  ],
-  [
-    { label: "Surveys", icon: ClipboardList, count: "3", href: "/product/surveys" },
-    { label: "Sentiment", icon: Smile, href: "/product/sentiment" },
-    { label: "Always-on listening", icon: Radio, href: "/product/listening" },
-  ],
-  [
-    { label: "Recognition", icon: HeartHandshake, href: "/product/recognition" },
-    { label: "Campaigns", icon: Megaphone, href: "/product/campaigns" },
-    { label: "Feed", icon: Newspaper, href: "/product/feed" },
-  ],
-  [
-    { label: "Manager hub", icon: UsersRound, count: "5", href: "/product/managers" },
-    { label: "Cases", icon: FolderKanban, href: "/product/cases" },
-    { label: "Knowledge", icon: BookOpen, href: "/product/knowledge" },
-  ],
-];
-
-/* left-hand domain label per section (top-bar breadcrumb root) */
-const DOMAIN: Record<string, string> = {
-  Home: "My workspace", Pulse: "People intelligence", Analytics: "People intelligence",
-  Surveys: "Listening", Sentiment: "Listening", "Always-on listening": "Listening",
-  Recognition: "Engage", Campaigns: "Engage", Feed: "Engage",
-  "Manager hub": "Operations", Cases: "Operations", Knowledge: "Workspace", Settings: "Account",
-};
-
-function Rail({ active }: { active: string }) {
-  return (
-    <Sidebar
-      className="max-lg:hidden"
-      logo={
-        <Link href="/product" className="flex items-center gap-2.5">
-          <Mark className="h-7 w-7" />
-          <span className="text-[16px] font-bold tracking-tight text-[var(--ink)]">
-            vadal<span className="text-[var(--brand)]">.ai</span>
-          </span>
-        </Link>
-      }
-      workspace={
-        <WorkspaceSwitcher
-          name={org.name}
-          meta={`${org.headcount.toLocaleString()} people`}
-          logo={<Image src={org.logo} alt={org.name} width={32} height={32} className="h-full w-full object-contain p-[3px]" />}
-        />
-      }
-      briefing={<AIBriefing title="Today's AI briefing" subtitle="3 new insights" />}
-      health={<Health value={health.score} label="Health" trend={{ direction: "up", value: String(health.delta) }} />}
-      footer={<NavItem icon={<Settings className="size-[18px]" strokeWidth={1.85} />} label="Settings" active={active === "Settings"} href="/product/settings" />}
-    >
-      {RAIL.map((group, gi) => (
-        <NavGroup key={gi}>
-          {group.map((it) => (
-            <NavItem
-              key={it.label}
-              href={it.href ?? "#"}
-              active={it.label === active}
-              label={it.label}
-              count={it.count}
-              icon={<it.icon className="size-[18px]" strokeWidth={it.label === active ? 2.1 : 1.85} />}
-            />
-          ))}
-        </NavGroup>
-      ))}
-    </Sidebar>
-  );
-}
-
+// Rail lives in ./Rail (client) — Signal logo · workspace switcher + menu · AI briefing · nav · Health.
 // TopBar lives in ./header/TopBar (client) — breadcrumb · search (⌘K) · Intelligence · theme · notifications · account.
 // AiDock lives in ./ai-dock (client) — a functional chat dock opened from anywhere via the `vadal:ask` event.
