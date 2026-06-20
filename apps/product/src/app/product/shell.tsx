@@ -41,7 +41,7 @@ export function Shell({
       <Rail active={active} />
       <div className="relative flex min-w-0 flex-1 flex-col">
         <div className="canvas-glow" aria-hidden />
-        <TopBar domain={active === "Home" ? "My workspace" : "People intelligence"} breadcrumb={breadcrumb} />
+        <TopBar domain={DOMAIN[active] ?? "Workspace"} breadcrumb={breadcrumb} />
         <main className="relative mx-auto w-full max-w-[1240px] flex-1 px-6 pb-28 pt-8 sm:px-10 sm:pt-10">
           {children}
         </main>
@@ -83,24 +83,32 @@ const RAIL: RailItem[][] = [
   [
     { label: "Home", icon: House, href: "/product/home" },
     { label: "Pulse", icon: Gauge, href: "/product" },
-    { label: "Analytics", icon: BarChart3 },
+    { label: "Analytics", icon: BarChart3, href: "/product/analytics" },
   ],
   [
-    { label: "Surveys", icon: ClipboardList, count: "3" },
-    { label: "Sentiment", icon: Smile },
-    { label: "Always-on listening", icon: Radio },
+    { label: "Surveys", icon: ClipboardList, count: "3", href: "/product/surveys" },
+    { label: "Sentiment", icon: Smile, href: "/product/sentiment" },
+    { label: "Always-on listening", icon: Radio, href: "/product/listening" },
   ],
   [
-    { label: "Recognition", icon: HeartHandshake },
-    { label: "Campaigns", icon: Megaphone },
+    { label: "Recognition", icon: HeartHandshake, href: "/product/recognition" },
+    { label: "Campaigns", icon: Megaphone, href: "/product/campaigns" },
     { label: "Feed", icon: Newspaper, href: "/product/feed" },
   ],
   [
-    { label: "Manager hub", icon: UsersRound, count: "5" },
-    { label: "Cases", icon: FolderKanban },
-    { label: "Knowledge", icon: BookOpen },
+    { label: "Manager hub", icon: UsersRound, count: "5", href: "/product/managers" },
+    { label: "Cases", icon: FolderKanban, href: "/product/cases" },
+    { label: "Knowledge", icon: BookOpen, href: "/product/knowledge" },
   ],
 ];
+
+/* left-hand domain label per section (top-bar breadcrumb root) */
+const DOMAIN: Record<string, string> = {
+  Home: "My workspace", Pulse: "People intelligence", Analytics: "People intelligence",
+  Surveys: "Listening", Sentiment: "Listening", "Always-on listening": "Listening",
+  Recognition: "Engage", Campaigns: "Engage", Feed: "Engage",
+  "Manager hub": "Operations", Cases: "Operations", Knowledge: "Workspace", Settings: "Account",
+};
 
 function Rail({ active }: { active: string }) {
   return (
@@ -123,7 +131,7 @@ function Rail({ active }: { active: string }) {
       }
       briefing={<AIBriefing title="Today's AI briefing" subtitle="3 new insights" />}
       health={<Health value={health.score} label="Health" trend={{ direction: "up", value: String(health.delta) }} />}
-      footer={<NavItem icon={<Settings className="size-[18px]" strokeWidth={1.85} />} label="Settings" href="#" />}
+      footer={<NavItem icon={<Settings className="size-[18px]" strokeWidth={1.85} />} label="Settings" active={active === "Settings"} href="/product/settings" />}
     >
       {RAIL.map((group, gi) => (
         <NavGroup key={gi}>

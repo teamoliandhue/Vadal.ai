@@ -48,14 +48,12 @@ function Figure({ label, children, className = "" }: { label: string; children: 
 
 /* ════════════════════════ Briefing (command bar + decisions) ════════════════════════ */
 const PERIODS = ["7 days", "30 days", "Quarter"] as const;
-function Briefing({ tab, setTab }: { tab: string; setTab: (t: string) => void }) {
-  const [period, setPeriod] = usePersistentState<string>("vadal:pulse-period", "30 days");
+function Briefing({ setTab, period, setPeriod }: { setTab: (t: string) => void; period: string; setPeriod: (p: string) => void }) {
   const acts = [
     { label: "Review risk", to: "Attrition & risk" },
     { label: "See engagement", to: "Engagement" },
     { label: "Review managers", to: "Managers" },
   ];
-  void tab;
   return (
     <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card p-7 shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)] sm:p-9">
       <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
@@ -120,17 +118,23 @@ function HealthCard({ className = "" }: { className?: string }) {
     </Card>
   );
 }
-function TrendCard({ className = "" }: { className?: string }) {
+const WIN_PTS: Record<string, number> = { "7 days": 5, "30 days": 9, "Quarter": engagementTrend.series.length };
+const WIN_MO: Record<string, number> = { "7 days": 4, "30 days": 7, "Quarter": engagementTrend.months.length };
+function TrendCard({ period, className = "" }: { period: string; className?: string }) {
+  const n = WIN_PTS[period] ?? engagementTrend.series.length;
+  const series = engagementTrend.series.slice(-n);
+  const benchmark = engagementTrend.benchmark.slice(-n);
+  const months = engagementTrend.months.slice(-(WIN_MO[period] ?? engagementTrend.months.length));
   return (
     <Card className={className}>
       <div className="flex items-start justify-between">
-        <div><Eyebrow>Engagement</Eyebrow><h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Trend vs benchmark</h2></div>
+        <div><Eyebrow>Engagement · {period}</Eyebrow><h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Trend vs benchmark</h2></div>
         <div className="flex items-center gap-3 text-[12px] text-faint"><span className="flex items-center gap-1.5"><span className="h-2 w-4 rounded-full" style={{ background: TONE.purple }} /> Us</span><span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t-2 border-dashed border-line" /> Benchmark</span></div>
       </div>
-      <Figure label={`Engagement trend vs benchmark, ${engagementTrend.months[0]} to ${engagementTrend.months[engagementTrend.months.length - 1]}`}>
-        <TrendChart series={[...engagementTrend.series]} benchmark={[...engagementTrend.benchmark]} color={TONE.purple} height={190} id="eng" className="mt-4" />
+      <Figure label={`Engagement trend vs benchmark over ${period}`}>
+        <TrendChart series={series} benchmark={benchmark} color={TONE.purple} height={190} id="eng" className="mt-4" />
       </Figure>
-      <div className="mt-1 flex justify-between text-[12px] text-faint">{engagementTrend.months.filter((_, i) => i % 2 === 0).map((m) => <span key={m}>{m}</span>)}</div>
+      <div className="mt-1 flex justify-between text-[12px] text-faint">{months.filter((_, i) => months.length <= 6 || i % 2 === 0).map((m) => <span key={m}>{m}</span>)}</div>
       <p className="mt-3 rounded-2xl bg-soft p-3.5 text-[14px] leading-relaxed text-muted"><Sparkles className="mr-1 inline h-3.5 w-3.5 text-[var(--purple)]" />{engagementTrend.insight}</p>
     </Card>
   );
@@ -348,11 +352,12 @@ type Tab = (typeof TABS)[number];
 export function PulseDashboard() {
   const [tab, setTab] = React.useState<Tab>("Overview");
   const [scope, setScope] = usePersistentState<string>("vadal:pulse-scope", "All teams");
+  const [period, setPeriod] = usePersistentState<string>("vadal:pulse-period", "30 days");
   const scopes = ["All teams", ...departments.map((d) => d.name)];
 
   return (
     <div className="flex flex-col gap-6">
-      <Briefing tab={tab} setTab={(t) => setTab(t as Tab)} />
+      <Briefing setTab={(t) => setTab(t as Tab)} period={period} setPeriod={setPeriod} />
 
       {/* tabs + scope */}
       <div className="sticky top-[57px] z-10 -mx-2 flex flex-wrap items-center justify-between gap-3 border-b border-line bg-canvas/85 px-2 py-2 backdrop-blur-md">
@@ -369,14 +374,14 @@ export function PulseDashboard() {
       </div>
 
       {tab === "Overview" && (<>
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><HealthCard className="xl:col-span-4" /><TrendCard className="xl:col-span-8" /></div>
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><HealthCard className="xl:col-span-4" /><TrendCard period={period} className="xl:col-span-8" /></div>
         <KpiRow />
         <ActionQueueCard />
         <BusinessImpactStrip />
       </>)}
 
       {tab === "Engagement" && (<>
-        <TrendCard />
+        <TrendCard period={period} />
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><VoiceCard className="xl:col-span-7" /><CampaignsCard className="xl:col-span-5" /></div>
       </>)}
 
