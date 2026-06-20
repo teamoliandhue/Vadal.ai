@@ -102,7 +102,7 @@ function Briefing({ v, setTab, period, setPeriod }: { v: PulseView; setTab: (t: 
                 <div className="min-w-0 flex-1"><div className="text-[14px] font-semibold leading-snug">{b.text}</div><div className="mt-0.5 text-[12px] text-faint">{b.sub}</div></div>
               </div>
               <div className="mt-3 flex items-center gap-2">
-                <Button variant="brand" size="sm" onClick={() => setTab(acts[i].to)}>{acts[i].label}</Button>
+                <Button variant="secondary" size="sm" onClick={() => setTab(acts[i].to)}>{acts[i].label}</Button>
                 <button onClick={() => ask(b.text)} className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] hover:underline"><Sparkles className="h-3 w-3" /> Why</button>
               </div>
             </div>
