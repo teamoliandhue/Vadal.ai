@@ -362,10 +362,52 @@ export const managers = [
 
 /* 7 · Employee Experience Feed (content layer — the biggest gap) */
 export const experience = { dau: "8.1K", wau: "11.2K", dauPct: 65, views: "42K", reactions: "9.3K", comments: "2.1K" };
-export const feed = [
-  { kind: "Leadership", author: "Pradeep K.", role: "CEO", img: "/avatars/user-6.svg", text: "Q2 wrapped strong — thank you for the energy. Watch for the new wellbeing campaign next week.", time: "2h", likes: 312, comments: 48, accent: "#8b7cf8" },
-  { kind: "Recognition", author: "Neha R.", role: "→ Design team", img: "/avatars/user-5.svg", text: "Shoutout to the team for shipping the onboarding flow ahead of schedule. Ownership at its best.", time: "5h", likes: 186, comments: 22, accent: "#33b28a" },
-  { kind: "Announcement", author: "People Team", role: "Company-wide", img: "/avatars/user-8.svg", text: "The annual engagement survey opens Monday. Your voice shapes the next quarter.", time: "1d", likes: 94, comments: 12, accent: "#f2884d" },
+
+export type FeedPost = {
+  kind: "Leadership" | "Recognition" | "Announcement" | "Team";
+  author: string;
+  role: string;
+  img: string;
+  text: string;
+  time: string;
+  likes: number;
+  comments: number;
+  pinned?: boolean;
+  /** CSS gradient used as a media banner. */
+  banner?: string;
+  /** Avatar srcs of a few people who reacted. */
+  likedBy?: string[];
+};
+
+export const feed: FeedPost[] = [
+  {
+    kind: "Leadership", author: "Pradeep K.", role: "CEO", img: "/avatars/user-6.svg",
+    text: "Q2 wrapped strong — thank you all for the energy. Next week we kick off the Wellbeing campaign: focus weeks, no-meeting Wednesdays, and a refreshed benefits guide. 💜",
+    time: "2h", likes: 312, comments: 48, pinned: true,
+    banner: "linear-gradient(120deg,#c7d2fe,#ddd6fe 45%,#fbcfe8)",
+    likedBy: ["/avatars/user-5.svg", "/avatars/user-1.svg", "/avatars/user-7.svg"],
+  },
+  {
+    kind: "Recognition", author: "Neha R.", role: "Design", img: "/avatars/user-5.svg",
+    text: "Shoutout to the team for shipping the onboarding flow ahead of schedule. Ownership at its best 👏",
+    time: "5h", likes: 186, comments: 22, likedBy: ["/avatars/user-8.svg", "/avatars/user-2.svg"],
+  },
+  {
+    kind: "Team", author: "Aarav S.", role: "Engineering", img: "/avatars/user-2.svg",
+    text: "Shipped the new search — about 40% faster on large workspaces. Thanks to everyone who stress-tested it over the weekend.",
+    time: "7h", likes: 64, comments: 9,
+  },
+  {
+    kind: "Announcement", author: "People Team", role: "Company-wide", img: "/avatars/user-8.svg",
+    text: "The annual engagement survey opens Monday. 10 minutes, fully confidential — your voice shapes next quarter.",
+    time: "1d", likes: 94, comments: 12,
+  },
+];
+
+export const celebrations = [
+  { type: "Birthday", emoji: "🎂", name: "Sara Mehta", team: "Support", detail: "Today", img: "/avatars/user-7.svg" },
+  { type: "Work anniversary", emoji: "🎉", name: "Arjun Rao", team: "Engineering", detail: "3 years", img: "/avatars/user-2.svg" },
+  { type: "New joiner", emoji: "👋", name: "Dev Patel", team: "Design", detail: "Joined Mon", img: "/avatars/user-3.svg" },
 ] as const;
 
 /* 9 · Gamification & Participation */
