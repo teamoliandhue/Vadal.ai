@@ -16,7 +16,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 const VARIANT: Record<ButtonVariant, string> = {
   primary: 'bg-[var(--button-primary-bg)] text-[var(--button-primary-label)] hover:bg-[var(--button-primary-bg-hover)] active:bg-[var(--button-primary-bg-active)]',
   brand: 'bg-[var(--button-brand-bg)] text-[var(--button-brand-label)] hover:bg-[var(--button-brand-bg-hover)] active:bg-[var(--button-brand-bg-active)]',
-  secondary: 'bg-[var(--button-secondary-bg)] text-[var(--button-secondary-label)] hover:bg-[var(--button-secondary-bg-hover)]',
+  secondary: 'bg-[var(--button-secondary-bg)] text-[var(--button-secondary-label)] ring-1 ring-inset ring-[var(--button-secondary-border)] hover:bg-[var(--button-secondary-bg-hover)]',
   tertiary: 'bg-[var(--button-tertiary-bg)] text-[var(--button-tertiary-label)] border border-[var(--button-tertiary-border)] hover:bg-[var(--button-tertiary-bg-hover)]',
   ghost: 'bg-transparent text-[var(--button-ghost-label)] hover:bg-[var(--button-ghost-bg-hover)]',
   destructive: 'bg-[var(--button-danger-bg)] text-[var(--button-danger-label)]',

@@ -15,6 +15,8 @@
   "brand": { "$type": "color", "$value": "#7c5cf8" },
   "brand-strong": { "$type": "color", "$value": "#6a5cf0" },
   "brand-soft": { "$type": "color", "$value": "#f1effd" },
+  "brand-soft-hover": { "$type": "color", "$value": "#e7e1fc" },
+  "brand-soft-border": { "$type": "color", "$value": "#cdc5f6" },
   "brand-text": { "$type": "color", "$value": "#7c5cf8" },
   "brand-border": { "$type": "color", "$value": "#7c5cf8" },
   "brand-hover": { "$type": "color", "$value": "#6a4fe6" },

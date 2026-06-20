@@ -16,6 +16,8 @@
   --brand: #7c5cf8;
   --brand-strong: #6a5cf0;
   --brand-soft: #f1effd;
+  --brand-soft-hover: #e7e1fc;
+  --brand-soft-border: #cdc5f6;
   --brand-text: #7c5cf8;
   --brand-border: #7c5cf8;
   --brand-hover: #6a4fe6;
@@ -66,7 +68,8 @@
   --button-brand-bg-active: #5a40d6;
   --button-brand-label: #ffffff;
   --button-secondary-bg: #f1effd;
-  --button-secondary-bg-hover: #f1effd;
+  --button-secondary-bg-hover: #e7e1fc;
+  --button-secondary-border: #cdc5f6;
   --button-secondary-label: #7c5cf8;
   --button-tertiary-bg: #ffffff;
   --button-tertiary-bg-hover: #f6f6f8;
@@ -274,6 +277,8 @@ html.dark {
   --brand: #9270ff;
   --brand-strong: #b5a8ff;
   --brand-soft: #232136;
+  --brand-soft-hover: #2b2942;
+  --brand-soft-border: #3b3756;
   --brand-text: #b5a8ff;
   --brand-border: #9270ff;
   --brand-hover: #a98cff;
@@ -324,7 +329,8 @@ html.dark {
   --button-brand-bg-active: #b89eff;
   --button-brand-label: #ffffff;
   --button-secondary-bg: #232136;
-  --button-secondary-bg-hover: #232136;
+  --button-secondary-bg-hover: #2b2942;
+  --button-secondary-border: #3b3756;
   --button-secondary-label: #b5a8ff;
   --button-tertiary-bg: #17171d;
   --button-tertiary-bg-hover: #1e1e25;
