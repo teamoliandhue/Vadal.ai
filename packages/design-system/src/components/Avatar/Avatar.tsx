@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 
 /** Mirrors the Figma `Avatar` component set (Size × Type) + Status/Ring/Notification toggles — bound to avatar/* tokens.
