@@ -7,11 +7,13 @@ export interface NavItemProps extends React.AnchorHTMLAttributes<HTMLAnchorEleme
   label: string;
   /** Optional count pill (e.g. "3"). */
   count?: string | number;
+  /** Optional status chip (e.g. "Soon") — quieter than a count; shown instead of it. */
+  tag?: string;
   active?: boolean;
 }
 
 export const NavItem = React.forwardRef<HTMLAnchorElement, NavItemProps>(function NavItem(
-  { icon, label, count, active = false, className = '', ...rest },
+  { icon, label, count, tag, active = false, className = '', ...rest },
   ref,
 ) {
   return (
@@ -39,10 +41,16 @@ export const NavItem = React.forwardRef<HTMLAnchorElement, NavItemProps>(functio
         {icon}
       </span>
       <span className="flex-1 truncate">{label}</span>
-      {count != null && (
-        <span className="rounded-full bg-[var(--nav-count-bg)] px-1.5 py-0.5 text-[12px] font-semibold text-[var(--nav-count-label)]">
-          {count}
+      {tag ? (
+        <span className="rounded-full px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--faint)] ring-1 ring-[var(--line)]">
+          {tag}
         </span>
+      ) : (
+        count != null && (
+          <span className="rounded-full bg-[var(--nav-count-bg)] px-1.5 py-0.5 text-[12px] font-semibold text-[var(--nav-count-label)]">
+            {count}
+          </span>
+        )
       )}
     </a>
   );

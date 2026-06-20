@@ -17,10 +17,19 @@ export interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
 }
 
-/** A spaced group of NavItems. Groups after the first get a hairline top divider. */
-export function NavGroup({ children, className = '', ...rest }: React.HTMLAttributes<HTMLDivElement>) {
+/** A spaced group of NavItems. Groups after the first get a hairline top divider.
+ *  Pass `label` to render a small uppercase section header (the nav taxonomy). */
+export interface NavGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  label?: string;
+}
+export function NavGroup({ label, children, className = '', ...rest }: NavGroupProps) {
   return (
     <div className={['flex flex-col gap-0.5 py-2 first:pt-0', className].join(' ')} {...rest}>
+      {label && (
+        <p className="px-3 pb-1 pt-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--faint)]">
+          {label}
+        </p>
+      )}
       {children}
     </div>
   );

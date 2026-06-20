@@ -19,29 +19,48 @@ import { toast } from "./Toaster";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 
-type RailItem = { label: string; icon: LucideIcon; href?: string; count?: string };
+type RailItem = { label: string; icon: LucideIcon; href: string; soon?: boolean };
+type RailGroup = { label: string; items: RailItem[] };
 
-const RAIL: RailItem[][] = [
-  [
-    { label: "Home", icon: House, href: "/product/home" },
-    { label: "Pulse", icon: Gauge, href: "/product" },
-    { label: "Analytics", icon: BarChart3, href: "/product/analytics" },
-  ],
-  [
-    { label: "Surveys", icon: ClipboardList, count: "3", href: "/product/surveys" },
-    { label: "Sentiment", icon: Smile, href: "/product/sentiment" },
-    { label: "Always-on listening", icon: Radio, href: "/product/listening" },
-  ],
-  [
-    { label: "Recognition", icon: HeartHandshake, href: "/product/recognition" },
-    { label: "Campaigns", icon: Megaphone, href: "/product/campaigns" },
-    { label: "Feed", icon: Newspaper, href: "/product/feed" },
-  ],
-  [
-    { label: "Manager hub", icon: UsersRound, count: "5", href: "/product/managers" },
-    { label: "Cases", icon: FolderKanban, href: "/product/cases" },
-    { label: "Knowledge", icon: BookOpen, href: "/product/knowledge" },
-  ],
+/* Module-aligned IA (strategy doc) — intelligence-forward. "Soon" marks the
+   post-go-live / not-yet-built sections; built surfaces (Home, Pulse, Analytics,
+   Feed) carry no chip. */
+const RAIL: RailGroup[] = [
+  { label: "Workspace", items: [{ label: "Home", icon: House, href: "/product/home" }] },
+  {
+    label: "Intelligence",
+    items: [
+      { label: "Pulse", icon: Gauge, href: "/product" },
+      { label: "Analytics", icon: BarChart3, href: "/product/analytics" },
+    ],
+  },
+  {
+    label: "Listen",
+    items: [
+      { label: "Surveys", icon: ClipboardList, href: "/product/surveys", soon: true },
+      { label: "Sentiment", icon: Smile, href: "/product/sentiment", soon: true },
+      { label: "Always-on listening", icon: Radio, href: "/product/listening", soon: true },
+    ],
+  },
+  {
+    label: "Engage",
+    items: [
+      { label: "Recognition", icon: HeartHandshake, href: "/product/recognition", soon: true },
+      { label: "Campaigns", icon: Megaphone, href: "/product/campaigns", soon: true },
+      { label: "Feed", icon: Newspaper, href: "/product/feed" },
+    ],
+  },
+  {
+    label: "Operations",
+    items: [
+      { label: "Manager hub", icon: UsersRound, href: "/product/managers", soon: true },
+      { label: "Cases", icon: FolderKanban, href: "/product/cases", soon: true },
+    ],
+  },
+  {
+    label: "Knowledge",
+    items: [{ label: "Knowledge", icon: BookOpen, href: "/product/knowledge", soon: true }],
+  },
 ];
 
 export function Rail({ active }: { active: string }) {
@@ -93,15 +112,15 @@ export function Rail({ active }: { active: string }) {
       health={<Health value={health.score} label="Health" trend={{ direction: "up", value: String(health.delta) }} href="/product" />}
       footer={<NavItem icon={<Settings className="size-[18px]" strokeWidth={1.85} />} label="Settings" active={active === "Settings"} href="/product/settings" />}
     >
-      {RAIL.map((group, gi) => (
-        <NavGroup key={gi}>
-          {group.map((it) => (
+      {RAIL.map((group) => (
+        <NavGroup key={group.label} label={group.label}>
+          {group.items.map((it) => (
             <NavItem
               key={it.label}
-              href={it.href ?? "#"}
+              href={it.href}
               active={it.label === active}
               label={it.label}
-              count={it.count}
+              tag={it.soon ? "Soon" : undefined}
               icon={<it.icon className="size-[18px]" strokeWidth={it.label === active ? 2.1 : 1.85} />}
             />
           ))}
