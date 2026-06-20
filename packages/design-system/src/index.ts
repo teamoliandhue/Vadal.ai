@@ -37,6 +37,9 @@ export type { WorkspaceMenuProps } from './components/WorkspaceMenu/WorkspaceMen
 export { AIBriefing } from './components/AIBriefing/AIBriefing';
 export type { AIBriefingProps } from './components/AIBriefing/AIBriefing';
 
+export { SparkMark } from './components/SparkMark/SparkMark';
+export type { SparkMarkProps } from './components/SparkMark/SparkMark';
+
 export { Health } from './components/Health/Health';
 export type { HealthProps } from './components/Health/Health';
 

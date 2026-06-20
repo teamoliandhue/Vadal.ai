@@ -3,7 +3,8 @@
    Floating launcher → chat panel. Opens from anywhere via a `vadal:ask` window event
    (the Home "Ask Vadal" card dispatches it). Demo answers, no backend. */
 import * as React from "react";
-import { ArrowUp, Sparkles, X } from "lucide-react";
+import { ArrowUp, X } from "lucide-react";
+import { SparkMark } from "@vadal/design-system";
 
 type Msg = { role: "user" | "ai"; text: string };
 
@@ -27,11 +28,17 @@ export function AiDock() {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const bodyRef = React.useRef<HTMLDivElement>(null);
 
+  const [thinking, setThinking] = React.useState(false);
+
   const send = React.useCallback((q: string) => {
     if (!q.trim()) return;
     setMsgs((m) => [...m, { role: "user", text: q }]);
     setVal("");
-    setTimeout(() => setMsgs((m) => [...m, { role: "ai", text: aiAnswer(q) }]), 550);
+    setThinking(true);
+    setTimeout(() => {
+      setMsgs((m) => [...m, { role: "ai", text: aiAnswer(q) }]);
+      setThinking(false);
+    }, 800);
   }, []);
 
   React.useEffect(() => {
@@ -47,14 +54,14 @@ export function AiDock() {
 
   React.useEffect(() => {
     if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
-  }, [msgs]);
+  }, [msgs, thinking]);
 
   return (
     <>
       {open && (
         <div className="fixed bottom-24 right-6 z-40 flex w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-3xl border border-line bg-card shadow-[0_24px_60px_-20px_rgba(20,20,40,0.45)] dark:border-white/10">
           <div className="flex items-center gap-2.5 border-b border-line px-4 py-3 dark:border-white/10">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#2dd4bf] via-[#818cf8] to-[#f472b6]"><Sparkles className="h-4 w-4 text-white" /></span>
+            <span className="ai-grad grid h-8 w-8 place-items-center rounded-full"><SparkMark size={18} tone="solid" state={thinking ? "thinking" : "still"} /></span>
             <div className="flex-1">
               <div className="text-[14px] font-bold tracking-tight">Vadal AI</div>
               <div className="text-[14px] text-faint">Ask HR or Company</div>
@@ -72,11 +79,22 @@ export function AiDock() {
                 </div>
               </>
             ) : (
-              msgs.map((m, i) => (
-                <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
-                  <div className={`max-w-[82%] rounded-2xl px-3 py-2 text-[16px] leading-relaxed ${m.role === "user" ? "bg-[var(--purple)] text-white" : "bg-soft text-ink"}`}>{m.text}</div>
-                </div>
-              ))
+              <>
+                {msgs.map((m, i) => (
+                  <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start gap-2"}>
+                    {m.role === "ai" && <span className="ai-grad mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" /></span>}
+                    <div className={`ai-stream max-w-[82%] rounded-2xl px-3 py-2 text-[16px] leading-relaxed ${m.role === "user" ? "bg-[var(--purple)] text-white" : "bg-[var(--ai-surface)] text-ink ring-1 ring-[var(--ai-border)]"}`}>{m.text}</div>
+                  </div>
+                ))}
+                {thinking && (
+                  <div className="flex items-center gap-2">
+                    <span className="ai-grad grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" state="thinking" /></span>
+                    <span className="flex items-center gap-1 rounded-2xl bg-[var(--ai-surface)] px-3 py-3 ring-1 ring-[var(--ai-border)]" aria-label="Vadal is thinking">
+                      <span className="ai-dot" /><span className="ai-dot" style={{ animationDelay: "0.16s" }} /><span className="ai-dot" style={{ animationDelay: "0.32s" }} />
+                    </span>
+                  </div>
+                )}
+              </>
             )}
           </div>
           <form onSubmit={(e) => { e.preventDefault(); send(val); }} className="flex items-center gap-2 border-t border-line p-3 dark:border-white/10">
@@ -89,7 +107,7 @@ export function AiDock() {
         onClick={() => setOpen((o) => !o)}
         className="fixed bottom-5 right-6 z-30 flex items-center gap-2.5 rounded-full border border-line bg-card py-2.5 pl-3 pr-4 shadow-[0_10px_34px_rgba(20,20,25,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_44px_rgba(139,124,248,0.32)] dark:border-white/10 dark:shadow-[0_10px_34px_rgba(0,0,0,0.5)]"
       >
-        <span className="ai-aura grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#2dd4bf] via-[#818cf8] to-[#f472b6]"><Sparkles className="h-4 w-4 text-white" /></span>
+        <span className="ai-aura ai-grad grid h-8 w-8 place-items-center rounded-full"><SparkMark size={18} tone="solid" state="idle" /></span>
         <span className="text-left">
           <span className="flex items-center gap-1 text-[14px] font-semibold">Vadal <span className="rounded-[4px] border border-line px-1 text-[12px] font-bold text-muted dark:border-white/15">AI</span></span>
           <span className="block text-[14px] text-faint">What are you looking for today?</span>

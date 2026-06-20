@@ -1,8 +1,9 @@
 "use client";
-/* Header · Intelligence — amber trigger → today's AI insights popover.
+/* Header · Intelligence — Aurora trigger → today's AI insights popover.
    Surfaces the org briefing (flight-risk, engagement, manager actions) + impact. */
 import * as React from "react";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { SparkMark } from "@vadal/design-system";
 import { aiBriefing, briefingImpact } from "@/lib/data";
 import { useMenu } from "./useMenu";
 
@@ -19,9 +20,9 @@ export function IntelligenceMenu() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex items-center gap-1.5 rounded-full border border-[#f3d9a8] bg-card px-3.5 py-2 text-[14px] font-semibold transition hover:shadow-[0_4px_16px_rgba(245,184,107,0.3)] aria-expanded:shadow-[0_4px_16px_rgba(245,184,107,0.3)] dark:border-[#5a4a26]"
+        className="flex items-center gap-1.5 rounded-full bg-card px-3.5 py-2 text-[14px] font-semibold ring-1 ring-[var(--ai-border)] transition hover:shadow-[0_4px_16px_rgba(124,92,248,0.28)] aria-expanded:shadow-[0_4px_16px_rgba(124,92,248,0.28)]"
       >
-        <Sparkles className="h-3.5 w-3.5 text-[#e89b3c]" />
+        <SparkMark size={14} />
         Intelligence
       </button>
 
@@ -31,7 +32,7 @@ export function IntelligenceMenu() {
           className="absolute right-0 top-[calc(100%+10px)] z-40 w-[360px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-line bg-card shadow-[0_4px_12px_-2px_rgba(10,10,12,0.12),0_18px_44px_-10px_rgba(10,10,12,0.22)] dark:border-white/10"
         >
           <div className="flex items-center gap-2.5 border-b border-line px-4 py-3 dark:border-white/10">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#f6b26b] to-[#e0708a]"><Sparkles className="h-4 w-4 text-white" /></span>
+            <span className="ai-grad grid h-8 w-8 place-items-center rounded-full"><SparkMark size={18} tone="solid" /></span>
             <div className="flex-1">
               <div className="text-[14px] font-bold tracking-tight">Today’s intelligence</div>
               <div className="text-[12px] text-faint">{aiBriefing.length} new insights for your org</div>
@@ -62,7 +63,7 @@ export function IntelligenceMenu() {
             onClick={openAssistant}
             className="flex w-full items-center justify-center gap-1.5 border-t border-line py-3 text-[14px] font-semibold text-[var(--purple)] transition hover:bg-soft dark:border-white/10"
           >
-            <Sparkles className="h-3.5 w-3.5" /> Open assistant
+            <SparkMark size={14} /> Open assistant
           </button>
         </div>
       )}

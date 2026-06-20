@@ -38,6 +38,15 @@
   --color-warning-soft: var(--warning-soft);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
+  --color-ai-grad-1: var(--ai-grad-1);
+  --color-ai-grad-2: var(--ai-grad-2);
+  --color-ai-grad-3: var(--ai-grad-3);
+  --color-ai-grad-4: var(--ai-grad-4);
+  --color-ai-accent: var(--ai-accent);
+  --color-ai-accent-soft: var(--ai-accent-soft);
+  --color-ai-surface: var(--ai-surface);
+  --color-ai-border: var(--ai-border);
+  --color-ai-on-grad: var(--ai-on-grad);
   --color-surface-lilac: var(--surface-lilac);
   --color-surface-lilac-ink: var(--surface-lilac-ink);
   --color-surface-mint: var(--surface-mint);

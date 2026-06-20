@@ -1,19 +1,14 @@
 import * as React from 'react';
+import { SparkMark } from '../SparkMark/SparkMark';
 
-/** Mirrors the Figma `AI briefing` set (State Default/Hover/Pressed/Focus + Title/Subtitle/New) — the brand/violet
- *  AI call-to-action in the sidebar, bound to ai-briefing/* tokens. */
+/** Mirrors the Figma `AI briefing` set (State Default/Hover/Pressed/Focus + Title/Subtitle/New) — the
+ *  AI call-to-action in the sidebar. Wears the Vadal spark on the Aurora gradient (ai/* tokens). */
 export interface AIBriefingProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   title?: string;
   subtitle?: string;
   /** Shows the unread notification dot on the spark chip. */
   isNew?: boolean;
 }
-
-const Spark = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-    <path d="M12 2.3c.5 4.8 2.4 6.7 7.2 7.2-4.8.5-6.7 2.4-7.2 7.2-.5-4.8-2.4-6.7-7.2-7.2C9.6 9 11.5 7.1 12 2.3Z" />
-  </svg>
-);
 
 const Arrow = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -41,8 +36,8 @@ export const AIBriefing = React.forwardRef<HTMLButtonElement, AIBriefingProps>(f
       ].join(' ')}
       {...rest}
     >
-      <span className="relative grid size-8 shrink-0 place-items-center rounded-[10px] text-[var(--ai-briefing-spark)] [background-image:linear-gradient(135deg,var(--grad-from),var(--grad-via),var(--grad-to))]">
-        <Spark />
+      <span className="relative grid size-8 shrink-0 place-items-center overflow-hidden rounded-[10px] [background-image:linear-gradient(135deg,var(--ai-grad-1),var(--ai-grad-2),var(--ai-grad-3),var(--ai-grad-4))]">
+        <SparkMark size={18} tone="solid" />
         {isNew && (
           <span
             className="absolute -right-px -top-px size-[7px] rounded-full bg-[var(--ai-briefing-dot)] ring-[1.5px] ring-[var(--ai-briefing-bg)]"

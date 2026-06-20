@@ -43,6 +43,16 @@
   "info": { "$type": "color", "$value": "#52acff" },
   "info-soft": { "$type": "color", "$value": "#52acff1f" },
 
+  "ai-grad-1": { "$type": "color", "$value": "#3debd0" },
+  "ai-grad-2": { "$type": "color", "$value": "#52acff" },
+  "ai-grad-3": { "$type": "color", "$value": "#9270ff" },
+  "ai-grad-4": { "$type": "color", "$value": "#f78fc6" },
+  "ai-accent": { "$type": "color", "$value": "#8b8bff" },
+  "ai-accent-soft": { "$type": "color", "$value": "#1d2030" },
+  "ai-surface": { "$type": "color", "$value": "#191a26" },
+  "ai-border": { "$type": "color", "$value": "#34324a" },
+  "ai-on-grad": { "$type": "color", "$value": "#ffffff" },
+
   "surface-lilac": { "$type": "color", "$value": "#232136" },
   "surface-lilac-ink": { "$type": "color", "$value": "#b5a8ff" },
   "surface-mint": { "$type": "color", "$value": "#4ade801f" },

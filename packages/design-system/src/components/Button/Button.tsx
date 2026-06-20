@@ -20,7 +20,7 @@ const VARIANT: Record<ButtonVariant, string> = {
   tertiary: 'bg-[var(--button-tertiary-bg)] text-[var(--button-tertiary-label)] border border-[var(--button-tertiary-border)] hover:bg-[var(--button-tertiary-bg-hover)]',
   ghost: 'bg-transparent text-[var(--button-ghost-label)] hover:bg-[var(--button-ghost-bg-hover)]',
   destructive: 'bg-[var(--button-danger-bg)] text-[var(--button-danger-label)]',
-  ai: 'text-white [background-image:linear-gradient(105deg,var(--grad-from),var(--grad-via),var(--grad-to))]',
+  ai: 'text-[var(--ai-on-grad)] [background-image:linear-gradient(105deg,var(--ai-grad-1),var(--ai-grad-2)_34%,var(--ai-grad-3)_66%,var(--ai-grad-4))]',
 };
 
 const SIZE: Record<ButtonSize, string> = {
