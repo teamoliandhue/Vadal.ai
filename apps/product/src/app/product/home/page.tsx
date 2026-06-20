@@ -1,14 +1,16 @@
 /* ════════════════════════════════════════════════════════════════════
    HOME — the employee daily workspace (route /product/home).
-   "The morning ritual": a merged greeting + mood hero, a focus/feed bento,
-   restrained neutral surfaces with violet as the single accent, one premium
-   AI moment. Built to the Notion Home spec; reusable bits use @vadal/design-system.
+   "The morning ritual": a merged greeting + mood hero with a focal "Up next"
+   action, a focus/feed bento, restrained neutral surfaces with violet as the
+   single accent, narrative metrics, one premium AI moment.
+   Built to the Notion Home spec; reusable bits use @vadal/design-system.
    ════════════════════════════════════════════════════════════════════ */
 
 import {
   ArrowRight,
   Award,
   BookOpen,
+  Clock,
   Gift,
   Heart,
   MessageSquare,
@@ -18,9 +20,10 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
-import { Avatar, Badge, Button, type BadgeTone } from "@vadal/design-system";
+import { Avatar, Badge, Button, Trend, type BadgeTone } from "@vadal/design-system";
+import { Sparkline } from "@/components/charts";
 import { Shell } from "../shell";
-import { org, me, myRecognition, communities, feed } from "@/lib/data";
+import { org, me, myRecognition, communities, feed, myDay, engagementTrend } from "@/lib/data";
 import { MoodCheck } from "./MoodCheck";
 import { MyDay } from "./MyDay";
 import { QuickPoll } from "./QuickPoll";
@@ -29,6 +32,12 @@ const FEED_TONE: Record<string, BadgeTone> = { Leadership: "brand", Recognition:
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
+}
+
+function greetingFor(hour: number) {
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
 }
 
 export default function HomePage() {
@@ -43,7 +52,7 @@ export default function HomePage() {
         <FeedCard className="xl:col-span-7" />
         <div className="flex flex-col gap-6 xl:col-span-5">
           <AskAiCard />
-          <QuickPoll />
+          <QuickPoll className="card-lift" />
         </div>
       </div>
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12">
@@ -54,23 +63,25 @@ export default function HomePage() {
   );
 }
 
-/* ── 1 · Ritual hero — greeting + mood, merged (the daily ritual) ── */
+/* ── 1 · Ritual hero — greeting + mood, with a focal "Up next" action ── */
 function RitualHero() {
+  const greeting = greetingFor(new Date().getHours());
+  const upNext = myDay.find((t) => t.tag === "Meeting") ?? myDay[0];
   return (
-    <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card">
+    <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)]">
       <div
         className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl"
         style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }}
         aria-hidden
       />
-      <div className="relative grid gap-8 p-7 sm:p-9 lg:grid-cols-[1.25fr_0.85fr] lg:items-center lg:gap-12">
+      <div className="relative grid gap-8 p-7 sm:p-9 lg:grid-cols-[1.25fr_0.85fr] lg:items-start lg:gap-12">
         <div>
           <Eyebrow>{org.date}</Eyebrow>
           <h1 className="mt-3 text-[clamp(30px,4.4vw,46px)] font-bold leading-[1.03] tracking-[-0.025em]">
-            {me.greeting}, <span className="text-[var(--purple)]">{me.name}</span> <span aria-hidden>👋</span>
+            {greeting}, <span className="text-[var(--purple)]">{me.name}</span> <span aria-hidden>👋</span>
           </h1>
           <p className="mt-3 max-w-md text-[15px] leading-relaxed text-muted">
-            You’ve got <b className="font-semibold text-ink">3 things</b> today, and you’re on a{" "}
+            You’ve got <b className="font-semibold text-ink">{myDay.length} things</b> today, and you’re on a{" "}
             <b className="font-semibold text-ink">{me.streak}-day</b> streak. 🔥
           </p>
         </div>
@@ -78,11 +89,26 @@ function RitualHero() {
           <MoodCheck />
         </div>
       </div>
+      {/* Focal "Up next" — the single most time-sensitive action */}
+      <div className="relative flex flex-wrap items-center justify-between gap-3 border-t border-line bg-soft px-7 py-4 sm:px-9">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[var(--lav)] text-[var(--purple)]">
+            <Clock className="h-[18px] w-[18px]" />
+          </span>
+          <div className="min-w-0">
+            <Eyebrow>Up next</Eyebrow>
+            <p className="truncate text-[13.5px] font-semibold">
+              {upNext.title} <span className="font-normal text-faint">· {upNext.meta}</span>
+            </p>
+          </div>
+        </div>
+        <Button variant="brand" size="sm">{upNext.action}</Button>
+      </div>
     </header>
   );
 }
 
-/* ── 2 · You — personal panel ── */
+/* ── 2 · You — personal panel with a narrative engagement trend ── */
 function YouCard({ className = "" }: { className?: string }) {
   const stats: [React.ReactNode, string][] = [
     [me.points.toLocaleString(), "Points"],
@@ -112,7 +138,20 @@ function YouCard({ className = "" }: { className?: string }) {
         ))}
       </div>
 
-      <div className="mt-6 rounded-2xl bg-soft p-4">
+      {/* narrative metric — not a bare number */}
+      <div className="mt-5 rounded-2xl border border-line p-4">
+        <div className="flex items-center justify-between">
+          <Eyebrow>Your engagement</Eyebrow>
+          <span className="flex items-center gap-1.5">
+            <span className="text-[15px] font-bold tracking-tight">82</span>
+            <Trend direction="up" value="4" />
+          </span>
+        </div>
+        <Sparkline values={engagementTrend.series} color="#6d5df0" id="you-eng" height={42} className="mt-2.5" />
+        <p className="mt-1 text-[11.5px] leading-snug text-faint">Trending up since recognition picked up — keep your 1:1s on track.</p>
+      </div>
+
+      <div className="mt-4 rounded-2xl bg-soft p-4">
         <div className="flex items-center gap-2 text-[12.5px] font-semibold">
           <Award className="h-4 w-4 text-[var(--purple)]" /> {me.nextBadge.left} more to “{me.nextBadge.name}”
         </div>
@@ -159,7 +198,7 @@ function FeedCard({ className = "" }: { className?: string }) {
               </div>
               <Badge tone={FEED_TONE[p.kind] ?? "neutral"} variant="soft" size="sm">{p.kind}</Badge>
             </div>
-            <p className="mt-2.5 text-[13px] leading-relaxed text-muted">{p.text}</p>
+            <p className="mt-2.5 text-[13px] leading-relaxed text-ink/85">{p.text}</p>
             <div className="mt-2.5 flex items-center gap-5 text-[11.5px] text-faint">
               <button className="flex items-center gap-1.5 transition hover:text-[var(--purple)]"><Heart className="h-3.5 w-3.5" /> {p.likes}</button>
               <button className="flex items-center gap-1.5 transition hover:text-ink"><MessageSquare className="h-3.5 w-3.5" /> {p.comments}</button>
@@ -181,7 +220,7 @@ const QUICK = [
 
 function AskAiCard() {
   return (
-    <section className="relative flex flex-col overflow-hidden rounded-[26px] bg-[#141419] p-6 text-white dark:ring-1 dark:ring-white/[0.08]">
+    <section className="relative flex flex-col overflow-hidden rounded-[26px] bg-[#141419] p-6 text-white shadow-[0_18px_44px_-22px_rgba(0,0,0,0.5)] dark:ring-1 dark:ring-white/[0.08]">
       <div
         className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full opacity-55 blur-2xl"
         style={{ background: "radial-gradient(circle, #818cf8 0%, #2dd4bf 70%, transparent 78%)" }}
@@ -265,9 +304,11 @@ function CommunitiesCard({ className = "" }: { className?: string }) {
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-[15px] font-bold text-white" style={{ background: c.color }}>{c.name[0]}</span>
             <div className="min-w-0 flex-1">
               <div className="truncate text-[13px] font-semibold">{c.name}</div>
-              <div className="text-[11px] text-faint">{c.members} members</div>
+              <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-faint">
+                <span>{c.members} members</span>
+                {c.fresh > 0 && <span className="font-semibold text-[var(--purple)]">· {c.fresh} new</span>}
+              </div>
             </div>
-            {c.fresh > 0 && <Badge tone="brand" variant="soft" size="sm">{c.fresh} new</Badge>}
           </button>
         ))}
       </div>
