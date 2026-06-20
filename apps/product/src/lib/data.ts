@@ -487,8 +487,12 @@ export const impact = {
 
 export const me = {
   name: "Priya",
+  fullName: "Priya Sharma",
+  email: "priya@oliandhue.com",
   greeting: "Good morning",
   role: "Product Designer · Design",
+  title: "Product Designer",
+  team: "Design",
   img: "/avatars/user-8.svg",
   streak: 12,
   points: 4180,
@@ -531,3 +535,54 @@ export const poll = {
     { label: "Gym / fitness", pct: 23 },
   ],
 } as const;
+
+/* ════════════════════════════════════════════════════════════════════
+   HEADER — global app chrome (TopBar): notifications, search index, people.
+   ════════════════════════════════════════════════════════════════════ */
+
+export type NotifKind = "recognition" | "mention" | "survey" | "manager" | "system" | "celebration";
+
+export type Notif = {
+  id: string;
+  kind: NotifKind;
+  /** Bold lead — usually a person or source. */
+  actor: string;
+  /** What happened. */
+  body: string;
+  time: string;
+  read: boolean;
+  /** Avatar src; system notifications fall back to a kind icon. */
+  img?: string;
+  href?: string;
+};
+
+export const notifications: Notif[] = [
+  { id: "n1", kind: "recognition", actor: "Anita Desai", body: "recognised you for Ownership — “clean and shipped on time.”", time: "8m", read: false, img: "/avatars/user-5.svg", href: "/product/home" },
+  { id: "n2", kind: "mention", actor: "Rahul Verma", body: "mentioned you in a comment on the Sales dashboard review.", time: "40m", read: false, img: "/avatars/user-1.svg", href: "/product/feed" },
+  { id: "n3", kind: "manager", actor: "1:1 with Anita", body: "starts in 2 hours — your prep doc is pinned to Your day.", time: "1h", read: false, img: "/avatars/user-5.svg", href: "/product/home" },
+  { id: "n4", kind: "survey", actor: "Pulse survey", body: "6 quick questions close Friday — 2 minutes left to add your voice.", time: "3h", read: true, href: "/product/home" },
+  { id: "n5", kind: "celebration", actor: "Sara Mehta", body: "has a birthday today 🎂 — send a quick note.", time: "5h", read: true, img: "/avatars/user-7.svg", href: "/product/home" },
+  { id: "n6", kind: "system", actor: "Vadal", body: "Your weekly engagement summary is ready to view.", time: "1d", read: true, href: "/product" },
+];
+
+export type Person = { name: string; role: string; team: string; img: string };
+
+/** Directory used by header search. */
+export const people: Person[] = [
+  { name: "Anita Desai", role: "Design Lead", team: "Design", img: "/avatars/user-5.svg" },
+  { name: "Rahul Verma", role: "Sales Manager", team: "Sales · West", img: "/avatars/user-1.svg" },
+  { name: "Aarav Sharma", role: "Engineer", team: "Engineering", img: "/avatars/user-2.svg" },
+  { name: "Meera Pillai", role: "Support Lead", team: "Support", img: "/avatars/user-7.svg" },
+  { name: "Neha Rao", role: "Product Designer", team: "Design", img: "/avatars/user-5.svg" },
+  { name: "Imran Shaikh", role: "Eng Manager", team: "Engineering", img: "/avatars/user-2.svg" },
+  { name: "Pradeep Kumar", role: "CEO", team: "Leadership", img: "/avatars/user-6.svg" },
+  { name: "Sara Mehta", role: "Support Specialist", team: "Support", img: "/avatars/user-7.svg" },
+];
+
+/** Quick-action commands surfaced in the command palette. */
+export const quickActions = [
+  { label: "Apply for leave", hint: "Request time off" },
+  { label: "Give kudos", hint: "Recognise a teammate" },
+  { label: "Start a pulse survey", hint: "Ask your team" },
+  { label: "Search the knowledge base", hint: "Policies & how-tos" },
+] as const;
