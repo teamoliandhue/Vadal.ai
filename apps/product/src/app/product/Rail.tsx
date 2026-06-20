@@ -97,7 +97,8 @@ export function Rail({ active }: { active: string }) {
           <WorkspaceSwitcher name={org.name} meta={meta} logo={wsLogo} open={wsOpen} onClick={() => setWsOpen((o) => !o)} />
           {wsOpen && (
             <div className="absolute inset-x-0 top-full z-50 mt-1.5">
-              <WorkspaceMenu name={org.name} meta={meta} logo={wsLogo} className="w-full">
+              {/* No identity header here — the switcher above already shows it (avoids the repeat). */}
+              <WorkspaceMenu className="w-full">
                 <MenuItem icon={<Settings className="h-4 w-4" />} label="Workspace settings" href="/product/settings" />
                 <MenuItem icon={<UserPlus className="h-4 w-4" />} label="Invite people" onClick={() => { setWsOpen(false); toast("Invite link copied ✓"); }} />
                 <WorkspaceMenuDivider />
