@@ -1,16 +1,14 @@
 /* ════════════════════════════════════════════════════════════════════
-   HOME — the personalized employee daily workspace (route /product/home).
-   The doc's headline shift: "HR dashboard → employee daily workspace".
-   This is Priya's own view: greeting + mood check-in, her day, the feed,
-   her recognition & progress, communities, and the AI assistant.
-   Built to the Notion Home spec; reusable bits use @vadal/design-system.
+   HOME — the employee daily workspace (route /product/home).
+   "The morning ritual": a merged greeting + mood hero, a focus/feed bento,
+   restrained neutral surfaces with violet as the single accent, one premium
+   AI moment. Built to the Notion Home spec; reusable bits use @vadal/design-system.
    ════════════════════════════════════════════════════════════════════ */
 
 import {
   ArrowRight,
   Award,
   BookOpen,
-  Flame,
   Gift,
   Heart,
   MessageSquare,
@@ -20,121 +18,136 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
-import { Avatar, Badge, type BadgeTone } from "@vadal/design-system";
+import { Avatar, Badge, Button, type BadgeTone } from "@vadal/design-system";
 import { Shell } from "../shell";
 import { org, me, myRecognition, communities, feed } from "@/lib/data";
 import { MoodCheck } from "./MoodCheck";
 import { MyDay } from "./MyDay";
 import { QuickPoll } from "./QuickPoll";
 
-const warmGrad = {
-  backgroundImage: "linear-gradient(100deg, #f6a14b 0%, #ef7faf 55%, #8b7cf8 110%)",
-  WebkitBackgroundClip: "text" as const,
-  backgroundClip: "text" as const,
-  color: "transparent",
-};
+const FEED_TONE: Record<string, BadgeTone> = { Leadership: "brand", Recognition: "neutral", Announcement: "neutral" };
 
-const FEED_TONE: Record<string, BadgeTone> = {
-  Leadership: "brand",
-  Recognition: "success",
-  Announcement: "warning",
-};
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
+}
 
 export default function HomePage() {
   return (
     <Shell active="Home" breadcrumb="Home">
-      <GreetingHero />
-      <MoodCheck />
-      <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-12">
-        <MyDay className="xl:col-span-8" />
-        <MeCard className="xl:col-span-4" />
-      </section>
-      <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-12">
-        <FeedCard className="xl:col-span-8" />
-        <div className="flex flex-col gap-5 xl:col-span-4">
-          <AskHrCard />
+      <RitualHero />
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12">
+        <MyDay className="xl:col-span-7" />
+        <YouCard className="xl:col-span-5" />
+      </div>
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12">
+        <FeedCard className="xl:col-span-7" />
+        <div className="flex flex-col gap-6 xl:col-span-5">
+          <AskAiCard />
           <QuickPoll />
         </div>
-      </section>
-      <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-12">
-        <RecognitionMeCard className="xl:col-span-5" />
-        <CommunitiesCard className="xl:col-span-7" />
-      </section>
+      </div>
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12">
+        <RecognitionCard className="xl:col-span-6" />
+        <CommunitiesCard className="xl:col-span-6" />
+      </div>
     </Shell>
   );
 }
 
-function MiniStat({ value, label }: { value: React.ReactNode; label: string }) {
+/* ── 1 · Ritual hero — greeting + mood, merged (the daily ritual) ── */
+function RitualHero() {
   return (
-    <div className="rounded-2xl bg-soft px-3 py-3 text-center">
-      <div className="text-[19px] font-bold tracking-tight">{value}</div>
-      <div className="mt-0.5 text-[10.5px] leading-tight text-faint">{label}</div>
-    </div>
-  );
-}
-
-function GreetingHero() {
-  return (
-    <div className="rise flex flex-wrap items-end justify-between gap-5">
-      <div>
-        <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-faint">{org.date}</div>
-        <h1 className="mt-3 text-[clamp(28px,4vw,40px)] font-bold leading-[1.05] tracking-[-0.02em]">
-          {me.greeting}, <span style={warmGrad}>{me.name}</span>.
-        </h1>
-        <p className="mt-2.5 max-w-md text-[14px] leading-relaxed text-muted">
-          You’re on a <b className="text-ink">{me.streak}-day</b> streak. One survey and a 1:1 need you today.
-        </p>
-      </div>
-      <div className="flex items-center gap-2 rounded-full bg-[#fdf6e9] px-4 py-2 ring-1 ring-[#f5e5c2] dark:bg-white/[0.05] dark:ring-white/10">
-        <Flame className="h-4 w-4 text-[#f2884d]" />
-        <span className="text-[14px] font-bold">{me.streak}</span>
-        <span className="text-[11px] text-muted">day streak</span>
-      </div>
-    </div>
-  );
-}
-
-function MeCard({ className = "" }: { className?: string }) {
-  return (
-    <div className={`card-lift flex flex-col rounded-3xl border border-line bg-card p-7 ${className}`}>
-      <div className="flex items-center gap-2.5">
-        <Avatar src={me.img} name={me.name} size="lg" />
+    <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card">
+      <div
+        className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl"
+        style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }}
+        aria-hidden
+      />
+      <div className="relative grid gap-8 p-7 sm:p-9 lg:grid-cols-[1.25fr_0.85fr] lg:items-center lg:gap-12">
         <div>
-          <h3 className="text-[14px] font-bold tracking-tight">{me.name}</h3>
-          <p className="text-[11px] text-faint">{me.role}</p>
+          <Eyebrow>{org.date}</Eyebrow>
+          <h1 className="mt-3 text-[clamp(30px,4.4vw,46px)] font-bold leading-[1.03] tracking-[-0.025em]">
+            {me.greeting}, <span className="text-[var(--purple)]">{me.name}</span> <span aria-hidden>👋</span>
+          </h1>
+          <p className="mt-3 max-w-md text-[15px] leading-relaxed text-muted">
+            You’ve got <b className="font-semibold text-ink">3 things</b> today, and you’re on a{" "}
+            <b className="font-semibold text-ink">{me.streak}-day</b> streak. 🔥
+          </p>
+        </div>
+        <div className="lg:border-l lg:border-line lg:pl-12">
+          <MoodCheck />
         </div>
       </div>
-      <div className="mt-5 grid grid-cols-3 gap-3">
-        <MiniStat value={me.points.toLocaleString()} label="Points" />
-        <MiniStat value={me.streak} label="Day streak" />
-        <MiniStat value={`#${me.rank}`} label="Team rank" />
-      </div>
-      <div className="mt-4 rounded-2xl bg-cream px-4 py-3.5 ring-1 ring-cream-ring">
-        <div className="flex items-center gap-2">
-          <Award className="h-4 w-4 shrink-0 text-[#e89b3c]" />
-          <span className="text-[12.5px] font-semibold text-cream-ink">{me.nextBadge.left} more to unlock “{me.nextBadge.name}”</span>
-        </div>
-        <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-white/60">
-          <span className="block h-full rounded-full" style={{ width: "66%", background: "linear-gradient(90deg,#f6a14b,#ef7faf)" }} />
-        </div>
-      </div>
-      <button className="mt-auto flex items-center justify-center gap-2 rounded-full bg-soft py-2.5 text-[12.5px] font-semibold transition hover:bg-line">
-        <Trophy className="h-4 w-4 text-[#e89b3c]" /> View leaderboard
-      </button>
-    </div>
+    </header>
   );
 }
 
+/* ── 2 · You — personal panel ── */
+function YouCard({ className = "" }: { className?: string }) {
+  const stats: [React.ReactNode, string][] = [
+    [me.points.toLocaleString(), "Points"],
+    [me.streak, "Day streak"],
+    [`#${me.rank}`, "Team rank"],
+  ];
+  return (
+    <section className={`card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>
+      <div className="flex items-center gap-3">
+        <span className="grid place-items-center rounded-full p-[2.5px]" style={{ background: "linear-gradient(135deg,var(--purple),#a99df9)" }}>
+          <span className="rounded-full ring-2 ring-card">
+            <Avatar src={me.img} name={me.name} size="lg" />
+          </span>
+        </span>
+        <div>
+          <h3 className="text-[15px] font-bold tracking-tight">{me.name}</h3>
+          <p className="text-[11.5px] text-faint">{me.role}</p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-3 divide-x divide-line">
+        {stats.map(([value, label]) => (
+          <div key={label} className="px-2 text-center first:pl-0 last:pr-0">
+            <div className="text-[22px] font-bold tracking-tight">{value}</div>
+            <div className="mt-0.5 text-[10.5px] text-faint">{label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 rounded-2xl bg-soft p-4">
+        <div className="flex items-center gap-2 text-[12.5px] font-semibold">
+          <Award className="h-4 w-4 text-[var(--purple)]" /> {me.nextBadge.left} more to “{me.nextBadge.name}”
+        </div>
+        <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-line">
+          <span className="block h-full rounded-full bg-[var(--purple)]" style={{ width: "66%" }} />
+        </div>
+      </div>
+
+      <Button variant="tertiary" leadingIcon={<Trophy className="h-4 w-4 text-[var(--purple)]" />} className="mt-auto w-full">
+        View leaderboard
+      </Button>
+    </section>
+  );
+}
+
+/* ── 3 · Feed — what's happening (with composer) ── */
 function FeedCard({ className = "" }: { className?: string }) {
   return (
-    <div className={`card-lift flex flex-col rounded-3xl border border-line bg-card p-7 ${className}`}>
-      <div className="flex items-center justify-between">
-        <h3 className="text-[15.5px] font-bold tracking-tight">What’s happening</h3>
-        <span className="text-[11px] font-medium text-faint">Company feed</span>
+    <section className={`card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>
+      <div className="flex items-end justify-between">
+        <div>
+          <Eyebrow>Company feed</Eyebrow>
+          <h2 className="mt-1.5 text-[18px] font-bold tracking-tight">What’s happening</h2>
+        </div>
       </div>
-      <div className="mt-4 space-y-3">
+
+      <div className="mt-4 flex items-center gap-3 rounded-2xl border border-line px-3.5 py-2.5">
+        <Avatar src={me.img} name={me.name} size="sm" />
+        <span className="flex-1 text-[12.5px] text-faint">Share an update with your team…</span>
+        <Button variant="tertiary" size="sm">Post</Button>
+      </div>
+
+      <div className="mt-5 space-y-5">
         {feed.map((p) => (
-          <div key={p.text} className="rounded-2xl border border-line p-4">
+          <article key={p.text} className="group">
             <div className="flex items-center gap-2.5">
               <Avatar src={p.img} name={p.author} size="md" />
               <div className="min-w-0 flex-1">
@@ -146,18 +159,19 @@ function FeedCard({ className = "" }: { className?: string }) {
               </div>
               <Badge tone={FEED_TONE[p.kind] ?? "neutral"} variant="soft" size="sm">{p.kind}</Badge>
             </div>
-            <p className="mt-2.5 text-[12.5px] leading-relaxed text-muted">{p.text}</p>
-            <div className="mt-2.5 flex items-center gap-4 text-[11px] text-faint">
-              <button className="flex items-center gap-1 transition hover:text-[#ef7faf]"><Heart className="h-3.5 w-3.5" /> {p.likes}</button>
-              <button className="flex items-center gap-1 transition hover:text-ink"><MessageSquare className="h-3.5 w-3.5" /> {p.comments}</button>
+            <p className="mt-2.5 text-[13px] leading-relaxed text-muted">{p.text}</p>
+            <div className="mt-2.5 flex items-center gap-5 text-[11.5px] text-faint">
+              <button className="flex items-center gap-1.5 transition hover:text-[var(--purple)]"><Heart className="h-3.5 w-3.5" /> {p.likes}</button>
+              <button className="flex items-center gap-1.5 transition hover:text-ink"><MessageSquare className="h-3.5 w-3.5" /> {p.comments}</button>
             </div>
-          </div>
+          </article>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
+/* ── 4 · Ask Vadal — the premium AI moment (the one dark element) ── */
 const QUICK = [
   { label: "Apply leave", icon: Plane },
   { label: "Give kudos", icon: Gift },
@@ -165,24 +179,29 @@ const QUICK = [
   { label: "Directory", icon: Users },
 ];
 
-function AskHrCard() {
+function AskAiCard() {
   return (
-    <div className="card-lift relative flex flex-col overflow-hidden rounded-3xl bg-[#141419] p-6 text-white dark:ring-1 dark:ring-white/[0.08]">
-      <div className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full opacity-50 blur-2xl" style={{ background: "radial-gradient(circle, #818cf8 0%, #2dd4bf 70%, transparent 78%)" }} aria-hidden />
+    <section className="relative flex flex-col overflow-hidden rounded-[26px] bg-[#141419] p-6 text-white dark:ring-1 dark:ring-white/[0.08]">
+      <div
+        className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full opacity-55 blur-2xl"
+        style={{ background: "radial-gradient(circle, #818cf8 0%, #2dd4bf 70%, transparent 78%)" }}
+        aria-hidden
+      />
       <div className="relative">
         <div className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#2dd4bf] via-[#818cf8] to-[#f472b6]">
             <Sparkles className="h-4 w-4 text-white" />
           </span>
-          <h3 className="text-[15px] font-bold tracking-tight">Ask anything</h3>
+          <h3 className="text-[15px] font-bold tracking-tight">Ask Vadal</h3>
+          <span className="rounded-[5px] border border-white/15 px-1.5 py-0.5 text-[8.5px] font-bold tracking-wide text-zinc-300">AI</span>
         </div>
         <p className="mt-2.5 text-[12.5px] leading-relaxed text-zinc-400">
-          Leave balance, policies, “who owns payroll?” — the assistant answers, and routes you when it can’t.
+          Leave balance, policies, “who owns payroll?” — instant answers, routed to a human when needed.
         </p>
         <button className="mt-4 flex w-full items-center gap-2 rounded-full bg-white/[0.07] px-4 py-2.5 text-left text-[12.5px] text-zinc-400 ring-1 ring-white/[0.08] transition hover:bg-white/[0.12]">
           <Search className="h-3.5 w-3.5" />
           <span className="flex-1">Ask HR or Ask Company…</span>
-          <ArrowRight className="h-3.5 w-3.5" />
+          <kbd className="text-[10px] font-semibold text-zinc-500">⌘K</kbd>
         </button>
         <div className="mt-3 grid grid-cols-2 gap-2">
           {QUICK.map((q) => (
@@ -192,46 +211,51 @@ function AskHrCard() {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
-function RecognitionMeCard({ className = "" }: { className?: string }) {
+/* ── 5 · Recognition ── */
+function RecognitionCard({ className = "" }: { className?: string }) {
   return (
-    <div className={`card-lift flex flex-col rounded-3xl border border-line bg-card p-7 ${className}`}>
-      <div className="flex items-center justify-between">
-        <h3 className="text-[15.5px] font-bold tracking-tight">Recognition for you</h3>
-        <Heart className="h-4 w-4 text-[#ef7faf]" />
+    <section className={`card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>
+      <div className="flex items-end justify-between">
+        <div>
+          <Eyebrow>Kudos</Eyebrow>
+          <h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Recognition for you</h2>
+        </div>
+        <Heart className="h-4 w-4 text-[var(--purple)]" />
       </div>
       <ul className="mt-4 space-y-3">
         {myRecognition.map((r) => (
-          <li key={r.from} className="rounded-2xl bg-soft p-4">
+          <li key={r.from} className="rounded-2xl border border-line p-4">
             <div className="flex items-center gap-2.5">
               <Avatar src={r.img} name={r.from} size="sm" />
               <span className="text-[12.5px] font-semibold">{r.from}</span>
-              <Badge tone="success" variant="soft" size="sm">{r.value}</Badge>
+              <Badge tone="brand" variant="soft" size="sm">{r.value}</Badge>
               <span className="ml-auto text-[10.5px] text-faint">{r.time}</span>
             </div>
             <p className="mt-2 text-[12.5px] leading-relaxed text-muted">{r.text}</p>
           </li>
         ))}
       </ul>
-      <button className="mt-auto flex items-center justify-center gap-2 rounded-full bg-soft py-2.5 text-[12.5px] font-semibold transition hover:bg-line">
-        <Gift className="h-4 w-4 text-[#f2884d]" /> Recognise a teammate
-      </button>
-    </div>
+      <Button variant="tertiary" leadingIcon={<Gift className="h-4 w-4 text-[var(--purple)]" />} className="mt-auto w-full">
+        Recognise a teammate
+      </Button>
+    </section>
   );
 }
 
+/* ── 6 · Communities ── */
 function CommunitiesCard({ className = "" }: { className?: string }) {
   return (
-    <div className={`card-lift rounded-3xl border border-line bg-card p-7 ${className}`}>
-      <div className="flex items-center justify-between">
+    <section className={`card-lift rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>
+      <div className="flex items-end justify-between">
         <div>
-          <h3 className="text-[15.5px] font-bold tracking-tight">Your communities</h3>
-          <p className="mt-0.5 text-[12px] text-faint">Where your people connect</p>
+          <Eyebrow>Belong</Eyebrow>
+          <h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Your communities</h2>
         </div>
-        <button className="flex items-center gap-1 text-[12px] font-semibold text-[#7c6cf0]">
+        <button className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5">
           Explore <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </div>
@@ -247,6 +271,6 @@ function CommunitiesCard({ className = "" }: { className?: string }) {
           </button>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,22 +1,23 @@
 "use client";
-/* Quick Poll — lightweight pulse vote (Notion Home spec §2.7). Unvoted → voted (reveals results). */
+/* Quick Poll (Notion Home spec §2.7) — unvoted → voted (reveals results). Neutral + violet. */
 import * as React from "react";
 import { Check } from "lucide-react";
 import { poll } from "@/lib/data";
 
-export function QuickPoll() {
+export function QuickPoll({ className = "" }: { className?: string }) {
   const [voted, setVoted] = React.useState<string | null>(null);
   const max = Math.max(...poll.options.map((o) => o.pct));
   const votes = poll.votes + (voted ? 1 : 0);
 
   return (
-    <div className="card-lift rounded-3xl border border-line bg-card p-6">
+    <section className={`rounded-[26px] border border-line bg-card p-6 ${className}`}>
       <div className="flex items-center justify-between">
-        <h3 className="text-[14px] font-bold tracking-tight">Quick poll</h3>
-        <span className="text-[10.5px] text-faint">{votes.toLocaleString()} votes</span>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-faint">Pulse poll</p>
+          <h3 className="mt-1.5 text-[14px] font-bold leading-snug tracking-tight">{poll.q}</h3>
+        </div>
       </div>
-      <p className="mt-2 text-[13px] font-semibold leading-snug">{poll.q}</p>
-      <div className="mt-3 space-y-2.5">
+      <div className="mt-4 space-y-2">
         {poll.options.map((o) => {
           const on = voted === o.label;
           if (!voted) {
@@ -24,32 +25,33 @@ export function QuickPoll() {
               <button
                 key={o.label}
                 onClick={() => setVoted(o.label)}
-                className="block w-full rounded-xl border border-line px-3.5 py-2.5 text-left text-[12.5px] font-medium transition hover:border-[#8b7cf8] hover:bg-soft"
+                className="block w-full rounded-xl border border-line px-3.5 py-2.5 text-left text-[12.5px] font-medium transition hover:border-[var(--purple)] hover:bg-soft"
               >
                 {o.label}
               </button>
             );
           }
           return (
-            <div key={o.label} className="block w-full text-left">
-              <div className="flex items-center justify-between text-[12px]">
-                <span className="flex items-center gap-1 font-medium">
+            <div key={o.label} className="relative overflow-hidden rounded-xl border border-line px-3.5 py-2.5">
+              <span
+                className="absolute inset-y-0 left-0 rounded-xl transition-[width] duration-500"
+                style={{ width: `${(o.pct / max) * 100}%`, background: on ? "var(--lav)" : "var(--soft)" }}
+                aria-hidden
+              />
+              <div className="relative flex items-center justify-between text-[12.5px]">
+                <span className="flex items-center gap-1.5 font-medium">
+                  {on && <Check className="h-3.5 w-3.5 text-[var(--purple)]" />}
                   {o.label}
-                  {on && <Check className="h-3.5 w-3.5 text-[#8b7cf8]" />}
                 </span>
-                <span className="font-bold text-muted">{o.pct}%</span>
-              </div>
-              <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-soft">
-                <span
-                  className="block h-full rounded-full transition-[width] duration-500"
-                  style={{ width: `${(o.pct / max) * 100}%`, background: on ? "linear-gradient(90deg,#8b7cf8,#ef7faf)" : "#cdd0d8" }}
-                />
+                <span className={`font-bold ${on ? "text-[var(--purple)]" : "text-muted"}`}>{o.pct}%</span>
               </div>
             </div>
           );
         })}
       </div>
-      {voted && <p className="mt-3 text-[11px] text-faint">Thanks for voting — results update live.</p>}
-    </div>
+      <p className="mt-3 text-[11px] text-faint">
+        {votes.toLocaleString()} votes{voted ? " · thanks for voting" : ""}
+      </p>
+    </section>
   );
 }
