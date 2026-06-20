@@ -94,7 +94,7 @@ const RAIL: RailItem[][] = [
   [
     { label: "Recognition", icon: HeartHandshake },
     { label: "Campaigns", icon: Megaphone },
-    { label: "Feed", icon: Newspaper },
+    { label: "Feed", icon: Newspaper, href: "/product/feed" },
   ],
   [
     { label: "Manager hub", icon: UsersRound, count: "5" },

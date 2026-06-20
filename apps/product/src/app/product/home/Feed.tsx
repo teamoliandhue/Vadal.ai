@@ -3,7 +3,8 @@
    Filter tabs · celebrations (birthdays/anniversaries/joiners) · pinned posts ·
    media banners · composer · reactions. Neutral surfaces + violet accent. */
 import * as React from "react";
-import { Gift, Heart, ImageIcon, MessageSquare, Newspaper, Pin, Share2, BarChart3 } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Gift, Heart, ImageIcon, MessageSquare, Newspaper, Pin, Share2, BarChart3 } from "lucide-react";
 import { Avatar, Badge, Button, type BadgeTone } from "@vadal/design-system";
 import { feed as seedFeed, celebrations, me, type FeedPost } from "@/lib/data";
 
@@ -19,7 +20,7 @@ type Tab = (typeof TABS)[number];
 
 type Post = FeedPost & { id: string; liked: boolean };
 
-export function Feed({ className = "", empty = false }: { className?: string; empty?: boolean }) {
+export function Feed({ className = "", empty = false, showMore = false }: { className?: string; empty?: boolean; showMore?: boolean }) {
   const idRef = React.useRef(0);
   const [posts, setPosts] = React.useState<Post[]>(() =>
     empty ? [] : seedFeed.map((p, i) => ({ ...p, id: `seed-${i}`, liked: false })),
@@ -163,6 +164,14 @@ export function Feed({ className = "", empty = false }: { className?: string; em
             </article>
           ))}
         </div>
+      )}
+
+      {showMore && (
+        <Link href="/product/feed" className="mt-auto block pt-5">
+          <span className="flex items-center justify-center gap-1.5 rounded-full border border-line py-2.5 text-[12.5px] font-semibold transition hover:border-faint/40 hover:bg-soft">
+            View all updates <ArrowRight className="h-3.5 w-3.5" />
+          </span>
+        </Link>
       )}
     </section>
   );

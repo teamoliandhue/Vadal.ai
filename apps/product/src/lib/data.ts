@@ -402,6 +402,21 @@ export const feed: FeedPost[] = [
     text: "The annual engagement survey opens Monday. 10 minutes, fully confidential — your voice shapes next quarter.",
     time: "1d", likes: 94, comments: 12,
   },
+  {
+    kind: "Recognition", author: "Rahul Verma", role: "Sales · West", img: "/avatars/user-1.svg",
+    text: "Huge thanks to the West team for closing the quarter 14% over target — relentless work. 🏆",
+    time: "1d", likes: 142, comments: 18, likedBy: ["/avatars/user-5.svg", "/avatars/user-6.svg"],
+  },
+  {
+    kind: "Team", author: "Meera Pillai", role: "Support", img: "/avatars/user-7.svg",
+    text: "Kudos to the weekend on-call crew — you kept every SLA green through the release. 🙌",
+    time: "2d", likes: 88, comments: 11,
+  },
+  {
+    kind: "Announcement", author: "IT Helpdesk", role: "Company-wide", img: "/avatars/user-3.svg",
+    text: "Scheduled maintenance this Saturday 10pm–12am IST. Vadal may be briefly unavailable.",
+    time: "3d", likes: 21, comments: 4,
+  },
 ];
 
 export const celebrations = [

@@ -33,19 +33,19 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     <Shell active="Home" breadcrumb="Home">
       <RitualHero firstTime={firstTime} />
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12">
-        <MyDay className="xl:col-span-7" empty={firstTime} />
-        <YouCard className="xl:col-span-5" firstTime={firstTime} />
-      </div>
-      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12">
-        <Feed className="xl:col-span-7" empty={firstTime} />
+        {/* LEFT — profile + the personal/utility stack */}
         <div className="flex flex-col gap-6 xl:col-span-5">
-          <AskAi />
+          <YouCard firstTime={firstTime} />
+          <MyDay empty={firstTime} />
           <QuickPoll className="card-lift" />
+          <RecognitionCard firstTime={firstTime} />
+          <CommunitiesCard />
         </div>
-      </div>
-      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12">
-        <RecognitionCard className="xl:col-span-6" firstTime={firstTime} />
-        <CommunitiesCard className="xl:col-span-6" />
+        {/* RIGHT — AI on top, then the feed (fills to balance the left column) */}
+        <div className="flex flex-col gap-6 xl:col-span-7">
+          <AskAi />
+          <Feed className="flex-1" empty={firstTime} showMore />
+        </div>
       </div>
     </Shell>
   );
