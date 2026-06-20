@@ -50,7 +50,7 @@ export function Feed({ className = "", empty = false, showMore = false }: { clas
   return (
     <section className={`card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>
       <div>
-        <p className="text-[14px] font-semibold uppercase tracking-[0.16em] text-faint">Company feed</p>
+        <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">Company feed</p>
         <h2 className="mt-1.5 text-[18px] font-bold tracking-tight">What’s happening</h2>
       </div>
 
@@ -72,7 +72,7 @@ export function Feed({ className = "", empty = false, showMore = false }: { clas
       {/* celebrations */}
       {showCelebrations && (
         <div className="mt-4">
-          <p className="text-[14px] font-semibold uppercase tracking-[0.16em] text-faint">🎉 Celebrations</p>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">🎉 Celebrations</p>
           <div className="mt-2.5 flex gap-2.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {celebrations.map((c) => (
               <div key={c.name} className="flex min-w-[185px] shrink-0 items-center gap-2.5 rounded-2xl border border-line bg-[var(--lav)] p-2.5">
@@ -82,7 +82,7 @@ export function Feed({ className = "", empty = false, showMore = false }: { clas
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[14px] font-semibold">{c.name}</div>
-                  <div className="truncate text-[14px] text-faint">{c.type} · {c.detail}</div>
+                  <div className="truncate text-[12px] text-faint">{c.type} · {c.detail}</div>
                 </div>
                 <button className="shrink-0 rounded-full bg-card px-2.5 py-1 text-[14px] font-semibold text-[var(--purple)] ring-1 ring-line transition hover:bg-soft">Send</button>
               </div>
@@ -125,7 +125,7 @@ export function Feed({ className = "", empty = false, showMore = false }: { clas
           {ordered.map((p) => (
             <article key={p.id} className="group">
               {p.pinned && (
-                <div className="mb-1.5 flex items-center gap-1.5 text-[14px] font-semibold uppercase tracking-wide text-[var(--purple)]">
+                <div className="mb-1.5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wide text-[var(--purple)]">
                   <Pin className="h-3 w-3" /> Pinned
                 </div>
               )}
@@ -134,16 +134,16 @@ export function Feed({ className = "", empty = false, showMore = false }: { clas
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 text-[14px]">
                     <span className="font-semibold">{p.author}</span>
-                    <span className="truncate text-faint">{p.role}</span>
+                    <span className="truncate text-[12px] text-faint">{p.role}</span>
                   </div>
-                  <div className="text-[14px] text-faint">{p.time === "now" ? "just now" : `${p.time} ago`}</div>
+                  <div className="text-[12px] text-faint">{p.time === "now" ? "just now" : `${p.time} ago`}</div>
                 </div>
                 <Badge tone={FEED_TONE[p.kind] ?? "neutral"} variant="soft" size="sm">{p.kind}</Badge>
               </div>
               <p className="mt-2.5 text-[16px] leading-relaxed text-ink/85">{p.text}</p>
               {p.banner && <div className="mt-3 h-32 w-full rounded-2xl" style={{ backgroundImage: p.banner }} aria-hidden />}
               <div className="mt-3 flex items-center justify-between">
-                <div className="flex items-center gap-5 text-[14px] text-faint">
+                <div className="flex items-center gap-5 text-[12px] text-faint">
                   <button onClick={() => toggleLike(p.id)} aria-pressed={p.liked} className={`flex items-center gap-1.5 transition ${p.liked ? "text-[var(--purple)]" : "hover:text-[var(--purple)]"}`}>
                     <Heart className="h-3.5 w-3.5" fill={p.liked ? "currentColor" : "none"} /> {p.likes}
                   </button>
@@ -157,7 +157,7 @@ export function Feed({ className = "", empty = false, showMore = false }: { clas
                         <span key={i} className="rounded-full ring-2 ring-card"><Avatar src={src} name="" size="sm" /></span>
                       ))}
                     </div>
-                    <span className="text-[14px] text-faint">+{Math.max(0, p.likes - p.likedBy.length)}</span>
+                    <span className="text-[12px] text-faint">+{Math.max(0, p.likes - p.likedBy.length)}</span>
                   </div>
                 )}
               </div>

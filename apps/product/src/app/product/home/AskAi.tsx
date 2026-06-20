@@ -39,7 +39,7 @@ export function AskAi() {
         >
           <Search className="h-3.5 w-3.5" />
           <span className="flex-1">Ask HR or Ask Company…</span>
-          <kbd className="text-[14px] font-semibold text-zinc-500">⌘K</kbd>
+          <kbd className="text-[12px] font-semibold text-zinc-500">⌘K</kbd>
         </button>
         <div className="mt-3 grid grid-cols-2 gap-2">
           {QUICK.map((q) => (

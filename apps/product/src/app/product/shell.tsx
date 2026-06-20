@@ -155,7 +155,7 @@ function TopBar({ domain, breadcrumb }: { domain: string; breadcrumb: string }) 
       <button className="hidden w-72 items-center gap-2 rounded-full border border-line bg-soft px-3.5 py-2 text-left text-[14px] text-faint transition hover:border-faint/40 md:flex">
         <Search className="h-3.5 w-3.5" />
         <span className="flex-1">Search people, teams, insights</span>
-        <kbd className="text-[14px] font-semibold text-faint">⌘K</kbd>
+        <kbd className="text-[12px] font-semibold text-faint">⌘K</kbd>
       </button>
       <button className="flex items-center gap-1.5 rounded-full border border-[#f3d9a8] bg-card px-3.5 py-2 text-[14px] font-semibold transition hover:shadow-[0_4px_16px_rgba(245,184,107,0.3)] dark:border-[#5a4a26]">
         <Sparkles className="h-3.5 w-3.5 text-[#e89b3c]" />

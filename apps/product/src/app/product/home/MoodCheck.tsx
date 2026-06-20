@@ -7,7 +7,7 @@ import { Button } from "@vadal/design-system";
 import { moods, me } from "@/lib/data";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-[14px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
+  return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
 }
 
 export function MoodCheck() {

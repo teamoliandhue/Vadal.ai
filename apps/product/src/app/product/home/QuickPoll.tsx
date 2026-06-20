@@ -13,8 +13,8 @@ export function QuickPoll({ className = "" }: { className?: string }) {
     <section className={`rounded-[26px] border border-line bg-card p-6 ${className}`}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[14px] font-semibold uppercase tracking-[0.16em] text-faint">Pulse poll</p>
-          <h3 className="mt-1.5 text-[14px] font-bold leading-snug tracking-tight">{poll.q}</h3>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">Pulse poll</p>
+          <h3 className="mt-1.5 text-[16px] font-bold leading-snug tracking-tight">{poll.q}</h3>
         </div>
       </div>
       <div className="mt-4 space-y-2">
@@ -49,7 +49,7 @@ export function QuickPoll({ className = "" }: { className?: string }) {
           );
         })}
       </div>
-      <p className="mt-3 text-[14px] text-faint">
+      <p className="mt-3 text-[12px] text-faint">
         {votes.toLocaleString()} votes{voted ? " · thanks for voting" : ""}
       </p>
     </section>

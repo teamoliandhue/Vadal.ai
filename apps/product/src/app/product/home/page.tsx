@@ -18,7 +18,7 @@ import { Feed } from "./Feed";
 import { AskAi } from "./AskAi";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-[14px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
+  return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
 }
 
 function greetingFor(hour: number) {
@@ -115,7 +115,7 @@ function YouCard({ className = "", firstTime = false }: { className?: string; fi
         </span>
         <div>
           <h3 className="text-[16px] font-bold tracking-tight">{me.name}</h3>
-          <p className="text-[14px] text-faint">{me.role}</p>
+          <p className="text-[12px] text-faint">{me.role}</p>
         </div>
       </div>
 
@@ -123,7 +123,7 @@ function YouCard({ className = "", firstTime = false }: { className?: string; fi
         {stats.map(([value, label]) => (
           <div key={label} className="px-2 text-center first:pl-0 last:pr-0">
             <div className="text-[22px] font-bold tracking-tight">{value}</div>
-            <div className="mt-0.5 text-[14px] text-faint">{label}</div>
+            <div className="mt-0.5 text-[12px] text-faint">{label}</div>
           </div>
         ))}
       </div>
@@ -188,7 +188,7 @@ function RecognitionCard({ className = "", firstTime = false }: { className?: st
                 <Avatar src={r.img} name={r.from} size="sm" />
                 <span className="text-[14px] font-semibold">{r.from}</span>
                 <Badge tone="brand" variant="soft" size="sm">{r.value}</Badge>
-                <span className="ml-auto text-[14px] text-faint">{r.time}</span>
+                <span className="ml-auto text-[12px] text-faint">{r.time}</span>
               </div>
               <p className="mt-2 text-[16px] leading-relaxed text-muted">{r.text}</p>
             </li>
@@ -221,7 +221,7 @@ function CommunitiesCard({ className = "" }: { className?: string }) {
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-[16px] font-bold text-white" style={{ background: c.color }}>{c.name[0]}</span>
             <div className="min-w-0 flex-1">
               <div className="truncate text-[14px] font-semibold">{c.name}</div>
-              <div className="mt-0.5 flex items-center gap-1.5 text-[14px] text-faint">
+              <div className="mt-0.5 flex items-center gap-1.5 text-[12px] text-faint">
                 <span>{c.members} members</span>
                 {c.fresh > 0 && <span className="font-semibold text-[var(--purple)]">· {c.fresh} new</span>}
               </div>
