@@ -73,9 +73,9 @@ export function Feed({ className = "", empty = false, showMore = false }: { clas
       {showCelebrations && (
         <div className="mt-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-faint">🎉 Celebrations</p>
-          <div className="mt-2.5 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+          <div className="mt-2.5 flex gap-2.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {celebrations.map((c) => (
-              <div key={c.name} className="flex items-center gap-2.5 rounded-2xl border border-line bg-[var(--lav)] p-2.5">
+              <div key={c.name} className="flex min-w-[185px] shrink-0 items-center gap-2.5 rounded-2xl border border-line bg-[var(--lav)] p-2.5">
                 <span className="relative shrink-0">
                   <Avatar src={c.img} name={c.name} size="sm" />
                   <span className="absolute -bottom-1.5 -right-1.5 text-[13px] leading-none">{c.emoji}</span>
