@@ -18,7 +18,7 @@ import { Feed } from "./Feed";
 import { AskAi } from "./AskAi";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
+  return <p className="text-[14px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
 }
 
 function greetingFor(hour: number) {
@@ -68,7 +68,7 @@ function RitualHero({ firstTime }: { firstTime: boolean }) {
           <h1 className="mt-3 text-[clamp(30px,4.4vw,46px)] font-bold leading-[1.03] tracking-[-0.025em]">
             {firstTime ? "Welcome" : greeting}, <span className="text-[var(--purple)]">{me.name}</span> <span aria-hidden>👋</span>
           </h1>
-          <p className="mt-3 max-w-md text-[15px] leading-relaxed text-muted">
+          <p className="mt-3 max-w-md text-[16px] leading-relaxed text-muted">
             {firstTime ? (
               <>Let’s set up your day — start with a quick mood check-in. We’ll fill the rest as you go.</>
             ) : (
@@ -88,7 +88,7 @@ function RitualHero({ firstTime }: { firstTime: boolean }) {
             </span>
             <div className="min-w-0">
               <Eyebrow>Up next</Eyebrow>
-              <p className="truncate text-[13.5px] font-semibold">
+              <p className="truncate text-[14px] font-semibold">
                 {upNext.title} <span className="font-normal text-faint">· {upNext.meta}</span>
               </p>
             </div>
@@ -114,8 +114,8 @@ function YouCard({ className = "", firstTime = false }: { className?: string; fi
           </span>
         </span>
         <div>
-          <h3 className="text-[15px] font-bold tracking-tight">{me.name}</h3>
-          <p className="text-[11.5px] text-faint">{me.role}</p>
+          <h3 className="text-[16px] font-bold tracking-tight">{me.name}</h3>
+          <p className="text-[14px] text-faint">{me.role}</p>
         </div>
       </div>
 
@@ -123,32 +123,32 @@ function YouCard({ className = "", firstTime = false }: { className?: string; fi
         {stats.map(([value, label]) => (
           <div key={label} className="px-2 text-center first:pl-0 last:pr-0">
             <div className="text-[22px] font-bold tracking-tight">{value}</div>
-            <div className="mt-0.5 text-[10.5px] text-faint">{label}</div>
+            <div className="mt-0.5 text-[14px] text-faint">{label}</div>
           </div>
         ))}
       </div>
 
       {firstTime ? (
         <div className="mt-5 rounded-2xl border border-dashed border-line p-4 text-center">
-          <p className="text-[12.5px] font-semibold">Your engagement insights appear after your first week 📈</p>
-          <p className="mt-1 text-[11.5px] text-faint">Check in daily and recognise teammates to get started.</p>
+          <p className="text-[14px] font-semibold">Your engagement insights appear after your first week 📈</p>
+          <p className="mt-1 text-[14px] text-faint">Check in daily and recognise teammates to get started.</p>
         </div>
       ) : (
         <div className="mt-5 rounded-2xl border border-line p-4">
           <div className="flex items-center justify-between">
             <Eyebrow>Your engagement</Eyebrow>
             <span className="flex items-center gap-1.5">
-              <span className="text-[15px] font-bold tracking-tight">82</span>
+              <span className="text-[16px] font-bold tracking-tight">82</span>
               <Trend direction="up" value="4" />
             </span>
           </div>
           <Sparkline values={engagementTrend.series} color="#6d5df0" id="you-eng" height={42} className="mt-2.5" />
-          <p className="mt-1 text-[11.5px] leading-snug text-faint">Trending up since recognition picked up — keep your 1:1s on track.</p>
+          <p className="mt-1 text-[14px] leading-snug text-faint">Trending up since recognition picked up — keep your 1:1s on track.</p>
         </div>
       )}
 
       <div className="mt-4 rounded-2xl bg-soft p-4">
-        <div className="flex items-center gap-2 text-[12.5px] font-semibold">
+        <div className="flex items-center gap-2 text-[14px] font-semibold">
           <Award className="h-4 w-4 text-[var(--purple)]" /> {firstTime ? "Earn points to unlock badges" : `${me.nextBadge.left} more to “${me.nextBadge.name}”`}
         </div>
         <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-line">
@@ -177,8 +177,8 @@ function RecognitionCard({ className = "", firstTime = false }: { className?: st
       {firstTime ? (
         <div className="mt-4 flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line py-12 text-center">
           <Gift className="h-7 w-7 text-[var(--purple)]" />
-          <p className="text-[13px] font-semibold">No kudos yet</p>
-          <p className="text-[12px] text-faint">Give recognition first — it usually comes back around.</p>
+          <p className="text-[14px] font-semibold">No kudos yet</p>
+          <p className="text-[14px] text-faint">Give recognition first — it usually comes back around.</p>
         </div>
       ) : (
         <ul className="mt-4 space-y-3">
@@ -186,11 +186,11 @@ function RecognitionCard({ className = "", firstTime = false }: { className?: st
             <li key={r.from} className="rounded-2xl border border-line p-4">
               <div className="flex items-center gap-2.5">
                 <Avatar src={r.img} name={r.from} size="sm" />
-                <span className="text-[12.5px] font-semibold">{r.from}</span>
+                <span className="text-[14px] font-semibold">{r.from}</span>
                 <Badge tone="brand" variant="soft" size="sm">{r.value}</Badge>
-                <span className="ml-auto text-[10.5px] text-faint">{r.time}</span>
+                <span className="ml-auto text-[14px] text-faint">{r.time}</span>
               </div>
-              <p className="mt-2 text-[12.5px] leading-relaxed text-muted">{r.text}</p>
+              <p className="mt-2 text-[16px] leading-relaxed text-muted">{r.text}</p>
             </li>
           ))}
         </ul>
@@ -211,17 +211,17 @@ function CommunitiesCard({ className = "" }: { className?: string }) {
           <Eyebrow>Belong</Eyebrow>
           <h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Your communities</h2>
         </div>
-        <button className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5">
+        <button className="flex items-center gap-1 text-[14px] font-semibold text-[var(--purple)] transition hover:gap-1.5">
           Explore <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </div>
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {communities.map((c) => (
           <button key={c.name} className="flex items-center gap-3 rounded-2xl border border-line p-3.5 text-left transition hover:bg-soft">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-[15px] font-bold text-white" style={{ background: c.color }}>{c.name[0]}</span>
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-[16px] font-bold text-white" style={{ background: c.color }}>{c.name[0]}</span>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[13px] font-semibold">{c.name}</div>
-              <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-faint">
+              <div className="truncate text-[14px] font-semibold">{c.name}</div>
+              <div className="mt-0.5 flex items-center gap-1.5 text-[14px] text-faint">
                 <span>{c.members} members</span>
                 {c.fresh > 0 && <span className="font-semibold text-[var(--purple)]">· {c.fresh} new</span>}
               </div>

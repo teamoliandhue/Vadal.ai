@@ -36,7 +36,7 @@ export const Health = React.forwardRef<HTMLButtonElement, HealthProps>(function 
       <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-[var(--health-chip-bg)] text-[var(--health-chip-icon)]" aria-hidden>
         <Pulse />
       </span>
-      <span className="flex-1 text-[12.5px] font-medium text-[var(--health-label)]">{label}</span>
+      <span className="flex-1 text-sm font-medium text-[var(--health-label)]">{label}</span>
       <span className="text-[15px] font-bold text-[var(--health-value)]">{value}</span>
       {trend && <Trend direction={trend.direction} value={trend.value} />}
     </button>

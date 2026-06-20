@@ -27,32 +27,32 @@ export function AskAi() {
           <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#2dd4bf] via-[#818cf8] to-[#f472b6]">
             <Sparkles className="h-4 w-4 text-white" />
           </span>
-          <h3 className="text-[15px] font-bold tracking-tight">Ask Vadal</h3>
-          <span className="rounded-[5px] border border-white/15 px-1.5 py-0.5 text-[8.5px] font-bold tracking-wide text-zinc-300">AI</span>
+          <h3 className="text-[16px] font-bold tracking-tight">Ask Vadal</h3>
+          <span className="rounded-[5px] border border-white/15 px-1.5 py-0.5 text-[12px] font-bold tracking-wide text-zinc-300">AI</span>
         </div>
-        <p className="mt-2.5 text-[12.5px] leading-relaxed text-zinc-400">
+        <p className="mt-2.5 text-[16px] leading-relaxed text-zinc-400">
           Leave balance, policies, “who owns payroll?” — instant answers, routed to a human when needed.
         </p>
         <button
           onClick={() => ask()}
-          className="mt-4 flex w-full items-center gap-2 rounded-full bg-white/[0.07] px-4 py-2.5 text-left text-[12.5px] text-zinc-400 ring-1 ring-white/[0.08] transition hover:bg-white/[0.12]"
+          className="mt-4 flex w-full items-center gap-2 rounded-full bg-white/[0.07] px-4 py-2.5 text-left text-[14px] text-zinc-400 ring-1 ring-white/[0.08] transition hover:bg-white/[0.12]"
         >
           <Search className="h-3.5 w-3.5" />
           <span className="flex-1">Ask HR or Ask Company…</span>
-          <kbd className="text-[10px] font-semibold text-zinc-500">⌘K</kbd>
+          <kbd className="text-[14px] font-semibold text-zinc-500">⌘K</kbd>
         </button>
         <div className="mt-3 grid grid-cols-2 gap-2">
           {QUICK.map((q) => (
             <button
               key={q.label}
               onClick={() => ask(q.q)}
-              className="flex items-center gap-2 rounded-xl bg-white/[0.05] px-3 py-2 text-[11.5px] font-medium text-zinc-300 ring-1 ring-white/[0.06] transition hover:bg-white/[0.1]"
+              className="flex items-center gap-2 rounded-xl bg-white/[0.05] px-3 py-2 text-[14px] font-medium text-zinc-300 ring-1 ring-white/[0.06] transition hover:bg-white/[0.1]"
             >
               <q.icon className="h-3.5 w-3.5" /> {q.label}
             </button>
           ))}
         </div>
-        <button onClick={() => ask()} className="mt-3 flex items-center gap-1 text-[11.5px] font-semibold text-zinc-400 transition hover:text-white">
+        <button onClick={() => ask()} className="mt-3 flex items-center gap-1 text-[14px] font-semibold text-zinc-400 transition hover:text-white">
           Open assistant <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </div>

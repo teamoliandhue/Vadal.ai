@@ -19,7 +19,7 @@ export const NavItem = React.forwardRef<HTMLAnchorElement, NavItemProps>(functio
       ref={ref}
       aria-current={active ? 'page' : undefined}
       className={[
-        'group flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] outline-none',
+        'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm outline-none',
         'transition-colors duration-[var(--duration-fast)]',
         'focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]',
         active
@@ -40,7 +40,7 @@ export const NavItem = React.forwardRef<HTMLAnchorElement, NavItemProps>(functio
       </span>
       <span className="flex-1 truncate">{label}</span>
       {count != null && (
-        <span className="rounded-full bg-[var(--nav-count-bg)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--nav-count-label)]">
+        <span className="rounded-full bg-[var(--nav-count-bg)] px-1.5 py-0.5 text-[12px] font-semibold text-[var(--nav-count-label)]">
           {count}
         </span>
       )}

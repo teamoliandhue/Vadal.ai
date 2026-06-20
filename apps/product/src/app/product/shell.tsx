@@ -147,17 +147,17 @@ function Rail({ active }: { active: string }) {
 function TopBar({ domain, breadcrumb }: { domain: string; breadcrumb: string }) {
   return (
     <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-line bg-card/85 px-6 py-3 backdrop-blur-md transition-colors sm:px-10">
-      <span className="text-[12px] font-medium text-faint">
+      <span className="text-[14px] font-medium text-faint">
         {domain} <span className="mx-1.5 text-line">/</span>
         <span className="font-semibold text-ink">{breadcrumb}</span>
       </span>
       <div className="flex-1" />
-      <button className="hidden w-72 items-center gap-2 rounded-full border border-line bg-soft px-3.5 py-2 text-left text-[12.5px] text-faint transition hover:border-faint/40 md:flex">
+      <button className="hidden w-72 items-center gap-2 rounded-full border border-line bg-soft px-3.5 py-2 text-left text-[14px] text-faint transition hover:border-faint/40 md:flex">
         <Search className="h-3.5 w-3.5" />
         <span className="flex-1">Search people, teams, insights</span>
-        <kbd className="text-[10px] font-semibold text-faint">⌘K</kbd>
+        <kbd className="text-[14px] font-semibold text-faint">⌘K</kbd>
       </button>
-      <button className="flex items-center gap-1.5 rounded-full border border-[#f3d9a8] bg-card px-3.5 py-2 text-[12px] font-semibold transition hover:shadow-[0_4px_16px_rgba(245,184,107,0.3)] dark:border-[#5a4a26]">
+      <button className="flex items-center gap-1.5 rounded-full border border-[#f3d9a8] bg-card px-3.5 py-2 text-[14px] font-semibold transition hover:shadow-[0_4px_16px_rgba(245,184,107,0.3)] dark:border-[#5a4a26]">
         <Sparkles className="h-3.5 w-3.5 text-[#e89b3c]" />
         Intelligence
       </button>

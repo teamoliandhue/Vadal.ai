@@ -56,31 +56,31 @@ export function AiDock() {
           <div className="flex items-center gap-2.5 border-b border-line px-4 py-3 dark:border-white/10">
             <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#2dd4bf] via-[#818cf8] to-[#f472b6]"><Sparkles className="h-4 w-4 text-white" /></span>
             <div className="flex-1">
-              <div className="text-[13px] font-bold tracking-tight">Vadal AI</div>
-              <div className="text-[10.5px] text-faint">Ask HR or Company</div>
+              <div className="text-[14px] font-bold tracking-tight">Vadal AI</div>
+              <div className="text-[14px] text-faint">Ask HR or Company</div>
             </div>
             <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-7 w-7 place-items-center rounded-full text-faint transition hover:bg-soft"><X className="h-4 w-4" /></button>
           </div>
           <div ref={bodyRef} className="max-h-[340px] min-h-[170px] flex-1 space-y-3 overflow-y-auto p-4">
             {msgs.length === 0 ? (
               <>
-                <p className="text-[12.5px] leading-relaxed text-muted">Hi Priya 👋 Ask me about leave, policies, payroll — or anything in your workspace.</p>
+                <p className="text-[16px] leading-relaxed text-muted">Hi Priya 👋 Ask me about leave, policies, payroll — or anything in your workspace.</p>
                 <div className="flex flex-col gap-2 pt-1">
                   {SUGGESTED.map((s) => (
-                    <button key={s} onClick={() => send(s)} className="rounded-xl border border-line px-3 py-2 text-left text-[12px] transition hover:border-[var(--purple)] hover:bg-soft">{s}</button>
+                    <button key={s} onClick={() => send(s)} className="rounded-xl border border-line px-3 py-2 text-left text-[14px] transition hover:border-[var(--purple)] hover:bg-soft">{s}</button>
                   ))}
                 </div>
               </>
             ) : (
               msgs.map((m, i) => (
                 <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
-                  <div className={`max-w-[82%] rounded-2xl px-3 py-2 text-[12.5px] leading-relaxed ${m.role === "user" ? "bg-[var(--purple)] text-white" : "bg-soft text-ink"}`}>{m.text}</div>
+                  <div className={`max-w-[82%] rounded-2xl px-3 py-2 text-[16px] leading-relaxed ${m.role === "user" ? "bg-[var(--purple)] text-white" : "bg-soft text-ink"}`}>{m.text}</div>
                 </div>
               ))
             )}
           </div>
           <form onSubmit={(e) => { e.preventDefault(); send(val); }} className="flex items-center gap-2 border-t border-line p-3 dark:border-white/10">
-            <input ref={inputRef} value={val} onChange={(e) => setVal(e.target.value)} placeholder="Ask anything…" className="min-w-0 flex-1 rounded-full border border-line bg-soft px-3.5 py-2 text-[12.5px] outline-none transition focus:border-[var(--purple)]" />
+            <input ref={inputRef} value={val} onChange={(e) => setVal(e.target.value)} placeholder="Ask anything…" className="min-w-0 flex-1 rounded-full border border-line bg-soft px-3.5 py-2 text-[14px] outline-none transition focus:border-[var(--purple)]" />
             <button type="submit" aria-label="Send" className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--purple)] text-white transition hover:opacity-90"><ArrowUp className="h-4 w-4" /></button>
           </form>
         </div>
@@ -91,8 +91,8 @@ export function AiDock() {
       >
         <span className="ai-aura grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#2dd4bf] via-[#818cf8] to-[#f472b6]"><Sparkles className="h-4 w-4 text-white" /></span>
         <span className="text-left">
-          <span className="flex items-center gap-1 text-[12.5px] font-semibold">Vadal <span className="rounded-[4px] border border-line px-1 text-[8.5px] font-bold text-muted dark:border-white/15">AI</span></span>
-          <span className="block text-[10.5px] text-faint">What are you looking for today?</span>
+          <span className="flex items-center gap-1 text-[14px] font-semibold">Vadal <span className="rounded-[4px] border border-line px-1 text-[12px] font-bold text-muted dark:border-white/15">AI</span></span>
+          <span className="block text-[14px] text-faint">What are you looking for today?</span>
         </span>
       </button>
     </>

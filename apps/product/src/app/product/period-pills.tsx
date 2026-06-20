@@ -12,7 +12,7 @@ export function PeriodPills() {
         <button
           key={p}
           onClick={() => setActive(p)}
-          className={`rounded-full px-3.5 py-1.5 text-[12px] transition ${
+          className={`rounded-full px-3.5 py-1.5 text-[14px] transition ${
             active === p
               ? "bg-ink font-semibold text-background"
               : "border border-line bg-card font-medium text-muted hover:border-faint/40 hover:text-ink"

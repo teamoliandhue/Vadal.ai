@@ -14,7 +14,7 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
 
 const BOX: Record<CheckboxSize, string> = { sm: 'h-4 w-4', md: 'h-[18px] w-[18px]' };
 const TICK: Record<CheckboxSize, string> = { sm: 'h-2.5 w-2.5', md: 'h-3 w-3' };
-const LABEL: Record<CheckboxSize, string> = { sm: 'text-[13px]', md: 'text-sm' };
+const LABEL: Record<CheckboxSize, string> = { sm: 'text-sm', md: 'text-sm' };
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
   { label, description, size = 'md', indeterminate, error, disabled, className = '', id, ...rest },
@@ -95,7 +95,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
             </span>
           )}
           {description && (
-            <span className="text-[13px] text-[var(--checkbox-description)] group-has-[:disabled]:text-[var(--checkbox-label-disabled)]">
+            <span className="text-sm text-[var(--checkbox-description)] group-has-[:disabled]:text-[var(--checkbox-label-disabled)]">
               {description}
             </span>
           )}

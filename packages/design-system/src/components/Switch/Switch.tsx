@@ -13,7 +13,7 @@ export interface SwitchProps extends Omit<React.InputHTMLAttributes<HTMLInputEle
 const TRACK: Record<SwitchSize, string> = { sm: 'h-5 w-9', md: 'h-6 w-11' };
 const THUMB: Record<SwitchSize, string> = { sm: 'h-4 w-4', md: 'h-5 w-5' };
 const TRAVEL: Record<SwitchSize, string> = { sm: 'group-has-[:checked]:translate-x-4', md: 'group-has-[:checked]:translate-x-5' };
-const LABEL: Record<SwitchSize, string> = { sm: 'text-[13px]', md: 'text-sm' };
+const LABEL: Record<SwitchSize, string> = { sm: 'text-sm', md: 'text-sm' };
 
 export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(function Switch(
   { label, description, size = 'md', disabled, className = '', id, ...rest },
@@ -69,7 +69,7 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(function S
             </span>
           )}
           {description && (
-            <span className="text-[13px] text-[var(--switch-description)] group-has-[:disabled]:opacity-60">
+            <span className="text-sm text-[var(--switch-description)] group-has-[:disabled]:opacity-60">
               {description}
             </span>
           )}

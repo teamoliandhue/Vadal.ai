@@ -21,7 +21,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Inp
   return (
     <div className={['flex w-full flex-col gap-1.5', className].join(' ')}>
       {label && (
-        <label htmlFor={inputId} className="text-[13px] font-medium text-[var(--input-label)] data-[disabled]:text-[var(--input-label-disabled)]" data-disabled={disabled || undefined}>
+        <label htmlFor={inputId} className="text-sm font-medium text-[var(--input-label)] data-[disabled]:text-[var(--input-label-disabled)]" data-disabled={disabled || undefined}>
           {label}
           {required && <span className="ml-0.5 text-[var(--input-required)]">*</span>}
         </label>

@@ -34,7 +34,7 @@ const SOFT_BG: Record<BadgeTone, string> = {
 };
 
 const SIZE: Record<BadgeSize, string> = {
-  sm: 'h-5 px-2 text-[11px] gap-1',
+  sm: 'h-5 px-2 text-[12px] gap-1',
   md: 'h-6 px-2.5 text-xs gap-1.5',
 };
 

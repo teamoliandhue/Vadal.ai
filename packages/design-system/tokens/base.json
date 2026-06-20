@@ -31,9 +31,7 @@
   "size-avatar-lg": { "$type": "dimension", "$value": "40px" },
   "size-avatar-xl": { "$type": "dimension", "$value": "56px" },
 
-  "text-11": { "$type": "dimension", "$value": "11px" },
   "text-12": { "$type": "dimension", "$value": "12px" },
-  "text-13": { "$type": "dimension", "$value": "13px" },
   "text-14": { "$type": "dimension", "$value": "14px" },
   "text-16": { "$type": "dimension", "$value": "16px" },
   "text-18": { "$type": "dimension", "$value": "18px" },
@@ -43,6 +41,13 @@
   "text-36": { "$type": "dimension", "$value": "36px" },
   "text-48": { "$type": "dimension", "$value": "48px" },
   "text-60": { "$type": "dimension", "$value": "60px" },
+
+  "font-micro":   { "$type": "dimension", "$value": "{text-12}" },
+  "font-label":   { "$type": "dimension", "$value": "{text-14}" },
+  "font-body":    { "$type": "dimension", "$value": "{text-16}" },
+  "font-title":   { "$type": "dimension", "$value": "{text-18}" },
+  "font-heading": { "$type": "dimension", "$value": "{text-24}" },
+  "font-display": { "$type": "dimension", "$value": "{text-36}" },
 
   "weight-regular": { "$type": "fontWeight", "$value": "400" },
   "weight-medium": { "$type": "fontWeight", "$value": "500" },

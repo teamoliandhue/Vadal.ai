@@ -7,7 +7,7 @@ import { Button } from "@vadal/design-system";
 import { moods, me } from "@/lib/data";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
+  return <p className="text-[14px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
 }
 
 export function MoodCheck() {
@@ -28,7 +28,7 @@ export function MoodCheck() {
             <p className="text-[14px] font-semibold tracking-tight">
               Logged — feeling {mood?.emoji} {selected?.toLowerCase()}
             </p>
-            <p className="mt-0.5 text-[12px] text-faint">
+            <p className="mt-0.5 text-[14px] text-faint">
               Private to you · {me.streak + 1}-day streak ·{" "}
               <button onClick={() => { setDone(false); setSelected(null); setNote(""); }} className="font-semibold text-[var(--purple)] hover:underline">
                 Change
@@ -58,7 +58,7 @@ export function MoodCheck() {
               style={on ? { boxShadow: `inset 0 0 0 1.5px ${m.color}` } : undefined}
             >
               <span className="text-[24px] leading-none transition group-hover:scale-110">{m.emoji}</span>
-              <span className="text-[10.5px] font-semibold" style={{ color: on ? m.color : "var(--faint)" }}>{m.label}</span>
+              <span className="text-[14px] font-semibold" style={{ color: on ? m.color : "var(--faint)" }}>{m.label}</span>
             </button>
           );
         })}
@@ -69,12 +69,12 @@ export function MoodCheck() {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Add a line on why (optional)…"
-            className="min-w-0 flex-1 rounded-xl border border-line bg-card px-3.5 py-2.5 text-[12.5px] outline-none transition focus:border-[var(--purple)]"
+            className="min-w-0 flex-1 rounded-xl border border-line bg-card px-3.5 py-2.5 text-[14px] outline-none transition focus:border-[var(--purple)]"
           />
           <Button variant="brand" onClick={() => setDone(true)}>Log</Button>
         </div>
       ) : (
-        <p className="mt-3 text-[12px] text-faint">Takes 5 seconds — private to you, helps us fix things early.</p>
+        <p className="mt-3 text-[14px] text-faint">Takes 5 seconds — private to you, helps us fix things early.</p>
       )}
     </div>
   );

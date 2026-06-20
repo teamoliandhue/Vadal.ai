@@ -31,7 +31,7 @@ export const Trend = React.forwardRef<HTMLSpanElement, TrendProps>(function Tren
     <span
       ref={ref}
       className={[
-        'inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-semibold leading-none',
+        'inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[12px] font-semibold leading-none',
         TONE[direction],
         className,
       ].join(' ')}

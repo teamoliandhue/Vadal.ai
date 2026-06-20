@@ -14,7 +14,7 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
   ref,
 ) {
   const cls = [
-    'flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-[13px] font-medium outline-none',
+    'flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm font-medium outline-none',
     'text-[var(--menu-item-label)] transition-colors duration-[var(--duration-fast)]',
     'hover:bg-[var(--menu-item-bg-hover)] focus-visible:bg-[var(--menu-item-bg-hover)]',
     className,

@@ -13,7 +13,7 @@ export function QuickPoll({ className = "" }: { className?: string }) {
     <section className={`rounded-[26px] border border-line bg-card p-6 ${className}`}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-faint">Pulse poll</p>
+          <p className="text-[14px] font-semibold uppercase tracking-[0.16em] text-faint">Pulse poll</p>
           <h3 className="mt-1.5 text-[14px] font-bold leading-snug tracking-tight">{poll.q}</h3>
         </div>
       </div>
@@ -25,7 +25,7 @@ export function QuickPoll({ className = "" }: { className?: string }) {
               <button
                 key={o.label}
                 onClick={() => setVoted(o.label)}
-                className="block w-full rounded-xl border border-line px-3.5 py-2.5 text-left text-[12.5px] font-medium transition hover:border-[var(--purple)] hover:bg-soft"
+                className="block w-full rounded-xl border border-line px-3.5 py-2.5 text-left text-[14px] font-medium transition hover:border-[var(--purple)] hover:bg-soft"
               >
                 {o.label}
               </button>
@@ -38,7 +38,7 @@ export function QuickPoll({ className = "" }: { className?: string }) {
                 style={{ width: `${(o.pct / max) * 100}%`, background: on ? "var(--lav)" : "var(--soft)" }}
                 aria-hidden
               />
-              <div className="relative flex items-center justify-between text-[12.5px]">
+              <div className="relative flex items-center justify-between text-[14px]">
                 <span className="flex items-center gap-1.5 font-medium">
                   {on && <Check className="h-3.5 w-3.5 text-[var(--purple)]" />}
                   {o.label}
@@ -49,7 +49,7 @@ export function QuickPoll({ className = "" }: { className?: string }) {
           );
         })}
       </div>
-      <p className="mt-3 text-[11px] text-faint">
+      <p className="mt-3 text-[14px] text-faint">
         {votes.toLocaleString()} votes{voted ? " · thanks for voting" : ""}
       </p>
     </section>

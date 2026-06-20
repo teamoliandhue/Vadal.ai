@@ -211,6 +211,12 @@
   --radius-xl: var(--radius-xl);
   --radius-2xl: var(--radius-2xl);
   --radius-full: var(--radius-full);
+  --font-micro: var(--font-micro);
+  --font-label: var(--font-label);
+  --font-body: var(--font-body);
+  --font-title: var(--font-title);
+  --font-heading: var(--font-heading);
+  --font-display: var(--font-display);
   --font-inter: var(--font-inter);
   --font-grotesk: var(--font-grotesk);
   --font-serif: var(--font-serif);

@@ -182,7 +182,7 @@ export function ScoreRing({
         <span className="text-[34px] font-bold leading-none tracking-tight text-ink">
           {score}
         </span>
-        <span className="mt-1 text-[11px] text-faint">of 100</span>
+        <span className="mt-1 text-[12px] text-faint">of 100</span>
       </div>
     </div>
   );
@@ -234,7 +234,7 @@ export function ArcGauge({
         <span className="text-[44px] font-bold leading-none tracking-tight">
           {score}
         </span>
-        <span className="mt-1 text-[11px] text-faint">workforce health</span>
+        <span className="mt-1 text-[12px] text-faint">workforce health</span>
       </div>
     </div>
   );

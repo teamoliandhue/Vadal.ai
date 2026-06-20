@@ -52,8 +52,8 @@ export const AIBriefing = React.forwardRef<HTMLButtonElement, AIBriefingProps>(f
         )}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[13px] font-semibold text-[var(--ai-briefing-title)]">{title}</span>
-        {subtitle && <span className="block truncate text-[11px] text-[var(--ai-briefing-subtitle)]">{subtitle}</span>}
+        <span className="block truncate text-sm font-semibold text-[var(--ai-briefing-title)]">{title}</span>
+        {subtitle && <span className="block truncate text-[12px] text-[var(--ai-briefing-subtitle)]">{subtitle}</span>}
       </span>
       <span className="text-[var(--ai-briefing-arrow)] transition-transform duration-[var(--duration-base)] group-hover:translate-x-0.5">
         <Arrow />

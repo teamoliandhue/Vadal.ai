@@ -36,8 +36,8 @@ export const WorkspaceMenu = React.forwardRef<HTMLDivElement, WorkspaceMenuProps
           {logo}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[13px] font-semibold lowercase text-[var(--workspace-menu-header-label)]">{name}</span>
-          <span className="block truncate text-[11px] text-[var(--workspace-menu-header-meta)]">{meta}</span>
+          <span className="block truncate text-sm font-semibold lowercase text-[var(--workspace-menu-header-label)]">{name}</span>
+          <span className="block truncate text-[12px] text-[var(--workspace-menu-header-meta)]">{meta}</span>
         </span>
       </div>
       <WorkspaceMenuDivider />

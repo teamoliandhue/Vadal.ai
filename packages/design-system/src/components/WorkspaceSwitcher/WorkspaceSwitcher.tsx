@@ -53,8 +53,8 @@ export const WorkspaceSwitcher = React.forwardRef<HTMLButtonElement, WorkspaceSw
         {logo}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[13px] font-semibold lowercase text-[var(--workspace-name)]">{name}</span>
-        <span className="block truncate text-[10.5px] text-[var(--workspace-meta)]">{meta}</span>
+        <span className="block truncate text-sm font-semibold lowercase text-[var(--workspace-name)]">{name}</span>
+        <span className="block truncate text-[12px] text-[var(--workspace-meta)]">{meta}</span>
       </span>
       <span className="text-[var(--workspace-caret)]">
         <Caret open={open} />

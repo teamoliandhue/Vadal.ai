@@ -12,7 +12,7 @@ export interface RadioProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
 
 const BOX: Record<RadioSize, string> = { sm: 'h-4 w-4', md: 'h-[18px] w-[18px]' };
 const DOT: Record<RadioSize, string> = { sm: 'h-1.5 w-1.5', md: 'h-2 w-2' };
-const LABEL: Record<RadioSize, string> = { sm: 'text-[13px]', md: 'text-sm' };
+const LABEL: Record<RadioSize, string> = { sm: 'text-sm', md: 'text-sm' };
 
 export const Radio = React.forwardRef<HTMLInputElement, RadioProps>(function Radio(
   { label, description, size = 'md', error, disabled, className = '', id, ...rest },
@@ -70,7 +70,7 @@ export const Radio = React.forwardRef<HTMLInputElement, RadioProps>(function Rad
             </span>
           )}
           {description && (
-            <span className="text-[13px] text-[var(--radio-description)] group-has-[:disabled]:text-[var(--radio-label-disabled)]">
+            <span className="text-sm text-[var(--radio-description)] group-has-[:disabled]:text-[var(--radio-label-disabled)]">
               {description}
             </span>
           )}
