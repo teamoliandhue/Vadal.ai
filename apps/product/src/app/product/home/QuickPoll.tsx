@@ -3,9 +3,12 @@
 import * as React from "react";
 import { Check } from "lucide-react";
 import { poll } from "@/lib/data";
+import { usePersistentState } from "@/lib/usePersistentState";
+import { toast } from "../Toaster";
 
 export function QuickPoll({ className = "" }: { className?: string }) {
-  const [voted, setVoted] = React.useState<string | null>(null);
+  const [voted, setVoted] = usePersistentState<string | null>("vadal:poll", null);
+  function vote(label: string) { setVoted(label); toast("Thanks for voting 🗳️"); }
   const max = Math.max(...poll.options.map((o) => o.pct));
   const votes = poll.votes + (voted ? 1 : 0);
 
@@ -24,7 +27,7 @@ export function QuickPoll({ className = "" }: { className?: string }) {
             return (
               <button
                 key={o.label}
-                onClick={() => setVoted(o.label)}
+                onClick={() => vote(o.label)}
                 className="block w-full rounded-xl border border-line px-3.5 py-2.5 text-left text-[14px] font-medium transition hover:border-[var(--purple)] hover:bg-soft"
               >
                 {o.label}

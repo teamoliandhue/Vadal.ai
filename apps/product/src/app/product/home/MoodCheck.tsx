@@ -1,22 +1,31 @@
 "use client";
 /* The daily ritual (Notion Home spec §2.2) — lives inside the hero band. Card-less.
-   Default → selected (+ optional why) → confirmed. Neutral surfaces, violet accent. */
+   Default → selected (+ optional why) → confirmed. Persists today's check-in + toasts. */
 import * as React from "react";
 import { Check } from "lucide-react";
 import { Button } from "@vadal/design-system";
 import { moods, me } from "@/lib/data";
+import { usePersistentState } from "@/lib/usePersistentState";
+import { toast } from "../Toaster";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
 }
 
 export function MoodCheck() {
+  const [logged, setLogged] = usePersistentState<{ mood: string } | null>("vadal:mood", null);
   const [selected, setSelected] = React.useState<string | null>(null);
   const [note, setNote] = React.useState("");
-  const [done, setDone] = React.useState(false);
 
-  if (done) {
-    const mood = moods.find((m) => m.label === selected);
+  function log() {
+    if (!selected) return;
+    setLogged({ mood: selected });
+    const m = moods.find((x) => x.label === selected);
+    toast(`Mood logged ${m?.emoji ?? ""} — ${me.streak + 1}-day streak`);
+  }
+
+  if (logged) {
+    const mood = moods.find((m) => m.label === logged.mood);
     return (
       <div>
         <Eyebrow>Daily check-in</Eyebrow>
@@ -26,11 +35,11 @@ export function MoodCheck() {
           </span>
           <div className="min-w-0">
             <p className="text-[14px] font-semibold tracking-tight">
-              Logged — feeling {mood?.emoji} {selected?.toLowerCase()}
+              Logged — feeling {mood?.emoji} {logged.mood.toLowerCase()}
             </p>
             <p className="mt-0.5 text-[14px] text-faint">
               Private to you · {me.streak + 1}-day streak ·{" "}
-              <button onClick={() => { setDone(false); setSelected(null); setNote(""); }} className="font-semibold text-[var(--purple)] hover:underline">
+              <button onClick={() => { setLogged(null); setSelected(null); setNote(""); }} className="font-semibold text-[var(--purple)] hover:underline">
                 Change
               </button>
             </p>
@@ -71,7 +80,7 @@ export function MoodCheck() {
             placeholder="Add a line on why (optional)…"
             className="min-w-0 flex-1 rounded-xl border border-line bg-card px-3.5 py-2.5 text-[14px] outline-none transition focus:border-[var(--purple)]"
           />
-          <Button variant="brand" onClick={() => setDone(true)}>Log</Button>
+          <Button variant="brand" onClick={log}>Log</Button>
         </div>
       ) : (
         <p className="mt-3 text-[14px] text-faint">Takes 5 seconds — private to you, helps us fix things early.</p>

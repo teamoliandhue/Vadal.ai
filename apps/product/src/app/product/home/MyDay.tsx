@@ -5,6 +5,8 @@ import * as React from "react";
 import { Check, PartyPopper } from "lucide-react";
 import { Button } from "@vadal/design-system";
 import { myDay } from "@/lib/data";
+import { usePersistentState } from "@/lib/usePersistentState";
+import { toast } from "../Toaster";
 
 const DOT: Record<string, string> = {
   Survey: "#8b7cf8",
@@ -14,7 +16,13 @@ const DOT: Record<string, string> = {
 };
 
 export function MyDay({ className = "", empty = false }: { className?: string; empty?: boolean }) {
-  const [doneIdx, setDoneIdx] = React.useState<number[]>([]);
+  const [doneIdx, setDoneIdx] = usePersistentState<number[]>("vadal:myday-done", []);
+  function complete(i: number) {
+    if (doneIdx.includes(i)) return;
+    const next = [...doneIdx, i];
+    setDoneIdx(next);
+    toast(myDay.length - next.length === 0 ? "All caught up — enjoy it 🎉" : "Nice — one off your list ✓");
+  }
   const items = empty ? [] : myDay;
   const remaining = items.filter((_, i) => !doneIdx.includes(i));
   const total = items.length;
@@ -47,7 +55,7 @@ export function MyDay({ className = "", empty = false }: { className?: string; e
             doneIdx.includes(i) ? null : (
               <li key={t.title} className="group flex items-center gap-3 rounded-2xl px-2 py-2.5 transition hover:bg-soft">
                 <button
-                  onClick={() => setDoneIdx((d) => [...d, i])}
+                  onClick={() => complete(i)}
                   aria-label={`Mark “${t.title}” done`}
                   className="grid size-5 shrink-0 place-items-center rounded-full border-[1.5px] border-line text-transparent transition hover:border-[var(--purple)] hover:text-[var(--purple)]"
                 >
@@ -60,7 +68,7 @@ export function MyDay({ className = "", empty = false }: { className?: string; e
                   </div>
                   <div className="mt-0.5 pl-3.5 text-[12px] text-faint">{t.meta} · {t.tag}</div>
                 </div>
-                <Button variant="tertiary" size="sm" onClick={() => setDoneIdx((d) => [...d, i])}>{t.action}</Button>
+                <Button variant="tertiary" size="sm" onClick={() => complete(i)}>{t.action}</Button>
               </li>
             ),
           )}

@@ -20,6 +20,7 @@ import { Sidebar, NavGroup, NavItem, WorkspaceSwitcher, AIBriefing, Health } fro
 import { org, health } from "@/lib/data";
 import { AiDock } from "./ai-dock";
 import { TopBar } from "./header/TopBar";
+import { Toaster } from "./Toaster";
 
 /* ════════════════════════ shared product shell ════════════════════════
    The Lumen app chrome — sidebar rail, top bar, AI dock — used by both
@@ -46,6 +47,7 @@ export function Shell({
         </main>
       </div>
       <AiDock />
+      <Toaster />
     </div>
   );
 }

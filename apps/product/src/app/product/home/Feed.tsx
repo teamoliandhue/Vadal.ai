@@ -7,6 +7,8 @@ import Link from "next/link";
 import { ArrowRight, Gift, Heart, ImageIcon, MessageSquare, Newspaper, Pin, Share2, BarChart3 } from "lucide-react";
 import { Avatar, Badge, Button, type BadgeTone } from "@vadal/design-system";
 import { feed as seedFeed, celebrations, me, type FeedPost } from "@/lib/data";
+import { usePersistentState } from "@/lib/usePersistentState";
+import { toast } from "../Toaster";
 
 const FEED_TONE: Record<string, BadgeTone> = {
   Leadership: "brand",
@@ -18,31 +20,31 @@ const FEED_TONE: Record<string, BadgeTone> = {
 const TABS = ["All", "Leadership", "Recognition", "Announcement", "Team"] as const;
 type Tab = (typeof TABS)[number];
 
-type Post = FeedPost & { id: string; liked: boolean };
+type Post = FeedPost & { id: string };
 
 export function Feed({ className = "", empty = false, showMore = false }: { className?: string; empty?: boolean; showMore?: boolean }) {
   const idRef = React.useRef(0);
-  const [posts, setPosts] = React.useState<Post[]>(() =>
-    empty ? [] : seedFeed.map((p, i) => ({ ...p, id: `seed-${i}`, liked: false })),
-  );
+  const [mine, setMine] = usePersistentState<Post[]>("vadal:feed-mine", []);
+  const [liked, setLiked] = usePersistentState<string[]>("vadal:feed-liked", []);
   const [tab, setTab] = React.useState<Tab>("All");
   const [draft, setDraft] = React.useState("");
 
   function post() {
     const text = draft.trim();
     if (!text) return;
-    setPosts((p) => [
-      { id: `you-${idRef.current++}`, kind: "Team", author: me.name, role: "You", img: me.img, text, time: "now", likes: 0, comments: 0, liked: false },
-      ...p,
-    ]);
+    const np: Post = { id: `you-${Date.now()}-${idRef.current++}`, kind: "Team", author: me.name, role: "You", img: me.img, text, time: "now", likes: 0, comments: 0 };
+    setMine((m) => [np, ...m]);
     setDraft("");
     setTab("All");
+    toast("Posted to your team 🎉");
   }
 
   function toggleLike(id: string) {
-    setPosts((ps) => ps.map((p) => (p.id === id ? { ...p, liked: !p.liked, likes: p.likes + (p.liked ? -1 : 1) } : p)));
+    setLiked((l) => (l.includes(id) ? l.filter((x) => x !== id) : [...l, id]));
   }
 
+  const base: Post[] = empty ? [] : seedFeed.map((p, i) => ({ ...p, id: `seed-${i}` }));
+  const posts = (empty ? [] : [...mine, ...base]).map((p) => ({ ...p, liked: liked.includes(p.id), likes: p.likes + (liked.includes(p.id) ? 1 : 0) }));
   const filtered = posts.filter((p) => tab === "All" || p.kind === tab);
   const ordered = [...filtered].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
   const showCelebrations = !empty && tab === "All" && celebrations.length > 0;
