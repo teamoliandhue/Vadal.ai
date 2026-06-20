@@ -1,7 +1,7 @@
 /* Section registry for not-yet-built nav destinations — drives the [section]
    coming-soon route + keeps labels in sync with the sidebar (Shell RAIL). */
 import {
-  BarChart3, BookOpen, ClipboardList, FolderKanban, HeartHandshake,
+  BookOpen, ClipboardList, FolderKanban, HeartHandshake,
   Megaphone, Radio, Settings, Smile, UsersRound, type LucideIcon,
 } from "lucide-react";
 
@@ -14,12 +14,6 @@ export type SectionMeta = {
 };
 
 export const SECTIONS: Record<string, SectionMeta> = {
-  analytics: {
-    label: "Analytics", Icon: BarChart3,
-    tagline: "Slice engagement, attrition and recognition any way you need — the deep, query-style companion to Pulse.",
-    bullets: ["Custom views by team, location & tenure", "Compare periods and cohorts", "Export board-ready reports"],
-    ask: "What will I be able to explore in Analytics?",
-  },
   surveys: {
     label: "Surveys", Icon: ClipboardList,
     tagline: "Design, send and track pulse + lifecycle surveys — the listening engine that feeds Pulse.",
