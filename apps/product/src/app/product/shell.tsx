@@ -1,11 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowRight,
   BarChart3,
   Bell,
   BookOpen,
-  ChevronDown,
   ClipboardList,
   FolderKanban,
   Gauge,
@@ -21,6 +19,7 @@ import {
   UsersRound,
   type LucideIcon,
 } from "lucide-react";
+import { Sidebar, NavGroup, NavItem, WorkspaceSwitcher, AIBriefing, Health } from "@vadal/design-system";
 import { org, health } from "@/lib/data";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -39,7 +38,7 @@ export function Shell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="lumen flex min-h-screen bg-canvas text-ink">
+    <div className="lumen flex min-h-screen bg-canvas text-ink" data-ds>
       <Rail active={active} />
       <div className="relative flex min-w-0 flex-1 flex-col">
         <div className="canvas-glow" aria-hidden />
@@ -105,69 +104,42 @@ const RAIL: RailItem[][] = [
 
 function Rail({ active }: { active: string }) {
   return (
-    <aside className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col border-r border-line bg-card px-3.5 py-5 text-ink transition-colors lg:flex dark:border-transparent dark:bg-[#101015] dark:text-[#d6d6de] dark:shadow-[1px_0_0_rgba(255,255,255,0.05)]">
-      <Link href="/product" className="flex items-center gap-2.5 px-2">
-        <Mark className="h-7 w-7" />
-        <span className="text-[16px] font-bold tracking-tight text-ink dark:text-white">
-          vadal<span className="text-[#7c6cf0] dark:text-[#a99df9]">.ai</span>
-        </span>
-      </Link>
-
-      <button className="mt-5 flex w-full items-center gap-2.5 rounded-xl bg-card p-2.5 text-left ring-1 ring-line shadow-[0_2px_6px_rgba(26,27,31,0.05)] transition hover:bg-soft dark:bg-white/[0.04] dark:shadow-none dark:ring-white/[0.07] dark:hover:bg-white/[0.08]">
-        <span className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-white ring-1 ring-line dark:ring-white/10">
-          <Image src={org.logo} alt={org.name} width={32} height={32} className="h-full w-full object-contain p-[3px]" />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-[13px] font-semibold lowercase text-ink dark:text-white">{org.name}</span>
-          <span className="block truncate text-[10.5px] text-faint dark:text-[#85858f]">{org.headcount.toLocaleString()} people</span>
-        </span>
-        <ChevronDown className="h-3.5 w-3.5 text-faint dark:text-[#85858f]" />
-      </button>
-
-      <button className="mt-4 flex w-full items-center gap-2.5 rounded-xl bg-[#fdf6e9] px-2.5 py-2.5 text-left ring-1 ring-[#f5e5c2] transition hover:bg-[#fbefd9] dark:bg-transparent dark:ring-0 dark:hover:bg-white/[0.06]">
-        <Sparkles className="h-[17px] w-[17px] text-[#dd9026] dark:text-[#f5b86b]" strokeWidth={2} />
-        <span className="flex-1 text-[13px] font-semibold text-[#a06a14] dark:text-[#f5cb9b]">Today&apos;s AI briefing</span>
-        <ArrowRight className="h-3.5 w-3.5 text-[#dd9026] dark:text-[#f5b86b]" />
-      </button>
-
-      <nav className="mt-1 flex-1 overflow-y-auto">
-        {RAIL.map((group, gi) => (
-          <div key={gi} className={gi > 0 ? "mt-2 border-t border-line pt-2 dark:border-white/[0.06]" : ""}>
-            {group.map((it) => {
-              const isActive = it.label === active;
-              const cls = `group mb-0.5 flex items-center gap-2.5 rounded-[10px] px-2.5 py-[8.5px] text-[13px] transition ${
-                isActive
-                  ? "bg-soft font-semibold text-ink dark:bg-white/[0.09] dark:text-white"
-                  : "text-muted hover:bg-soft hover:text-ink dark:text-[#aaaab4] dark:hover:bg-white/[0.05] dark:hover:text-white"
-              }`;
-              const inner = (
-                <>
-                  <it.icon className={`h-[17px] w-[17px] ${isActive ? "text-ink dark:text-white" : "text-faint dark:text-[#6e6e7a]"}`} strokeWidth={isActive ? 2.1 : 1.8} />
-                  <span className="flex-1">{it.label}</span>
-                  {it.count && <span className="rounded-full bg-line px-1.5 py-0.5 text-[10px] font-semibold text-muted dark:bg-white/10 dark:text-[#aaaab4]">{it.count}</span>}
-                </>
-              );
-              return it.href ? (
-                <Link key={it.label} href={it.href} className={cls}>{inner}</Link>
-              ) : (
-                <a key={it.label} href="#" className={cls}>{inner}</a>
-              );
-            })}
-          </div>
-        ))}
-      </nav>
-
-      <div className="mt-3 flex items-center gap-2.5 rounded-xl bg-soft px-2.5 py-2.5 ring-1 ring-line dark:bg-white/[0.04] dark:ring-white/[0.07]">
-        <Gauge className="h-[16px] w-[16px] text-vgreen dark:text-[#9be3b8]" strokeWidth={2} />
-        <span className="flex-1 text-[12.5px] font-medium text-muted dark:text-[#aaaab4]">Health</span>
-        <span className="text-[13px] font-bold text-ink dark:text-white">{health.score}</span>
-        <span className="text-[10.5px] font-semibold text-vgreen dark:text-[#9be3b8]">▲{health.delta}</span>
-      </div>
-      <a href="#" className="mt-1.5 flex items-center gap-2.5 rounded-[10px] px-2.5 py-2 text-[13px] font-medium text-muted transition hover:bg-soft hover:text-ink dark:text-[#aaaab4] dark:hover:bg-white/[0.05] dark:hover:text-white">
-        <Settings className="h-[16px] w-[16px] text-faint dark:text-[#6e6e7a]" strokeWidth={1.8} />
-        Settings
-      </a>
-    </aside>
+    <Sidebar
+      className="max-lg:hidden"
+      logo={
+        <Link href="/product" className="flex items-center gap-2.5">
+          <Mark className="h-7 w-7" />
+          <span className="text-[16px] font-bold tracking-tight text-[var(--ink)]">
+            vadal<span className="text-[var(--brand)]">.ai</span>
+          </span>
+        </Link>
+      }
+      workspace={
+        <WorkspaceSwitcher
+          name={org.name}
+          meta={`${org.headcount.toLocaleString()} people`}
+          logo={<Image src={org.logo} alt={org.name} width={32} height={32} className="h-full w-full object-contain p-[3px]" />}
+        />
+      }
+      briefing={<AIBriefing title="Today's AI briefing" subtitle="3 new insights" />}
+      health={<Health value={health.score} label="Health" trend={{ direction: "up", value: String(health.delta) }} />}
+      footer={<NavItem icon={<Settings className="size-[18px]" strokeWidth={1.85} />} label="Settings" href="#" />}
+    >
+      {RAIL.map((group, gi) => (
+        <NavGroup key={gi}>
+          {group.map((it) => (
+            <NavItem
+              key={it.label}
+              href={it.href ?? "#"}
+              active={it.label === active}
+              label={it.label}
+              count={it.count}
+              icon={<it.icon className="size-[18px]" strokeWidth={it.label === active ? 2.1 : 1.85} />}
+            />
+          ))}
+        </NavGroup>
+      ))}
+    </Sidebar>
   );
 }
 

@@ -1,4 +1,9 @@
 @import "tailwindcss";
+/* Design-system tokens ([data-ds] light + .dark [data-ds]) — generated from @vadal/design-system. */
+@import "./design-system/tokens.scoped.css";
+
+/* Let Tailwind generate the arbitrary var(--token) utilities used by the DS components. */
+@source "../../../../packages/design-system/src";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

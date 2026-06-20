@@ -18,4 +18,28 @@ export type { RadioProps, RadioSize } from './components/Radio/Radio';
 
 export { Switch } from './components/Switch/Switch';
 export type { SwitchProps, SwitchSize } from './components/Switch/Switch';
+
+export { Trend } from './components/Trend/Trend';
+export type { TrendProps, TrendDirection } from './components/Trend/Trend';
+
+export { NavItem } from './components/NavItem/NavItem';
+export type { NavItemProps } from './components/NavItem/NavItem';
+
+export { MenuItem } from './components/MenuItem/MenuItem';
+export type { MenuItemProps } from './components/MenuItem/MenuItem';
+
+export { WorkspaceSwitcher } from './components/WorkspaceSwitcher/WorkspaceSwitcher';
+export type { WorkspaceSwitcherProps } from './components/WorkspaceSwitcher/WorkspaceSwitcher';
+
+export { WorkspaceMenu, WorkspaceMenuDivider } from './components/WorkspaceMenu/WorkspaceMenu';
+export type { WorkspaceMenuProps } from './components/WorkspaceMenu/WorkspaceMenu';
+
+export { AIBriefing } from './components/AIBriefing/AIBriefing';
+export type { AIBriefingProps } from './components/AIBriefing/AIBriefing';
+
+export { Health } from './components/Health/Health';
+export type { HealthProps } from './components/Health/Health';
+
+export { Sidebar, NavGroup } from './components/Sidebar/Sidebar';
+export type { SidebarProps } from './components/Sidebar/Sidebar';
 // Icon, IconContainer … exported as they're added.

@@ -98,5 +98,55 @@
   "switch-thumb-disabled": { "$type": "color", "$value": "{disabled-content}" },
   "switch-label": { "$type": "color", "$value": "{ink}" },
   "switch-description": { "$type": "color", "$value": "{muted}" },
-  "switch-focus-ring": { "$type": "color", "$value": "{focus-ring}" }
+  "switch-focus-ring": { "$type": "color", "$value": "{focus-ring}" },
+
+  "sidebar-bg": { "$type": "color", "$value": "{card}" },
+  "sidebar-border": { "$type": "color", "$value": "{line}" },
+
+  "nav-item-label": { "$type": "color", "$value": "{muted}" },
+  "nav-item-label-active": { "$type": "color", "$value": "{ink}" },
+  "nav-item-icon": { "$type": "color", "$value": "{icon-subtle}" },
+  "nav-item-icon-active": { "$type": "color", "$value": "{ink}" },
+  "nav-item-bg-hover": { "$type": "color", "$value": "{soft}" },
+  "nav-item-bg-active": { "$type": "color", "$value": "{soft}" },
+  "nav-count-bg": { "$type": "color", "$value": "{line}" },
+  "nav-count-label": { "$type": "color", "$value": "{muted}" },
+
+  "menu-item-label": { "$type": "color", "$value": "{ink}" },
+  "menu-item-icon": { "$type": "color", "$value": "{icon-muted}" },
+  "menu-item-bg-hover": { "$type": "color", "$value": "{soft}" },
+
+  "workspace-bg": { "$type": "color", "$value": "{card}" },
+  "workspace-bg-hover": { "$type": "color", "$value": "{soft}" },
+  "workspace-border": { "$type": "color", "$value": "{line}" },
+  "workspace-border-hover": { "$type": "color", "$value": "{border-strong}" },
+  "workspace-name": { "$type": "color", "$value": "{ink}" },
+  "workspace-meta": { "$type": "color", "$value": "{faint}" },
+  "workspace-caret": { "$type": "color", "$value": "{icon-subtle}" },
+  "workspace-menu-bg": { "$type": "color", "$value": "{card}" },
+  "workspace-menu-border": { "$type": "color", "$value": "{line}" },
+  "workspace-menu-header-label": { "$type": "color", "$value": "{ink}" },
+  "workspace-menu-header-meta": { "$type": "color", "$value": "{muted}" },
+
+  "ai-briefing-bg": { "$type": "color", "$value": "{brand-soft}" },
+  "ai-briefing-border": { "$type": "color", "$value": "{line}" },
+  "ai-briefing-title": { "$type": "color", "$value": "{brand-text}" },
+  "ai-briefing-subtitle": { "$type": "color", "$value": "{ink}" },
+  "ai-briefing-spark": { "$type": "color", "$value": "{brand-soft}" },
+  "ai-briefing-arrow": { "$type": "color", "$value": "{brand}" },
+  "ai-briefing-dot": { "$type": "color", "$value": "{signal}" },
+
+  "health-bg": { "$type": "color", "$value": "{card}" },
+  "health-border": { "$type": "color", "$value": "{line}" },
+  "health-label": { "$type": "color", "$value": "{muted}" },
+  "health-value": { "$type": "color", "$value": "{ink}" },
+  "health-chip-bg": { "$type": "color", "$value": "{success-soft}" },
+  "health-chip-icon": { "$type": "color", "$value": "{success}" },
+
+  "trend-up-bg": { "$type": "color", "$value": "{success-soft}" },
+  "trend-up-label": { "$type": "color", "$value": "{success}" },
+  "trend-down-bg": { "$type": "color", "$value": "{danger-soft}" },
+  "trend-down-label": { "$type": "color", "$value": "{danger}" },
+  "trend-flat-bg": { "$type": "color", "$value": "{soft}" },
+  "trend-flat-label": { "$type": "color", "$value": "{muted}" }
 }
