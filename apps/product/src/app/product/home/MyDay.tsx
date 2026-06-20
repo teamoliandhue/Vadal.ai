@@ -13,10 +13,11 @@ const DOT: Record<string, string> = {
   Learning: "#e0708a",
 };
 
-export function MyDay({ className = "" }: { className?: string }) {
+export function MyDay({ className = "", empty = false }: { className?: string; empty?: boolean }) {
   const [doneIdx, setDoneIdx] = React.useState<number[]>([]);
-  const remaining = myDay.filter((_, i) => !doneIdx.includes(i));
-  const total = myDay.length;
+  const items = empty ? [] : myDay;
+  const remaining = items.filter((_, i) => !doneIdx.includes(i));
+  const total = items.length;
   const done = total - remaining.length;
 
   return (
@@ -26,17 +27,19 @@ export function MyDay({ className = "" }: { className?: string }) {
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-faint">Today</p>
           <h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Your day</h2>
         </div>
-        <span className="text-[11.5px] font-medium text-faint">{done}/{total} done</span>
+        <span className="text-[11.5px] font-medium text-faint">{total > 0 ? `${done}/${total} done` : "Nothing today"}</span>
       </div>
-      <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-soft">
-        <span className="block h-full rounded-full bg-[var(--purple)] transition-[width] duration-500" style={{ width: `${(done / total) * 100}%` }} />
-      </div>
+      {total > 0 && (
+        <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-soft">
+          <span className="block h-full rounded-full bg-[var(--purple)] transition-[width] duration-500" style={{ width: `${(done / total) * 100}%` }} />
+        </div>
+      )}
 
       {remaining.length === 0 ? (
         <div className="mt-5 flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line py-14 text-center">
           <PartyPopper className="h-8 w-8 text-[var(--purple)]" />
-          <p className="text-[14px] font-semibold">You’re all caught up 🎉</p>
-          <p className="text-[12px] text-faint">Nothing left for today. Enjoy it.</p>
+          <p className="text-[14px] font-semibold">{empty ? "Your day is clear" : "You’re all caught up 🎉"}</p>
+          <p className="text-[12px] text-faint">{empty ? "New tasks and nudges will land here." : "Nothing left for today. Enjoy it."}</p>
         </div>
       ) : (
         <ul className="mt-3 -mx-2">

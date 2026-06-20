@@ -22,6 +22,7 @@ import {
 import { Sidebar, NavGroup, NavItem, WorkspaceSwitcher, AIBriefing, Health } from "@vadal/design-system";
 import { org, health } from "@/lib/data";
 import { ThemeToggle } from "./theme-toggle";
+import { AiDock } from "./ai-dock";
 
 /* ════════════════════════ shared product shell ════════════════════════
    The Lumen app chrome — sidebar rail, top bar, AI dock — used by both
@@ -170,19 +171,4 @@ function TopBar({ domain, breadcrumb }: { domain: string; breadcrumb: string }) 
   );
 }
 
-function AiDock() {
-  return (
-    <button className="fixed bottom-5 right-6 z-30 flex items-center gap-2.5 rounded-full border border-line bg-card py-2.5 pl-3 pr-4 shadow-[0_10px_34px_rgba(20,20,25,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_44px_rgba(139,124,248,0.32)] dark:shadow-[0_10px_34px_rgba(0,0,0,0.5)]">
-      <span className="ai-aura grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#2dd4bf] via-[#818cf8] to-[#f472b6]">
-        <Sparkles className="h-4 w-4 text-white" />
-      </span>
-      <span className="text-left">
-        <span className="flex items-center gap-1 text-[12.5px] font-semibold">
-          Vadal
-          <span className="rounded-[4px] border border-line px-1 text-[8.5px] font-bold text-muted">AI</span>
-        </span>
-        <span className="block text-[10.5px] text-faint">What are you looking for today?</span>
-      </span>
-    </button>
-  );
-}
+// AiDock lives in ./ai-dock (client) — a functional chat dock opened from anywhere via the `vadal:ask` event.
