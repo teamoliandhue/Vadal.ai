@@ -2,6 +2,7 @@ import { AiDock } from "./ai-dock";
 import { TopBar } from "./header/TopBar";
 import { Toaster } from "./Toaster";
 import { Rail } from "./Rail";
+import { SelectionAI } from "./SelectionAI";
 
 /* ════════════════════════ shared product shell ════════════════════════
    The Lumen app chrome — sidebar rail (./Rail, client), top bar, AI dock —
@@ -36,6 +37,7 @@ export function Shell({
         </main>
       </div>
       <AiDock />
+      <SelectionAI />
       <Toaster />
     </div>
   );
