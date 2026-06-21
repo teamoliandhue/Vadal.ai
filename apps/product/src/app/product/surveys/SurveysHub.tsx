@@ -7,14 +7,27 @@ import * as React from "react";
 import { Plus } from "lucide-react";
 import { Badge, Button, SparkMark, type BadgeTone } from "@vadal/design-system";
 import { toast } from "../Toaster";
-import { surveyStats, surveys, surveyTemplates, surveyResult, type SurveyStatus } from "@/lib/listen";
+import { Drawer } from "../Drawer";
+import { surveyStats, surveys, surveyTemplates, surveyResult, type Survey, type SurveyStatus } from "@/lib/listen";
 
 const TONE = { good: "#2f9e6e", bad: "#dc4a44", warn: "#d68a1e", purple: "#6d5df0" } as const;
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 const toneOf = (t: string) => (t === "good" ? TONE.good : t === "bad" ? TONE.bad : t === "warn" ? TONE.warn : TONE.purple);
+const hash = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
 const STATUS_TONE: Record<SurveyStatus, BadgeTone> = { live: "success", scheduled: "info", closed: "neutral" };
 const STATUS_LABEL: Record<SurveyStatus, string> = { live: "Live", scheduled: "Scheduled", closed: "Closed" };
 const FILTERS = ["All", "Live", "Scheduled", "Closed"] as const;
+
+/* per-survey results — varies the standard question set by a stable name hash */
+function resultsFor(s: Survey) {
+  if (s.status === "scheduled") return null;
+  const off = (hash(s.name) % 15) - 7;
+  return {
+    questions: surveyResult.questions.map((q) => ({ ...q, topPct: Math.max(22, Math.min(92, q.topPct + off)) })),
+    themes: surveyResult.themes,
+    summary: surveyResult.aiSummary,
+  };
+}
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
@@ -25,7 +38,9 @@ function Card({ className = "", children }: { className?: string; children: Reac
 
 export function SurveysHub() {
   const [filter, setFilter] = React.useState<(typeof FILTERS)[number]>("All");
+  const [open, setOpen] = React.useState<Survey | null>(null);
   const rows = surveys.filter((s) => filter === "All" || STATUS_LABEL[s.status] === filter);
+  const detail = open ? resultsFor(open) : null;
 
   const kpis: [string, string, string?][] = [
     ["Active surveys", String(surveyStats.active)],
@@ -86,9 +101,7 @@ export function SurveysHub() {
                   </td>
                   <td className="px-2 py-3 text-[14px] text-muted">{s.when}</td>
                   <td className="px-2 py-3 text-right">
-                    {s.status === "scheduled"
-                      ? <button onClick={() => toast(`Reminder set for “${s.name}” ✓`)} className="text-[12px] font-semibold text-[var(--purple)] hover:underline">Edit</button>
-                      : <button onClick={() => toast(`Opening results for “${s.name}”…`)} className="text-[12px] font-semibold text-[var(--purple)] hover:underline">View results</button>}
+                    <button onClick={() => setOpen(s)} className="text-[12px] font-semibold text-[var(--purple)] hover:underline">{s.status === "scheduled" ? "Details" : "View results"}</button>
                   </td>
                 </tr>
               ))}
@@ -137,6 +150,44 @@ export function SurveysHub() {
           </div>
         </div>
       </Card>
+
+      <Drawer open={!!open} title={open?.name} onClose={() => setOpen(null)}>
+        {open && (
+          <>
+            <Eyebrow>Survey · {open.type}</Eyebrow>
+            <h2 className="mt-1.5 text-[20px] font-bold tracking-tight">{open.name}</h2>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Badge tone={STATUS_TONE[open.status]} variant="soft" size="sm">{STATUS_LABEL[open.status]}</Badge>
+              <span className="rounded-full bg-soft px-2 py-0.5 text-[12px] text-muted">{open.audience}</span>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="rounded-2xl border border-line p-3"><div className="text-[12px] text-faint">Response rate</div><div className="mt-1 text-[18px] font-bold tabular-nums">{open.responseRate}%</div></div>
+              <div className="rounded-2xl border border-line p-3"><div className="text-[12px] text-faint">Responses</div><div className="mt-1 text-[18px] font-bold tabular-nums">{open.responses.toLocaleString()}</div></div>
+            </div>
+            {detail ? (
+              <>
+                <h3 className="mt-5 text-[14px] font-bold">Top answers</h3>
+                <div className="mt-2 flex flex-col gap-3">
+                  {detail.questions.map((q) => (
+                    <div key={q.q}>
+                      <div className="flex items-center justify-between text-[14px]"><span className="font-medium">{q.q}</span><span className="text-[12px] text-faint">{q.top} · {q.topPct}%</span></div>
+                      <span className="mt-1.5 block h-2 overflow-hidden rounded-full bg-soft"><span className="block h-full rounded-full" style={{ width: `${q.topPct}%`, background: toneOf(q.tone) }} /></span>
+                    </div>
+                  ))}
+                </div>
+                <h3 className="mt-5 text-[14px] font-bold">AI themes · open text</h3>
+                <ul className="mt-2 space-y-2">
+                  {detail.themes.map((t) => <li key={t.name} className="flex items-center justify-between text-[14px]"><span className="font-medium">{t.name}</span><span className="rounded-full px-2 py-0.5 text-[12px] font-semibold" style={{ background: `${toneOf(t.tone)}1a`, color: toneOf(t.tone) }}>{t.mentions}</span></li>)}
+                </ul>
+                <div className="mt-3 flex items-start gap-2 rounded-2xl bg-[var(--ai-surface)] p-3 text-[14px] leading-relaxed text-muted ring-1 ring-[var(--ai-border)]"><SparkMark size={14} className="mt-0.5 shrink-0" /><span>{detail.summary}</span></div>
+                <Button variant="brand" className="mt-5" leadingIcon={<SparkMark size={14} tone="solid" />} onClick={() => ask(`Summarise the results of the ${open.name} and suggest actions.`)}>Ask Vadal about this</Button>
+              </>
+            ) : (
+              <div className="mt-6 flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line py-12 text-center"><p className="text-[14px] font-semibold">Not started yet</p><p className="text-[14px] text-faint">Opens {open.when}. Results appear here once responses come in.</p></div>
+            )}
+          </>
+        )}
+      </Drawer>
     </div>
   );
 }

@@ -32,6 +32,7 @@ export const surveyTemplates: { key: string; name: string; desc: string; cadence
   { key: "exit", name: "Exit", desc: "Why people leave — themes & regret loss.", cadence: "Triggered" },
   { key: "dei", name: "DEI climate", desc: "Belonging & inclusion, anonymity-safe.", cadence: "Bi-annual" },
   { key: "manager", name: "Manager effectiveness", desc: "360 on manager behaviours.", cadence: "Quarterly" },
+  { key: "candidate", name: "Candidate experience", desc: "Feedback from people who interviewed.", cadence: "Triggered" },
 ];
 
 export const surveyResult = {
@@ -62,6 +63,27 @@ export const sentiment = {
   comments: 4120,
   months: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun"],
   netSeries: [41, 43, 44, 42, 45, 47, 46, 49, 50, 51, 53, 52],
+  posSeries: [55, 57, 58, 56, 59, 61, 60, 62, 63, 64, 66, 64],
+  negSeries: [18, 16, 16, 18, 15, 14, 15, 13, 13, 12, 11, 12],
+  summary: [
+    "Recognition and team belonging are the strongest positive drivers — both rising for 3 straight months.",
+    "Workload after the reorg is the dominant negative theme, concentrated in Engineering and Plant Ops.",
+    "A new anxiety signal: “appraisal timeline” questions are spiking in Engineering ahead of the review cycle.",
+  ],
+  themeComments: {
+    Recognition: [
+      { text: "The new recognition program actually changed how the team feels day to day.", meta: "Design · 2d ago" },
+      { text: "Getting a shout-out in the all-hands meant a lot.", meta: "Sales · 4d ago" },
+    ],
+    "Workload & burnout": [
+      { text: "Workload has doubled since the reorg — we're running on fumes.", meta: "Engineering · 2d ago" },
+      { text: "Another weekend of on-call. This isn't sustainable.", meta: "Plant Ops · 1d ago" },
+    ],
+    "Pay & growth": [
+      { text: "Still unclear how pay bands map to the new levels.", meta: "Finance · 4d ago" },
+      { text: "I'd like a clearer path to senior.", meta: "Support · 3d ago" },
+    ],
+  } as Record<string, { text: string; meta: string }[]>,
   themes: [
     { name: "Recognition", sentiment: "positive", occurrences: 268, trend: "up" },
     { name: "Team & belonging", sentiment: "positive", occurrences: 214, trend: "up" },
@@ -90,6 +112,20 @@ export const sentiment = {
     ],
   },
 };
+
+/* Anonymity threshold + scopes for sentiment drill-down. Cuts below MIN_N
+   respondents are hidden to protect anonymity. */
+export const MIN_N = 5;
+export const sentimentScopes: { name: string; respondents: number }[] = [
+  { name: "All teams", respondents: 4120 },
+  { name: "Engineering", respondents: 980 },
+  { name: "Sales", respondents: 1240 },
+  { name: "Support", respondents: 760 },
+  { name: "Design", respondents: 210 },
+  { name: "Plant Ops", respondents: 1520 },
+  { name: "Leadership", respondents: 4 },
+  { name: "DEI council", respondents: 3 },
+];
 
 /* ── Always-on listening ───────────────────────────────────────────── */
 export const listening = {

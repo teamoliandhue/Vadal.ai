@@ -44,7 +44,6 @@ export function TrendChart({
   className?: string;
   id?: string;
 }) {
-  void benchColor;
   const W = 800;
   // scale both series against the union so they share an axis
   const all = benchmark ? [...series, ...benchmark] : series;
@@ -70,7 +69,7 @@ export function TrendChart({
         <path
           d={b.d}
           fill="none"
-          stroke="var(--bench, #c9c9d4)"
+          stroke={benchColor}
           strokeWidth="2"
           strokeDasharray="5 7"
           vectorEffect="non-scaling-stroke"

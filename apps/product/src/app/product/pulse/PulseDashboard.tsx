@@ -225,7 +225,7 @@ function BusinessImpactStrip() {
 function VoiceCard({ v, className = "" }: { v: PulseView; className?: string }) {
   return (
     <Card className={className}>
-      <CardHead eyebrow="Employee voice" title={`${v.voice.comments.toLocaleString()} comments`} action={<Explore q={`Summarise employee sentiment themes for ${v.scope}`} />} />
+      <CardHead eyebrow="Employee voice" title={`${v.voice.comments.toLocaleString()} comments`} action={<Link href="/product/sentiment" className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5">Open Sentiment <ArrowUpRight className="h-3 w-3" /></Link>} />
       <Figure label={`Sentiment: ${v.voice.mood.map((m) => `${m.label} ${m.pct}%`).join(", ")}`} className="mt-4 flex h-2.5 overflow-hidden rounded-full">
         {v.voice.mood.map((m) => <span key={m.label} style={{ width: `${m.pct}%`, background: m.color }} />)}
       </Figure>
