@@ -37,8 +37,9 @@ const DIMS = {
 type DimKey = keyof typeof DIMS;
 const DIM_KEYS = Object.keys(DIMS) as DimKey[];
 
-const PERIODS = ["7 days", "30 days", "Quarter"] as const;
-const WIN: Record<string, number> = { "7 days": 5, "30 days": 9, "Quarter": 14 };
+// Trends are monthly series — windows are in months so the labels match the data.
+const PERIODS = ["3 months", "6 months", "12 months"] as const;
+const WIN: Record<string, number> = { "3 months": 3, "6 months": 6, "12 months": 12 };
 
 function value(metric: MetricKey, cat: string): number {
   if (metric === "engagement") {
@@ -84,7 +85,7 @@ export function AnalyticsExplorer({ initialMetric, initialDim }: { initialMetric
   const startDim = (initialDim && initialDim in DIMS ? initialDim : "team") as DimKey;
   const [metric, setMetric] = React.useState<MetricKey>(startMetric);
   const [dim, setDim] = React.useState<DimKey>(startDim);
-  const [period, setPeriod] = React.useState<string>("30 days");
+  const [period, setPeriod] = React.useState<string>("6 months");
 
   const M = METRICS[metric];
   const fmt = React.useCallback((v: number) => `${v}${M.unit}`, [M.unit]);

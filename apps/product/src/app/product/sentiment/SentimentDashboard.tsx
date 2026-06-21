@@ -19,8 +19,9 @@ const hash = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >
 const sentTone = (s: string) => (s === "positive" ? TONE.good : s === "negative" ? TONE.bad : TONE.muted);
 const trendGlyph = (t: string) => (t === "up" ? "▲" : t === "down" ? "▼" : "→");
 
-const PERIODS = ["7 days", "30 days", "Quarter"] as const;
-const WIN: Record<string, number> = { "7 days": 5, "30 days": 9, "Quarter": 12 };
+// The trend is a monthly series — windows are in months so labels match the data.
+const PERIODS = ["3 months", "6 months", "12 months"] as const;
+const WIN: Record<string, number> = { "3 months": 3, "6 months": 6, "12 months": 12 };
 const THEME_FILTERS = ["All", "Positive", "Negative", "Rising"] as const;
 
 type Theme = (typeof sentiment.themes)[number];
@@ -58,7 +59,7 @@ function Card({ className = "", children }: { className?: string; children: Reac
 }
 
 export function SentimentDashboard() {
-  const [period, setPeriod] = React.useState<string>("30 days");
+  const [period, setPeriod] = React.useState<string>("6 months");
   const [themeFilter, setThemeFilter] = React.useState<(typeof THEME_FILTERS)[number]>("All");
   const [scope, setScope] = React.useState<string>("All teams");
   const [openTheme, setOpenTheme] = React.useState<Theme | null>(null);
