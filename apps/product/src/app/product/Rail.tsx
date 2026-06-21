@@ -37,9 +37,9 @@ const RAIL: RailGroup[] = [
   {
     label: "Listen",
     items: [
-      { label: "Surveys", icon: ClipboardList, href: "/product/surveys", soon: true },
-      { label: "Sentiment", icon: Smile, href: "/product/sentiment", soon: true },
-      { label: "Always-on listening", icon: Radio, href: "/product/listening", soon: true },
+      { label: "Surveys", icon: ClipboardList, href: "/product/surveys" },
+      { label: "Sentiment", icon: Smile, href: "/product/sentiment" },
+      { label: "Always-on listening", icon: Radio, href: "/product/listening" },
     ],
   },
   {

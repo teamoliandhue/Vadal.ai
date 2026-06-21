@@ -192,9 +192,11 @@ export function ScoreRing({
 export function ArcGauge({
   score,
   width = 220,
+  label = "workforce health",
 }: {
   score: number;
   width?: number;
+  label?: string;
 }) {
   const stroke = 14;
   const r = (width - stroke) / 2;
@@ -234,7 +236,7 @@ export function ArcGauge({
         <span className="text-[44px] font-bold leading-none tracking-tight">
           {score}
         </span>
-        <span className="mt-1 text-[12px] text-faint">workforce health</span>
+        <span className="mt-1 text-[12px] text-faint">{label}</span>
       </div>
     </div>
   );

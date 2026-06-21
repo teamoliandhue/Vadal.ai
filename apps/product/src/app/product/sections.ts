@@ -1,8 +1,8 @@
 /* Section registry for not-yet-built nav destinations — drives the [section]
    coming-soon route + keeps labels in sync with the sidebar (Shell RAIL). */
 import {
-  BookOpen, ClipboardList, FolderKanban, HeartHandshake,
-  Megaphone, Radio, Settings, Smile, UsersRound, type LucideIcon,
+  BookOpen, FolderKanban, HeartHandshake,
+  Megaphone, Settings, UsersRound, type LucideIcon,
 } from "lucide-react";
 
 export type SectionMeta = {
@@ -14,24 +14,6 @@ export type SectionMeta = {
 };
 
 export const SECTIONS: Record<string, SectionMeta> = {
-  surveys: {
-    label: "Surveys", Icon: ClipboardList,
-    tagline: "Design, send and track pulse + lifecycle surveys — the listening engine that feeds Pulse.",
-    bullets: ["Templated pulse, onboarding & exit surveys", "Live response tracking & reminders", "AI theme detection on open text"],
-    ask: "What will the Surveys section do?",
-  },
-  sentiment: {
-    label: "Sentiment", Icon: Smile,
-    tagline: "An always-on read on how people feel, from every comment and signal.",
-    bullets: ["Real-time mood & theme tracking", "Anonymity-safe drill-downs", "Early-warning alerts on dips"],
-    ask: "How will Sentiment work?",
-  },
-  listening: {
-    label: "Always-on listening", Icon: Radio,
-    tagline: "Continuous listening across channels — never wait for a survey cycle.",
-    bullets: ["Passive signals from feed, chat & 1:1s", "Topic & risk detection", "Routes findings to the action queue"],
-    ask: "What is Always-on listening?",
-  },
   recognition: {
     label: "Recognition", Icon: HeartHandshake,
     tagline: "Make appreciation flow — give kudos, run values campaigns, and close cold zones.",
