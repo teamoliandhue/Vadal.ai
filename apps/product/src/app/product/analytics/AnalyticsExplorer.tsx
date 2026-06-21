@@ -40,13 +40,6 @@ const DIM_KEYS = Object.keys(DIMS) as DimKey[];
 const PERIODS = ["7 days", "30 days", "Quarter"] as const;
 const WIN: Record<string, number> = { "7 days": 5, "30 days": 9, "Quarter": 14 };
 
-const VIEWS: { label: string; metric: MetricKey; dim: DimKey }[] = [
-  { label: "Engagement by team", metric: "engagement", dim: "team" },
-  { label: "Attrition by tenure", metric: "attrition", dim: "tenure" },
-  { label: "Recognition by location", metric: "recognition", dim: "location" },
-  { label: "Manager score by seniority", metric: "manager", dim: "seniority" },
-];
-
 function value(metric: MetricKey, cat: string): number {
   if (metric === "engagement") {
     const dept = departments.find((d) => d.name === cat);
@@ -129,31 +122,25 @@ export function AnalyticsExplorer({ initialMetric, initialDim }: { initialMetric
           </div>
           <Button variant="secondary" size="sm" leadingIcon={<Download className="h-4 w-4" />} onClick={() => toast("Report exported ✓")}>Export</Button>
         </div>
-        {/* controls */}
-        <div className="relative mt-6 flex flex-col gap-3 border-t border-line pt-5">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="mr-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">Metric</span>
-            {METRIC_KEYS.map((k) => (
-              <button key={k} onClick={() => setMetric(k)} className={`rounded-full px-3 py-1.5 text-[14px] font-semibold transition ${metric === k ? "bg-ink text-[var(--card)]" : "border border-line text-muted hover:bg-soft hover:text-ink"}`}>{METRICS[k].label}</button>
+        {/* controls — dimension + period (metric is picked from the KPI strip below) */}
+        <div className="relative mt-6 flex flex-wrap items-center gap-4 border-t border-line pt-5">
+          <label className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">By
+            <select value={dim} onChange={(e) => setDim(e.target.value as DimKey)} className="rounded-full border border-line bg-card px-3 py-1.5 text-[14px] font-medium normal-case tracking-normal text-ink outline-none transition hover:border-faint/40">
+              {DIM_KEYS.map((k) => <option key={k} value={k}>{DIMS[k].label}</option>)}
+            </select>
+          </label>
+          <div className="flex items-center gap-1 rounded-full border border-line bg-soft p-1">
+            {PERIODS.map((p) => (
+              <button key={p} onClick={() => setPeriod(p)} className={`rounded-full px-3 py-1.5 text-[14px] font-semibold transition ${period === p ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}>{p}</button>
             ))}
-          </div>
-          <div className="flex flex-wrap items-center gap-4">
-            <label className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">By
-              <select value={dim} onChange={(e) => setDim(e.target.value as DimKey)} className="rounded-full border border-line bg-card px-3 py-1.5 text-[14px] font-medium normal-case tracking-normal text-ink outline-none transition hover:border-faint/40">
-                {DIM_KEYS.map((k) => <option key={k} value={k}>{DIMS[k].label}</option>)}
-              </select>
-            </label>
-            <div className="flex items-center gap-1 rounded-full border border-line bg-soft p-1">
-              {PERIODS.map((p) => (
-                <button key={p} onClick={() => setPeriod(p)} className={`rounded-full px-3 py-1.5 text-[14px] font-semibold transition ${period === p ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}>{p}</button>
-              ))}
-            </div>
           </div>
         </div>
       </header>
 
-      {/* executive KPI strip */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+      {/* executive KPI strip — also the metric picker */}
+      <div className="flex flex-col gap-2.5">
+        <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">Metric · tap a card to explore it</span>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         {METRIC_KEYS.map((k) => {
           const t = trendFor(k);
           const w = t.slice(-7);
@@ -173,17 +160,7 @@ export function AnalyticsExplorer({ initialMetric, initialDim }: { initialMetric
             </button>
           );
         })}
-      </div>
-
-      {/* saved views */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">Saved views</span>
-        {VIEWS.map((v) => {
-          const active = v.metric === metric && v.dim === dim;
-          return (
-            <button key={v.label} onClick={() => { setMetric(v.metric); setDim(v.dim); }} className={`rounded-full px-3 py-1 text-[14px] font-medium transition ${active ? "bg-[var(--lav)] text-[var(--purple)] ring-1 ring-[var(--purple)]/30" : "bg-soft text-muted hover:text-ink"}`}>{v.label}</button>
-          );
-        })}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
