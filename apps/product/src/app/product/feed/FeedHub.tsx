@@ -25,6 +25,19 @@ function score(it: FeedItem) {
   const reacts = Object.values(it.reactions).reduce((s, n) => s + (n ?? 0), 0);
   return reacts + it.comments.length * 3 + it.views / 200;
 }
+/* relative "2h"/"1d"/"28m"/"now" → minutes ago, for the Recent sort */
+function timeMins(t: string): number {
+  if (t === "now") return 0;
+  const m = /^(\d+)\s*([mhd])$/.exec(t);
+  if (!m) return 1e9;
+  const n = +m[1];
+  return m[2] === "m" ? n : m[2] === "h" ? n * 60 : n * 1440;
+}
+/* fresh posts the "new posts" pill actually delivers (not a fake scroll) */
+const FRESH: FeedItem[] = [
+  { id: "fresh-1", type: "kudos", author: { name: "Anita Desai", role: "Engineering", img: "/avatars/user-5.svg" }, channel: "wins", time: "now", text: "Just shipped the billing fix with **Aarav** — clean rollback plan, zero downtime. 👏", kudos: { to: [{ name: "Aarav S.", role: "Engineering", img: "/avatars/user-2.svg" }], values: ["Ownership"] }, reactions: { "👏": 3 }, reactedBy: ["/avatars/user-2.svg"], comments: [], views: 12 },
+  { id: "fresh-2", type: "post", author: { name: "People Team", role: "Company-wide", img: "/avatars/user-8.svg" }, channel: "wellbeing", time: "now", text: "Reminder: the wellbeing perk vote closes tomorrow — get your pick in. 🌿", reactions: { "🙌": 2 }, reactedBy: [], comments: [], views: 8 },
+];
 
 export function FeedHub() {
   const [mine, setMine] = usePersistentState<FeedItem[]>("vadal:feed2-mine", []);
@@ -39,6 +52,7 @@ export function FeedHub() {
   const [sort, setSort] = React.useState<Sort>("trending");
   const [openId, setOpenId] = React.useState<string | null>(null);
   const [showNew, setShowNew] = React.useState(false);
+  const [extra, setExtra] = React.useState<FeedItem[]>([]); // posts the "new posts" pill delivers
   const topRef = React.useRef<HTMLDivElement>(null);
 
   // Simulated "new posts arrived" pill (a live feed feels alive).
@@ -64,13 +78,13 @@ export function FeedHub() {
     };
   }, [reacts, votes, bookmarks, myComments, going, likedC]);
 
-  const all = React.useMemo(() => [...mine, ...feedItems].map(toDisplay), [mine, toDisplay]);
+  const all = React.useMemo(() => [...extra, ...mine, ...feedItems].map(toDisplay), [extra, mine, toDisplay]);
 
   const stream = React.useMemo(() => {
     const filtered = channel ? all.filter((it) => it.channel === channel) : all;
     const pinned = filtered.filter((it) => it.pinned);
     const rest = filtered.filter((it) => !it.pinned);
-    rest.sort((a, b) => (sort === "trending" ? score(b) - score(a) : 0)); // recent = source order (mine first)
+    rest.sort((a, b) => (sort === "trending" ? score(b) - score(a) : timeMins(a.time) - timeMins(b.time)));
     return [...pinned, ...rest];
   }, [all, channel, sort]);
 
@@ -95,7 +109,7 @@ export function FeedHub() {
   const menu = (label: string) => toast(label === "Report" ? "Reported — thank you" : `${label} ✓`);
   const addPost = (item: FeedItem) => { setMine((m) => [item, ...m]); setChannel(null); setSort("recent"); };
 
-  const refresh = () => { setShowNew(false); setSort("recent"); topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  const refresh = () => { setExtra(FRESH); setShowNew(false); setSort("recent"); topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); };
 
   return (
     <div ref={topRef} className="mx-auto flex w-full max-w-[1100px] justify-center gap-6">
@@ -134,7 +148,7 @@ export function FeedHub() {
         {showNew && (
           <div className="flex justify-center">
             <button onClick={refresh} className="ai-pop flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-[13px] font-semibold text-[var(--card)] shadow-lg transition hover:opacity-90">
-              <ArrowUp className="h-3.5 w-3.5" /> 3 new posts
+              <ArrowUp className="h-3.5 w-3.5" /> {FRESH.length} new posts
             </button>
           </div>
         )}

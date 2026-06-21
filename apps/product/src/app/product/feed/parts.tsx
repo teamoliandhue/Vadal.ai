@@ -199,18 +199,32 @@ export function ReactionPicker({ onPick, onClose }: { onPick: (e: ReactionEmoji)
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("mousedown", onDown);
     window.addEventListener("keydown", onKey);
+    // move focus into the popover so it's keyboard-operable
+    (ref.current?.querySelector("button") as HTMLButtonElement | null)?.focus();
     return () => { document.removeEventListener("mousedown", onDown); window.removeEventListener("keydown", onKey); };
   }, [onClose]);
+  function onArrow(e: React.KeyboardEvent, i: number) {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    e.preventDefault();
+    const btns = ref.current?.querySelectorAll("button");
+    if (!btns) return;
+    const next = (i + (e.key === "ArrowRight" ? 1 : -1) + btns.length) % btns.length;
+    (btns[next] as HTMLButtonElement).focus();
+  }
   return (
     <div
       ref={ref}
+      role="menu"
+      aria-label="Pick a reaction"
       className="ai-pop absolute bottom-full left-0 z-20 mb-2 flex items-center gap-0.5 rounded-full border border-line bg-card p-1 shadow-[0_12px_30px_-10px_rgba(20,20,40,0.3)]"
     >
-      {REACTION_SET.map((e) => (
+      {REACTION_SET.map((e, i) => (
         <button
           key={e}
+          role="menuitem"
           onClick={() => onPick(e)}
-          className="grid h-9 w-9 place-items-center rounded-full text-[20px] transition hover:-translate-y-0.5 hover:scale-125 hover:bg-soft"
+          onKeyDown={(ev) => onArrow(ev, i)}
+          className="grid h-9 w-9 place-items-center rounded-full text-[20px] outline-none transition hover:-translate-y-0.5 hover:scale-125 hover:bg-soft focus-visible:bg-soft focus-visible:ring-2 focus-visible:ring-[var(--purple)]"
           aria-label={`React ${e}`}
         >
           {e}
@@ -231,6 +245,8 @@ export function EngagementBar({
   onShare: () => void;
 }) {
   const [pick, setPick] = React.useState(false);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const closePicker = () => { setPick(false); triggerRef.current?.focus(); };
   const entries = Object.entries(item.reactions) as [ReactionEmoji, number][];
   const total = entries.reduce((s, [, n]) => s + n, 0);
   const topEmojis = [...entries].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([e]) => e);
@@ -240,10 +256,13 @@ export function EngagementBar({
       <div className="flex items-center gap-1">
         {/* reactions summary / trigger */}
         <div className="relative">
-          {pick && <ReactionPicker onPick={(e) => { onReact(e); setPick(false); }} onClose={() => setPick(false)} />}
+          {pick && <ReactionPicker onPick={(e) => { onReact(e); closePicker(); }} onClose={closePicker} />}
           {total > 0 ? (
             <button
+              ref={triggerRef}
               onClick={() => setPick((p) => !p)}
+              aria-haspopup="true"
+              aria-expanded={pick}
               className={`flex items-center gap-1.5 rounded-full py-1 pl-1.5 pr-2.5 text-[13px] font-semibold transition hover:bg-soft ${
                 item.myReaction ? "text-[var(--purple)]" : "text-muted"
               }`}
@@ -257,7 +276,10 @@ export function EngagementBar({
             </button>
           ) : (
             <button
+              ref={triggerRef}
               onClick={() => setPick((p) => !p)}
+              aria-haspopup="true"
+              aria-expanded={pick}
               className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[13px] font-semibold text-muted transition hover:bg-soft hover:text-[var(--purple)]"
             >
               <Smile className="h-4 w-4" /> React

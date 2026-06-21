@@ -67,7 +67,11 @@ export function PostCard({
   return (
     <article
       onClick={onOpen}
-      className={`group card-lift cursor-pointer rounded-[22px] border bg-card p-5 transition sm:p-6 ${
+      role="button"
+      tabIndex={0}
+      aria-label={`Open post by ${item.author.name}`}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } }}
+      className={`group card-lift cursor-pointer rounded-[22px] border bg-card p-5 outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--purple)] sm:p-6 ${
         item.pinned ? "border-[var(--purple)]/35 ring-1 ring-[var(--purple)]/15" : "border-line"
       }`}
     >
