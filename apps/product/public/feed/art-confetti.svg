@@ -1,0 +1,26 @@
+<svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Celebration artwork">
+  <defs>
+    <linearGradient id="cf-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FEF3C7"/>
+      <stop offset="1" stop-color="#FBCFE8"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="320" fill="url(#cf-bg)"/>
+  <g opacity="0.95">
+    <rect x="80" y="40" width="14" height="14" rx="3" fill="#F472B6" transform="rotate(20 87 47)"/>
+    <rect x="200" y="90" width="12" height="12" rx="3" fill="#8DA2FF" transform="rotate(-25 206 96)"/>
+    <rect x="340" y="50" width="16" height="16" rx="3" fill="#34D399" transform="rotate(15 348 58)"/>
+    <rect x="470" y="100" width="12" height="12" rx="3" fill="#FBBF24" transform="rotate(40 476 106)"/>
+    <rect x="600" y="60" width="14" height="14" rx="3" fill="#FB7185" transform="rotate(-10 607 67)"/>
+    <rect x="710" y="110" width="12" height="12" rx="3" fill="#A78BFA" transform="rotate(30 716 116)"/>
+    <circle cx="150" cy="160" r="7" fill="#FBBF24"/>
+    <circle cx="280" cy="200" r="6" fill="#FB7185"/>
+    <circle cx="540" cy="180" r="7" fill="#34D399"/>
+    <circle cx="660" cy="210" r="6" fill="#8DA2FF"/>
+    <path d="M400 130 l9 19 21 3 -15 15 4 21 -19 -10 -19 10 4 -21 -15 -15 21 -3 z" fill="#F59E0B"/>
+    <g stroke="#5D63E1" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6">
+      <path d="M120 250 q 30 -40 60 0"/>
+      <path d="M620 250 q 30 -40 60 0"/>
+    </g>
+  </g>
+</svg>

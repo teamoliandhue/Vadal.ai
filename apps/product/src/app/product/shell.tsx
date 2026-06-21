@@ -11,9 +11,9 @@ import { SelectionAI } from "./SelectionAI";
 
 /* left-hand domain label per section (top-bar breadcrumb root) */
 const DOMAIN: Record<string, string> = {
-  Home: "My workspace", Pulse: "People intelligence", Analytics: "People intelligence",
+  Home: "My space", Feed: "My space", Pulse: "People intelligence", Analytics: "People intelligence",
   Surveys: "Listening", Sentiment: "Listening", "Always-on listening": "Listening",
-  Recognition: "Engage", Campaigns: "Engage", Feed: "Engage",
+  Recognition: "Engage", Campaigns: "Engage",
   "Manager hub": "Operations", Cases: "Operations", Knowledge: "Workspace", Settings: "Account",
 };
 

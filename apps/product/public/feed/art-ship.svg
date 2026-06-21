@@ -1,0 +1,28 @@
+<svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Product shipped artwork">
+  <defs>
+    <linearGradient id="sh-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1020"/>
+      <stop offset="1" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="sh-beam" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#5D63E1"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="320" fill="url(#sh-bg)"/>
+  <g opacity="0.18" stroke="#8DA2FF" stroke-width="1">
+    <path d="M0 60 H800 M0 120 H800 M0 180 H800 M0 240 H800"/>
+    <path d="M100 0 V320 M250 0 V320 M400 0 V320 M550 0 V320 M700 0 V320"/>
+  </g>
+  <g transform="translate(400 165)">
+    <polygon points="0,-95 60,-15 0,40 -60,-15" fill="url(#sh-beam)"/>
+    <polygon points="0,-95 60,-15 0,-50" fill="#22D3EE" opacity="0.55"/>
+    <polygon points="0,-95 -60,-15 0,-50" fill="#8DA2FF" opacity="0.5"/>
+    <polygon points="0,40 60,-15 0,5" fill="#4338CA" opacity="0.7"/>
+    <polygon points="0,40 -60,-15 0,5" fill="#312E81" opacity="0.7"/>
+    <ellipse cx="0" cy="78" rx="80" ry="14" fill="#22D3EE" opacity="0.25"/>
+  </g>
+  <g fill="#A7F3D0">
+    <circle cx="640" cy="70" r="3"/><circle cx="690" cy="120" r="2.5"/><circle cx="150" cy="90" r="2.5"/><circle cx="120" cy="220" r="3"/>
+  </g>
+</svg>

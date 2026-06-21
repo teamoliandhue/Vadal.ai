@@ -26,7 +26,13 @@ type RailGroup = { label: string; items: RailItem[] };
    post-go-live / not-yet-built sections; built surfaces (Home, Pulse, Analytics,
    Feed) carry no chip. */
 const RAIL: RailGroup[] = [
-  { label: "Workspace", items: [{ label: "Home", icon: House, href: "/product/home" }] },
+  {
+    label: "My space",
+    items: [
+      { label: "Home", icon: House, href: "/product/home" },
+      { label: "Feed", icon: Newspaper, href: "/product/feed" },
+    ],
+  },
   {
     label: "Intelligence",
     items: [
@@ -47,7 +53,6 @@ const RAIL: RailGroup[] = [
     items: [
       { label: "Recognition", icon: HeartHandshake, href: "/product/recognition", soon: true },
       { label: "Campaigns", icon: Megaphone, href: "/product/campaigns", soon: true },
-      { label: "Feed", icon: Newspaper, href: "/product/feed" },
     ],
   },
   {

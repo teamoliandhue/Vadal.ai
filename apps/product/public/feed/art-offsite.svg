@@ -1,0 +1,23 @@
+<svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Team offsite event artwork">
+  <defs>
+    <linearGradient id="os-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FB7185"/>
+      <stop offset="0.5" stop-color="#F472B6"/>
+      <stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="320" fill="url(#os-bg)"/>
+  <circle cx="120" cy="90" r="70" fill="#FDE68A" opacity="0.9"/>
+  <path d="M-20 230 L160 150 L340 250 L520 140 L720 240 L820 200 V340 H-20 Z" fill="#7C3AED" opacity="0.55"/>
+  <path d="M-20 270 L200 200 L420 280 L640 190 L820 260 V340 H-20 Z" fill="#5B21B6" opacity="0.6"/>
+  <g stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.85" fill="none">
+    <path d="M560 70 q 20 -30 40 0 q 20 30 40 0"/>
+    <path d="M600 110 l0 -18 M650 95 l12 -10 M548 100 l-12 -8"/>
+  </g>
+  <g fill="#FFFFFF" opacity="0.95">
+    <rect x="300" y="60" width="10" height="10" rx="2" transform="rotate(20 305 65)"/>
+    <rect x="430" y="90" width="8" height="8" rx="2" transform="rotate(-15 434 94)"/>
+    <circle cx="380" cy="50" r="5"/>
+    <circle cx="500" cy="60" r="4"/>
+  </g>
+</svg>
