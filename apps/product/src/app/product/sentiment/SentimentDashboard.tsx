@@ -119,7 +119,7 @@ export function SentimentDashboard() {
                 <div><Eyebrow>Over time · {period}</Eyebrow><h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Positive vs negative</h2></div>
                 <div className="flex items-center gap-3 text-[12px] text-faint"><span className="flex items-center gap-1.5"><span className="h-2 w-4 rounded-full" style={{ background: TONE.good }} /> Positive</span><span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t-2 border-dashed" style={{ borderColor: TONE.bad }} /> Negative</span></div>
               </div>
-              <div role="img" aria-label={`Positive vs negative sentiment over ${period}`}><TrendChart series={v.posSeries.slice(-(WIN[period] ?? 12))} benchmark={v.negSeries.slice(-(WIN[period] ?? 12))} color={TONE.good} benchColor={TONE.bad} height={170} id="sent" className="mt-4" /></div>
+              <TrendChart series={v.posSeries.slice(-(WIN[period] ?? 12))} benchmark={v.negSeries.slice(-(WIN[period] ?? 12))} labels={v.months.slice(-(WIN[period] ?? 12))} seriesLabel="Positive %" benchLabel="Negative %" caption={`Positive vs negative sentiment, last ${WIN[period] ?? 12} months`} color={TONE.good} benchColor={TONE.bad} height={170} id="sent" className="mt-4" />
               <div className="mt-1 flex justify-between text-[12px] text-faint">{v.months.slice(-(WIN[period] ?? 12)).filter((_, i, a) => a.length <= 6 || i % 2 === 0).map((m) => <span key={m}>{m}</span>)}</div>
             </Card>
           </div>

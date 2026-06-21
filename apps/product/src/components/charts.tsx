@@ -35,6 +35,10 @@ export function TrendChart({
   height = 210,
   className = "",
   id = "trend",
+  labels,
+  seriesLabel = "This period",
+  benchLabel = "Benchmark",
+  caption,
 }: {
   series: number[];
   benchmark?: number[];
@@ -43,6 +47,12 @@ export function TrendChart({
   height?: number;
   className?: string;
   id?: string;
+  /** Period labels (one per point). When given, a visually-hidden data table is
+   *  rendered so screen readers get the actual values, not just "a chart". */
+  labels?: string[];
+  seriesLabel?: string;
+  benchLabel?: string;
+  caption?: string;
 }) {
   const W = 800;
   // scale both series against the union so they share an axis
@@ -51,10 +61,11 @@ export function TrendChart({
   const m = smoothPath(series, W, height, 8, scale);
   const b = benchmark ? smoothPath(benchmark, W, height, 8, scale) : null;
   return (
+    <div className={className}>
     <svg
       viewBox={`0 0 ${W} ${height}`}
       preserveAspectRatio="none"
-      className={`block w-full ${className}`}
+      className="block w-full"
       style={{ height }}
       aria-hidden
     >
@@ -93,6 +104,28 @@ export function TrendChart({
         strokeWidth="3"
       />
     </svg>
+    {labels && (
+      <table className="sr-only">
+        {caption && <caption>{caption}</caption>}
+        <thead>
+          <tr>
+            <th scope="col">Period</th>
+            <th scope="col">{seriesLabel}</th>
+            {benchmark && <th scope="col">{benchLabel}</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {labels.map((lab, i) => (
+            <tr key={lab}>
+              <th scope="row">{lab}</th>
+              <td>{series[i]}</td>
+              {benchmark && <td>{benchmark[i]}</td>}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+    </div>
   );
 }
 

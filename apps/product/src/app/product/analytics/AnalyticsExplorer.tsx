@@ -192,9 +192,7 @@ export function AnalyticsExplorer({ initialMetric, initialDim }: { initialMetric
               <div><p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{M.label} · {period}</p><h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Trend vs benchmark</h2></div>
               <div className="flex items-center gap-3 text-[12px] text-faint"><span className="flex items-center gap-1.5"><span className="h-2 w-4 rounded-full" style={{ background: TONE.purple }} /> Us</span><span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t-2 border-dashed border-line" /> Bench</span></div>
             </div>
-            <div role="img" aria-label={`${M.label} trend vs benchmark over ${period}`}>
-              <TrendChart series={series} benchmark={bench} color={TONE.purple} height={150} id="ax" className="mt-4" />
-            </div>
+            <TrendChart series={series} benchmark={bench} labels={engagementTrend.months.slice(-series.length)} seriesLabel={M.label} benchLabel="Benchmark" caption={`${M.label} vs benchmark, last ${series.length} months`} color={TONE.purple} height={150} id="ax" className="mt-4" />
             <div className="mt-3 grid grid-cols-3 divide-x divide-line">
               {[[fmt(best.v), "Top"], [fmt(avg), "Average"], [fmt(worst.v), "Bottom"]].map(([val, l]) => <div key={l} className="px-2 text-center first:pl-0 last:pr-0"><div className="text-[16px] font-bold tracking-tight">{val}</div><div className="mt-0.5 text-[12px] text-faint">{l}</div></div>)}
             </div>
@@ -221,21 +219,22 @@ export function AnalyticsExplorer({ initialMetric, initialDim }: { initialMetric
         </div>
         <div className="mt-4 -mx-2 overflow-x-auto px-2">
           <table className="w-full min-w-[560px] border-separate border-spacing-1">
+            <caption className="sr-only">{M.label} by team and {DIMS[colDim].label}</caption>
             <thead>
               <tr>
                 <th className="w-24" />
-                {heatCols.map((c) => <th key={c} className="px-1 pb-1 text-[12px] font-semibold text-faint">{c}</th>)}
+                {heatCols.map((c) => <th key={c} scope="col" className="px-1 pb-1 text-[12px] font-semibold text-faint">{c}</th>)}
               </tr>
             </thead>
             <tbody>
               {heatRows.map((row) => (
                 <tr key={row}>
-                  <td className="pr-2 text-right text-[14px] font-medium text-muted">{row}</td>
+                  <th scope="row" className="pr-2 text-right text-[14px] font-medium text-muted">{row}</th>
                   {heatCols.map((col) => {
                     const v = cellValue(metric, row, col);
                     const c = toneFor(metric, v);
                     return (
-                      <td key={col} className="rounded-lg p-0">
+                      <td key={col} className="rounded-lg p-0" aria-label={`${row}, ${col}: ${v}`}>
                         <div className="grid h-9 place-items-center rounded-lg text-[13px] font-bold tabular-nums" style={{ background: `${c}24`, color: c }}>{v}</div>
                       </td>
                     );

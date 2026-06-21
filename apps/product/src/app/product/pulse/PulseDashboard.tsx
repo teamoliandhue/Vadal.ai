@@ -55,9 +55,9 @@ function OrgWideTag({ show }: { show: boolean }) {
 }
 /* accessible chart wrapper — gives screen readers a text alternative for the aria-hidden svgs.
    When `explain`, a hover "Explain" pill asks Vadal about the chart in context. */
-function Figure({ label, children, className = "", explain = false }: { label: string; children: React.ReactNode; className?: string; explain?: boolean }) {
+function Figure({ label, children, className = "", explain = false, group = false }: { label: string; children: React.ReactNode; className?: string; explain?: boolean; group?: boolean }) {
   return (
-    <div role="img" aria-label={label} className={`${explain ? "group relative" : ""} ${className}`}>
+    <div role={group ? "group" : "img"} aria-label={label} className={`${explain ? "group relative" : ""} ${className}`}>
       {children}
       {explain && (
         <button
@@ -140,22 +140,21 @@ function HealthCard({ v, className = "" }: { v: PulseView; className?: string })
     </Card>
   );
 }
-const WIN_PTS: Record<string, number> = { "7 days": 5, "30 days": 9, "Quarter": 14 };
-const WIN_MO: Record<string, number> = { "7 days": 4, "30 days": 7, "Quarter": 12 };
+const WIN: Record<string, number> = { "7 days": 5, "30 days": 9, "Quarter": 12 };
 function TrendCard({ v, period, className = "" }: { v: PulseView; period: string; className?: string }) {
   const t = v.trend;
-  const n = WIN_PTS[period] ?? t.series.length;
+  const n = WIN[period] ?? t.series.length;
   const series = t.series.slice(-n);
   const benchmark = t.benchmark.slice(-n);
-  const months = t.months.slice(-(WIN_MO[period] ?? t.months.length));
+  const months = t.months.slice(-n);
   return (
     <Card className={className}>
       <div className="flex items-start justify-between">
         <div><Eyebrow>Engagement · {period}</Eyebrow><h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Trend vs benchmark</h2></div>
         <div className="flex items-center gap-3 text-[12px] text-faint"><span className="flex items-center gap-1.5"><span className="h-2 w-4 rounded-full" style={{ background: TONE.purple }} /> Us</span><span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t-2 border-dashed border-line" /> Benchmark</span></div>
       </div>
-      <Figure label={`Engagement trend vs benchmark over ${period}`} explain>
-        <TrendChart series={series} benchmark={benchmark} color={TONE.purple} height={190} id="eng" className="mt-4" />
+      <Figure label={`Engagement trend vs benchmark over ${period}`} explain group>
+        <TrendChart series={series} benchmark={benchmark} labels={months} seriesLabel={v.scope} benchLabel="Benchmark" caption={`Engagement vs benchmark, last ${n} months`} color={TONE.purple} height={190} id="eng" className="mt-4" />
       </Figure>
       <div className="mt-1 flex justify-between text-[12px] text-faint">{months.filter((_, i) => months.length <= 6 || i % 2 === 0).map((m) => <span key={m}>{m}</span>)}</div>
       <div className="mt-3 flex items-start gap-2 rounded-2xl bg-soft p-3.5 text-[14px] leading-relaxed text-muted"><Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--purple)]" /><span className="flex-1">{t.insight}</span></div>
