@@ -81,12 +81,19 @@ function benchmarkFor(metric: MetricKey): number[] {
   return Array.from({ length: 14 }, () => b);
 }
 
-export function AnalyticsExplorer({ initialMetric, initialDim }: { initialMetric?: string; initialDim?: string }) {
+export function AnalyticsExplorer({ initialMetric, initialDim, initialPeriod }: { initialMetric?: string; initialDim?: string; initialPeriod?: string }) {
   const startMetric = (initialMetric && initialMetric in METRICS ? initialMetric : "engagement") as MetricKey;
   const startDim = (initialDim && initialDim in DIMS ? initialDim : "team") as DimKey;
+  const startPeriod = initialPeriod && (PERIODS as readonly string[]).includes(initialPeriod) ? initialPeriod : "6 months";
   const [metric, setMetric] = React.useState<MetricKey>(startMetric);
   const [dim, setDim] = React.useState<DimKey>(startDim);
-  const [period, setPeriod] = React.useState<string>("6 months");
+  const [period, setPeriod] = React.useState<string>(startPeriod);
+
+  // Reflect the current slice in the URL so views are shareable / bookmarkable.
+  React.useEffect(() => {
+    const qs = `?metric=${metric}&dim=${dim}&period=${encodeURIComponent(period)}`;
+    window.history.replaceState(null, "", qs);
+  }, [metric, dim, period]);
 
   const M = METRICS[metric];
   const fmt = React.useCallback((v: number) => `${v}${M.unit}`, [M.unit]);
