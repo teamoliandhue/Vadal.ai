@@ -4,23 +4,61 @@
    Streams answers token-by-token, shows a thinking state, suggests contextual
    follow-ups, and takes feedback. Demo answers, no backend. */
 import * as React from "react";
-import { ArrowUp, ThumbsDown, ThumbsUp, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowUp, FileText, ThumbsDown, ThumbsUp, X } from "lucide-react";
 import { SparkMark } from "@vadal/design-system";
 import { toast } from "./Toaster";
 
-type Msg = { role: "user" | "ai"; text: string; done?: boolean; followups?: string[] };
+type ActionKind = "leave-request" | "raise-ticket" | "open-prep" | "give-kudos" | "navigate";
+type Action = { label: string; kind: ActionKind; href?: string; primary?: boolean };
+type Msg = {
+  role: "user" | "ai";
+  text: string;
+  done?: boolean;
+  followups?: string[];
+  sources?: string[];
+  actions?: Action[];
+};
 
 const SUGGESTED = ["How many leaves do I have?", "When's my next 1:1?", "Reset my payslip access"];
 
-function aiAnswer(q: string): string {
+type Answer = { text: string; sources?: string[]; actions?: Action[] };
+
+function aiResponse(q: string): Answer {
   const s = q.toLowerCase();
-  if (s.includes("leave") || s.includes("time off")) return "You have 14 paid-leave days left this year (3 pending approval). Want me to start a request?";
-  if (s.includes("1:1") || s.includes("next") || s.includes("meeting")) return "Your next 1:1 is with Anita today at 3:00 PM — I've pinned the prep doc to Your day.";
-  if (s.includes("payslip") || s.includes("payroll")) return "Payroll is owned by People Ops. I can raise a payslip-access ticket for you — shall I?";
-  if (s.includes("kudos") || s.includes("recogni")) return "Open recognition? You haven't given kudos this week — Anita and Rahul are good shouts.";
-  if (s.includes("knowledge") || s.includes("policy") || s.includes("polic")) return "Searching the knowledge base… top hits: Leave policy, Reimbursement, WFH guidelines.";
-  if (s.includes("directory") || s.includes("who")) return "I can find anyone in the directory — tell me a name, team, or who owns a process.";
-  return "Got it — I'll route this to the right place and follow up here. (Demo response.)";
+  if (s.includes("leave") || s.includes("time off"))
+    return {
+      text: "You have 14 paid-leave days left this year (3 pending approval). Want me to start a request?",
+      sources: ["Leave policy", "HRIS"],
+      actions: [{ label: "Start leave request", kind: "leave-request", primary: true }, { label: "View balance", kind: "navigate", href: "/product/home" }],
+    };
+  if (s.includes("1:1") || s.includes("next") || s.includes("meeting"))
+    return {
+      text: "Your next 1:1 is with Anita today at 3:00 PM — I've pinned the prep doc to Your day.",
+      sources: ["Your calendar"],
+      actions: [{ label: "Open prep doc", kind: "open-prep", primary: true }, { label: "Reschedule", kind: "navigate", href: "/product/home" }],
+    };
+  if (s.includes("payslip") || s.includes("payroll"))
+    return {
+      text: "Payroll is owned by People Ops. I can raise a payslip-access ticket for you — shall I?",
+      sources: ["People Ops"],
+      actions: [{ label: "Raise the ticket", kind: "raise-ticket", primary: true }],
+    };
+  if (s.includes("kudos") || s.includes("recogni"))
+    return {
+      text: "You haven't given kudos this week — Anita and Rahul are good shouts.",
+      sources: ["Recognition"],
+      actions: [{ label: "Give kudos to Anita", kind: "give-kudos", primary: true }, { label: "Open Recognition", kind: "navigate", href: "/product/recognition" }],
+    };
+  if (s.includes("knowledge") || s.includes("policy") || s.includes("polic"))
+    return {
+      text: "Top hits in the knowledge base: **Leave policy**, **Reimbursement**, **WFH guidelines**.",
+      sources: ["Knowledge base"],
+      actions: [{ label: "Open Knowledge", kind: "navigate", href: "/product/knowledge", primary: true }],
+    };
+  if (s.includes("directory") || s.includes("who"))
+    return { text: "I can find anyone in the directory — tell me a name, team, or who owns a process.", sources: ["Directory"] };
+  return { text: "Got it — I'll route this to the right place and follow up here. (Demo response.)" };
 }
 
 function followups(q: string): string[] {
@@ -57,6 +95,7 @@ function renderRich(text: string): React.ReactNode[] {
 }
 
 export function AiDock() {
+  const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [msgs, setMsgs] = React.useState<Msg[]>([]);
   const [val, setVal] = React.useState("");
@@ -75,7 +114,8 @@ export function AiDock() {
     setVal("");
     setMsgs((m) => [...m, { role: "user", text: q }]);
 
-    const full = aiAnswer(q);
+    const ans = aiResponse(q);
+    const full = ans.text;
     const fu = followups(q);
     const steps = reasoningSteps(q);
     const STEP_MS = 620;
@@ -102,7 +142,7 @@ export function AiDock() {
           setMsgs((m) => {
             const next = m.slice();
             const last = next[next.length - 1];
-            if (last?.role === "ai") next[next.length - 1] = { ...last, done: true, followups: fu };
+            if (last?.role === "ai") next[next.length - 1] = { ...last, done: true, followups: fu, sources: ans.sources, actions: ans.actions };
             return next;
           });
         }
@@ -115,6 +155,16 @@ export function AiDock() {
   function rate(i: number, dir: "up" | "down") {
     setFeedback((f) => ({ ...f, [i]: dir }));
     toast(dir === "up" ? "Thanks — glad that helped" : "Thanks — I'll keep improving");
+  }
+
+  function runAction(a: Action) {
+    switch (a.kind) {
+      case "leave-request": toast("Leave request started — pending approval ✓"); break;
+      case "raise-ticket": toast("Payslip-access ticket raised ✓"); break;
+      case "open-prep": toast("Opening your 1:1 prep doc…"); break;
+      case "give-kudos": toast("Kudos sent to Anita 💜"); break;
+      case "navigate": if (a.href) { setOpen(false); router.push(a.href); } break;
+    }
   }
 
   React.useEffect(() => {
@@ -176,6 +226,29 @@ export function AiDock() {
                           {renderRich(m.text)}
                           {!m.done && <span className="ai-caret" />}
                         </div>
+                        {m.done && m.actions?.length ? (
+                          <div className="flex flex-wrap gap-1.5">
+                            {m.actions.map((a) => (
+                              <button
+                                key={a.label}
+                                onClick={() => runAction(a)}
+                                className={a.primary
+                                  ? "rounded-full bg-[var(--purple)] px-3 py-1 text-[14px] font-semibold text-white transition hover:opacity-90"
+                                  : "rounded-full bg-soft px-3 py-1 text-[14px] font-semibold text-ink ring-1 ring-[var(--line)] transition hover:bg-[var(--card-hover)]"}
+                              >
+                                {a.label}
+                              </button>
+                            ))}
+                          </div>
+                        ) : null}
+                        {m.done && m.sources?.length ? (
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-[12px] font-semibold uppercase tracking-wide text-faint">Sources</span>
+                            {m.sources.map((src) => (
+                              <span key={src} className="inline-flex items-center gap-1 rounded-full bg-soft px-2 py-0.5 text-[12px] text-muted"><FileText className="h-3 w-3" />{src}</span>
+                            ))}
+                          </div>
+                        ) : null}
                         {m.done && (
                           <div className="flex items-center gap-0.5">
                             <button onClick={() => rate(i, "up")} aria-label="Helpful" className={`grid h-6 w-6 place-items-center rounded-md transition hover:bg-soft ${feedback[i] === "up" ? "text-[var(--ai-accent)]" : "text-faint"}`}><ThumbsUp className="h-3.5 w-3.5" /></button>
