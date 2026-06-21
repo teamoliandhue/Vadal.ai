@@ -8,16 +8,18 @@ import { ClipboardList, LogOut, MessageSquare, Newspaper, NotebookPen, Radio, Tr
 import { Button, SparkMark } from "@vadal/design-system";
 import { toast } from "../Toaster";
 import { Drawer } from "../Drawer";
-import { listening, MIN_N } from "@/lib/listen";
+import { listening, listeningTopicById, MIN_N } from "@/lib/listen";
 
 type Signal = (typeof listening.stream)[number];
 type Topic = (typeof listening.topics)[number];
+type KeyedSignal = Signal & { __k: number };
+const topicName = (id: string) => listeningTopicById[id]?.name ?? id;
 /* pool the live stream cycles through (client-only, after mount) */
 const POOL: Signal[] = [
-  { source: "Chat", snippet: "Can we get clarity on the return-to-office policy?", topic: "Return to office", sentiment: "negative", time: "just now" },
-  { source: "Feed", snippet: "Loving the new no-meeting Wednesdays 🙌", topic: "Workload", sentiment: "positive", time: "just now" },
-  { source: "Survey", snippet: "Clearer promotion criteria would really help.", topic: "Career growth", sentiment: "neutral", time: "just now" },
-  { source: "Chat", snippet: "Tooling keeps logging me out mid-task.", topic: "Tooling", sentiment: "negative", time: "just now" },
+  { source: "Chat", snippet: "Can we get clarity on the return-to-office policy?", topicId: "rto", sentiment: "negative", time: "just now" },
+  { source: "Feed", snippet: "Loving the new no-meeting Wednesdays 🙌", topicId: "workload", sentiment: "positive", time: "just now" },
+  { source: "Survey", snippet: "Clearer promotion criteria would really help.", topicId: "growth", sentiment: "neutral", time: "just now" },
+  { source: "Chat", snippet: "Tooling keeps logging me out mid-task.", topicId: "tooling", sentiment: "negative", time: "just now" },
 ];
 
 const TONE = { good: "#2f9e6e", bad: "#dc4a44", warn: "#d68a1e", purple: "#6d5df0", muted: "#8a8f98" } as const;
@@ -37,16 +39,20 @@ function Card({ className = "", children }: { className?: string; children: Reac
 
 export function ListeningHub() {
   const [channels, setChannels] = React.useState(listening.channels);
-  const [stream, setStream] = React.useState<Signal[]>(listening.stream);
+  const [stream, setStream] = React.useState<KeyedSignal[]>(() => listening.stream.map((s, i) => ({ ...s, __k: i })));
   const [openTopic, setOpenTopic] = React.useState<Topic | null>(null);
+  const keyRef = React.useRef(listening.stream.length);
 
-  // live stream — prepend a new signal every few seconds (client-only, no SSR mismatch)
+  // live stream — prepend a new signal every few seconds (client-only, no SSR
+  // mismatch). Pauses for reduced-motion and when the tab is backgrounded.
   React.useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     let i = 0;
     const id = window.setInterval(() => {
+      if (document.hidden) return;
       const next = POOL[i % POOL.length];
       i += 1;
-      setStream((s) => [{ ...next }, ...s].slice(0, 8));
+      setStream((s) => [{ ...next, __k: keyRef.current++ }, ...s].slice(0, 8));
     }, 5000);
     return () => window.clearInterval(id);
   }, []);
@@ -125,21 +131,21 @@ export function ListeningHub() {
             <CardHead title="Live signal stream" eyebrow="As it happens" />
             <span className="flex items-center gap-1.5 text-[12px] font-semibold text-faint"><span className="h-2 w-2 rounded-full" style={{ background: TONE.good }} /> Live</span>
           </div>
-          <ul className="mt-4 space-y-2.5">
-            {stream.map((s, i) => {
+          <ul className="mt-4 space-y-2.5" aria-live="polite" aria-label="Live signal stream">
+            {stream.map((s) => {
               const Icon = SOURCE_ICON[s.source] ?? Radio;
               return (
-                <li key={i} className="flex items-start gap-3 rounded-2xl border border-line p-3">
+                <li key={s.__k} className="flex items-start gap-3 rounded-2xl border border-line p-3">
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-soft text-muted"><Icon className="h-4 w-4" /></span>
                   <div className="min-w-0 flex-1">
                     <p className="text-[14px] leading-snug">{s.snippet}</p>
                     <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[12px] text-faint">
                       <span>{s.source}</span><span>·</span>
-                      <span className="rounded-full px-2 py-0.5 font-semibold" style={{ background: `${sentTone(s.sentiment)}1a`, color: sentTone(s.sentiment) }}>{s.topic}</span>
+                      <span className="rounded-full px-2 py-0.5 font-semibold" style={{ background: `${sentTone(s.sentiment)}1a`, color: sentTone(s.sentiment) }}>{topicName(s.topicId)}</span>
                       <span>·</span><span>{s.time}</span>
                     </div>
                   </div>
-                  <button onClick={() => toast(`Routed “${s.topic}” signal to Pulse ✓`)} className="shrink-0 self-center text-[12px] font-semibold text-[var(--purple)] hover:underline">Route</button>
+                  <button onClick={() => toast(`Routed “${topicName(s.topicId)}” signal to Pulse ✓`)} className="shrink-0 self-center text-[12px] font-semibold text-[var(--purple)] hover:underline">Route</button>
                 </li>
               );
             })}
@@ -150,7 +156,7 @@ export function ListeningHub() {
       {/* topic drill-down */}
       <Drawer open={!!openTopic} title={openTopic?.name} onClose={() => setOpenTopic(null)}>
         {openTopic && (() => {
-          const signals = listening.stream.filter((s) => s.topic === openTopic.name);
+          const signals = stream.filter((s) => s.topicId === openTopic.id);
           const safe = openTopic.volume >= MIN_N;
           return (
             <>

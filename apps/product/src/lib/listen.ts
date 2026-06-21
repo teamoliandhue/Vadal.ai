@@ -138,20 +138,30 @@ export const listening = {
     { key: "exit", name: "Exit interviews", on: true, signals: 18 },
     { key: "pulse", name: "Always-on pulse", on: false, signals: 0 },
   ],
+  /* Topics carry a stable `id`; the stream joins on `topicId` (display name is
+     looked up via listeningTopicById) so the taxonomy can't silently drift. */
   topics: [
-    { name: "Workload & burnout", volume: 312, sentiment: "negative", trend: "up", risk: true },
-    { name: "Return to office", volume: 154, sentiment: "negative", trend: "up", risk: true },
-    { name: "Recognition", volume: 268, sentiment: "positive", trend: "up", risk: false },
-    { name: "Career growth", volume: 142, sentiment: "neutral", trend: "flat", risk: false },
-    { name: "Appraisal timeline", volume: 88, sentiment: "negative", trend: "up", risk: true },
-    { name: "Tooling", volume: 74, sentiment: "neutral", trend: "down", risk: false },
+    { id: "workload", name: "Workload & burnout", volume: 312, sentiment: "negative", trend: "up", risk: true },
+    { id: "rto", name: "Return to office", volume: 154, sentiment: "negative", trend: "up", risk: true },
+    { id: "recognition", name: "Recognition", volume: 268, sentiment: "positive", trend: "up", risk: false },
+    { id: "growth", name: "Career growth", volume: 142, sentiment: "neutral", trend: "flat", risk: false },
+    { id: "appraisal", name: "Appraisal timeline", volume: 88, sentiment: "negative", trend: "up", risk: true },
+    { id: "tooling", name: "Tooling & process", volume: 74, sentiment: "neutral", trend: "down", risk: false },
+    // Low-volume cut → exercises the MIN_N anonymity gate in the drill-down.
+    { id: "leadership", name: "Leadership clarity", volume: 4, sentiment: "neutral", trend: "up", risk: false },
   ],
   stream: [
-    { source: "Chat", snippet: "Another weekend of on-call — we can't keep shipping like this.", topic: "Workload", sentiment: "negative", time: "12m" },
-    { source: "Feed", snippet: "Huge shoutout to Design for the onboarding revamp 👏", topic: "Recognition", sentiment: "positive", time: "28m" },
-    { source: "Survey", snippet: "When does the appraisal window actually open this cycle?", topic: "Appraisal timeline", sentiment: "negative", time: "1h" },
-    { source: "Chat", snippet: "3 days in office is a lot with my commute.", topic: "Return to office", sentiment: "negative", time: "2h" },
-    { source: "1:1 notes", snippet: "Wants a clearer growth path to senior.", topic: "Career growth", sentiment: "neutral", time: "3h" },
-    { source: "Exit", snippet: "Leaving mainly for comp — loved the team though.", topic: "Pay & growth", sentiment: "negative", time: "5h" },
+    { source: "Chat", snippet: "Another weekend of on-call — we can't keep shipping like this.", topicId: "workload", sentiment: "negative", time: "12m" },
+    { source: "Feed", snippet: "Huge shoutout to Design for the onboarding revamp 👏", topicId: "recognition", sentiment: "positive", time: "28m" },
+    { source: "Survey", snippet: "When does the appraisal window actually open this cycle?", topicId: "appraisal", sentiment: "negative", time: "1h" },
+    { source: "Chat", snippet: "3 days in office is a lot with my commute.", topicId: "rto", sentiment: "negative", time: "2h" },
+    { source: "1:1 notes", snippet: "Wants a clearer growth path to senior.", topicId: "growth", sentiment: "neutral", time: "3h" },
+    { source: "Survey", snippet: "The new deploy tooling logs me out mid-task again.", topicId: "tooling", sentiment: "negative", time: "4h" },
+    { source: "Chat", snippet: "Workload has been brutal this whole sprint.", topicId: "workload", sentiment: "negative", time: "5h" },
+    { source: "1:1 notes", snippet: "Still unclear on direction after the reorg.", topicId: "leadership", sentiment: "neutral", time: "6h" },
   ],
 };
+
+/* id → topic, for joining stream signals to their topic display name. */
+export const listeningTopicById: Record<string, (typeof listening.topics)[number]> =
+  Object.fromEntries(listening.topics.map((t) => [t.id, t]));
