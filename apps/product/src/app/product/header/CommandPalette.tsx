@@ -10,6 +10,7 @@ import {
   HeartHandshake, House, Megaphone, Newspaper, Radio, Search, Settings, Smile, Sparkles,
   UsersRound, type LucideIcon,
 } from "lucide-react";
+import { SparkMark } from "@vadal/design-system";
 import { people, departments, aiBriefing, quickActions } from "@/lib/data";
 
 type Item = {
@@ -67,7 +68,8 @@ function buildIndex(): Item[] {
   return [...nav, ...ppl, ...teams, ...insights, ...actions];
 }
 
-const GROUP_ORDER = ["Jump to", "People", "Teams", "Insights", "Actions"];
+const GROUP_ORDER = ["Ask Vadal", "Jump to", "People", "Teams", "Insights", "Actions"];
+const ASK_RE = /^(who|what|how|when|why|where|can|is|are|should|could|would|do|does|did|draft|write|summar|explain|show|find|list|tell|give|help)\b/i;
 
 export function CommandPalette() {
   const router = useRouter();
@@ -100,10 +102,18 @@ export function CommandPalette() {
   }, [open]);
 
   const query = q.trim().toLowerCase();
+  const isQuestion = /\?\s*$/.test(q) || ASK_RE.test(q.trim());
   const pool = query
     ? index
     : [...index.filter((i) => i.group === "Jump to"), ...index.filter((i) => i.group === "Actions"), ...index.filter((i) => i.group === "People").slice(0, 3)];
-  const results = pool.filter((i) => !query || i.keywords.includes(query) || i.label.toLowerCase().includes(query));
+  const matched = pool.filter((i) => !query || i.keywords.includes(query) || i.label.toLowerCase().includes(query));
+  // an "Ask Vadal" row for any query — turns ⌘K into ask-or-jump (top when it reads like a question)
+  const askItem: Item | null = query
+    ? { id: "ask-vadal", group: "Ask Vadal", label: "Ask Vadal", sub: `“${q.trim()}”`, keywords: "", run: ask(q.trim()) }
+    : null;
+  const groupOrder = isQuestion ? GROUP_ORDER : [...GROUP_ORDER.filter((g) => g !== "Ask Vadal"), "Ask Vadal"];
+  const all = askItem ? [...matched, askItem] : matched;
+  const results = groupOrder.flatMap((g) => all.filter((r) => r.group === g));
 
   // re-clamp the active row when the result set changes
   React.useEffect(() => { setActive((a) => Math.min(a, Math.max(0, results.length - 1))); }, [results.length]);
@@ -124,7 +134,7 @@ export function CommandPalette() {
 
   // group while preserving each item's flat index (for keyboard highlight)
   let flat = -1;
-  const grouped = GROUP_ORDER.map((g) => ({
+  const grouped = groupOrder.map((g) => ({
     group: g,
     items: results.filter((r) => r.group === g).map((r) => ({ item: r, idx: ++flat })),
   })).filter((s) => s.items.length > 0);
@@ -135,13 +145,15 @@ export function CommandPalette() {
       <div className="relative flex max-h-[70vh] w-full max-w-[600px] flex-col overflow-hidden rounded-2xl border border-line bg-card shadow-[0_24px_70px_-18px_rgba(10,10,30,0.5)] dark:border-white/10">
         {/* input */}
         <div className="flex items-center gap-3 border-b border-line px-4 dark:border-white/10">
-          <Search className="h-[18px] w-[18px] shrink-0 text-faint" />
+          {isQuestion
+            ? <span className="ai-grad grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" /></span>
+            : <Search className="h-[18px] w-[18px] shrink-0 text-faint" />}
           <input
             ref={inputRef}
             value={q}
             onChange={(e) => { setQ(e.target.value); setActive(0); }}
             onKeyDown={onKeyDown}
-            placeholder="Search people, teams, insights…"
+            placeholder="Search or ask Vadal anything…"
             className="min-w-0 flex-1 bg-transparent py-4 text-[16px] outline-none placeholder:text-faint"
           />
           <kbd className="rounded-md border border-line px-1.5 py-0.5 text-[12px] font-semibold text-faint dark:border-white/15">esc</kbd>
@@ -167,7 +179,9 @@ export function CommandPalette() {
                     onMouseMove={() => setActive(idx)}
                     className={`flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition ${idx === active ? "bg-soft" : ""}`}
                   >
-                    {item.img ? (
+                    {item.id === "ask-vadal" ? (
+                      <span className="ai-grad grid h-8 w-8 shrink-0 place-items-center rounded-lg"><SparkMark size={16} tone="solid" /></span>
+                    ) : item.img ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={item.img} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
                     ) : (
@@ -192,7 +206,7 @@ export function CommandPalette() {
           <span className="flex items-center gap-1"><kbd className="rounded border border-line px-1 dark:border-white/15">↑</kbd><kbd className="rounded border border-line px-1 dark:border-white/15">↓</kbd> navigate</span>
           <span className="flex items-center gap-1"><kbd className="rounded border border-line px-1 dark:border-white/15">↵</kbd> select</span>
           <span className="flex items-center gap-1"><kbd className="rounded border border-line px-1 dark:border-white/15">esc</kbd> close</span>
-          <span className="ml-auto flex items-center gap-1"><Sparkles className="h-3 w-3" /> Vadal search</span>
+          <span className="ml-auto flex items-center gap-1"><SparkMark size={12} /> {isQuestion ? "Ask Vadal" : "Vadal search"}</span>
         </div>
       </div>
     </div>
