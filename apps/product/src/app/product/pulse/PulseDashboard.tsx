@@ -9,12 +9,13 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  ArrowUpRight, ArrowRight, Check, Heart, Sparkles, TriangleAlert, X,
+  ArrowUpRight, ArrowRight, Check, Heart, Sparkles, TriangleAlert,
 } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark, Trend, type BadgeTone } from "@vadal/design-system";
 import { ArcGauge, Sparkline, TrendChart } from "@/components/charts";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { toast } from "../Toaster";
+import { Drawer } from "../Drawer";
 import {
   org, actionQueue, actionProgress,
   recognitionExtra, departments, managerSummary, gamification,
@@ -381,26 +382,12 @@ type Detail =
   | { kind: "manager"; data: PulseView["managers"][number] };
 
 function DetailDrawer({ detail, onClose }: { detail: Detail | null; onClose: () => void }) {
-  const open = detail !== null;
-  const [show, setShow] = React.useState(false);
-  React.useEffect(() => {
-    if (!open) { setShow(false); return; }
-    const id = requestAnimationFrame(() => setShow(true));
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => { cancelAnimationFrame(id); window.removeEventListener("keydown", onKey); };
-  }, [open, onClose]);
-  if (!detail) return null;
   return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Details">
-      <div onClick={onClose} className={`absolute inset-0 bg-black/35 backdrop-blur-[2px] transition-opacity duration-300 ${show ? "opacity-100" : "opacity-0"}`} aria-hidden />
-      <div className={`absolute right-0 top-0 flex h-full w-full max-w-[420px] flex-col border-l border-line bg-card shadow-[0_0_60px_-12px_rgba(20,20,40,0.4)] transition-transform duration-300 ${show ? "translate-x-0" : "translate-x-full"}`}>
-        <button onClick={onClose} aria-label="Close" className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full text-faint transition hover:bg-soft hover:text-ink"><X className="h-4 w-4" /></button>
-        <div className="flex-1 overflow-y-auto p-7">
-          {detail.kind === "person" ? <PersonDetail p={detail.data} onClose={onClose} /> : <ManagerDetail m={detail.data} onClose={onClose} />}
-        </div>
-      </div>
-    </div>
+    <Drawer open={detail !== null} title="Details" onClose={onClose}>
+      {detail && (detail.kind === "person"
+        ? <PersonDetail p={detail.data} onClose={onClose} />
+        : <ManagerDetail m={detail.data} onClose={onClose} />)}
+    </Drawer>
   );
 }
 function personActions(driver: string): string[] {
