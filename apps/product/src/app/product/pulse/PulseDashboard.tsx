@@ -11,7 +11,7 @@ import Link from "next/link";
 import {
   ArrowUpRight, ArrowRight, Check, Heart, Sparkles, TriangleAlert, X,
 } from "lucide-react";
-import { Avatar, Badge, Button, Trend, type BadgeTone } from "@vadal/design-system";
+import { Avatar, Badge, Button, SparkMark, Trend, type BadgeTone } from "@vadal/design-system";
 import { ArcGauge, Sparkline, TrendChart } from "@/components/charts";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { toast } from "../Toaster";
@@ -48,9 +48,22 @@ function Explore({ q }: { q: string }) {
 function AnalyticsLink({ metric, dim = "team", label = "Slice in Analytics" }: { metric: string; dim?: string; label?: string }) {
   return <Link href={analyticsHref(metric, dim)} className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5">{label} <ArrowUpRight className="h-3 w-3" /></Link>;
 }
-/* accessible chart wrapper — gives screen readers a text alternative for the aria-hidden svgs */
-function Figure({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
-  return <div role="img" aria-label={label} className={className}>{children}</div>;
+/* accessible chart wrapper — gives screen readers a text alternative for the aria-hidden svgs.
+   When `explain`, a hover "Explain" pill asks Vadal about the chart in context. */
+function Figure({ label, children, className = "", explain = false }: { label: string; children: React.ReactNode; className?: string; explain?: boolean }) {
+  return (
+    <div role="img" aria-label={label} className={`${explain ? "group relative" : ""} ${className}`}>
+      {children}
+      {explain && (
+        <button
+          onClick={() => ask(`Explain this chart: ${label}`)}
+          className="ai-grad absolute right-2 top-2 flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-semibold text-[var(--ai-on-grad)] opacity-0 shadow-sm transition group-hover:opacity-100 focus-visible:opacity-100"
+        >
+          <SparkMark size={12} tone="solid" /> Explain
+        </button>
+      )}
+    </div>
+  );
 }
 
 /* ════════════════════════ Briefing (command bar + decisions) ════════════════════════ */
@@ -119,7 +132,7 @@ function HealthCard({ v, className = "" }: { v: PulseView; className?: string })
   return (
     <Card className={className}>
       <CardHead eyebrow="Workforce health" title="Org health score" action={<Explore q={`Break down workforce health drivers for ${v.scope}`} />} />
-      <Figure label={`Workforce health ${h.score} of 100`} className="mt-2 flex justify-center"><ArcGauge score={h.score} width={200} /></Figure>
+      <Figure label={`Workforce health ${h.score} of 100`} explain className="mt-2 flex justify-center"><ArcGauge score={h.score} width={200} /></Figure>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {h.drivers.map((d) => <span key={d.label} className="rounded-full px-2.5 py-1 text-[12px] font-semibold" style={{ background: `${toneOf(d.tone)}1a`, color: d.tone === "neutral" ? "var(--muted)" : toneOf(d.tone) }}>{d.label}</span>)}
       </div>
@@ -141,7 +154,7 @@ function TrendCard({ v, period, className = "" }: { v: PulseView; period: string
         <div><Eyebrow>Engagement · {period}</Eyebrow><h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Trend vs benchmark</h2></div>
         <div className="flex items-center gap-3 text-[12px] text-faint"><span className="flex items-center gap-1.5"><span className="h-2 w-4 rounded-full" style={{ background: TONE.purple }} /> Us</span><span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t-2 border-dashed border-line" /> Benchmark</span></div>
       </div>
-      <Figure label={`Engagement trend vs benchmark over ${period}`}>
+      <Figure label={`Engagement trend vs benchmark over ${period}`} explain>
         <TrendChart series={series} benchmark={benchmark} color={TONE.purple} height={190} id="eng" className="mt-4" />
       </Figure>
       <div className="mt-1 flex justify-between text-[12px] text-faint">{months.filter((_, i) => months.length <= 6 || i % 2 === 0).map((m) => <span key={m}>{m}</span>)}</div>

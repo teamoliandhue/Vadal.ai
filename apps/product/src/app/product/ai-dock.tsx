@@ -22,6 +22,9 @@ type Msg = {
 
 const SUGGESTED = ["How many leaves do I have?", "When's my next 1:1?", "Reset my payslip access"];
 
+/* A proactive nudge — the AI surfacing something unprompted, once per session. */
+const PROACTIVE = { text: "Engineering engagement dropped 6 pts this week — worth a look.", q: "Why did Engineering engagement drop 6 points this week?" };
+
 type Answer = { text: string; sources?: string[]; actions?: Action[] };
 
 function aiResponse(q: string): Answer {
@@ -102,6 +105,7 @@ export function AiDock() {
   const [thinking, setThinking] = React.useState(false);
   const [stepText, setStepText] = React.useState("");
   const [feedback, setFeedback] = React.useState<Record<number, "up" | "down">>({});
+  const [nudge, setNudge] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const bodyRef = React.useRef<HTMLDivElement>(null);
   const timers = React.useRef<number[]>([]);
@@ -167,6 +171,12 @@ export function AiDock() {
     }
   }
 
+  function dismissNudge() {
+    setNudge(false);
+    try { sessionStorage.setItem("vadal:nudged", "1"); } catch { /* ignore */ }
+  }
+  function takeNudge() { dismissNudge(); setOpen(true); send(PROACTIVE.q); }
+
   React.useEffect(() => {
     function onAsk(e: Event) {
       const q = (e as CustomEvent).detail?.q as string | undefined;
@@ -177,6 +187,13 @@ export function AiDock() {
     window.addEventListener("vadal:ask", onAsk as EventListener);
     return () => window.removeEventListener("vadal:ask", onAsk as EventListener);
   }, [send]);
+
+  // proactive nudge — surface one insight ~5s after landing, once per session
+  React.useEffect(() => {
+    try { if (sessionStorage.getItem("vadal:nudged")) return; } catch { /* ignore */ }
+    const t = window.setTimeout(() => setNudge(true), 5000);
+    return () => window.clearTimeout(t);
+  }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(() => () => timers.current.forEach((t) => { window.clearInterval(t); window.clearTimeout(t); }), []);
@@ -283,6 +300,20 @@ export function AiDock() {
             <button type="submit" aria-label="Send" disabled={busy} className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--purple)] text-white transition hover:opacity-90 disabled:opacity-45"><ArrowUp className="h-4 w-4" /></button>
           </form>
         </div>
+        </div>
+      )}
+      {nudge && !open && (
+        <div className="ai-pop ai-glow-border fixed bottom-[92px] right-6 z-30 w-[300px] max-w-[calc(100vw-2rem)] rounded-[20px] p-[1.5px]">
+          <div className="rounded-[18.5px] bg-card p-3">
+            <div className="flex items-start gap-2.5">
+              <span className="ai-grad grid h-7 w-7 shrink-0 place-items-center rounded-full"><SparkMark size={15} tone="solid" state="idle" /></span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[14px] font-semibold leading-snug">{PROACTIVE.text}</div>
+                <button onClick={takeNudge} className="mt-1.5 flex items-center gap-1 text-[14px] font-semibold text-[var(--ai-accent)] transition hover:gap-1.5">Look into it →</button>
+              </div>
+              <button onClick={dismissNudge} aria-label="Dismiss" className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-faint transition hover:bg-soft"><X className="h-3.5 w-3.5" /></button>
+            </div>
+          </div>
         </div>
       )}
       <button
