@@ -7,10 +7,11 @@
    real warehouse cut without one. Notion spec: "📈 Analytics". */
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, Download, Grid3x3 } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Bookmark, Download, Grid3x3, X } from "lucide-react";
 import { Button, SparkMark } from "@vadal/design-system";
 import { Sparkline, TrendChart } from "@/components/charts";
 import { engagementTrend, departments } from "@/lib/data";
+import { usePersistentState } from "@/lib/usePersistentState";
 import { toast } from "../Toaster";
 
 const TONE = { good: "var(--success)", bad: "var(--danger)", warn: "var(--warning)", purple: "var(--purple)" } as const;
@@ -41,6 +42,9 @@ const DIM_KEYS = Object.keys(DIMS) as DimKey[];
 // Trends are monthly series — windows are in months so the labels match the data.
 const PERIODS = ["3 months", "6 months", "12 months"] as const;
 const WIN: Record<string, number> = { "3 months": 3, "6 months": 6, "12 months": 12 };
+
+type SavedView = { id: string; metric: MetricKey; dim: DimKey; period: string };
+const avgOf = (a: number[]) => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : 0);
 
 function value(metric: MetricKey, cat: string): number {
   if (metric === "engagement") {
@@ -88,6 +92,7 @@ export function AnalyticsExplorer({ initialMetric, initialDim, initialPeriod }: 
   const [metric, setMetric] = React.useState<MetricKey>(startMetric);
   const [dim, setDim] = React.useState<DimKey>(startDim);
   const [period, setPeriod] = React.useState<string>(startPeriod);
+  const [views, setViews] = usePersistentState<SavedView[]>("vadal:analytics-views", []);
 
   // Reflect the current slice in the URL so views are shareable / bookmarkable.
   React.useEffect(() => {
@@ -106,8 +111,31 @@ export function AnalyticsExplorer({ initialMetric, initialDim, initialPeriod }: 
   const avg = Math.round((rows.reduce((s, r) => s + r.v, 0) / rows.length) * 10) / 10;
   const best = rows[0], worst = rows[rows.length - 1];
   const n = WIN[period] ?? 14;
-  const series = trendFor(metric).slice(-n);
+  const full = trendFor(metric);
+  const series = full.slice(-n);
   const bench = benchmarkFor(metric).slice(-n);
+  // compare: this window vs the window before it
+  const prevWin = full.slice(-2 * n, -n);
+  const prevDelta = prevWin.length ? Math.round((avgOf(series) - avgOf(prevWin)) * 10) / 10 : 0;
+  const prevGood = M.goodHigh ? prevDelta >= 0 : prevDelta <= 0;
+
+  function saveView() {
+    const id = `${metric}·${dim}·${period}`;
+    setViews((vs) => (vs.some((v) => v.id === id) ? vs : [...vs, { id, metric, dim, period }]));
+    toast("View saved ✓");
+  }
+  function exportCsv() {
+    const head = ["Metric", "Dimension", "Category", "Value"];
+    const body = rows.map((r) => [M.label, DIMS[dim].label, r.cat, String(r.v)]);
+    const csv = [head, ...body].map((row) => row.map((c) => `"${c.replace(/"/g, '""')}"`).join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `vadal-${metric}-by-${dim}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast("Exported CSV ✓");
+  }
 
   // heatmap: team (rows) × a second cut (cols). If the chosen dim is team, cross with tenure.
   const colDim: DimKey = dim === "team" ? "tenure" : dim;
@@ -129,7 +157,10 @@ export function AnalyticsExplorer({ initialMetric, initialDim, initialPeriod }: 
             <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Analytics</h1>
             <p className="mt-2 max-w-xl text-[14px] text-muted">Slice any metric across any cut. Pulse tells you what needs attention — Analytics lets you ask why, your way.</p>
           </div>
-          <Button variant="secondary" size="sm" leadingIcon={<Download className="h-4 w-4" />} onClick={() => toast("Report exported ✓")}>Export</Button>
+          <div className="flex items-center gap-2">
+            <Button variant="tertiary" size="sm" leadingIcon={<Bookmark className="h-4 w-4" />} onClick={saveView}>Save view</Button>
+            <Button variant="secondary" size="sm" leadingIcon={<Download className="h-4 w-4" />} onClick={exportCsv}>Export</Button>
+          </div>
         </div>
         {/* controls — dimension + period (metric is picked from the KPI strip below) */}
         <div className="relative mt-6 flex flex-wrap items-center gap-4 border-t border-line pt-5">
@@ -144,6 +175,21 @@ export function AnalyticsExplorer({ initialMetric, initialDim, initialPeriod }: 
             ))}
           </div>
         </div>
+        {/* saved views */}
+        {views.length > 0 && (
+          <div className="relative mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">Saved</span>
+            {views.map((v) => {
+              const active = v.metric === metric && v.dim === dim && v.period === period;
+              return (
+                <span key={v.id} className={`flex items-center gap-1 rounded-full py-1 pl-3 pr-1.5 text-[13px] font-semibold ring-1 transition ${active ? "bg-[var(--lav)] text-[var(--purple)] ring-transparent" : "bg-card text-muted ring-line hover:bg-soft"}`}>
+                  <button onClick={() => { setMetric(v.metric); setDim(v.dim); setPeriod(v.period); }}>{METRICS[v.metric].label} · {DIMS[v.dim].label}</button>
+                  <button onClick={() => setViews((vs) => vs.filter((x) => x.id !== v.id))} aria-label="Remove saved view" className="grid h-5 w-5 place-items-center rounded-full text-faint transition hover:bg-card hover:text-ink"><X className="h-3 w-3" /></button>
+                </span>
+              );
+            })}
+          </div>
+        )}
       </header>
 
       {/* executive KPI strip — also the metric picker */}
@@ -197,7 +243,14 @@ export function AnalyticsExplorer({ initialMetric, initialDim, initialPeriod }: 
         <div className="flex flex-col gap-6 xl:col-span-5">
           <section className="card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7">
             <div className="flex items-start justify-between">
-              <div><p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{M.label} · {period}</p><h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Trend vs benchmark</h2></div>
+              <div>
+                <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{M.label} · {period}</p>
+                <h2 className="mt-1.5 flex items-center gap-2 text-[18px] font-bold tracking-tight">Trend vs benchmark
+                  {prevWin.length > 0 && (
+                    <span className="rounded-full px-2 py-0.5 text-[12px] font-bold" style={{ background: soft(prevGood ? TONE.good : TONE.bad), color: prevGood ? TONE.good : TONE.bad }}>{prevDelta >= 0 ? "▲" : "▼"} {Math.abs(prevDelta)}{M.unit} vs prev</span>
+                  )}
+                </h2>
+              </div>
               <div className="flex items-center gap-3 text-[12px] text-faint"><span className="flex items-center gap-1.5"><span className="h-2 w-4 rounded-full" style={{ background: TONE.purple }} /> Us</span><span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t-2 border-dashed border-line" /> Bench</span></div>
             </div>
             <TrendChart series={series} benchmark={bench} labels={engagementTrend.months.slice(-series.length)} seriesLabel={M.label} benchLabel="Benchmark" caption={`${M.label} vs benchmark, last ${series.length} months`} color={TONE.purple} height={150} id="ax" className="mt-4" />
@@ -242,8 +295,13 @@ export function AnalyticsExplorer({ initialMetric, initialDim, initialPeriod }: 
                     const v = cellValue(metric, row, col);
                     const c = toneFor(metric, v);
                     return (
-                      <td key={col} className="rounded-lg p-0" aria-label={`${row}, ${col}: ${v}`}>
-                        <div className="grid h-9 place-items-center rounded-lg text-[13px] font-bold tabular-nums" style={{ background: soft(c, 18), color: c }}>{v}</div>
+                      <td key={col} className="rounded-lg p-0">
+                        <button
+                          onClick={() => ask(`In Analytics, why is ${M.label.toLowerCase()} ${fmt(v)} for ${row} · ${col}? What's driving it?`)}
+                          aria-label={`${row}, ${col}: ${v} — ask Vadal`}
+                          className="grid h-9 w-full place-items-center rounded-lg text-[13px] font-bold tabular-nums outline-none transition hover:ring-2 hover:ring-[var(--purple)] focus-visible:ring-2 focus-visible:ring-[var(--purple)]"
+                          style={{ background: soft(c, 18), color: c }}
+                        >{v}</button>
                       </td>
                     );
                   })}
