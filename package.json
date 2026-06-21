@@ -6,5 +6,10 @@
   "workspaces": [
     "packages/design-system",
     "apps/product"
-  ]
+  ],
+  "comment-optionalDependencies": "Tailwind v4 (lightningcss + @tailwindcss/oxide) ships platform-specific native binaries. The lockfile is generated on macOS, so without these the linux-x64-gnu binaries Vercel needs are absent. Pinned here at the same versions as the parent packages; skipped on non-linux hosts by OS mismatch.",
+  "optionalDependencies": {
+    "lightningcss-linux-x64-gnu": "1.32.0",
+    "@tailwindcss/oxide-linux-x64-gnu": "4.3.1"
+  }
 }

@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
   // The codebase is type-clean; the only failures are an environmental workspace-root
   // react-types misdetection that surfaces under `next build`. Don't block deploys on it.
   typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
 };
 
 export default nextConfig;
