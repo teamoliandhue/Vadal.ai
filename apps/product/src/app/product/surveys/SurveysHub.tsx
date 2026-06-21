@@ -8,9 +8,12 @@ import { Plus } from "lucide-react";
 import { Badge, Button, SparkMark, type BadgeTone } from "@vadal/design-system";
 import { toast } from "../Toaster";
 import { Drawer } from "../Drawer";
+import { usePersistentState } from "@/lib/usePersistentState";
 import { surveyStats, surveys, surveyTemplates, surveyResult, type Survey, type SurveyStatus } from "@/lib/listen";
+import { SurveyBuilder, type BuilderSeed } from "./SurveyBuilder";
 
-const TONE = { good: "#2f9e6e", bad: "#dc4a44", warn: "#d68a1e", purple: "#6d5df0" } as const;
+const TONE = { good: "var(--success)", bad: "var(--danger)", warn: "var(--warning)", purple: "var(--purple)" } as const;
+const soft = (c: string, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 const toneOf = (t: string) => (t === "good" ? TONE.good : t === "bad" ? TONE.bad : t === "warn" ? TONE.warn : TONE.purple);
 const hash = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
@@ -20,7 +23,7 @@ const FILTERS = ["All", "Live", "Scheduled", "Closed"] as const;
 
 /* per-survey results — varies the standard question set by a stable name hash */
 function resultsFor(s: Survey) {
-  if (s.status === "scheduled") return null;
+  if (s.status === "scheduled" || s.responses === 0) return null;
   const off = (hash(s.name) % 15) - 7;
   return {
     questions: surveyResult.questions.map((q) => ({ ...q, topPct: Math.max(22, Math.min(92, q.topPct + off)) })),
@@ -39,11 +42,14 @@ function Card({ className = "", children }: { className?: string; children: Reac
 export function SurveysHub() {
   const [filter, setFilter] = React.useState<(typeof FILTERS)[number]>("All");
   const [open, setOpen] = React.useState<Survey | null>(null);
-  const rows = surveys.filter((s) => filter === "All" || STATUS_LABEL[s.status] === filter);
+  const [mine, setMine] = usePersistentState<Survey[]>("vadal:surveys-mine", []);
+  const [builder, setBuilder] = React.useState<BuilderSeed>(null);
+  const all = [...mine, ...surveys];
+  const rows = all.filter((s) => filter === "All" || STATUS_LABEL[s.status] === filter);
   const detail = open ? resultsFor(open) : null;
 
   const kpis: [string, string, string?][] = [
-    ["Active surveys", String(surveyStats.active)],
+    ["Active surveys", String(surveyStats.active + mine.filter((s) => s.status === "live").length)],
     ["Avg response rate", `${surveyStats.avgResponse}%`],
     ["Responses · 30d", surveyStats.responses],
     ["eNPS", String(surveyStats.enps), `+${surveyStats.enpsDelta}`],
@@ -60,7 +66,7 @@ export function SurveysHub() {
             <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Surveys</h1>
             <p className="mt-2 max-w-xl text-[14px] text-muted">Ask deliberately — launch, track, and read surveys. The listening that feeds Pulse.</p>
           </div>
-          <Button variant="brand" leadingIcon={<Plus className="h-4 w-4" />} onClick={() => toast("Pick a template below to launch in minutes ✓")}>Launch survey</Button>
+          <Button variant="brand" leadingIcon={<Plus className="h-4 w-4" />} onClick={() => setBuilder({ name: "", cadence: "One-time" })}>Launch survey</Button>
         </div>
         <div className="relative mt-6 grid grid-cols-2 gap-4 border-t border-line pt-5 lg:grid-cols-4">
           {kpis.map(([label, val, delta]) => (
@@ -118,7 +124,7 @@ export function SurveysHub() {
             <div key={t.key} className="card-lift flex flex-col rounded-2xl border border-line bg-card p-4">
               <div className="flex items-center justify-between"><span className="text-[14px] font-semibold">{t.name}</span><span className="rounded-full bg-soft px-2 py-0.5 text-[12px] font-medium text-faint">{t.cadence}</span></div>
               <p className="mt-1 flex-1 text-[14px] leading-relaxed text-muted">{t.desc}</p>
-              <Button variant="secondary" size="sm" className="mt-3 self-start" onClick={() => toast(`Drafted “${t.name}” — choose audience to send ✓`)}>Use template</Button>
+              <Button variant="secondary" size="sm" className="mt-3 self-start" onClick={() => setBuilder({ name: t.name, cadence: t.cadence, key: t.key })}>Use template</Button>
             </div>
           ))}
         </div>
@@ -143,7 +149,7 @@ export function SurveysHub() {
             <Eyebrow>AI themes · open text</Eyebrow>
             <ul className="mt-2 space-y-2">
               {surveyResult.themes.map((t) => (
-                <li key={t.name} className="flex items-center justify-between text-[14px]"><span className="font-medium">{t.name}</span><span className="rounded-full px-2 py-0.5 text-[12px] font-semibold" style={{ background: `${toneOf(t.tone)}1a`, color: toneOf(t.tone) }}>{t.mentions}</span></li>
+                <li key={t.name} className="flex items-center justify-between text-[14px]"><span className="font-medium">{t.name}</span><span className="rounded-full px-2 py-0.5 text-[12px] font-semibold" style={{ background: soft(toneOf(t.tone)), color: toneOf(t.tone) }}>{t.mentions}</span></li>
               ))}
             </ul>
             <div className="mt-3 flex items-start gap-2 rounded-2xl bg-[var(--ai-surface)] p-3 text-[14px] leading-relaxed text-muted ring-1 ring-[var(--ai-border)]"><SparkMark size={14} className="mt-0.5 shrink-0" /><span>{surveyResult.aiSummary}</span></div>
@@ -177,17 +183,22 @@ export function SurveysHub() {
                 </div>
                 <h3 className="mt-5 text-[14px] font-bold">AI themes · open text</h3>
                 <ul className="mt-2 space-y-2">
-                  {detail.themes.map((t) => <li key={t.name} className="flex items-center justify-between text-[14px]"><span className="font-medium">{t.name}</span><span className="rounded-full px-2 py-0.5 text-[12px] font-semibold" style={{ background: `${toneOf(t.tone)}1a`, color: toneOf(t.tone) }}>{t.mentions}</span></li>)}
+                  {detail.themes.map((t) => <li key={t.name} className="flex items-center justify-between text-[14px]"><span className="font-medium">{t.name}</span><span className="rounded-full px-2 py-0.5 text-[12px] font-semibold" style={{ background: soft(toneOf(t.tone)), color: toneOf(t.tone) }}>{t.mentions}</span></li>)}
                 </ul>
                 <div className="mt-3 flex items-start gap-2 rounded-2xl bg-[var(--ai-surface)] p-3 text-[14px] leading-relaxed text-muted ring-1 ring-[var(--ai-border)]"><SparkMark size={14} className="mt-0.5 shrink-0" /><span>{detail.summary}</span></div>
                 <Button variant="brand" className="mt-5" leadingIcon={<SparkMark size={14} tone="solid" />} onClick={() => ask(`Summarise the results of the ${open.name} and suggest actions.`)}>Ask Vadal about this</Button>
               </>
             ) : (
-              <div className="mt-6 flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line py-12 text-center"><p className="text-[14px] font-semibold">Not started yet</p><p className="text-[14px] text-faint">Opens {open.when}. Results appear here once responses come in.</p></div>
+              <div className="mt-6 flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line py-12 text-center">
+                <p className="text-[14px] font-semibold">{open.status === "live" ? "Collecting responses" : "Not started yet"}</p>
+                <p className="text-[14px] text-faint">{open.status === "live" ? `Sent to ${open.audience} · results appear here as responses come in.` : `Opens ${open.when}. Results appear here once responses come in.`}</p>
+              </div>
             )}
           </>
         )}
       </Drawer>
+
+      <SurveyBuilder seed={builder} onClose={() => setBuilder(null)} onLaunch={(s) => setMine((m) => [s, ...m])} />
     </div>
   );
 }
