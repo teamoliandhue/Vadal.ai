@@ -1,17 +1,22 @@
 "use client";
 /* Ask Vadal (Notion Home spec §2.6) — the premium AI moment. Opens the AI dock
    (ai-dock.tsx) via a `vadal:ask` window event; quick actions ask a starter question. */
-import { ArrowRight, BookOpen, Gift, Plane, Search, Sparkles, Users } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarClock, Gift, Plane, Search, Sparkles, TrendingUp } from "lucide-react";
+import { myDay } from "@/lib/data";
 
 function ask(q?: string) {
   window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 }
 
+/* Context-aware quick actions — drawn from today's plan, not generic stubs. */
+const oneOnOne = myDay.find((t) => t.tag === "Meeting");
 const QUICK = [
+  oneOnOne
+    ? { label: "Prep my 1:1", icon: CalendarClock, q: `Help me prep for "${oneOnOne.title}" (${oneOnOne.meta}).` }
+    : { label: "Give kudos", icon: Gift, q: "Help me give kudos to a teammate" },
+  { label: "My engagement", icon: TrendingUp, q: "Why is my engagement trending up, and what should I keep doing?" },
   { label: "Apply leave", icon: Plane, q: "How do I apply for leave?" },
-  { label: "Give kudos", icon: Gift, q: "Help me give kudos to a teammate" },
   { label: "Knowledge", icon: BookOpen, q: "Search the knowledge base" },
-  { label: "Directory", icon: Users, q: "Find someone in the directory" },
 ];
 
 export function AskAi() {

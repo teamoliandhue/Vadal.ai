@@ -37,7 +37,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <div className="flex flex-col gap-6 xl:col-span-7">
           <MyDay empty={firstTime} />
           <YouCard firstTime={firstTime} />
-          <QuickPoll className="card-lift" />
+          <QuickPoll className="card-lift" firstTime={firstTime} />
           <RecognitionCard firstTime={firstTime} />
           <CommunitiesCard />
         </div>
@@ -77,7 +77,7 @@ function RitualHero({ firstTime }: { firstTime: boolean }) {
           </p>
         </div>
         <div className="lg:border-l lg:border-line lg:pl-12">
-          <MoodCheck />
+          <MoodCheck firstTime={firstTime} />
         </div>
       </div>
       {!firstTime && (
@@ -102,6 +102,9 @@ function RitualHero({ firstTime }: { firstTime: boolean }) {
 
 /* ── 2 · You — personal panel with a narrative engagement trend ── */
 function YouCard({ className = "", firstTime = false }: { className?: string; firstTime?: boolean }) {
+  const es = engagementTrend.series;
+  const engScore = es[es.length - 1];
+  const engDelta = engScore - es[es.length - 4];
   const stats: [React.ReactNode, string][] = firstTime
     ? [["0", "Points"], ["0", "Day streak"], ["—", "Team rank"]]
     : [[me.points.toLocaleString(), "Points"], [me.streak, "Day streak"], [`#${me.rank}`, "Team rank"]];
@@ -138,12 +141,16 @@ function YouCard({ className = "", firstTime = false }: { className?: string; fi
           <div className="flex items-center justify-between">
             <Eyebrow>Your engagement</Eyebrow>
             <span className="flex items-center gap-1.5">
-              <span className="text-[16px] font-bold tracking-tight">82</span>
-              <Trend direction="up" value="4" />
+              <span className="text-[16px] font-bold tracking-tight">{engScore}</span>
+              <Trend direction={engDelta >= 0 ? "up" : "down"} value={String(Math.abs(engDelta))} />
             </span>
           </div>
-          <Sparkline values={engagementTrend.series} color="#6d5df0" id="you-eng" height={42} className="mt-2.5" />
-          <p className="mt-1 text-[14px] leading-snug text-faint">Trending up since recognition picked up — keep your 1:1s on track.</p>
+          <Sparkline values={engagementTrend.series} benchmark={engagementTrend.benchmark} color="#6d5df0" id="you-eng" height={42} className="mt-2.5" />
+          <div className="mt-1.5 flex items-center gap-3 text-[12px] text-faint">
+            <span className="flex items-center gap-1.5"><span className="h-[2px] w-4 rounded-full bg-[#6d5df0]" /> You</span>
+            <span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t border-dashed border-faint" /> Benchmark</span>
+          </div>
+          <p className="mt-2 text-[14px] leading-snug text-faint">{engagementTrend.insight}</p>
         </div>
       )}
 

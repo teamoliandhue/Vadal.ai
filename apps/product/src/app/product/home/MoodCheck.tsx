@@ -12,16 +12,17 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
 }
 
-export function MoodCheck() {
+export function MoodCheck({ firstTime = false }: { firstTime?: boolean }) {
   const [logged, setLogged] = usePersistentState<{ mood: string } | null>("vadal:mood", null);
   const [selected, setSelected] = React.useState<string | null>(null);
   const [note, setNote] = React.useState("");
+  const streak = (firstTime ? 0 : me.streak) + 1;
 
   function log() {
     if (!selected) return;
     setLogged({ mood: selected });
     const m = moods.find((x) => x.label === selected);
-    toast(`Mood logged ${m?.emoji ?? ""} — ${me.streak + 1}-day streak`);
+    toast(`Mood logged ${m?.emoji ?? ""} — ${streak}-day streak`);
   }
 
   if (logged) {

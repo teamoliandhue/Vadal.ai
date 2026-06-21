@@ -102,15 +102,21 @@ export function Sparkline({
   height = 56,
   id,
   className = "",
+  benchmark,
 }: {
   values: number[];
   color: string;
   height?: number;
   id: string;
   className?: string;
+  /** Optional faint dashed reference line, drawn on a shared scale. */
+  benchmark?: number[];
 }) {
   const W = 300;
-  const m = smoothPath(values, W, height, 5);
+  const all = benchmark ? [...values, ...benchmark] : values;
+  const scale = { min: Math.min(...all), max: Math.max(...all) };
+  const m = smoothPath(values, W, height, 5, scale);
+  const b = benchmark ? smoothPath(benchmark, W, height, 5, scale) : null;
   return (
     <svg
       viewBox={`0 0 ${W} ${height}`}
@@ -126,6 +132,16 @@ export function Sparkline({
         </linearGradient>
       </defs>
       <path d={`${m.d} L ${W} ${height} L 0 ${height} Z`} fill={`url(#${id}-fill)`} />
+      {b && (
+        <path
+          d={b.d}
+          fill="none"
+          stroke="var(--faint)"
+          strokeWidth="1.5"
+          strokeDasharray="3 4"
+          vectorEffect="non-scaling-stroke"
+        />
+      )}
       <path
         d={m.d}
         fill="none"

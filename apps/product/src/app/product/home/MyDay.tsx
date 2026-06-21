@@ -16,15 +16,17 @@ const DOT: Record<string, string> = {
 };
 
 export function MyDay({ className = "", empty = false }: { className?: string; empty?: boolean }) {
-  const [doneIdx, setDoneIdx] = usePersistentState<number[]>("vadal:myday-done", []);
-  function complete(i: number) {
-    if (doneIdx.includes(i)) return;
-    const next = [...doneIdx, i];
-    setDoneIdx(next);
-    toast(myDay.length - next.length === 0 ? "All caught up — enjoy it 🎉" : "Nice — one off your list ✓");
-  }
+  // Track completion by stable task title (not array index) so the list and the
+  // progress/empty state can never disagree.
+  const [doneIds, setDoneIds] = usePersistentState<string[]>("vadal:myday-done2", []);
   const items = empty ? [] : myDay;
-  const remaining = items.filter((_, i) => !doneIdx.includes(i));
+  function complete(title: string) {
+    if (doneIds.includes(title)) return;
+    const next = [...doneIds, title];
+    setDoneIds(next);
+    toast(items.filter((t) => !next.includes(t.title)).length === 0 ? "All caught up — enjoy it 🎉" : "Nice — one off your list ✓");
+  }
+  const remaining = items.filter((t) => !doneIds.includes(t.title));
   const total = items.length;
   const done = total - remaining.length;
 
@@ -51,11 +53,11 @@ export function MyDay({ className = "", empty = false }: { className?: string; e
         </div>
       ) : (
         <ul className="mt-3 -mx-2">
-          {myDay.map((t, i) =>
-            doneIdx.includes(i) ? null : (
+          {items.map((t) =>
+            doneIds.includes(t.title) ? null : (
               <li key={t.title} className="group flex items-center gap-3 rounded-2xl px-2 py-2.5 transition hover:bg-soft">
                 <button
-                  onClick={() => complete(i)}
+                  onClick={() => complete(t.title)}
                   aria-label={`Mark “${t.title}” done`}
                   className="grid size-5 shrink-0 place-items-center rounded-full border-[1.5px] border-line text-transparent transition hover:border-[var(--purple)] hover:text-[var(--purple)]"
                 >
@@ -68,7 +70,7 @@ export function MyDay({ className = "", empty = false }: { className?: string; e
                   </div>
                   <div className="mt-0.5 pl-3.5 text-[12px] text-faint">{t.meta} · {t.tag}</div>
                 </div>
-                <Button variant="tertiary" size="sm" onClick={() => complete(i)}>{t.action}</Button>
+                <Button variant="tertiary" size="sm" onClick={() => complete(t.title)}>{t.action}</Button>
               </li>
             ),
           )}

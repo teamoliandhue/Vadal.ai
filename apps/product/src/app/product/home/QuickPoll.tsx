@@ -6,11 +6,23 @@ import { poll } from "@/lib/data";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { toast } from "../Toaster";
 
-export function QuickPoll({ className = "" }: { className?: string }) {
+export function QuickPoll({ className = "", firstTime = false }: { className?: string; firstTime?: boolean }) {
   const [voted, setVoted] = usePersistentState<string | null>("vadal:poll", null);
   function vote(label: string) { setVoted(label); toast("Thanks for voting 🗳️"); }
   const max = Math.max(...poll.options.map((o) => o.pct));
   const votes = poll.votes + (voted ? 1 : 0);
+
+  if (firstTime) {
+    return (
+      <section className={`rounded-[26px] border border-line bg-card p-6 ${className}`}>
+        <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">Pulse poll</p>
+        <div className="mt-3 flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line py-10 text-center">
+          <p className="text-[14px] font-semibold">No active polls yet</p>
+          <p className="text-[14px] text-faint">Quick team polls will show up here.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className={`rounded-[26px] border border-line bg-card p-6 ${className}`}>
