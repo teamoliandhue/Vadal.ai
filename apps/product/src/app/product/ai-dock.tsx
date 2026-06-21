@@ -33,11 +33,35 @@ function followups(q: string): string[] {
   return ["Tell me more", "Draft a message", "Who can help?"];
 }
 
+/* Short "what I'm doing" lines shown while thinking — feels like real work, not a stall. */
+function reasoningSteps(q: string): string[] {
+  const s = q.toLowerCase();
+  if (s.includes("leave") || s.includes("time off")) return ["Reading your leave balance…", "Checking the leave policy…"];
+  if (s.includes("1:1") || s.includes("meeting") || s.includes("next")) return ["Checking your calendar…", "Finding the prep doc…"];
+  if (s.includes("payslip") || s.includes("payroll")) return ["Locating the payroll owner…", "Checking your access…"];
+  if (s.includes("kudos") || s.includes("recogni")) return ["Reviewing recognition…", "Finding good teammates…"];
+  if (s.includes("knowledge") || s.includes("policy") || s.includes("polic")) return ["Searching the knowledge base…", "Ranking the best hits…"];
+  return ["Understanding your question…", "Gathering the context…"];
+}
+
+/* Lightweight rich text — **bold** + key numbers/currency in Aurora gradient. */
+function renderRich(text: string): React.ReactNode[] {
+  return text.split(/(\*\*[^*]+\*\*)/g).flatMap((part, i) => {
+    if (/^\*\*[^*]+\*\*$/.test(part)) return [<strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>];
+    return part.split(/(₹[\d,.]+|\b\d[\d,.:]*%?\b)/g).map((t, j) =>
+      /^(\d|₹)/.test(t)
+        ? <span key={`${i}-${j}`} className="ai-text-grad">{t}</span>
+        : <React.Fragment key={`${i}-${j}`}>{t}</React.Fragment>,
+    );
+  });
+}
+
 export function AiDock() {
   const [open, setOpen] = React.useState(false);
   const [msgs, setMsgs] = React.useState<Msg[]>([]);
   const [val, setVal] = React.useState("");
   const [thinking, setThinking] = React.useState(false);
+  const [stepText, setStepText] = React.useState("");
   const [feedback, setFeedback] = React.useState<Record<number, "up" | "down">>({});
   const inputRef = React.useRef<HTMLInputElement>(null);
   const bodyRef = React.useRef<HTMLDivElement>(null);
@@ -49,11 +73,17 @@ export function AiDock() {
     timers.current.forEach((t) => window.clearTimeout(t));
     timers.current = [];
     setVal("");
-    setThinking(true);
     setMsgs((m) => [...m, { role: "user", text: q }]);
 
     const full = aiAnswer(q);
     const fu = followups(q);
+    const steps = reasoningSteps(q);
+    const STEP_MS = 620;
+    setThinking(true);
+    setStepText(steps[0]);
+    steps.forEach((st, k) => {
+      if (k > 0) timers.current.push(window.setTimeout(() => setStepText(st), k * STEP_MS));
+    });
     const think = window.setTimeout(() => {
       setThinking(false);
       setMsgs((m) => [...m, { role: "ai", text: "", done: false }]);
@@ -78,7 +108,7 @@ export function AiDock() {
         }
       }, 26);
       timers.current.push(stream);
-    }, 480);
+    }, steps.length * STEP_MS);
     timers.current.push(think);
   }, []);
 
@@ -111,7 +141,8 @@ export function AiDock() {
   return (
     <>
       {open && (
-        <div className="fixed bottom-24 right-6 z-40 flex w-[372px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-3xl border border-line bg-card shadow-[0_24px_60px_-20px_rgba(20,20,40,0.45)] dark:border-white/10">
+        <div className={`ai-pop ai-glow-border fixed bottom-24 right-6 z-40 w-[372px] max-w-[calc(100vw-2rem)] rounded-[26px] p-[1.5px] ${busy ? "is-busy" : ""}`}>
+        <div className="flex flex-col overflow-hidden rounded-[24.5px] bg-card">
           <div className="flex items-center gap-2.5 border-b border-line px-4 py-3 dark:border-white/10">
             <span className="ai-grad grid h-8 w-8 place-items-center rounded-full"><SparkMark size={18} tone="solid" state={busy ? "thinking" : "still"} /></span>
             <div className="flex-1">
@@ -141,8 +172,8 @@ export function AiDock() {
                     <div key={i} className="flex justify-start gap-2">
                       <span className="ai-grad mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" /></span>
                       <div className="flex min-w-0 flex-col items-start gap-1">
-                        <div className="ai-stream max-w-full rounded-2xl bg-[var(--ai-surface)] px-3 py-2 text-[16px] leading-relaxed text-ink ring-1 ring-[var(--ai-border)]">
-                          {m.text}
+                        <div className={`ai-stream relative max-w-full overflow-hidden rounded-2xl bg-[var(--ai-surface)] px-3 py-2 text-[16px] leading-relaxed text-ink ring-1 ring-[var(--ai-border)] ${!m.done ? "ai-sheen" : ""}`}>
+                          {renderRich(m.text)}
                           {!m.done && <span className="ai-caret" />}
                         </div>
                         {m.done && (
@@ -158,8 +189,9 @@ export function AiDock() {
                 {thinking && (
                   <div className="flex items-center gap-2">
                     <span className="ai-grad grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" state="thinking" /></span>
-                    <span className="flex items-center gap-1 rounded-2xl bg-[var(--ai-surface)] px-3 py-3 ring-1 ring-[var(--ai-border)]" aria-label="Vadal is thinking">
-                      <span className="ai-dot" /><span className="ai-dot" style={{ animationDelay: "0.16s" }} /><span className="ai-dot" style={{ animationDelay: "0.32s" }} />
+                    <span className="flex items-center gap-2 rounded-2xl bg-[var(--ai-surface)] px-3 py-2.5 ring-1 ring-[var(--ai-border)]" aria-label="Vadal is thinking">
+                      <span className="text-[14px] text-muted">{stepText}</span>
+                      <span className="flex items-center gap-1"><span className="ai-dot" /><span className="ai-dot" style={{ animationDelay: "0.16s" }} /><span className="ai-dot" style={{ animationDelay: "0.32s" }} /></span>
                     </span>
                   </div>
                 )}
@@ -177,6 +209,7 @@ export function AiDock() {
             <input ref={inputRef} value={val} onChange={(e) => setVal(e.target.value)} placeholder="Ask anything…" className="min-w-0 flex-1 rounded-full border border-line bg-soft px-3.5 py-2 text-[14px] outline-none transition focus:border-[var(--ai-accent)]" />
             <button type="submit" aria-label="Send" disabled={busy} className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--purple)] text-white transition hover:opacity-90 disabled:opacity-45"><ArrowUp className="h-4 w-4" /></button>
           </form>
+        </div>
         </div>
       )}
       <button

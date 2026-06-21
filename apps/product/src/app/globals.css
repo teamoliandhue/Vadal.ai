@@ -161,9 +161,20 @@ body {
 .lumen .ai-caret { display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -2px; border-radius: 1px; background: var(--ai-accent); animation: ai-caret 1s steps(2, start) infinite; }
 @keyframes ai-caret { 50% { opacity: 0; } }
 
+/* rotating aurora glow-border (the "Siri glow") — outer wrapper holds the conic gradient, inner panel covers the centre */
+@property --ai-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+.lumen .ai-glow-border { background: conic-gradient(from var(--ai-angle), var(--ai-grad-1), var(--ai-grad-2), var(--ai-grad-3), var(--ai-grad-4), var(--ai-grad-1)); animation: ai-rotate 7s linear infinite; box-shadow: 0 24px 60px -20px rgba(20, 20, 40, 0.45), 0 0 30px -10px rgba(124, 92, 248, 0.4); }
+.lumen .ai-glow-border.is-busy { animation-duration: 2.4s; box-shadow: 0 24px 60px -20px rgba(20, 20, 40, 0.5), 0 0 42px -8px rgba(124, 92, 248, 0.6); }
+@keyframes ai-rotate { to { --ai-angle: 360deg; } }
+.lumen .ai-pop { animation: ai-pop 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; transform-origin: bottom right; }
+@keyframes ai-pop { from { opacity: 0; transform: translateY(16px) scale(0.96); } to { opacity: 1; transform: none; } }
+.lumen .ai-text-grad { background-image: linear-gradient(120deg, var(--ai-grad-2), var(--ai-grad-3)); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 700; }
+.lumen .ai-sheen::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 70%); background-size: 220% 100%; animation: ai-sheen 1.5s ease-in-out infinite; pointer-events: none; }
+@keyframes ai-sheen { from { background-position: 130% 0; } to { background-position: -130% 0; } }
+
 @media (prefers-reduced-motion: reduce) {
   .lumen .rise, .lumen .ring-animate, .lumen .draw-animate, .lumen .animate-floaty, .lumen .animate-floaty2, .lumen .ai-aura,
-  .lumen .ai-breathe, .lumen .ai-think, .lumen .ai-burst, .lumen .ai-dot, .lumen .ai-caret { animation: none; }
-  .lumen .ai-stream { animation: none; opacity: 1; }
+  .lumen .ai-breathe, .lumen .ai-think, .lumen .ai-burst, .lumen .ai-dot, .lumen .ai-caret, .lumen .ai-glow-border, .lumen .ai-sheen::after { animation: none; }
+  .lumen .ai-stream, .lumen .ai-pop { animation: none; opacity: 1; }
   .toast-in { animation: none; }
 }
