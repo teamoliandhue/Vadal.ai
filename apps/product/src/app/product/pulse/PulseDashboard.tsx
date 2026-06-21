@@ -23,9 +23,11 @@ import {
 } from "@/lib/data";
 import { derivePulse, ALL_TEAMS, type PulseView } from "./derive";
 
-const TONE = { good: "#2f9e6e", bad: "#dc4a44", warn: "#d68a1e", purple: "#6d5df0" } as const;
+// Semantic tones as Lumen tokens so they adapt across light/dark.
+const TONE = { good: "var(--success)", bad: "var(--danger)", warn: "var(--warning)", purple: "var(--purple)" } as const;
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 const toneOf = (t: string) => t === "good" ? TONE.good : t === "bad" ? TONE.bad : t === "warn" ? TONE.warn : TONE.purple;
+const soft = (c: string, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
 const band = (s: number) => (s >= 80 ? TONE.good : s >= 70 ? TONE.warn : TONE.bad);
 const analyticsHref = (metric: string, dim = "team") => `/product/analytics?metric=${metric}&dim=${dim}`;
 
@@ -134,7 +136,7 @@ function HealthCard({ v, className = "" }: { v: PulseView; className?: string })
       <CardHead eyebrow="Workforce health" title="Org health score" action={<Explore q={`Break down workforce health drivers for ${v.scope}`} />} />
       <Figure label={`Workforce health ${h.score} of 100`} explain className="mt-2 flex justify-center"><ArcGauge score={h.score} width={200} /></Figure>
       <div className="mt-3 flex flex-wrap gap-1.5">
-        {h.drivers.map((d) => <span key={d.label} className="rounded-full px-2.5 py-1 text-[12px] font-semibold" style={{ background: `${toneOf(d.tone)}1a`, color: d.tone === "neutral" ? "var(--muted)" : toneOf(d.tone) }}>{d.label}</span>)}
+        {h.drivers.map((d) => <span key={d.label} className="rounded-full px-2.5 py-1 text-[12px] font-semibold" style={{ background: soft(toneOf(d.tone)), color: d.tone === "neutral" ? "var(--muted)" : toneOf(d.tone) }}>{d.label}</span>)}
       </div>
       <p className="mt-3 text-[14px] leading-relaxed text-muted">{h.narrative}</p>
     </Card>
@@ -230,7 +232,7 @@ function VoiceCard({ v, className = "" }: { v: PulseView; className?: string }) 
       </Figure>
       <div className="mt-2 flex flex-wrap gap-4 text-[12px] text-faint">{v.voice.mood.map((m) => <span key={m.label} className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: m.color }} />{m.label} {m.pct}%</span>)}</div>
       <ul className="mt-4 space-y-2">
-        {v.voice.themes.map((t) => <li key={t.name} className="flex items-center justify-between text-[14px]"><span className="font-medium">{t.name}</span><span className="flex items-center gap-2 text-[12px] text-faint"><span>{t.mentions}</span><span className="rounded-full px-2 py-0.5 font-semibold" style={{ background: `${toneOf(t.tone)}1a`, color: toneOf(t.tone) }}>{t.tag}</span></span></li>)}
+        {v.voice.themes.map((t) => <li key={t.name} className="flex items-center justify-between text-[14px]"><span className="font-medium">{t.name}</span><span className="flex items-center gap-2 text-[12px] text-faint"><span>{t.mentions}</span><span className="rounded-full px-2 py-0.5 font-semibold" style={{ background: soft(toneOf(t.tone)), color: toneOf(t.tone) }}>{t.tag}</span></span></li>)}
       </ul>
       <blockquote className="mt-4 rounded-2xl border-l-2 border-[var(--purple)] bg-soft p-3.5 text-[14px] leading-relaxed text-muted">“{v.voice.quote.text}”<cite className="mt-1.5 block text-[12px] not-italic text-faint">{v.voice.quote.meta}</cite></blockquote>
     </Card>
@@ -241,7 +243,7 @@ function CampaignsCard({ isTeam = false, className = "" }: { isTeam?: boolean; c
     <Card className={className}>
       <CardHead eyebrow="Campaigns" title="Are interventions working" action={<div className="flex items-center gap-2"><OrgWideTag show={isTeam} /><Explore q="Which campaigns drove the most engagement lift?" /></div>} />
       <ul className="mt-4 flex-1 space-y-3">
-        {campaigns.map((c) => <li key={c.name} className="rounded-2xl border border-line p-3"><div className="flex items-center justify-between"><span className="text-[14px] font-semibold">{c.name}</span><span className="rounded-full px-2 py-0.5 text-[12px] font-bold" style={{ background: `${TONE.good}1a`, color: TONE.good }}>{c.lift} pts</span></div><div className="mt-1 text-[12px] text-faint">{c.audience}</div><div className="mt-2 flex items-center gap-2"><span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-soft"><span className="absolute inset-y-0 left-0 rounded-full bg-[var(--purple)]" style={{ width: `${c.participation}%` }} /></span><span className="text-[12px] font-medium text-muted">{c.participation}% joined</span></div></li>)}
+        {campaigns.map((c) => <li key={c.name} className="rounded-2xl border border-line p-3"><div className="flex items-center justify-between"><span className="text-[14px] font-semibold">{c.name}</span><span className="rounded-full px-2 py-0.5 text-[12px] font-bold" style={{ background: soft(TONE.good), color: TONE.good }}>{c.lift} pts</span></div><div className="mt-1 text-[12px] text-faint">{c.audience}</div><div className="mt-2 flex items-center gap-2"><span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-soft"><span className="absolute inset-y-0 left-0 rounded-full bg-[var(--purple)]" style={{ width: `${c.participation}%` }} /></span><span className="text-[12px] font-medium text-muted">{c.participation}% joined</span></div></li>)}
       </ul>
     </Card>
   );

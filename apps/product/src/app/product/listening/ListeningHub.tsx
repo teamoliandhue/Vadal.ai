@@ -22,7 +22,8 @@ const POOL: Signal[] = [
   { source: "Chat", snippet: "Tooling keeps logging me out mid-task.", topicId: "tooling", sentiment: "negative", time: "just now" },
 ];
 
-const TONE = { good: "#2f9e6e", bad: "#dc4a44", warn: "#d68a1e", purple: "#6d5df0", muted: "#8a8f98" } as const;
+const TONE = { good: "var(--success)", bad: "var(--danger)", warn: "var(--warning)", purple: "var(--purple)", muted: "var(--muted)" } as const;
+const soft = (c: string, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 const sentTone = (s: string) => (s === "positive" ? TONE.good : s === "negative" ? TONE.bad : TONE.muted);
 const trendGlyph = (t: string) => (t === "up" ? "▲" : t === "down" ? "▼" : "→");
@@ -141,7 +142,7 @@ export function ListeningHub() {
                     <p className="text-[14px] leading-snug">{s.snippet}</p>
                     <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[12px] text-faint">
                       <span>{s.source}</span><span>·</span>
-                      <span className="rounded-full px-2 py-0.5 font-semibold" style={{ background: `${sentTone(s.sentiment)}1a`, color: sentTone(s.sentiment) }}>{topicName(s.topicId)}</span>
+                      <span className="rounded-full px-2 py-0.5 font-semibold" style={{ background: soft(sentTone(s.sentiment)), color: sentTone(s.sentiment) }}>{topicName(s.topicId)}</span>
                       <span>·</span><span>{s.time}</span>
                     </div>
                   </div>

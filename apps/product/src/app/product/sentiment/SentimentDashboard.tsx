@@ -12,7 +12,8 @@ import { toast } from "../Toaster";
 import { Drawer } from "../Drawer";
 import { sentiment, sentimentScopes, MIN_N } from "@/lib/listen";
 
-const TONE = { good: "#2f9e6e", bad: "#dc4a44", warn: "#d68a1e", purple: "#6d5df0", muted: "#8a8f98" } as const;
+const TONE = { good: "var(--success)", bad: "var(--danger)", warn: "var(--warning)", purple: "var(--purple)", muted: "var(--muted)" } as const;
+const soft = (c: string, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 const hash = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
@@ -93,7 +94,7 @@ export function SentimentDashboard() {
       {v.hidden ? (
         <Card>
           <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-soft text-[var(--warn,#d68a1e)]"><ShieldAlert className="h-6 w-6" /></span>
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-soft text-[var(--warning)]"><ShieldAlert className="h-6 w-6" /></span>
             <p className="mt-1 text-[16px] font-semibold">Hidden to protect anonymity</p>
             <p className="max-w-sm text-[14px] text-muted">{scope} has {v.respondents} responses — fewer than the {MIN_N} needed to show a cut without identifying individuals. Choose a larger group.</p>
           </div>
@@ -139,7 +140,7 @@ export function SentimentDashboard() {
                   {v.themes.filter((t) => themeFilter === "All" ? true : themeFilter === "Rising" ? t.trend === "up" : t.sentiment === themeFilter.toLowerCase()).map((t) => (
                     <tr key={t.name} tabIndex={0} onClick={() => setOpenTheme(t)} onKeyDown={(e) => { if (e.key === "Enter") setOpenTheme(t); }} className="cursor-pointer border-t border-line outline-none transition hover:bg-soft focus-visible:bg-soft">
                       <td className="px-2 py-2.5 text-[14px] font-medium">{t.name}</td>
-                      <td className="px-2 py-2.5"><span className="rounded-full px-2 py-0.5 text-[12px] font-semibold capitalize" style={{ background: `${sentTone(t.sentiment)}1a`, color: sentTone(t.sentiment) }}>{t.sentiment}</span></td>
+                      <td className="px-2 py-2.5"><span className="rounded-full px-2 py-0.5 text-[12px] font-semibold capitalize" style={{ background: soft(sentTone(t.sentiment)), color: sentTone(t.sentiment) }}>{t.sentiment}</span></td>
                       <td className="px-2 py-2.5 text-[14px] font-bold tabular-nums">{t.occurrences}</td>
                       <td className="px-2 py-2.5 text-[14px]" style={{ color: t.trend === "up" ? TONE.bad : t.trend === "down" ? TONE.good : TONE.muted }}>{trendGlyph(t.trend)}</td>
                       <td className="px-2 py-2.5 text-right text-[12px] text-faint">→</td>
@@ -198,7 +199,7 @@ export function SentimentDashboard() {
               <Eyebrow>Theme</Eyebrow>
               <h2 className="mt-1.5 text-[20px] font-bold tracking-tight">{openTheme.name}</h2>
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="rounded-full px-2 py-0.5 text-[12px] font-semibold capitalize" style={{ background: `${sentTone(openTheme.sentiment)}1a`, color: sentTone(openTheme.sentiment) }}>{openTheme.sentiment}</span>
+                <span className="rounded-full px-2 py-0.5 text-[12px] font-semibold capitalize" style={{ background: soft(sentTone(openTheme.sentiment)), color: sentTone(openTheme.sentiment) }}>{openTheme.sentiment}</span>
                 <span className="rounded-full bg-soft px-2 py-0.5 text-[12px] text-muted">{openTheme.occurrences} mentions</span>
                 <span className="text-[12px]" style={{ color: openTheme.trend === "up" ? TONE.bad : openTheme.trend === "down" ? TONE.good : TONE.muted }}>{trendGlyph(openTheme.trend)} {openTheme.trend}</span>
               </div>

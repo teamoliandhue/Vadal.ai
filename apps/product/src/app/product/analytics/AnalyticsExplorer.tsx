@@ -13,7 +13,8 @@ import { Sparkline, TrendChart } from "@/components/charts";
 import { engagementTrend, departments } from "@/lib/data";
 import { toast } from "../Toaster";
 
-const TONE = { good: "#2f9e6e", bad: "#dc4a44", warn: "#d68a1e", purple: "#6d5df0" } as const;
+const TONE = { good: "var(--success)", bad: "var(--danger)", warn: "var(--warning)", purple: "var(--purple)" } as const;
+const soft = (c: string, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 const hash = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
@@ -235,7 +236,7 @@ export function AnalyticsExplorer({ initialMetric, initialDim }: { initialMetric
                     const c = toneFor(metric, v);
                     return (
                       <td key={col} className="rounded-lg p-0" aria-label={`${row}, ${col}: ${v}`}>
-                        <div className="grid h-9 place-items-center rounded-lg text-[13px] font-bold tabular-nums" style={{ background: `${c}24`, color: c }}>{v}</div>
+                        <div className="grid h-9 place-items-center rounded-lg text-[13px] font-bold tabular-nums" style={{ background: soft(c, 18), color: c }}>{v}</div>
                       </td>
                     );
                   })}
@@ -245,9 +246,9 @@ export function AnalyticsExplorer({ initialMetric, initialDim }: { initialMetric
           </table>
         </div>
         <div className="mt-3 flex items-center gap-4 text-[12px] text-faint">
-          <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded" style={{ background: `${TONE.good}33` }} /> Strong</span>
-          <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded" style={{ background: `${TONE.warn}33` }} /> Watch</span>
-          <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded" style={{ background: `${TONE.bad}33` }} /> {M.goodHigh ? "Weak" : "High risk"}</span>
+          <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded" style={{ background: soft(TONE.good, 22) }} /> Strong</span>
+          <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded" style={{ background: soft(TONE.warn, 22) }} /> Watch</span>
+          <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded" style={{ background: soft(TONE.bad, 22) }} /> {M.goodHigh ? "Weak" : "High risk"}</span>
         </div>
       </section>
     </div>
