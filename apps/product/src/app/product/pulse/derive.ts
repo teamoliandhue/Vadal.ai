@@ -9,7 +9,7 @@
    This is seeded demo data, not a live warehouse — but every figure is derived,
    internally consistent, and changes the way a real cut would. */
 import {
-  health, engagementTrend, attrition, voice, recognitionBoard,
+  health, engagementTrend, attrition, voice, recognitionBoard, briefingImpact,
   experience, flightRisks, managers, departments,
 } from "@/lib/data";
 
@@ -153,18 +153,61 @@ export function derivePulse(scope: string, period: string) {
   const fr = isTeam ? flightRisks.filter((r) => teamRoot(r.team) === scope) : flightRisks.map((r) => ({ ...r }));
   const mgr = isTeam ? managers.filter((m) => teamRoot(m.team) === scope) : managers.map((m) => ({ ...m }));
 
+  /* ── voice themes + representative quote (scope-aware) ── */
+  const vThemes = isTeam
+    ? voice.themes.map((t) => ({ ...t, mentions: Math.max(3, Math.round(t.mentions * w * 1.4)) })).sort((a, b) => b.mentions - a.mentions)
+    : voice.themes.map((t) => ({ ...t }));
+  const vQuote = isTeam ? { text: voice.quote.text, meta: `${scope} · anonymous · 2 days ago` } : { ...voice.quote };
+
+  /* ── attrition drivers (scope-aware ordering — low-score teams surface workload) ── */
+  const aDrivers = isTeam
+    ? attrition.drivers
+        .map((dr) => {
+          const nudge = (hash(scope + dr.label) % 14) - 6;
+          const boost = score < 72 && /workload|burnout/i.test(dr.label) ? 10 : 0;
+          return { ...dr, pct: clamp(dr.pct + nudge + boost, 6, 48) };
+        })
+        .sort((a, b) => b.pct - a.pct)
+    : attrition.drivers.map((dr) => ({ ...dr }));
+
+  /* ── recognition leaders (the team's own if present, else org) ── */
+  const teamLeaders = recognitionBoard.leaders.filter((l) => l.team === scope);
+  const recoLeaders = isTeam && teamLeaders.length ? teamLeaders : recognitionBoard.leaders;
+
+  /* ── AI briefing — derived from the scoped view (no hardcoded names) ── */
+  const highRisks = fr.filter((r) => r.level === "High");
+  const needyMgrs = mgr.filter((m) => m.atRisk > 4 || m.grade === "C" || m.grade === "D");
+  const briefing = {
+    items: [
+      highRisks.length
+        ? { text: `${highRisks.length} ${highRisks.length === 1 ? "person" : "people"} at high flight-risk`, sub: `${highRisks.slice(0, 3).map((r) => r.name.split(" ")[0]).join(", ")} — act this week`, dot: "#f87171", to: "Attrition & risk", label: "Review risk" }
+        : { text: `Flight risk is low in ${isTeam ? scope : "the org"}`, sub: `${predicted} predicted attrition`, dot: "#22b873", to: "Attrition & risk", label: "See risk" },
+      {
+        text: `Engagement ${score} · ${benchmarkDelta >= 0 ? "+" : ""}${benchmarkDelta} vs benchmark`,
+        sub: benchmarkDelta >= 0 ? "Holding above peers" : "Workload theme rising",
+        dot: benchmarkDelta >= 0 ? "#a5b4fc" : "#fbbf24",
+        to: "Engagement", label: "See engagement",
+      },
+      needyMgrs.length
+        ? { text: `${needyMgrs.length} manager action${needyMgrs.length > 1 ? "s" : ""} pending`, sub: `${needyMgrs[0].name} · ${needyMgrs[0].atRisk} at-risk reports`, dot: "#a5b4fc", to: "Managers", label: "Review managers" }
+        : { text: "Manager coverage is healthy", sub: `${isTeam ? mgrScore : 78} effectiveness index`, dot: "#22b873", to: "Managers", label: "See managers" },
+    ],
+    impact: isTeam ? `~₹${Math.max(2, Math.round(38 * w))}L exposure this quarter` : briefingImpact.value,
+  };
+
   return {
     scope, period, isTeam,
     health: { score, delta, benchmarkDelta, percentile, narrative, drivers },
     trend: { series, benchmark: engagementTrend.benchmark, months: engagementTrend.months, insight },
     signals,
-    attrition: { predicted, predictedDelta, segmentation },
-    voice: { comments, mood },
-    recognition: { total: recoTotal, coverage },
+    attrition: { predicted, predictedDelta, segmentation, drivers: aDrivers },
+    voice: { comments, mood, themes: vThemes, quote: vQuote },
+    recognition: { total: recoTotal, coverage, leaders: recoLeaders },
     adoption,
     managerIndex: isTeam ? mgrScore : 78,
     flightRisks: fr,
     managers: mgr,
+    briefing,
   };
 }
 

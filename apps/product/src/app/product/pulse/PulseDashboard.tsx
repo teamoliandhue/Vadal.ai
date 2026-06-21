@@ -16,8 +16,8 @@ import { ArcGauge, Sparkline, TrendChart } from "@/components/charts";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { toast } from "../Toaster";
 import {
-  org, aiBriefing, briefingImpact, voice, attrition, actionQueue, actionProgress,
-  recognitionBoard, recognitionExtra, departments, managerSummary, gamification,
+  org, actionQueue, actionProgress,
+  recognitionExtra, departments, managerSummary, gamification,
   campaigns, impact, knowledge, aiUsage,
 } from "@/lib/data";
 import { derivePulse, ALL_TEAMS, type PulseView } from "./derive";
@@ -48,6 +48,10 @@ function Explore({ q }: { q: string }) {
 function AnalyticsLink({ metric, dim = "team", label = "Slice in Analytics" }: { metric: string; dim?: string; label?: string }) {
   return <Link href={analyticsHref(metric, dim)} className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5">{label} <ArrowUpRight className="h-3 w-3" /></Link>;
 }
+/* Honest marker for cards that stay org-level even when a team scope is active. */
+function OrgWideTag({ show }: { show: boolean }) {
+  return show ? <span className="rounded-full bg-soft px-2 py-0.5 text-[12px] font-semibold text-faint">Org-wide</span> : null;
+}
 /* accessible chart wrapper — gives screen readers a text alternative for the aria-hidden svgs.
    When `explain`, a hover "Explain" pill asks Vadal about the chart in context. */
 function Figure({ label, children, className = "", explain = false }: { label: string; children: React.ReactNode; className?: string; explain?: boolean }) {
@@ -70,11 +74,6 @@ function Figure({ label, children, className = "", explain = false }: { label: s
 const PERIODS = ["7 days", "30 days", "Quarter"] as const;
 function Briefing({ v, setTab, period, setPeriod }: { v: PulseView; setTab: (t: string) => void; period: string; setPeriod: (p: string) => void }) {
   const h = v.health;
-  const acts = [
-    { label: "Review risk", to: "Attrition & risk" },
-    { label: "See engagement", to: "Engagement" },
-    { label: "Review managers", to: "Managers" },
-  ];
   return (
     <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card p-7 shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)] sm:p-9">
       <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
@@ -104,18 +103,18 @@ function Briefing({ v, setTab, period, setPeriod }: { v: PulseView; setTab: (t: 
       {/* decisions */}
       <div className="relative mt-5 border-t border-line pt-5">
         <div className="flex items-center justify-between">
-          <Eyebrow>Needs you today · {aiBriefing.length}</Eyebrow>
-          <span className="text-[12px] font-medium" style={{ color: TONE.bad }}>{briefingImpact.value} if unaddressed</span>
+          <Eyebrow>Needs you today · {v.briefing.items.length}</Eyebrow>
+          <span className="text-[12px] font-medium" style={{ color: TONE.bad }}>{v.briefing.impact} if unaddressed</span>
         </div>
         <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
-          {aiBriefing.map((b, i) => (
+          {v.briefing.items.map((b) => (
             <div key={b.text} className="flex flex-col rounded-2xl border border-line bg-soft p-4">
               <div className="flex items-start gap-2.5">
                 <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: b.dot }} />
                 <div className="min-w-0 flex-1"><div className="text-[14px] font-semibold leading-snug">{b.text}</div><div className="mt-0.5 text-[12px] text-faint">{b.sub}</div></div>
               </div>
               <div className="mt-3 flex items-center gap-2">
-                <Button variant="secondary" size="sm" onClick={() => setTab(acts[i].to)}>{acts[i].label}</Button>
+                <Button variant="secondary" size="sm" onClick={() => setTab(b.to)}>{b.label}</Button>
                 <button onClick={() => ask(b.text)} className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] hover:underline"><Sparkles className="h-3 w-3" /> Why</button>
               </div>
             </div>
@@ -206,13 +205,13 @@ function ActionQueueCard({ className = "" }: { className?: string }) {
     </Card>
   );
 }
-function BusinessImpactStrip() {
+function BusinessImpactStrip({ isTeam = false }: { isTeam?: boolean }) {
   const corr: [string, string][] = [[impact.attritionCorr, "↔ Attrition"], [impact.productivityCorr, "↔ Productivity"], [impact.revenueCorr, "↔ Revenue"]];
   return (
     <section className="relative overflow-hidden rounded-[26px] bg-[#141419] p-7 text-white shadow-[0_18px_44px_-22px_rgba(0,0,0,0.5)] sm:p-8 dark:ring-1 dark:ring-white/[0.08]">
       <div className="pointer-events-none absolute -right-12 -top-16 h-56 w-56 rounded-full opacity-50 blur-3xl" style={{ background: "radial-gradient(circle, #818cf8 0%, #2dd4bf 70%, transparent 78%)" }} aria-hidden />
       <div className="relative flex flex-wrap items-center justify-between gap-4">
-        <div><p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-zinc-400">Business impact</p><h2 className="mt-1.5 text-[20px] font-bold tracking-tight">Engagement moves the business</h2></div>
+        <div><p className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-zinc-400">Business impact {isTeam && <span className="rounded-full bg-white/10 px-2 py-0.5 text-[12px] font-semibold normal-case tracking-normal text-zinc-300">Org-wide</span>}</p><h2 className="mt-1.5 text-[20px] font-bold tracking-tight">Engagement moves the business</h2></div>
         <div className="flex gap-2.5">
           {corr.map(([val, l]) => <div key={l} className="rounded-2xl bg-white/[0.06] px-4 py-2 text-center ring-1 ring-white/[0.08]"><div className="text-[20px] font-bold" style={{ color: val.startsWith("-") || val.startsWith("−") ? "#5eead4" : "#a5b4fc" }}>{val}</div><div className="text-[12px] text-zinc-400">{l}</div></div>)}
           <div className="rounded-2xl bg-white/[0.06] px-4 py-2 text-center ring-1 ring-white/[0.08]"><div className="text-[20px] font-bold">{impact.roi}</div><div className="text-[12px] text-zinc-400">ROI</div></div>
@@ -231,16 +230,16 @@ function VoiceCard({ v, className = "" }: { v: PulseView; className?: string }) 
       </Figure>
       <div className="mt-2 flex flex-wrap gap-4 text-[12px] text-faint">{v.voice.mood.map((m) => <span key={m.label} className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: m.color }} />{m.label} {m.pct}%</span>)}</div>
       <ul className="mt-4 space-y-2">
-        {voice.themes.map((t) => <li key={t.name} className="flex items-center justify-between text-[14px]"><span className="font-medium">{t.name}</span><span className="flex items-center gap-2 text-[12px] text-faint"><span>{t.mentions}</span><span className="rounded-full px-2 py-0.5 font-semibold" style={{ background: `${toneOf(t.tone)}1a`, color: toneOf(t.tone) }}>{t.tag}</span></span></li>)}
+        {v.voice.themes.map((t) => <li key={t.name} className="flex items-center justify-between text-[14px]"><span className="font-medium">{t.name}</span><span className="flex items-center gap-2 text-[12px] text-faint"><span>{t.mentions}</span><span className="rounded-full px-2 py-0.5 font-semibold" style={{ background: `${toneOf(t.tone)}1a`, color: toneOf(t.tone) }}>{t.tag}</span></span></li>)}
       </ul>
-      <blockquote className="mt-4 rounded-2xl border-l-2 border-[var(--purple)] bg-soft p-3.5 text-[14px] leading-relaxed text-muted">“{voice.quote.text}”<cite className="mt-1.5 block text-[12px] not-italic text-faint">{voice.quote.meta}</cite></blockquote>
+      <blockquote className="mt-4 rounded-2xl border-l-2 border-[var(--purple)] bg-soft p-3.5 text-[14px] leading-relaxed text-muted">“{v.voice.quote.text}”<cite className="mt-1.5 block text-[12px] not-italic text-faint">{v.voice.quote.meta}</cite></blockquote>
     </Card>
   );
 }
-function CampaignsCard({ className = "" }: { className?: string }) {
+function CampaignsCard({ isTeam = false, className = "" }: { isTeam?: boolean; className?: string }) {
   return (
     <Card className={className}>
-      <CardHead eyebrow="Campaigns" title="Are interventions working" action={<Explore q="Which campaigns drove the most engagement lift?" />} />
+      <CardHead eyebrow="Campaigns" title="Are interventions working" action={<div className="flex items-center gap-2"><OrgWideTag show={isTeam} /><Explore q="Which campaigns drove the most engagement lift?" /></div>} />
       <ul className="mt-4 flex-1 space-y-3">
         {campaigns.map((c) => <li key={c.name} className="rounded-2xl border border-line p-3"><div className="flex items-center justify-between"><span className="text-[14px] font-semibold">{c.name}</span><span className="rounded-full px-2 py-0.5 text-[12px] font-bold" style={{ background: `${TONE.good}1a`, color: TONE.good }}>{c.lift} pts</span></div><div className="mt-1 text-[12px] text-faint">{c.audience}</div><div className="mt-2 flex items-center gap-2"><span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-soft"><span className="absolute inset-y-0 left-0 rounded-full bg-[var(--purple)]" style={{ width: `${c.participation}%` }} /></span><span className="text-[12px] font-medium text-muted">{c.participation}% joined</span></div></li>)}
       </ul>
@@ -259,7 +258,7 @@ function AttritionCard({ v, className = "" }: { v: PulseView; className?: string
       <div className="mt-2 flex flex-wrap gap-4 text-[12px] text-faint">{seg.map((s) => <span key={s.level} className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: s.color }} />{s.level} {s.count}</span>)}</div>
       <Eyebrow>Top drivers</Eyebrow>
       <ul className="mt-2 space-y-1.5">
-        {attrition.drivers.map((d) => <li key={d.label} className="flex items-center gap-3 text-[14px]"><span className="w-40 shrink-0 truncate">{d.label}</span><span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-soft"><span className="absolute inset-y-0 left-0 rounded-full bg-[var(--purple)]" style={{ width: `${d.pct * 2.5}%` }} /></span><span className="w-8 text-right text-[12px] text-faint">{d.pct}%</span></li>)}
+        {v.attrition.drivers.map((d) => <li key={d.label} className="flex items-center gap-3 text-[14px]"><span className="w-40 shrink-0 truncate">{d.label}</span><span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-soft"><span className="absolute inset-y-0 left-0 rounded-full bg-[var(--purple)]" style={{ width: `${d.pct * 2.5}%` }} /></span><span className="w-8 text-right text-[12px] text-faint">{d.pct}%</span></li>)}
       </ul>
     </Card>
   );
@@ -302,7 +301,7 @@ function RecognitionCard({ v, className = "" }: { v: PulseView; className?: stri
       </div>
       <Eyebrow>Top recognisers</Eyebrow>
       <ul className="mt-2 space-y-2">
-        {recognitionBoard.leaders.map((p, i) => <li key={p.name} className="flex items-center gap-3"><span className="w-4 text-[12px] font-bold text-faint">{i + 1}</span><Avatar src={p.img} name={p.name} size="sm" /><div className="min-w-0 flex-1"><div className="truncate text-[14px] font-semibold">{p.name}</div><div className="truncate text-[12px] text-faint">{p.team}</div></div><span className="text-[14px] font-bold tabular-nums">{p.given}</span></li>)}
+        {v.recognition.leaders.map((p, i) => <li key={p.name} className="flex items-center gap-3"><span className="w-4 text-[12px] font-bold text-faint">{i + 1}</span><Avatar src={p.img} name={p.name} size="sm" /><div className="min-w-0 flex-1"><div className="truncate text-[14px] font-semibold">{p.name}</div><div className="truncate text-[12px] text-faint">{p.team}</div></div><span className="text-[14px] font-bold tabular-nums">{p.given}</span></li>)}
       </ul>
       <div className="mt-3 flex items-start gap-2 rounded-2xl bg-soft p-3 text-[12px] text-muted"><TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: TONE.warn }} /><span>Cold zones: {recognitionExtra.lowZones.join(" · ")}</span></div>
     </Card>
@@ -365,10 +364,10 @@ function AdoptionCard({ v, className = "" }: { v: PulseView; className?: string 
     </Card>
   );
 }
-function KnowledgeCard({ className = "" }: { className?: string }) {
+function KnowledgeCard({ isTeam = false, className = "" }: { isTeam?: boolean; className?: string }) {
   return (
     <Card className={className}>
-      <CardHead eyebrow="Knowledge & AI" title="What people ask" action={<Explore q="What knowledge gaps should we close first?" />} />
+      <CardHead eyebrow="Knowledge & AI" title="What people ask" action={<div className="flex items-center gap-2"><OrgWideTag show={isTeam} /><Explore q="What knowledge gaps should we close first?" /></div>} />
       <div className="mt-3 grid grid-cols-2 gap-3">{[[aiUsage.questions, "AI questions"], [`${aiUsage.resolved}%`, "Self-resolved"]].map(([val, l]) => <div key={l} className="rounded-2xl border border-line p-3"><div className="text-[18px] font-bold tracking-tight">{val}</div><div className="mt-0.5 text-[12px] text-faint">{l}</div></div>)}</div>
       <ul className="mt-3 space-y-1.5">{knowledge.topQueries.slice(0, 3).map((q) => <li key={q.q} className="flex items-center justify-between text-[14px]"><span className="truncate">{q.q}</span><span className="text-[12px] text-faint">{q.n}</span></li>)}</ul>
       <div className="mt-auto flex items-start gap-2 rounded-2xl bg-soft p-3 text-[12px] text-muted"><Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--purple)]" /><span>{aiUsage.signal}</span></div>
@@ -509,12 +508,12 @@ export function PulseDashboard() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><HealthCard v={view} className="xl:col-span-4" /><TrendCard v={view} period={period} className="xl:col-span-8" /></div>
         <KpiRow v={view} />
         <ActionQueueCard />
-        <BusinessImpactStrip />
+        <BusinessImpactStrip isTeam={view.isTeam} />
       </>)}
 
       {tab === "Engagement" && (<>
         <TrendCard v={view} period={period} />
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><VoiceCard v={view} className="xl:col-span-7" /><CampaignsCard className="xl:col-span-5" /></div>
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><VoiceCard v={view} className="xl:col-span-7" /><CampaignsCard isTeam={view.isTeam} className="xl:col-span-5" /></div>
       </>)}
 
       {tab === "Attrition & risk" && (<>
@@ -532,7 +531,7 @@ export function PulseDashboard() {
       </>)}
 
       {tab === "Adoption" && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:items-start"><AdoptionCard v={view} /><KnowledgeCard /></div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:items-start"><AdoptionCard v={view} /><KnowledgeCard isTeam={view.isTeam} /></div>
       )}
 
       <DetailDrawer detail={detail} onClose={() => setDetail(null)} />
