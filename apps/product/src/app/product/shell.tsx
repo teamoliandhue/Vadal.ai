@@ -3,6 +3,7 @@ import { TopBar } from "./header/TopBar";
 import { Toaster } from "./Toaster";
 import { Rail } from "./Rail";
 import { SelectionAI } from "./SelectionAI";
+import { BrandProvider } from "./BrandProvider";
 
 /* ════════════════════════ shared product shell ════════════════════════
    The Lumen app chrome — sidebar rail (./Rail, client), top bar, AI dock —
@@ -28,6 +29,7 @@ export function Shell({
 }) {
   return (
     <div className="lumen flex min-h-screen bg-canvas text-ink" data-ds>
+      <BrandProvider />
       <Rail active={active} />
       <div className="relative flex min-w-0 flex-1 flex-col">
         <div className="canvas-glow" aria-hidden />

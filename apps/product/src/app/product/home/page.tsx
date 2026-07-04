@@ -6,16 +6,21 @@
    First-time/new-joiner preview: /product/home?view=new
    ════════════════════════════════════════════════════════════════════ */
 
+import Link from "next/link";
 import { ArrowRight, Award, Clock, Gift, Heart, Trophy } from "lucide-react";
 import { Avatar, Badge, Button, Trend } from "@vadal/design-system";
 import { Sparkline } from "@/components/charts";
 import { Shell } from "../shell";
-import { org, me, myRecognition, communities, myDay, engagementTrend } from "@/lib/data";
+import { org, me, myRecognition, communities, myDay, engagementTrend, myCalendar } from "@/lib/data";
 import { MoodCheck } from "./MoodCheck";
 import { MyDay } from "./MyDay";
 import { QuickPoll } from "./QuickPoll";
 import { Feed } from "./Feed";
 import { AskAi } from "./AskAi";
+import { HomeBrandLayer, VadalBadge } from "./HomeBrandLayer";
+import { CalendarCard } from "./CalendarCard";
+import { HooksCard } from "./HooksCard";
+import { ViewAsSwitch, ManagerSnapshot } from "./HomeRole";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
@@ -28,6 +33,7 @@ function greetingFor(hour: number) {
 }
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
+  // Home §1–7: client-brand band, conversational mood, calendar, hooks, view-as role.
   const firstTime = (await searchParams)?.view === "new";
   return (
     <Shell active="Home" breadcrumb="Home">
@@ -35,8 +41,11 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
         {/* LEFT (wider, action-first) — what you need to do, then who you are */}
         <div className="flex flex-col gap-6 xl:col-span-7">
+          <ManagerSnapshot />
           <MyDay empty={firstTime} />
+          <CalendarCard />
           <YouCard firstTime={firstTime} />
+          <HooksCard />
           <QuickPoll className="card-lift" firstTime={firstTime} />
           <RecognitionCard firstTime={firstTime} />
           <CommunitiesCard />
@@ -54,19 +63,24 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 /* ── 1 · Ritual hero — greeting + mood, with a focal "Up next" ── */
 function RitualHero({ firstTime }: { firstTime: boolean }) {
   const greeting = greetingFor(new Date().getHours());
-  const upNext = myDay.find((t) => t.tag === "Meeting") ?? myDay[0];
+  const upNext = myCalendar.find((e) => e.now) ?? myCalendar.find((e) => e.prep) ?? myCalendar[0];
   return (
     <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)]">
+      <HomeBrandLayer />
       <div
         className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl"
-        style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, var(--client-brand, var(--purple)), transparent 70%)" }}
         aria-hidden
       />
-      <div className="relative grid gap-8 p-7 sm:p-9 lg:grid-cols-[1.25fr_0.85fr] lg:items-start lg:gap-12">
+      <div className="relative flex flex-wrap items-center justify-between gap-3 px-7 pt-5 sm:px-9">
+        <ViewAsSwitch />
+        <VadalBadge />
+      </div>
+      <div className="relative grid gap-8 px-7 pb-7 pt-4 sm:px-9 sm:pb-9 lg:grid-cols-[1.25fr_0.85fr] lg:items-start lg:gap-12">
         <div>
           <Eyebrow>{org.date}</Eyebrow>
           <h1 className="mt-3 text-[clamp(30px,4.4vw,46px)] font-bold leading-[1.03] tracking-[-0.025em]">
-            {firstTime ? "Welcome" : greeting}, <span className="text-[var(--purple)]">{me.name}</span> <span aria-hidden>👋</span>
+            {firstTime ? "Welcome" : greeting}, <span style={{ color: "var(--client-brand, var(--purple))" }}>{me.name}</span> <span aria-hidden>👋</span>
           </h1>
           <p className="mt-3 max-w-md text-[16px] leading-relaxed text-muted">
             {firstTime ? (
@@ -87,13 +101,16 @@ function RitualHero({ firstTime }: { firstTime: boolean }) {
               <Clock className="h-[18px] w-[18px]" />
             </span>
             <div className="min-w-0">
-              <Eyebrow>Up next</Eyebrow>
+              <div className="flex items-center gap-2">
+                <Eyebrow>Up next</Eyebrow>
+                <span className="flex items-center gap-1 text-[11px] font-medium text-faint"><span aria-hidden>📅</span> Google Calendar</span>
+              </div>
               <p className="truncate text-[14px] font-semibold">
-                {upNext.title} <span className="font-normal text-faint">· {upNext.meta}</span>
+                {upNext.title} <span className="font-normal text-faint">· {upNext.time} · {upNext.with}</span>
               </p>
             </div>
           </div>
-          <Button variant="brand" size="sm">{upNext.action}</Button>
+          <Button variant="brand" size="sm">{upNext.now ? "Join" : upNext.prep ? "Prep" : "View"}</Button>
         </div>
       )}
     </header>
@@ -163,9 +180,11 @@ function YouCard({ className = "", firstTime = false }: { className?: string; fi
         </div>
       </div>
 
-      <Button variant="tertiary" leadingIcon={<Trophy className="h-4 w-4 text-[var(--purple)]" />} className="mt-auto w-full">
-        View leaderboard
-      </Button>
+      <Link href="/product/recognition" className="mt-auto block">
+        <Button variant="tertiary" leadingIcon={<Trophy className="h-4 w-4 text-[var(--purple)]" />} className="w-full">
+          View leaderboard
+        </Button>
+      </Link>
     </section>
   );
 }
@@ -202,9 +221,11 @@ function RecognitionCard({ className = "", firstTime = false }: { className?: st
           ))}
         </ul>
       )}
-      <Button variant="tertiary" leadingIcon={<Gift className="h-4 w-4 text-[var(--purple)]" />} className="mt-auto w-full">
-        Recognise a teammate
-      </Button>
+      <Link href="/product/recognition" className="mt-auto block">
+        <Button variant="tertiary" leadingIcon={<Gift className="h-4 w-4 text-[var(--purple)]" />} className="w-full">
+          Recognise a teammate
+        </Button>
+      </Link>
     </section>
   );
 }

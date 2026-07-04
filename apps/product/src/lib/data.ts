@@ -536,6 +536,24 @@ export const poll = {
   ],
 } as const;
 
+/* Today's calendar — synced from Google Calendar (Home §4). `kind` drives the
+   accent; `prep` marks events Vadal can prep for. */
+export const myCalendar = [
+  { time: "10:00", title: "Design standup", kind: "Team", mins: 15, with: "Design pod", now: false, prep: false },
+  { time: "13:00", title: "Roadmap review", kind: "Review", mins: 45, with: "Product + Design", now: true, prep: true },
+  { time: "15:00", title: "1:1 with Anita", kind: "Meeting", mins: 30, with: "Anita Desai", now: false, prep: true },
+  { time: "16:30", title: "Design critique", kind: "Team", mins: 60, with: "Design pod", now: false, prep: false },
+] as const;
+
+/* Daily-adoption hooks (Home §6) — optional widgets that give people a reason to
+   open the app every day. `connected` seeds which are already on. */
+export const homeHooks = [
+  { key: "health", label: "Health & steps", emoji: "⌚", desc: "Sync Fitbit — earn streak points for staying active.", connected: true, stat: "8,240 steps · 6-day streak" },
+  { key: "learning", label: "Daily learning", emoji: "📚", desc: "A 5-minute micro-lesson, earns 50 points.", connected: true, stat: "Giving feedback · 2 min left" },
+  { key: "visitor", label: "Visitor pass", emoji: "🚪", desc: "Pre-register guests and skip the front desk.", connected: false, stat: "" },
+  { key: "commute", label: "Commute & parking", emoji: "🅿️", desc: "Reserve a desk or parking spot for office days.", connected: false, stat: "" },
+] as const;
+
 /* ════════════════════════════════════════════════════════════════════
    HEADER — global app chrome (TopBar): notifications, search index, people.
    ════════════════════════════════════════════════════════════════════ */

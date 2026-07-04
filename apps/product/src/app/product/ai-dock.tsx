@@ -9,7 +9,7 @@ import { ArrowUp, FileText, ThumbsDown, ThumbsUp, X } from "lucide-react";
 import { SparkMark } from "@vadal/design-system";
 import { toast } from "./Toaster";
 
-type ActionKind = "leave-request" | "raise-ticket" | "open-prep" | "give-kudos" | "navigate";
+type ActionKind = "leave-request" | "raise-ticket" | "open-prep" | "give-kudos" | "navigate" | "wellbeing";
 type Action = { label: string; kind: ActionKind; href?: string; primary?: boolean };
 type Msg = {
   role: "user" | "ai";
@@ -29,6 +29,12 @@ type Answer = { text: string; sources?: string[]; actions?: Action[] };
 
 function aiResponse(q: string): Answer {
   const s = q.toLowerCase();
+  if (s.includes("feeling") || s.includes("i feel") || s.includes("struggling") || s.includes("stressed") || s.includes("overwhelmed") || s.includes("burn"))
+    return {
+      text: "Thanks for sharing that — it stays private to you. What's driving it most today? Even a word helps. If it's workload or something a person should hear, I can point you the right way.",
+      sources: ["Wellbeing", "Confidential"],
+      actions: [{ label: "Talk to someone confidentially", kind: "wellbeing", primary: true }, { label: "Wellbeing resources", kind: "navigate", href: "/product/knowledge" }],
+    };
   if (s.includes("leave") || s.includes("time off"))
     return {
       text: "You have 14 paid-leave days left this year (3 pending approval). Want me to start a request?",
@@ -66,6 +72,7 @@ function aiResponse(q: string): Answer {
 
 function followups(q: string): string[] {
   const s = q.toLowerCase();
+  if (s.includes("feeling") || s.includes("i feel") || s.includes("struggling") || s.includes("stressed") || s.includes("overwhelmed") || s.includes("burn")) return ["It's my workload", "It's going well actually", "What support is there?"];
   if (s.includes("leave") || s.includes("time off")) return ["Start a leave request", "Show my leave history", "Who approves it?"];
   if (s.includes("1:1") || s.includes("meeting") || s.includes("next")) return ["Open the prep doc", "Reschedule it", "Last 1:1 notes"];
   if (s.includes("payslip") || s.includes("payroll")) return ["Raise the ticket", "When is payday?", "Update bank details"];
@@ -77,6 +84,7 @@ function followups(q: string): string[] {
 /* Short "what I'm doing" lines shown while thinking — feels like real work, not a stall. */
 function reasoningSteps(q: string): string[] {
   const s = q.toLowerCase();
+  if (s.includes("feeling") || s.includes("i feel") || s.includes("struggling") || s.includes("stressed") || s.includes("overwhelmed") || s.includes("burn")) return ["Noting your check-in…", "Keeping this private to you…"];
   if (s.includes("leave") || s.includes("time off")) return ["Reading your leave balance…", "Checking the leave policy…"];
   if (s.includes("1:1") || s.includes("meeting") || s.includes("next")) return ["Checking your calendar…", "Finding the prep doc…"];
   if (s.includes("payslip") || s.includes("payroll")) return ["Locating the payroll owner…", "Checking your access…"];
@@ -167,6 +175,7 @@ export function AiDock() {
       case "raise-ticket": toast("Payslip-access ticket raised ✓"); break;
       case "open-prep": toast("Opening your 1:1 prep doc…"); break;
       case "give-kudos": toast("Kudos sent to Anita 💜"); break;
+      case "wellbeing": toast("A confidential wellbeing chat is booked 💙"); break;
       case "navigate": if (a.href) { setOpen(false); router.push(a.href); } break;
     }
   }

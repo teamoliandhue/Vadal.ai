@@ -16,6 +16,7 @@ import {
 } from "@vadal/design-system";
 import { org, health } from "@/lib/data";
 import { toast } from "./Toaster";
+import { useBrand } from "./useBrand";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 
@@ -51,26 +52,27 @@ const RAIL: RailGroup[] = [
   {
     label: "Engage",
     items: [
-      { label: "Recognition", icon: HeartHandshake, href: "/product/recognition", soon: true },
-      { label: "Campaigns", icon: Megaphone, href: "/product/campaigns", soon: true },
+      { label: "Recognition", icon: HeartHandshake, href: "/product/recognition" },
+      { label: "Campaigns", icon: Megaphone, href: "/product/campaigns" },
     ],
   },
   {
     label: "Operations",
     items: [
-      { label: "Manager hub", icon: UsersRound, href: "/product/managers", soon: true },
-      { label: "Cases", icon: FolderKanban, href: "/product/cases", soon: true },
+      { label: "Manager hub", icon: UsersRound, href: "/product/managers" },
+      { label: "Cases", icon: FolderKanban, href: "/product/cases" },
     ],
   },
   {
     label: "Knowledge",
-    items: [{ label: "Knowledge", icon: BookOpen, href: "/product/knowledge", soon: true }],
+    items: [{ label: "Knowledge", icon: BookOpen, href: "/product/knowledge" }],
   },
 ];
 
 export function Rail({ active }: { active: string }) {
   const [wsOpen, setWsOpen] = React.useState(false);
   const wsRef = React.useRef<HTMLDivElement>(null);
+  const { white } = useBrand(); // white-label hides the Vadal wordmark
 
   React.useEffect(() => {
     if (!wsOpen) return;
@@ -89,13 +91,18 @@ export function Rail({ active }: { active: string }) {
     <Sidebar
       className="max-lg:hidden"
       logo={
-        <Link href="/product" className="flex items-center gap-2.5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/signal-mark.svg" alt="Vadal" className="h-7 w-auto" />
-          <span className="text-[16px] font-bold tracking-tight text-[var(--ink)]">
-            vadal<span className="text-[var(--brand)]">.ai</span>
-          </span>
-        </Link>
+        // White-labelled: hide the Vadal mark entirely. The workspace switcher
+        // below already carries the client's logo + name, so showing it here too
+        // would just repeat it.
+        white ? undefined : (
+          <Link href="/product" className="flex items-center gap-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/signal-mark.svg" alt="Vadal" className="h-7 w-auto" />
+            <span className="text-[16px] font-bold tracking-tight text-[var(--ink)]">
+              vadal<span className="text-[var(--brand)]">.ai</span>
+            </span>
+          </Link>
+        )
       }
       workspace={
         <div ref={wsRef} className="relative">

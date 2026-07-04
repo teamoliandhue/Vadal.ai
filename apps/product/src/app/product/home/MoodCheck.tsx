@@ -2,8 +2,8 @@
 /* The daily ritual (Notion Home spec §2.2) — lives inside the hero band. Card-less.
    Default → selected (+ optional why) → confirmed. Persists today's check-in + toasts. */
 import * as React from "react";
-import { Check } from "lucide-react";
-import { Button } from "@vadal/design-system";
+import { Check, Sparkles } from "lucide-react";
+import { Button, SparkMark } from "@vadal/design-system";
 import { moods, me } from "@/lib/data";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { toast } from "../Toaster";
@@ -12,17 +12,25 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
 }
 
+const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
+
 export function MoodCheck({ firstTime = false }: { firstTime?: boolean }) {
   const [logged, setLogged] = usePersistentState<{ mood: string } | null>("vadal:mood", null);
   const [selected, setSelected] = React.useState<string | null>(null);
   const [note, setNote] = React.useState("");
   const streak = (firstTime ? 0 : me.streak) + 1;
 
-  function log() {
+  /* Open Vadal to talk it through — the conversational follow-up (Amber-style). */
+  function talkItThrough(mood: string, why?: string) {
+    ask(`I'm feeling ${mood.toLowerCase()} today${why ? ` — ${why}` : ""}.`);
+  }
+
+  function log(talk = false) {
     if (!selected) return;
     setLogged({ mood: selected });
     const m = moods.find((x) => x.label === selected);
-    toast(`Mood logged ${m?.emoji ?? ""} — ${streak}-day streak`);
+    if (talk) talkItThrough(selected, note.trim() || undefined);
+    else toast(`Mood logged ${m?.emoji ?? ""} — ${streak}-day streak`);
   }
 
   if (logged) {
@@ -44,6 +52,9 @@ export function MoodCheck({ firstTime = false }: { firstTime?: boolean }) {
                 Change
               </button>
             </p>
+            <button onClick={() => talkItThrough(logged.mood)} className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--ai-accent)] transition hover:gap-2">
+              <Sparkles className="h-3.5 w-3.5" /> Want to talk about it? →
+            </button>
           </div>
         </div>
       </div>
@@ -74,17 +85,20 @@ export function MoodCheck({ firstTime = false }: { firstTime?: boolean }) {
         })}
       </div>
       {selected ? (
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-3 flex flex-col gap-2">
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Add a line on why (optional)…"
-            className="min-w-0 flex-1 rounded-xl border border-line bg-card px-3.5 py-2.5 text-[14px] outline-none transition focus:border-[var(--purple)]"
+            className="w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-[14px] outline-none transition focus:border-[var(--purple)]"
           />
-          <Button variant="brand" onClick={log}>Log</Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="brand" onClick={() => log(false)}>Log</Button>
+            <Button variant="secondary" leadingIcon={<SparkMark size={14} tone="solid" />} onClick={() => log(true)}>Talk it through</Button>
+          </div>
         </div>
       ) : (
-        <p className="mt-3 text-[14px] text-faint">Takes 5 seconds — private to you, helps us fix things early.</p>
+        <p className="mt-3 text-[14px] text-faint">Takes 5 seconds — private to you. Tap a mood, then log it or talk it through with Vadal.</p>
       )}
     </div>
   );
