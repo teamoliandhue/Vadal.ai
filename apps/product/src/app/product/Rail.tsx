@@ -1,9 +1,9 @@
 "use client";
 /* The product sidebar rail (client) — composes the DS Sidebar from real,
-   interactive parts: the Signal brand mark, a working WorkspaceSwitcher +
-   WorkspaceMenu dropdown, an AI-briefing that opens the AI dock, a Health card
-   that routes to Pulse, and the nav groups. `active` highlights the current item. */
-import Link from "next/link";
+   interactive parts: a working WorkspaceSwitcher + WorkspaceMenu dropdown (the
+   top-of-sidebar identity), an AI-briefing that opens the AI dock, a Health card
+   that routes to Pulse, and the nav groups. `active` highlights the current item.
+   The Vadal wordmark is intentionally not shown here (client decision). */
 import * as React from "react";
 import {
   BarChart3, BookOpen, ClipboardList, FolderKanban, Gauge, HeartHandshake,
@@ -16,7 +16,6 @@ import {
 } from "@vadal/design-system";
 import { org, health } from "@/lib/data";
 import { toast } from "./Toaster";
-import { useBrand } from "./useBrand";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 
@@ -72,7 +71,6 @@ const RAIL: RailGroup[] = [
 export function Rail({ active }: { active: string }) {
   const [wsOpen, setWsOpen] = React.useState(false);
   const wsRef = React.useRef<HTMLDivElement>(null);
-  const { white } = useBrand(); // white-label hides the Vadal wordmark
 
   React.useEffect(() => {
     if (!wsOpen) return;
@@ -90,20 +88,8 @@ export function Rail({ active }: { active: string }) {
   return (
     <Sidebar
       className="max-lg:hidden"
-      logo={
-        // White-labelled: hide the Vadal mark entirely. The workspace switcher
-        // below already carries the client's logo + name, so showing it here too
-        // would just repeat it.
-        white ? undefined : (
-          <Link href="/product" className="flex items-center gap-2.5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/signal-mark.svg" alt="Vadal" className="h-7 w-auto" />
-            <span className="text-[16px] font-bold tracking-tight text-[var(--ink)]">
-              vadal<span className="text-[var(--brand)]">.ai</span>
-            </span>
-          </Link>
-        )
-      }
+      /* Vadal wordmark intentionally omitted (client decision) — the workspace
+         switcher below is the top-of-sidebar identity. */
       workspace={
         <div ref={wsRef} className="relative">
           <WorkspaceSwitcher name={org.name} meta={meta} logo={wsLogo} open={wsOpen} onClick={() => setWsOpen((o) => !o)} />
