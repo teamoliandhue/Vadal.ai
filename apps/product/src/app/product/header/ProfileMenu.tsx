@@ -4,8 +4,10 @@
 import * as React from "react";
 import Image from "next/image";
 import { ChevronDown, Keyboard, LifeBuoy, LogOut, Repeat, Settings, Trophy, UserPlus, UserRound, Building2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { MenuItem } from "@vadal/design-system";
 import { me } from "@/lib/data";
+import { getSession, setSession } from "@/lib/auth";
 import { useMenu } from "./useMenu";
 import { toast } from "../Toaster";
 import { useViewAs } from "../useViewAs";
@@ -19,9 +21,18 @@ const ACCOUNT = [
 ];
 
 export function ProfileMenu() {
+  const router = useRouter();
   const { open, setOpen, ref } = useMenu();
   const [role] = useViewAs();
   const canAdmin = role !== "employee"; // workspace controls are manager/admin-only
+  const session = typeof window !== "undefined" ? getSession() : null;
+
+  function signOut() {
+    setOpen(false);
+    setSession(null);
+    toast("Signed out — see you tomorrow 👋", "info");
+    router.push("/auth");
+  }
 
   return (
     <div ref={ref} className="relative">
@@ -42,10 +53,10 @@ export function ProfileMenu() {
         >
           {/* identity */}
           <div className="flex items-center gap-3 px-2 py-2">
-            <Image src={me.img} alt={me.fullName} width={40} height={40} className="h-10 w-10 rounded-full object-cover" />
+            <Image src={session?.img ?? me.img} alt={session?.name ?? me.fullName} width={40} height={40} className="h-10 w-10 rounded-full object-cover" />
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[14px] font-semibold">{me.fullName}</div>
-              <div className="truncate text-[12px] text-faint">{me.email}</div>
+              <div className="truncate text-[14px] font-semibold">{session?.name ?? me.fullName}</div>
+              <div className="truncate text-[12px] text-faint">{session?.email ?? me.email}</div>
             </div>
           </div>
           {/* points & badges pill */}
@@ -76,7 +87,7 @@ export function ProfileMenu() {
 
           <button
             type="button"
-            onClick={() => { setOpen(false); toast("Signed out (demo)", "info"); }}
+            onClick={signOut}
             className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm font-medium text-[#dc4a44] outline-none transition-colors hover:bg-[#fbecec] focus-visible:bg-[#fbecec] dark:hover:bg-[#3a1d1d] dark:focus-visible:bg-[#3a1d1d]"
           >
             <span className="grid size-5 shrink-0 place-items-center" aria-hidden><LogOut className="h-[18px] w-[18px]" strokeWidth={1.85} /></span>

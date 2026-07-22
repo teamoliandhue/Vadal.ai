@@ -4,6 +4,7 @@ import { Toaster } from "./Toaster";
 import { Rail } from "./Rail";
 import { SelectionAI } from "./SelectionAI";
 import { BrandProvider } from "./BrandProvider";
+import { AuthGuard } from "./AuthGuard";
 
 /* ════════════════════════ shared product shell ════════════════════════
    The Lumen app chrome — sidebar rail (./Rail, client), top bar, AI dock —
@@ -28,6 +29,7 @@ export function Shell({
   children: React.ReactNode;
 }) {
   return (
+    <AuthGuard>
     <div className="lumen flex min-h-screen bg-canvas text-ink" data-ds>
       <BrandProvider />
       <Rail active={active} />
@@ -42,6 +44,7 @@ export function Shell({
       <SelectionAI />
       <Toaster />
     </div>
+    </AuthGuard>
   );
 }
 
