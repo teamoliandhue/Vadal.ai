@@ -88,7 +88,7 @@ export function AuthFlow() {
         </div>
 
         <div className="relative mx-auto flex w-full max-w-[400px] flex-1 flex-col justify-center py-10">
-        <div className="rise">
+        <div key={step} className="af-step">
           {step === "email" && (
             <>
               <h1 className="text-[28px] font-bold leading-[1.1] tracking-[-0.02em]">The pulse of your company, daily.</h1>
@@ -163,7 +163,7 @@ export function AuthFlow() {
                     inputMode="numeric"
                     onChange={(e) => typeOtp(i, e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Backspace" && !code[i] && i > 0) otpRefs.current[i - 1]?.focus(); }}
-                    className="h-13 w-12 rounded-xl border border-line bg-card text-center text-[20px] font-bold outline-none transition focus:border-[var(--purple)]"
+                    className={`h-13 w-12 rounded-xl border border-line bg-card text-center text-[20px] font-bold outline-none transition focus:border-[var(--purple)] ${d ? "af-otp-filled" : ""}`}
                     style={{ height: 52 }}
                     aria-label={`Digit ${i + 1}`}
                   />
@@ -194,6 +194,14 @@ export function AuthFlow() {
 
       {/* ── RIGHT · the product showcase ── */}
       <Showcase variant={STEP_SHOWCASE[step]} />
+
+      <style>{`
+        .af-step { animation: afStepIn .42s cubic-bezier(.22,.9,.3,1) both; }
+        .af-otp-filled { border-color: var(--purple); animation: afOtpPop .22s cubic-bezier(.34,1.56,.64,1); }
+        @keyframes afStepIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes afOtpPop { 0% { transform: scale(1); } 55% { transform: scale(1.09); } 100% { transform: scale(1); } }
+        @media (prefers-reduced-motion: reduce) { .af-step, .af-otp-filled { animation: none !important; } }
+      `}</style>
     </div>
   );
 }

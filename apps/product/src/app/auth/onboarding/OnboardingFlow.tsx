@@ -63,6 +63,7 @@ export function OnboardingFlow() {
   const router = useRouter();
   const [session, setSess] = React.useState<Session | null>(null);
   const [i, setI] = React.useState(0);
+  const [finishing, setFinishing] = React.useState(false);
   // step-local demo state
   const [picked, setPicked] = React.useState<string[]>([]);
   const [notifs, setNotifs] = React.useState({ recognition: true, surveys: true, digest: true });
@@ -86,11 +87,13 @@ export function OnboardingFlow() {
 
   function next() {
     if (i < steps.length - 1) { setI(i + 1); return; }
+    // the launch moment — a brief branded beat before landing on Home
+    setFinishing(true);
     markOnboarded(session!.email);
     if (role === "admin" && brand) {
       try { localStorage.setItem("vadal:brand-color", JSON.stringify(brand)); window.dispatchEvent(new Event("vadal:brand")); } catch { /* ignore */ }
     }
-    router.push("/product/home");
+    window.setTimeout(() => router.push("/product/home"), 1400);
   }
 
   const toggleCommunity = (name: string) => setPicked((p) => (p.includes(name) ? p.filter((x) => x !== name) : [...p, name]));
@@ -117,7 +120,7 @@ export function OnboardingFlow() {
 
         <div className="relative mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center py-10">
         <Eyebrow>{ROLE_LABEL[session.role]} · setup · {i + 1} of {steps.length}</Eyebrow>
-        <div className="rise mt-3">
+        <div key={step.key} className="ob-step mt-3">
           {/* ── shared: profile ── */}
           {step.key === "profile" && (
             <>
@@ -348,6 +351,30 @@ export function OnboardingFlow() {
 
       {/* ── RIGHT · the step-relevant product showcase ── */}
       <Showcase variant={STEP_SHOWCASE[step.key] ?? "pulse"} />
+
+      {/* the launch moment */}
+      {finishing && (
+        <div className="ob-launch fixed inset-0 z-50 grid place-items-center bg-[#101014]">
+          <div className="ob-launch-glow pointer-events-none absolute h-[560px] w-[560px] rounded-full blur-3xl" aria-hidden />
+          <div className="relative flex flex-col items-center gap-4 text-center">
+            <span className="ai-grad ob-launch-mark grid h-16 w-16 place-items-center rounded-full"><SparkMark size={34} tone="solid" state="thinking" /></span>
+            <p className="text-[20px] font-bold tracking-tight text-white">{role === "admin" ? `Launching ${tenant.name}'s workspace…` : `Setting up your space, ${session.name.split(" ")[0]}…`}</p>
+            <p className="text-[13px] text-zinc-400">{role === "admin" ? "Branding applied · domains verified · guardrails on" : "Your day, your feed and Vadal AI are ready."}</p>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        .ob-step { animation: obStepIn .42s cubic-bezier(.22,.9,.3,1) both; }
+        .ob-launch { animation: obFadeIn .45s ease-out both; }
+        .ob-launch-glow { background: radial-gradient(circle, rgba(109,93,240,.45), rgba(45,212,191,.18) 55%, transparent 72%); animation: obGlowPulse 1.6s ease-in-out infinite alternate; }
+        .ob-launch-mark { animation: obMarkIn .6s cubic-bezier(.34,1.56,.64,1) both; box-shadow: 0 0 60px rgba(139,124,248,.45); }
+        @keyframes obStepIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes obFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes obGlowPulse { from { transform: scale(.92); opacity: .8; } to { transform: scale(1.06); opacity: 1; } }
+        @keyframes obMarkIn { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: scale(1); } }
+        @media (prefers-reduced-motion: reduce) { .ob-step, .ob-launch, .ob-launch-glow, .ob-launch-mark { animation: none !important; } }
+      `}</style>
     </div>
   );
 }
