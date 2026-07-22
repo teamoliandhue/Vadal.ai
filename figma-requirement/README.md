@@ -19,3 +19,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | # | Spec | Status |
 |---|------|--------|
 | 001 | [Authentication & Onboarding](./001-authentication-onboarding.md) | Built · needs Figma |
+| 002 | [Auth split-screen redesign (Fireflies pattern)](./002-auth-split-screen-redesign.md) | Built · needs Figma |

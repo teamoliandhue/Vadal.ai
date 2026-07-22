@@ -19,8 +19,16 @@ import { getSession, markOnboarded, ROLE_LABEL, TENANTS, type Role, type Session
 import { communities, moods } from "@/lib/data";
 import { reports, team } from "@/lib/manager";
 import { brandSwatches } from "@/lib/settings";
+import { Showcase, type ShowcaseVariant } from "../Showcase";
 
 const soft = (c: string, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
+
+/* which product moment the right panel shows for each step */
+const STEP_SHOWCASE: Record<string, ShowcaseVariant> = {
+  profile: "pulse", communities: "recognition", notifications: "ai", checkin: "privacy",
+  ai: "ai", team: "manager", cadence: "manager", branding: "branding", signin: "privacy",
+  invite: "recognition", guardrails: "privacy",
+};
 
 type StepDef = { key: string; label: string };
 const TRACKS: Record<Exclude<Role, "superadmin">, StepDef[]> = {
@@ -88,26 +96,28 @@ export function OnboardingFlow() {
   const toggleCommunity = (name: string) => setPicked((p) => (p.includes(name) ? p.filter((x) => x !== name) : [...p, name]));
 
   return (
-    <div className="lumen relative flex min-h-screen items-center justify-center overflow-hidden bg-canvas px-4 py-10 text-ink" data-ds>
-      <div className="pointer-events-none absolute -right-40 -top-40 h-[480px] w-[480px] rounded-full opacity-[0.10] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
+    <div className="lumen grid min-h-screen bg-canvas text-ink lg:grid-cols-2" data-ds>
+      {/* ── LEFT · the step column ── */}
+      <div className="relative flex min-h-screen flex-col overflow-hidden px-6 py-8 sm:px-12">
+        <div className="pointer-events-none absolute -left-40 -top-40 h-[420px] w-[420px] rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
 
-      <div className="relative w-full max-w-[520px]">
-        {/* progress */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <Eyebrow>{ROLE_LABEL[session.role]} · setup</Eyebrow>
-            <span className="text-[12px] font-semibold tabular-nums text-faint">{i + 1} / {steps.length}</span>
+        {/* brand + progress dots — Fireflies-style header row */}
+        <div className="relative flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/signal-mark.svg" alt="Vadal" className="h-7 w-auto" />
+            <span className="text-[15px] font-bold tracking-tight">vadal<span className="text-[var(--brand)]">.ai</span></span>
           </div>
-          <div className="mt-2.5 flex gap-1.5">
+          <div className="flex items-center gap-1.5" aria-label={`Step ${i + 1} of ${steps.length}`}>
             {steps.map((s, k) => (
-              <span key={s.key} className="h-1.5 flex-1 overflow-hidden rounded-full bg-soft">
-                <span className="block h-full rounded-full bg-[var(--purple)] transition-all duration-500" style={{ width: k < i ? "100%" : k === i ? "50%" : "0%" }} />
-              </span>
+              <span key={s.key} className="h-1.5 rounded-full transition-all duration-500" style={{ width: k === i ? 22 : 8, background: k <= i ? "var(--purple)" : "var(--line)" }} />
             ))}
           </div>
         </div>
 
-        <div className="rise rounded-[26px] border border-line bg-card p-7 shadow-[0_1px_2px_rgba(20,20,40,0.04),0_24px_60px_-28px_rgba(20,20,40,0.28)] sm:p-8">
+        <div className="relative mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center py-10">
+        <Eyebrow>{ROLE_LABEL[session.role]} · setup · {i + 1} of {steps.length}</Eyebrow>
+        <div className="rise mt-3">
           {/* ── shared: profile ── */}
           {step.key === "profile" && (
             <>
@@ -329,11 +339,15 @@ export function OnboardingFlow() {
             </Button>
           </div>
         </div>
+        </div>
 
-        <p className="mt-5 flex items-center justify-center gap-1.5 text-[12px] text-faint">
+        <p className="relative flex items-center gap-1.5 text-[12px] text-faint">
           {role === "admin" ? <><Building2 className="h-3.5 w-3.5" /> Setting up {tenant.name} · you can revisit everything in Settings</> : role === "manager" ? <><Users className="h-3.5 w-3.5" /> Your team&rsquo;s data stays scoped to you and HR</> : <><HeartHandshake className="h-3.5 w-3.5" /> Your check-ins are private to you</>}
         </p>
       </div>
+
+      {/* ── RIGHT · the step-relevant product showcase ── */}
+      <Showcase variant={STEP_SHOWCASE[step.key] ?? "pulse"} />
     </div>
   );
 }

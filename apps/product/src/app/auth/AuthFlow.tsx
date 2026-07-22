@@ -4,7 +4,9 @@
    message; unknown domains get a "workspace not found → talk to us" path.
    Step 2: the domain routes to the workspace → continue with its SSO, or a
    6-digit email code (demo shows the code inline). New users then go through
-   role-based onboarding; returning users land on Home. */
+   role-based onboarding; returning users land on Home.
+   Layout: Fireflies-pattern split screen — form column left, dark Showcase
+   panel (real product-UI moments + testimonial) right. */
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Building2, KeyRound, Lock, Mail } from "lucide-react";
@@ -12,8 +14,10 @@ import { Button, SparkMark } from "@vadal/design-system";
 import {
   checkEmail, demoOtp, DEMO_PERSONAS, sessionFor, setSession, type Tenant,
 } from "@/lib/auth";
+import { Showcase, type ShowcaseVariant } from "./Showcase";
 
 type Step = "email" | "method" | "otp";
+const STEP_SHOWCASE: Record<Step, ShowcaseVariant> = { email: "pulse", method: "ai", otp: "privacy" };
 
 export function AuthFlow() {
   const router = useRouter();
@@ -71,24 +75,24 @@ export function AuthFlow() {
   }
 
   return (
-    <div className="lumen relative flex min-h-screen items-center justify-center overflow-hidden bg-canvas px-4 text-ink" data-ds>
-      {/* ambient brand glow */}
-      <div className="pointer-events-none absolute -left-40 -top-40 h-[480px] w-[480px] rounded-full opacity-[0.10] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
-      <div className="pointer-events-none absolute -bottom-40 -right-40 h-[480px] w-[480px] rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, #2dd4bf, transparent 70%)" }} aria-hidden />
+    <div className="lumen grid min-h-screen bg-canvas text-ink lg:grid-cols-2" data-ds>
+      {/* ── LEFT · the form column ── */}
+      <div className="relative flex min-h-screen flex-col overflow-hidden px-6 py-8 sm:px-12">
+        <div className="pointer-events-none absolute -left-40 -top-40 h-[420px] w-[420px] rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
 
-      <div className="relative w-full max-w-[420px]">
-        {/* the "in a flash" brand moment — Vadal appears at sign-in, then gets out of the way */}
-        <div className="mb-8 flex flex-col items-center gap-3">
+        {/* brand — top-left, Fireflies-style */}
+        <div className="relative flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/signal-mark.svg" alt="Vadal" className="h-10 w-auto" />
-          <p className="text-[13px] text-faint">The pulse of your company, daily.</p>
+          <img src="/brand/signal-mark.svg" alt="Vadal" className="h-7 w-auto" />
+          <span className="text-[15px] font-bold tracking-tight">vadal<span className="text-[var(--brand)]">.ai</span></span>
         </div>
 
-        <div className="rise rounded-[26px] border border-line bg-card p-7 shadow-[0_1px_2px_rgba(20,20,40,0.04),0_24px_60px_-28px_rgba(20,20,40,0.28)] sm:p-8">
+        <div className="relative mx-auto flex w-full max-w-[400px] flex-1 flex-col justify-center py-10">
+        <div className="rise">
           {step === "email" && (
             <>
-              <h1 className="text-[22px] font-bold tracking-tight">Sign in to your workspace</h1>
-              <p className="mt-1.5 text-[14px] text-muted">Use your <b className="font-semibold text-ink">company email</b> — it routes you to the right workspace.</p>
+              <h1 className="text-[28px] font-bold leading-[1.1] tracking-[-0.02em]">The pulse of your company, daily.</h1>
+              <p className="mt-2.5 text-[14px] leading-relaxed text-muted">Sign in with your <b className="font-semibold text-ink">company email</b> — it routes you to the right workspace.</p>
               <form className="mt-5" onSubmit={(e) => { e.preventDefault(); submitEmail(email); }}>
                 <label className="block">
                   <span className="text-[12px] font-semibold text-faint">Work email</span>
@@ -175,14 +179,21 @@ export function AuthFlow() {
             </>
           )}
         </div>
+        </div>
 
-        <p className="mt-6 flex items-center justify-center gap-1.5 text-[12px] text-faint">
-          <Building2 className="h-3.5 w-3.5" /> Company workspaces only · SOC 2 · Data stays in your region
-        </p>
-        <p className="mt-2 flex items-center justify-center gap-1 text-[11px] text-faint/80">
-          Powered by <SparkMark size={11} /> Vadal
-        </p>
+        {/* trust footer — bottom of the form column */}
+        <div className="relative">
+          <p className="flex items-center gap-1.5 text-[12px] text-faint">
+            <Building2 className="h-3.5 w-3.5" /> Company workspaces only · SOC 2 · Data stays in your region
+          </p>
+          <p className="mt-1.5 flex items-center gap-1 text-[11px] text-faint/80">
+            Powered by <SparkMark size={11} /> Vadal
+          </p>
+        </div>
       </div>
+
+      {/* ── RIGHT · the product showcase ── */}
+      <Showcase variant={STEP_SHOWCASE[step]} />
     </div>
   );
 }
