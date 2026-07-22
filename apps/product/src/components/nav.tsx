@@ -8,13 +8,14 @@ import { Mark, IRIS_PICK } from "./mark";
    Dashboard → the project dashboard (the hub, where design system, assets,
    docs and the journey live). DS Doc / Assets / Project Doc are not built
    yet — shown greyed with a "Soon" tag. Journey lives in the dashboard.
-   Hidden on /product (the full-screen Lumen dashboard has its own chrome). */
+   Hidden on /product (the full-screen Lumen dashboard has its own chrome)
+   and on /auth (sign-in/onboarding are a clean, chrome-free canvas). */
 const DASHBOARD_URL = "https://vadal-hub.vercel.app";
 const SOON = ["DS Doc", "Assets", "Project Doc"];
 
 export function Nav() {
   const path = usePathname();
-  if (path?.startsWith("/product")) return null;
+  if (path?.startsWith("/product") || path?.startsWith("/auth")) return null;
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white/80 backdrop-blur-md">

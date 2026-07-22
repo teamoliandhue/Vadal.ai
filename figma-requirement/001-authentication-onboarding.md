@@ -40,6 +40,8 @@ JIT-provisioned as Employees ("New joiner") and go through employee onboarding.
 Centered 420px card on the canvas with two soft radial glows (violet top-left, teal
 bottom-right). Above the card: **Signal mark** + tagline "The pulse of your company, daily."
 Below: "🏢 Company workspaces only · SOC 2 · Data stays in your region" + "Powered by ✦ Vadal".
+**No app chrome anywhere on auth screens** — no top nav, no sidebar; the page is a clean,
+full-bleed canvas (sign-in and onboarding both).
 
 **Step A — Work email**
 - H1 "Sign in to your workspace", helper line emphasising **company email**.
