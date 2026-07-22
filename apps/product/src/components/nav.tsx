@@ -10,7 +10,7 @@ import { Mark, IRIS_PICK } from "./mark";
    yet — shown greyed with a "Soon" tag. Journey lives in the dashboard.
    Hidden on /product (the full-screen Lumen dashboard has its own chrome)
    and on /auth (sign-in/onboarding are a clean, chrome-free canvas). */
-const DASHBOARD_URL = "https://vadal-hub.vercel.app";
+const DASHBOARD_URL = "https://vadal-hub-kappa.vercel.app";
 const SOON = ["DS Doc", "Assets", "Project Doc"];
 
 export function Nav() {
