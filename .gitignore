@@ -4,3 +4,6 @@ node_modules/
 .next/
 .vercel
 Branding Mockups/
+
+# Competitor demo recordings — 7.7GB of local research video/audio, never commit
+docs/Demos/
