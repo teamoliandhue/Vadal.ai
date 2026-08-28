@@ -159,3 +159,90 @@ across the rest of the product — worth a pass.
 3. `Mark` — four platforms, three sizes
 4. Post card with image, and the text-only variant
 5. The three rail cards, including the collapsed platform-status line
+
+---
+
+# 010b · Finishing the job — share routes and the decline
+
+Added after the redesign. Two changes that move Amplify from a caption generator
+to something that actually completes the task and treats the person as a volunteer.
+
+## 9 · The share step — `Component / Amplify / ShareActions`
+
+Previously the screen wrote the caption and handed over a clipboard: copy, switch
+app, find the post, paste, publish. Four steps in someone else's product, which is
+where advocacy programmes die.
+
+**The route differs per platform, because the platforms differ.** Designing one
+"Copy caption" button for all four pretended otherwise.
+
+| Route | When | Primary button | Explanation shown |
+|---|---|---|---|
+| **Share sheet** | `navigator.share` exists — i.e. almost any phone | **Share** + share icon | "Opens your phone's share sheet with the caption already in it. You still press post." |
+| **Intent** | X on desktop | **Post on X** + arrow icon | none needed — the caption really is pre-filled |
+| **Copy then open** | LinkedIn, Facebook on desktop | **Copy & open LinkedIn** | "LinkedIn doesn't accept a pre-written caption from another site, so it's on your clipboard — paste it when the composer opens." |
+| **Copy only** | Instagram | **Copy caption** | "Instagram can't be posted to from a browser…" |
+
+A secondary plain **Copy** sits beside every route except copy-only. All buttons
+44px on touch, compact from 1024px.
+
+The mobile route is the important one — this product is built for people on
+phones, and the share sheet collapses four steps into one tap.
+
+### 9.1 "Did you post it?"
+
+Immediately after any share route fires, the button row is replaced by a `bg-soft`
+row: **"Did you post it?"** with **Yes** / **Not yet**.
+
+- **Yes** → a confirmed row: green check, *"Counted. Thank you — that one reaches
+  people we never could."*
+- **Not yet** → returns silently to the buttons. No nagging.
+
+Every number on this screen is modelled. One honest self-report is worth more than
+a better estimate, and it is what lets advocacy count as a contribution in
+Recognition rather than as a marketing statistic.
+
+`ShareActions` states: `Ready · Asked · Confirmed`.
+
+## 10 · Declining — `Component / Amplify / Decline`
+
+A one-way stream of asks with no way to say no is corrosive, and the decline is the
+single most useful signal HR could collect.
+
+**Trigger:** a quiet **Not for me** button with a thumbs-down, top-right of the
+hero's eyebrow row, 36px, `text-faint`.
+
+**Panel:** `bg-soft`, `rounded-2xl`. *"No problem. Anything we should know?"* with
+*"Optional, and never attributed to you."* beneath. Four reason pills, 40px, plus a
+plain **Just skip it** link so answering is never required:
+
+- Not my area · Reads too corporate · Not right now · I'd rather not share work posts at all
+
+Declines persist. Being shown a post you already passed on is the fastest way to
+make an optional feature feel like nagging.
+
+### 10.1 Caught up — the empty state
+
+When nothing is left: centred card, 48px `bg-soft` tile with a check in `--purple`,
+**"You're all caught up"**, and *"Nothing else is queued for sharing. We'll put
+something here when there is — and never more than one thing at a time."*
+
+A **Show the ones I passed on** button appears only if they have declined something.
+The "From the company" section hides entirely rather than leaving a heading over an
+empty list.
+
+### 10.2 Admin — `Why people passed`
+
+New rail card, admin only. Reason, count, and a `--purple` bar. Closing line:
+*"Declines are never attributed. The hiring post was passed on by 19 people and
+shared by 3 — worth knowing before it runs again."*
+
+This is the half of the picture nobody collects, and on the current data it is more
+interesting than the reach figure.
+
+## 11 · What to draw
+
+1. `ShareActions` — four routes × three states (Ready, Asked, Confirmed)
+2. `Decline` — trigger, panel, and the caught-up empty state
+3. `Why people passed` rail card
+4. Post rows now read `· 41 shared · 2 passed`

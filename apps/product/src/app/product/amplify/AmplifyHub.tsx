@@ -27,15 +27,16 @@
    so the gate is stated on the card rather than discovered after a click. */
 import * as React from "react";
 import Image from "next/image";
-import { Check, ChevronDown, Copy, Heart, MessageCircle, Repeat2, ShieldCheck, TrendingUp } from "lucide-react";
+import { ArrowUpRight, Check, ChevronDown, Copy, Heart, MessageCircle, Repeat2, Share2, ShieldCheck, ThumbsDown, TrendingUp } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark, Switch } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
-import { draftCaption, scoreAdvocacy, canAutoMirror, FEASIBILITY, type Voice } from "@/lib/ai/engines/advocacy";
+import { draftCaption, scoreAdvocacy, FEASIBILITY, type Voice } from "@/lib/ai/engines/advocacy";
 import { bestTimeToPost, type Platform } from "@/lib/ai/engines/timing";
 import {
   companyPosts, shares, companyPostReach, advocacyStats, recentSharers, myAdvocacy,
-  PLATFORM_MARK, type CompanyPost,
+  declineSignal, PLATFORM_MARK, type CompanyPost,
 } from "@/lib/amplify";
+import { canWebShare, routeFor, openShare, DECLINE_REASONS, type DeclineReason } from "@/lib/share";
 import { canAccess } from "@/lib/access";
 import { useViewAs } from "../useViewAs";
 import { useSession } from "../useSession";
@@ -80,24 +81,131 @@ function PlatformLine({ p, posted }: { p: Platform; posted: string }) {
   );
 }
 
+
+/** The share capability never changes after load, so there is nothing to subscribe to. */
+const NOOP_SUBSCRIBE = () => () => {};
+
+/* ── getting the caption out of Vadal and into a post ──────────────
+   The step the first two versions skipped. Every route ends with the
+   person pressing publish in the platform's own composer — nothing here
+   posts, and none of it needs the APIs the brief flags as risky.
+
+   The route differs per platform because the platforms differ, and a
+   single "Copy caption" button for all four pretended otherwise. */
+function ShareActions({ post, caption }: { post: CompanyPost; caption: string }) {
+  // A browser capability read without a hydration mismatch: the server snapshot
+  // is false, the client snapshot is the real answer, and React reconciles the
+  // two itself. An effect + setState would work but causes a cascading render
+  // for something that never changes after load.
+  const webShare = React.useSyncExternalStore(NOOP_SUBSCRIBE, canWebShare, () => false);
+
+  const [copied, setCopied] = React.useState(false);
+  const [asked, setAsked] = React.useState(false);
+  const [posted, setPosted] = React.useState<boolean | null>(null);
+
+  const route = routeFor(post.platform, caption, post.url, webShare);
+
+  function copyCaption() {
+    navigator.clipboard?.writeText(caption);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2200);
+  }
+
+  async function go() {
+    if (route.kind === "web-share") {
+      try {
+        await navigator.share({ text: caption, url: post.url });
+      } catch {
+        return; // they backed out of the sheet — not a failure, say nothing
+      }
+    } else if (route.kind === "intent") {
+      openShare(route.url);
+    } else if (route.kind === "copy-then-open") {
+      copyCaption();
+      openShare(route.url);
+    } else {
+      copyCaption();
+      toast("Caption copied");
+    }
+    setAsked(true);
+  }
+
+  const primaryLabel =
+    route.kind === "web-share" ? "Share" :
+    route.kind === "intent" || route.kind === "copy-then-open" ? route.label :
+    "Copy caption";
+
+  const PrimaryIcon =
+    route.kind === "web-share" ? Share2 :
+    route.kind === "copy-only" ? Copy : ArrowUpRight;
+
+  /* Closing the loop. Every number on this screen is modelled; one honest
+     self-report is worth more than a better estimate, and it is what lets
+     advocacy count as a contribution rather than a marketing statistic. */
+  if (asked && posted === null) {
+    return (
+      <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-soft px-3.5 py-3">
+        <span className="text-[14px] font-semibold">Did you post it?</span>
+        <div className="ml-auto flex items-center gap-2">
+          <Button size="sm" variant="brand" className="min-h-[44px] lg:min-h-0"
+            onClick={() => { setPosted(true); toast("Counted — it'll show in your reach and in Recognition"); }}>
+            Yes
+          </Button>
+          <Button size="sm" variant="tertiary" className="min-h-[44px] lg:min-h-0"
+            onClick={() => { setPosted(false); setAsked(false); }}>
+            Not yet
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (posted) {
+    return (
+      <div className="mt-3 flex items-center gap-2 rounded-xl bg-soft px-3.5 py-3">
+        <Check className="h-4 w-4 shrink-0 text-[var(--success)]" />
+        <span className="text-[14px]">Counted. Thank you — that one reaches people we never could.</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <Button size="sm" variant="brand" onClick={go} className="min-h-[44px] lg:min-h-0"
+          leadingIcon={<PrimaryIcon className="h-3.5 w-3.5" />}>
+          {primaryLabel}
+        </Button>
+        {route.kind !== "copy-only" && (
+          <Button size="sm" variant="tertiary" onClick={copyCaption} className="min-h-[44px] lg:min-h-0"
+            leadingIcon={copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}>
+            {copied ? "Copied" : "Copy"}
+          </Button>
+        )}
+      </div>
+
+      {/* Say what will happen before they press it, not after. */}
+      {"because" in route && (
+        <p className="mt-2.5 text-[12px] leading-snug text-faint">{route.because}</p>
+      )}
+      {route.kind === "web-share" && (
+        <p className="mt-2.5 text-[12px] leading-snug text-faint">
+          Opens your phone&apos;s share sheet with the caption already in it. You still press post.
+        </p>
+      )}
+    </div>
+  );
+}
+
 /* ── the caption composer, used by the hero and by any expanded post ── */
 function Composer({ post, title }: { post: CompanyPost; title?: string }) {
   const { session } = useSession();
   const [voice, setVoice] = React.useState<Voice>("warm");
   const [edited, setEdited] = React.useState<string | null>(null);
-  const [copied, setCopied] = React.useState(false);
 
   const draft = draftCaption(post.text, voice, post.platform, session?.title);
   const value = edited ?? draft.text;
   const timing = bestTimeToPost(post.platform);
-  const gate = canAutoMirror(post.platform);
-
-  function copy() {
-    navigator.clipboard?.writeText(value);
-    setCopied(true);
-    toast("Caption copied — paste it wherever you like");
-    window.setTimeout(() => setCopied(false), 2200);
-  }
 
   return (
     <div className="rounded-2xl bg-[var(--ai-surface)] p-4 ring-1 ring-[var(--ai-border)]">
@@ -130,19 +238,9 @@ function Composer({ post, title }: { post: CompanyPost; title?: string }) {
         className="mt-3 w-full resize-y rounded-xl border border-line bg-card p-3 text-[16px] leading-relaxed outline-none transition focus:border-[var(--ai-accent)]"
       />
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <Button size="sm" variant={copied ? "tertiary" : "brand"} onClick={copy}
-          className="min-h-[44px] lg:min-h-0"
-          leadingIcon={copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}>
-          {copied ? "Copied" : "Copy caption"}
-        </Button>
-        <span className="text-[12px] text-faint">{timing.reason}</span>
-      </div>
+      <ShareActions post={post} caption={value} />
 
-      {/* Stated before anyone tries, not after they click. */}
-      <p className="mt-3 text-[12px] leading-snug text-faint">
-        <b className="font-semibold text-muted">We can&apos;t post this for you yet.</b> {gate.reason}
-      </p>
+      <p className="mt-3 text-[12px] leading-snug text-faint">{timing.reason}</p>
     </div>
   );
 }
@@ -153,10 +251,22 @@ export function AmplifyHub() {
   const [optIn, setOptIn] = usePersistentState<boolean>("vadal:advocacy-optin", false);
   const [open, setOpen] = React.useState<string | null>(null);
   const [showPlatforms, setShowPlatforms] = React.useState(false);
+  /* Declines persist. Being shown the same post you already passed on is the
+     fastest way to make an optional feature feel like nagging. */
+  const [passed, setPassed] = usePersistentState<string[]>("vadal:advocacy-passed", []);
+  const [declining, setDeclining] = React.useState(false);
 
   const impact = scoreAdvocacy(shares, companyPostReach);
-  const featured = companyPosts.find((p) => p.featured) ?? companyPosts[0];
-  const rest = companyPosts.filter((p) => p.id !== featured.id);
+  const live = companyPosts.filter((p) => !passed.includes(p.id));
+  const featured = live.find((p) => p.featured) ?? live[0] ?? null;
+  const rest = live.filter((p) => p.id !== featured?.id);
+
+  function decline(reason: DeclineReason) {
+    if (!featured) return;
+    setPassed((all) => [...all, featured.id]);
+    setDeclining(false);
+    toast(reason === "never" ? "Noted — we'll stop putting these in front of you" : "Passed. We'll show you something else.");
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -218,7 +328,7 @@ export function AmplifyHub() {
             </div>
           </div>
         </header>
-      ) : (
+      ) : featured ? (
         /* ── opted in: the hero is today's pick, and it is the whole ritual ── */
         <header className="rise overflow-hidden rounded-[28px] border border-line bg-card shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)]">
           <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
@@ -233,18 +343,77 @@ export function AmplifyHub() {
                 {featured.sharedBy ? (
                   <span className="text-[12px] text-faint">· {featured.sharedBy} colleagues already have</span>
                 ) : null}
+                {/* Saying no has to be as easy as saying yes, or the ask stops
+                    being an invitation. It is also the signal HR would never
+                    otherwise get: which posts our own people won't put their
+                    name on. */}
+                <button
+                  onClick={() => setDeclining((v) => !v)}
+                  aria-expanded={declining}
+                  className="ml-auto flex min-h-[36px] items-center gap-1.5 rounded-full px-2.5 text-[12px] font-semibold text-faint transition hover:bg-soft hover:text-ink"
+                >
+                  <ThumbsDown className="h-3.5 w-3.5" /> Not for me
+                </button>
               </div>
+
+              {declining && (
+                <div className="mt-3 rounded-2xl bg-soft p-4">
+                  <p className="text-[14px] font-semibold">No problem. Anything we should know?</p>
+                  <p className="mt-1 text-[12px] text-faint">Optional, and never attributed to you.</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {DECLINE_REASONS.map((r) => (
+                      <button
+                        key={r.key}
+                        onClick={() => decline(r.key)}
+                        className="min-h-[40px] rounded-full border border-line bg-card px-3.5 text-[14px] font-medium transition hover:border-faint/50 hover:bg-[var(--card-hover)]"
+                      >
+                        {r.label}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => decline("not-now")}
+                    className="mt-3 text-[12px] font-semibold text-faint underline-offset-2 hover:underline"
+                  >
+                    Just skip it
+                  </button>
+                </div>
+              )}
               <p className="mt-3 text-[18px] font-semibold leading-relaxed tracking-[-0.01em]">{featured.text}</p>
               <div className="mt-3"><PlatformLine p={featured.platform} posted={featured.posted} /></div>
               <div className="mt-5"><Composer post={featured} /></div>
             </div>
           </div>
         </header>
+      ) : (
+        /* Nothing left to ask for. An empty queue should read as finished, not
+           broken — and it is the one moment we can say thank you plainly. */
+        <header className="rise rounded-[28px] border border-line bg-card p-8 text-center sm:p-10">
+          <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-soft text-[var(--purple)]">
+            <Check className="h-6 w-6" strokeWidth={1.9} />
+          </span>
+          <h1 className="mt-4 text-[22px] font-bold tracking-tight">You&apos;re all caught up</h1>
+          <p className="mx-auto mt-2 max-w-sm text-[16px] leading-relaxed text-muted">
+            Nothing else is queued for sharing. We&apos;ll put something here when there is —
+            and never more than one thing at a time.
+          </p>
+          {passed.length > 0 && (
+            <button
+              onClick={() => { setPassed([]); toast("Showing everything again"); }}
+              className="mt-5 min-h-[44px] rounded-full border border-line px-4 text-[14px] font-semibold transition hover:bg-soft"
+            >
+              Show the ones I passed on
+            </button>
+          )}
+        </header>
       )}
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
         {/* ══ the rest of what the company said ══ */}
         <div className="flex flex-col gap-6 xl:col-span-8">
+          {/* No dangling header when everything has been passed on — an empty
+              section under a heading reads as something failing to load. */}
+          {rest.length > 0 && (
           <div>
             <div className="flex items-baseline justify-between gap-3 pb-3">
               <div>
@@ -274,7 +443,8 @@ export function AmplifyHub() {
                         <span className="flex items-center gap-1"><Heart className="h-3 w-3" />{p.likes.toLocaleString()}</span>
                         <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" />{p.comments}</span>
                         <span className="flex items-center gap-1"><Repeat2 className="h-3 w-3" />{p.shares}</span>
-                        {p.sharedBy ? <span>· {p.sharedBy} colleagues shared this</span> : null}
+                        {p.sharedBy ? <span>· {p.sharedBy} shared</span> : null}
+                        {p.passedBy ? <span>· {p.passedBy} passed</span> : null}
                         {optIn && (
                           <Button size="sm" variant={isOpen ? "tertiary" : "secondary"}
                             className="ml-auto min-h-[44px] lg:min-h-0"
@@ -291,6 +461,7 @@ export function AmplifyHub() {
               })}
             </div>
           </div>
+          )}
         </div>
 
         {/* ══ right rail ══ */}
@@ -360,6 +531,34 @@ export function AmplifyHub() {
                 </ul>
               </div>
               <p className="mt-3 text-[12px] leading-snug text-faint">{impact.caveat}</p>
+            </Card>
+          )}
+
+          {/* The half of the picture nobody collects. 21 people declining a post
+              as "reads too corporate" is worth more than the 3 who shared it. */}
+          {isAdmin && (
+            <Card>
+              <Eyebrow>Why people passed</Eyebrow>
+              <ul className="mt-3 flex flex-col gap-2">
+                {declineSignal.map((d) => {
+                  const total = declineSignal.reduce((n, x) => n + x.count, 0);
+                  return (
+                    <li key={d.reason}>
+                      <div className="flex items-center gap-2 text-[14px]">
+                        <span className="truncate">{d.reason}</span>
+                        <span className="ml-auto shrink-0 text-[12px] font-semibold tabular-nums text-faint">{d.count}</span>
+                      </div>
+                      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-line">
+                        <span className="block h-full rounded-full bg-[var(--purple)]" style={{ width: `${(d.count / total) * 100}%` }} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+              <p className="mt-3 text-[12px] leading-snug text-faint">
+                Declines are never attributed. The hiring post was passed on by 19 people and shared by 3 —
+                worth knowing before it runs again.
+              </p>
             </Card>
           )}
 
