@@ -24,3 +24,6 @@ here for the product designer, so Figma stays in sync with the built product.
 | 004 | [Role-based access, mobile nav & session identity](./004-role-access-mobile-nav-identity.md) | Built · needs Figma |
 | 005 | [Permissions reconciled to the brief · team scope · frontline profile](./005-permissions-reconciled-team-scope.md) | Built · needs Figma |
 | 006 | [AI runtime — citations, refusals, agentic confirmation](./006-ai-runtime-citations-agentic-confirmation.md) | Built · needs Figma |
+| 007 | [Four pillar screens — Amplify · Thrive · Grow · One-to-One Help](./007-four-pillars-screens.md) | Built · needs Figma |
+| 008 | [Feed photography — art direction and placement](./008-feed-photography.md) | Built · needs Figma |
+| 009 | [Form-field rules — bare-field padding, 16px mobile floor](./009-form-field-rules.md) | Built · needs Figma |
