@@ -63,6 +63,15 @@ export const SECTION_ACCESS: Record<string, Role[]> = {
   Recognition: ALL_ROLES,
   Knowledge: ALL_ROLES,
 
+  // The four pillars from the brief that had no screens. All are employee-facing
+  // by design — Thrive is your own health and money, Grow is your own learning,
+  // One-to-One Help must never be gated, and Amplify only works if employees can
+  // actually reach it. Authoring inside them is gated separately, in the screen.
+  Thrive: ALL_ROLES,
+  Grow: ALL_ROLES,
+  Amplify: ALL_ROLES,
+  "One-to-One Help": ALL_ROLES,
+
   Pulse: MANAGER_UP,
   Sentiment: MANAGER_UP,
   "Manager hub": MANAGER_UP,

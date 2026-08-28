@@ -24,7 +24,8 @@ import { SectionGuard } from "./SectionGuard";
 const DOMAIN: Record<string, string> = {
   Home: "My space", Feed: "My space", Pulse: "People intelligence", Analytics: "People intelligence",
   Surveys: "Listening", Sentiment: "Listening", "Always-on listening": "Listening",
-  Recognition: "Engage", Campaigns: "Engage",
+  Recognition: "Engage", Campaigns: "Engage", Amplify: "Engage",
+  Thrive: "Wellbeing", "One-to-One Help": "Wellbeing", Grow: "Learn",
   "Manager hub": "Operations", Cases: "Operations", Knowledge: "Workspace", Settings: "Account",
 };
 

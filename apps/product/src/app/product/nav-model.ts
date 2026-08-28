@@ -8,8 +8,9 @@
    keys in lib/access.SECTION_ACCESS — that shared key is what keeps nav,
    routing and permissions in agreement. */
 import {
-  BarChart3, BookOpen, ClipboardList, FolderKanban, Gauge, HeartHandshake,
-  House, Megaphone, Newspaper, Radio, Smile, UsersRound, type LucideIcon,
+  BarChart3, BookOpen, ClipboardList, FolderKanban, Gauge, GraduationCap,
+  HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio,
+  Share2, Smile, UsersRound, type LucideIcon,
 } from "lucide-react";
 import type { Role } from "@/lib/auth";
 import { canAccess } from "@/lib/access";
@@ -45,7 +46,19 @@ export const NAV: NavGroupModel[] = [
     items: [
       { label: "Recognition", icon: HeartHandshake, href: "/product/recognition" },
       { label: "Campaigns", icon: Megaphone, href: "/product/campaigns" },
+      { label: "Amplify", icon: Share2, href: "/product/amplify" },
     ],
+  },
+  {
+    label: "Wellbeing",
+    items: [
+      { label: "Thrive", icon: HeartPulse, href: "/product/thrive" },
+      { label: "One-to-One Help", icon: LifeBuoy, href: "/product/help" },
+    ],
+  },
+  {
+    label: "Learn",
+    items: [{ label: "Grow", icon: GraduationCap, href: "/product/grow" }],
   },
   {
     label: "Operations",
@@ -76,7 +89,10 @@ export function navFor(role: Role | null): NavGroupModel[] {
  * we are most at risk of failing. Everything else lives one tap away under More.
  */
 const MOBILE_PRIORITY: Record<Role, string[]> = {
-  employee: ["Home", "Feed", "Recognition", "Knowledge"],
+  // Grow over Knowledge for the employee: a five-minute course on a break is the
+  // thing this product is asking a frontline worker to do, and Knowledge is
+  // reachable from the Copilot on any screen.
+  employee: ["Home", "Feed", "Grow", "Thrive"],
   manager: ["Home", "Pulse", "Manager hub", "Feed"],
   admin: ["Home", "Pulse", "Cases", "Feed"],
   superadmin: ["Home", "Pulse", "Cases", "Feed"],

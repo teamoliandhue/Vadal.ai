@@ -7,11 +7,10 @@
  * that every implementation actually exists at runtime — a feature that is
  * listed but not wired fails the check.
  *
- * `surface` is deliberately separate from `implemented`. Four of the seven
- * pillars have no product screens yet (Amplify, Thrive, Grow, One-to-One Help),
- * so their AI runs and is reachable through the Copilot, but has no dedicated
- * page. Conflating "the logic exists" with "there is a screen" is exactly the
- * kind of overclaim this file is meant to prevent.
+ * `surface` is deliberately separate from `implemented`, so "the logic exists"
+ * is never confused with "a person can reach it". All seven pillars now have
+ * screens; what remains `copilot` is reachable only by asking, and `engine-only`
+ * runs underneath a surface without a control of its own.
  */
 
 export type FeatureStatus = {
@@ -59,17 +58,17 @@ export const FEATURES: FeatureStatus[] = [
   { id: "connect-kudos", pillar: "Connect", brief: "Peer-to-peer recognition, drafted by the Copilot", module: "tools", entry: "give_recognition", agentic: true, surface: "copilot" },
 
   /* ── Pillar 3 · Amplify ──────────────────────────────────── */
-  { id: "amp-caption", pillar: "Amplify", brief: "AI-suggested personal caption in the employee's own voice", module: "engines/advocacy", entry: "draftCaption", agentic: false, surface: "copilot" },
-  { id: "amp-timing", pillar: "Amplify", brief: "Best-time-to-post recommendation per platform", module: "engines/timing", entry: "bestTimeToPost", agentic: false, surface: "copilot" },
-  { id: "amp-impact", pillar: "Amplify", brief: "Advocacy impact scoring — estimated reach/engagement uplift", module: "engines/advocacy", entry: "scoreAdvocacy", agentic: false, surface: "engine-only" },
+  { id: "amp-caption", pillar: "Amplify", brief: "AI-suggested personal caption in the employee's own voice", module: "engines/advocacy", entry: "draftCaption", agentic: false, surface: "screen" },
+  { id: "amp-timing", pillar: "Amplify", brief: "Best-time-to-post recommendation per platform", module: "engines/timing", entry: "bestTimeToPost", agentic: false, surface: "screen" },
+  { id: "amp-impact", pillar: "Amplify", brief: "Advocacy impact scoring — estimated reach/engagement uplift", module: "engines/advocacy", entry: "scoreAdvocacy", agentic: false, surface: "screen" },
   { id: "amp-share", pillar: "Amplify", brief: "AGENTIC — 'share that last company post for me'", module: "tools", entry: "share_to_social", agentic: true, surface: "copilot", blocked: "Needs a per-platform feasibility spike and per-employee OAuth — the brief requires the spike before committing." },
   { id: "amp-queue", pillar: "Amplify", brief: "AGENTIC — 'queue this for advocacy' builds the curated card automatically", module: "tools", entry: "queue_for_advocacy", agentic: true, surface: "copilot" },
 
   /* ── Pillar 4 · Thrive ───────────────────────────────────── */
-  { id: "thrive-nudge", pillar: "Thrive", brief: "Personalised nudges timed to when the person is likely to act", module: "engines/wellbeing", entry: "activityNudges", agentic: false, surface: "engine-only" },
-  { id: "thrive-money", pillar: "Thrive", brief: "AI financial tips by income band, role and region — guidance only", module: "engines/wellbeing", entry: "financialTips", agentic: false, surface: "copilot" },
-  { id: "thrive-wellbeing", pillar: "Thrive", brief: "Anomaly-aware wellbeing check, with consent, offering a warm handoff", module: "engines/wellbeing", entry: "wellbeingCheck", agentic: false, surface: "engine-only" },
-  { id: "thrive-cohorts", pillar: "Thrive", brief: "Smart challenge matching into fair leaderboard cohorts", module: "engines/wellbeing", entry: "buildCohorts", agentic: false, surface: "engine-only" },
+  { id: "thrive-nudge", pillar: "Thrive", brief: "Personalised nudges timed to when the person is likely to act", module: "engines/wellbeing", entry: "activityNudges", agentic: false, surface: "screen" },
+  { id: "thrive-money", pillar: "Thrive", brief: "AI financial tips by income band, role and region — guidance only", module: "engines/wellbeing", entry: "financialTips", agentic: false, surface: "screen" },
+  { id: "thrive-wellbeing", pillar: "Thrive", brief: "Anomaly-aware wellbeing check, with consent, offering a warm handoff", module: "engines/wellbeing", entry: "wellbeingCheck", agentic: false, surface: "screen" },
+  { id: "thrive-cohorts", pillar: "Thrive", brief: "Smart challenge matching into fair leaderboard cohorts", module: "engines/wellbeing", entry: "buildCohorts", agentic: false, surface: "screen" },
   { id: "thrive-log", pillar: "Thrive", brief: "AGENTIC — log activity conversationally ('I ran 5k this morning')", module: "tools", entry: "log_activity", agentic: true, surface: "copilot" },
   { id: "thrive-goal", pillar: "Thrive", brief: "AGENTIC — renegotiate a goal on request and adjust it", module: "tools", entry: "adjust_goal", agentic: true, surface: "copilot" },
   { id: "thrive-benefit", pillar: "Thrive", brief: "AGENTIC — flag an unused benefit before open enrolment and offer to book a call", module: "tools", entry: "book_benefit_call", agentic: true, surface: "copilot" },
@@ -84,19 +83,19 @@ export const FEATURES: FeatureStatus[] = [
   { id: "bc-chase", pillar: "Broadcast", brief: "AGENTIC — auto-chase acknowledgement, reminding only non-confirmers", module: "tools", entry: "chase_acknowledgement", agentic: true, surface: "copilot" },
 
   /* ── Pillar 6 · Grow ─────────────────────────────────────── */
-  { id: "grow-generate", pillar: "Grow", brief: "Course generation from a PDF/SOP/deck with quiz questions drafted for review", module: "engines/learning", entry: "generateCourse", agentic: false, surface: "copilot" },
-  { id: "grow-paths", pillar: "Grow", brief: "Personalised path recommendations from role, Pulse feedback and incident data", module: "engines/learning", entry: "recommendPaths", agentic: false, surface: "engine-only" },
-  { id: "grow-adaptive", pillar: "Grow", brief: "Adaptive quizzing with spaced repetition", module: "engines/learning", entry: "nextReview", agentic: false, surface: "engine-only" },
-  { id: "grow-tutor", pillar: "Grow", brief: "AI tutor answering only from that module's source content", module: "engines/learning", entry: "tutor", agentic: false, surface: "copilot" },
+  { id: "grow-generate", pillar: "Grow", brief: "Course generation from a PDF/SOP/deck with quiz questions drafted for review", module: "engines/learning", entry: "generateCourse", agentic: false, surface: "screen" },
+  { id: "grow-paths", pillar: "Grow", brief: "Personalised path recommendations from role, Pulse feedback and incident data", module: "engines/learning", entry: "recommendPaths", agentic: false, surface: "screen" },
+  { id: "grow-adaptive", pillar: "Grow", brief: "Adaptive quizzing with spaced repetition", module: "engines/learning", entry: "nextReview", agentic: false, surface: "screen" },
+  { id: "grow-tutor", pillar: "Grow", brief: "AI tutor answering only from that module's source content", module: "engines/learning", entry: "tutor", agentic: false, surface: "screen" },
   { id: "grow-make", pillar: "Grow", brief: "AGENTIC — 'make this a course' from pasted notes or an SOP", module: "tools", entry: "make_course", agentic: true, surface: "copilot" },
   { id: "grow-assign", pillar: "Grow", brief: "AGENTIC — auto-assign a matching path when Pulse flags a skills gap", module: "tools", entry: "assign_learning", agentic: true, surface: "copilot" },
 
   /* ── Pillar 7 · One-to-One Help ──────────────────────────── */
-  { id: "help-intake", pillar: "One-to-One Help", brief: "Empathetic conversational intake in plain, warm language", module: "engines/support", entry: "intake", agentic: false, surface: "copilot" },
-  { id: "help-triage", pillar: "One-to-One Help", brief: "Need and urgency triage into a band — never a clinical diagnosis", module: "engines/support", entry: "triage", agentic: false, surface: "copilot" },
-  { id: "help-handoff", pillar: "One-to-One Help", brief: "Consent-based handoff summary, with explicit sign-off", module: "engines/support", entry: "buildHandoff", agentic: false, surface: "copilot" },
-  { id: "help-resources", pillar: "One-to-One Help", brief: "Self-serve resource matching for lower-stakes moments", module: "engines/support", entry: "matchResources", agentic: false, surface: "copilot" },
-  { id: "help-crisis", pillar: "One-to-One Help", brief: "Always-visible crisis resources, never gated behind a conversation", module: "engines/support", entry: "crisisResources", agentic: false, surface: "copilot" },
+  { id: "help-intake", pillar: "One-to-One Help", brief: "Empathetic conversational intake in plain, warm language", module: "engines/support", entry: "intake", agentic: false, surface: "screen" },
+  { id: "help-triage", pillar: "One-to-One Help", brief: "Need and urgency triage into a band — never a clinical diagnosis", module: "engines/support", entry: "triage", agentic: false, surface: "screen" },
+  { id: "help-handoff", pillar: "One-to-One Help", brief: "Consent-based handoff summary, with explicit sign-off", module: "engines/support", entry: "buildHandoff", agentic: false, surface: "screen" },
+  { id: "help-resources", pillar: "One-to-One Help", brief: "Self-serve resource matching for lower-stakes moments", module: "engines/support", entry: "matchResources", agentic: false, surface: "screen" },
+  { id: "help-crisis", pillar: "One-to-One Help", brief: "Always-visible crisis resources, never gated behind a conversation", module: "engines/support", entry: "crisisResources", agentic: false, surface: "screen" },
   { id: "help-book", pillar: "One-to-One Help", brief: "AGENTIC — book a session and pass the handoff summary, with consent", module: "tools", entry: "book_counsellor", agentic: true, surface: "copilot", blocked: "Clinical, legal and HR sign-off on triage thresholds and data-access rules is a hard blocker on launch." },
   { id: "help-escalate", pillar: "One-to-One Help", brief: "AGENTIC — acute-risk escalation per the org's configured, human-reviewed policy", module: "engines/support", entry: "escalate", agentic: true, surface: "copilot", blocked: "Requires a signed escalation policy — assertLaunchable() throws without one." },
 
