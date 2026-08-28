@@ -11,7 +11,8 @@ import { toast } from "../Toaster";
 
 type Mode = "text" | "photo" | "poll" | "kudos";
 
-const ART = ["/feed/art-confetti.svg", "/feed/art-wellbeing.svg", "/feed/art-ship.svg", "/feed/art-offsite.svg"];
+/* Attachable images offered in the composer — real photography, same set the feed uses. */
+const ART = ["/feed/wellbeing.jpg", "/feed/ship.jpg", "/feed/plant.jpg", "/feed/milestone.jpg", "/feed/coldbrew.jpg"];
 const ROSTER: Person[] = [
   { name: "Aarav S.", role: "Engineering", img: "/avatars/user-2.svg" },
   { name: "Neha R.", role: "Design", img: "/avatars/user-5.svg" },
