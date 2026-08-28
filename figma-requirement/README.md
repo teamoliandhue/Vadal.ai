@@ -27,3 +27,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 007 | [Four pillar screens — Amplify · Thrive · Grow · One-to-One Help](./007-four-pillars-screens.md) | Built · needs Figma |
 | 008 | [Feed photography — art direction and placement](./008-feed-photography.md) | Built · needs Figma |
 | 009 | [Form-field rules — bare-field padding, 16px mobile floor](./009-form-field-rules.md) | Built · needs Figma |
+| 010 | [Amplify redesign — two-state hero, composer, platform marks](./010-amplify-redesign.md) | Built · needs Figma |
