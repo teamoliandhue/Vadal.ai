@@ -106,7 +106,8 @@ export function Feed({ className = "", empty = false, showMore = false }: { clas
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Share an update with your team…"
-            className="min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-faint"
+            /* -ml-1/pl-1 so a leading Q or J is not clipped — see Composer. */
+            className="-ml-1 min-w-0 flex-1 bg-transparent pl-1 text-[16px] outline-none placeholder:text-faint"
           />
           <Button variant={draft.trim() ? "brand" : "tertiary"} size="sm" type="submit">Post</Button>
         </div>

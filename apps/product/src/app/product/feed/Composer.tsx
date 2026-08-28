@@ -125,7 +125,12 @@ export function Composer({ onPost }: { onPost: (item: FeedItem) => void }) {
             onChange={(e) => setText(e.target.value)}
             rows={3}
             placeholder={mode === "kudos" ? "Say what they did well…" : "What's on your mind?"}
-            className="w-full resize-none rounded-xl bg-transparent text-[15px] leading-relaxed text-ink outline-none placeholder:text-faint"
+            /* Negative margin + equal padding: the text still lines up optically
+               with the card's content edge, but the box extends 4px further out
+               so a glyph with left side-bearing — Q, J, an italic f — cannot be
+               clipped by the element edge. A bare field with zero padding looks
+               fine until someone types the wrong first letter. */
+            className="-mx-1 w-[calc(100%+0.5rem)] resize-none rounded-xl bg-transparent px-1 text-[16px] leading-relaxed text-ink outline-none placeholder:text-faint"
           />
 
           {mode === "photo" && (

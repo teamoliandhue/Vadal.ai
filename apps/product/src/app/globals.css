@@ -173,6 +173,19 @@ body {
 @keyframes ai-sheen { from { background-position: 130% 0; } to { background-position: -130% 0; } }
 
 
+/* iOS Safari zooms the whole page whenever a focused field is smaller than 16px.
+   In a product built for people on phones that means the layout jumps every time
+   someone taps an input — 29 of our fields were under the threshold. Set the
+   floor once, on small screens only, so the denser desktop field sizes are
+   untouched (where the zoom behaviour does not exist anyway). */
+@media (max-width: 1023px) {
+  .lumen input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  .lumen textarea,
+  .lumen select {
+    font-size: 16px;
+  }
+}
+
 /* mobile nav sheet (MobileNav) — slides up from the bottom bar it was opened from */
 .lumen .sheet-panel { animation: sheet-up 0.34s cubic-bezier(0.22, 1, 0.36, 1) both; box-shadow: 0 -18px 50px -12px rgba(10, 10, 12, 0.35); }
 @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
