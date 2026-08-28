@@ -62,6 +62,12 @@ export type ToolCall = {
   args: Record<string, unknown>;
   requiresConfirmation: boolean;
   undoable: boolean;
+  /**
+   * Set when the brief itself blocks this action from shipping (a missing
+   * feasibility spike, an unsigned clinical policy). Surfaced ON the card, so a
+   * person is told before they confirm rather than after it fails.
+   */
+  blockedReason?: string;
   state: ToolState;
   /** Filled once it has run — what changed, and what undo needs to reverse it. */
   result?: { message: string; undoToken?: string };

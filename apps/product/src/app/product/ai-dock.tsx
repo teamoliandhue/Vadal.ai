@@ -74,10 +74,19 @@ function ToolCard({
   }
 
   const running = call.state === "running";
+  const blocked = Boolean(call.blockedReason);
   return (
     <div className="w-full rounded-2xl border border-[var(--ai-border)] bg-[var(--ai-surface)] p-3">
       <p className="text-[14px] font-bold tracking-tight">{call.title}</p>
       <p className="mt-1 text-[14px] leading-snug text-muted">{call.summary}</p>
+      {/* Some actions cannot run yet — a missing feasibility spike, an unsigned
+          clinical policy. Say so here rather than letting someone confirm and
+          watch it fail. */}
+      {blocked && (
+        <p className="mt-2 rounded-xl bg-soft px-2.5 py-2 text-[12px] leading-snug text-muted">
+          <span className="font-semibold text-ink">Can&apos;t send this yet.</span> {call.blockedReason}
+        </p>
+      )}
       <dl className="mt-2.5 space-y-1.5 border-t border-[var(--ai-border)] pt-2.5">
         {call.preview.map((p) => (
           <div key={p.label} className="grid grid-cols-[84px_1fr] gap-2">
@@ -87,21 +96,23 @@ function ToolCard({
         ))}
       </dl>
       <div className="mt-3 flex items-center gap-2">
-        <button
-          onClick={onConfirm}
-          disabled={running}
-          className="rounded-full bg-[var(--purple)] px-3.5 py-1.5 text-[14px] font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-        >
-          {running ? "Working…" : "Confirm & send"}
-        </button>
+        {!blocked && (
+          <button
+            onClick={onConfirm}
+            disabled={running}
+            className="rounded-full bg-[var(--purple)] px-3.5 py-1.5 text-[14px] font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+          >
+            {running ? "Working…" : "Confirm & send"}
+          </button>
+        )}
         <button
           onClick={onCancel}
           disabled={running}
           className="rounded-full bg-soft px-3 py-1.5 text-[14px] font-semibold text-ink ring-1 ring-[var(--line)] transition hover:bg-[var(--card-hover)] disabled:opacity-50"
         >
-          Cancel
+          {blocked ? "Dismiss" : "Cancel"}
         </button>
-        <span className="ml-auto text-[12px] text-faint">You can undo this</span>
+        {!blocked && <span className="ml-auto text-[12px] text-faint">You can undo this</span>}
       </div>
     </div>
   );
