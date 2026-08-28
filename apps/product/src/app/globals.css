@@ -172,9 +172,17 @@ body {
 .lumen .ai-sheen::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 70%); background-size: 220% 100%; animation: ai-sheen 1.5s ease-in-out infinite; pointer-events: none; }
 @keyframes ai-sheen { from { background-position: 130% 0; } to { background-position: -130% 0; } }
 
+
+/* mobile nav sheet (MobileNav) — slides up from the bottom bar it was opened from */
+.lumen .sheet-panel { animation: sheet-up 0.34s cubic-bezier(0.22, 1, 0.36, 1) both; box-shadow: 0 -18px 50px -12px rgba(10, 10, 12, 0.35); }
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.lumen .sheet-scrim { animation: sheet-fade 0.28s ease-out both; }
+@keyframes sheet-fade { from { opacity: 0; } to { opacity: 1; } }
+
 @media (prefers-reduced-motion: reduce) {
   .lumen .rise, .lumen .ring-animate, .lumen .draw-animate, .lumen .animate-floaty, .lumen .animate-floaty2, .lumen .ai-aura,
   .lumen .ai-breathe, .lumen .ai-think, .lumen .ai-burst, .lumen .ai-dot, .lumen .ai-caret, .lumen .ai-glow-border, .lumen .ai-sheen::after { animation: none; }
   .lumen .ai-stream, .lumen .ai-pop { animation: none; opacity: 1; }
+  .lumen .sheet-panel, .lumen .sheet-scrim { animation: none; transform: none; opacity: 1; }
   .toast-in { animation: none; }
 }

@@ -5,7 +5,7 @@
 import * as React from "react";
 import { Send, Sparkles, Heart } from "lucide-react";
 import { Avatar } from "@vadal/design-system";
-import { me } from "@/lib/data";
+import { useMe } from "../useSession";
 import type { Comment, ReactionEmoji } from "@/lib/feed";
 import { Drawer } from "../Drawer";
 import {
@@ -32,6 +32,7 @@ export function PostDrawer({
   onComment: (text: string) => void;
   onLikeComment: (commentId: string) => void;
 }) {
+  const me = useMe();
   const [draft, setDraft] = React.useState("");
   const ix = React.useRef(0);
   React.useEffect(() => { setDraft(""); }, [item?.id]);

@@ -1,13 +1,15 @@
 "use client";
-/* Role-aware Home (Home §5). A "Viewing as" switch lets the user see Home as an
-   Employee, Manager or Admin (the call's actor model). When viewing as a manager
-   or admin, a compact team snapshot appears above the personal cards and links
-   into the Manager hub. Employee view hides it. */
+/* Role-aware Home (Home §5). A "Viewing as" switch lets an admin or manager see
+   the product as a less-privileged role — the call's actor model. It only ever
+   scopes DOWN (useViewAs caps it against the session), so an employee sees no
+   switch at all rather than a control that would grant them nothing.
+   When viewing as a manager or admin, a compact team snapshot appears above the
+   personal cards and links into the Manager hub. Employee view hides it. */
 import * as React from "react";
 import Link from "next/link";
 import { AlertTriangle, ArrowRight, Users } from "lucide-react";
 import { Avatar } from "@vadal/design-system";
-import { useViewAs, VIEW_ROLES } from "../useViewAs";
+import { useViewAs } from "../useViewAs";
 import { team, reports } from "@/lib/manager";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -15,18 +17,23 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 export function ViewAsSwitch() {
-  const [role, setRole] = useViewAs();
+  const [role, setRole, meta] = useViewAs();
+  // Nothing below an employee to preview — and offering a role they cannot have
+  // was the escalation the audit found. Hide the control entirely.
+  if (!meta.ready || !meta.canSwitch) return <span />;
   return (
     <div className="flex items-center gap-2">
       <span className="text-[12px] font-medium text-faint">Viewing as</span>
       <div className="flex items-center gap-0.5 rounded-full border border-line bg-soft p-0.5">
-        {VIEW_ROLES.map((r) => {
-          const on = role === r.key;
+        {meta.options.map((r) => {
+          // superadmin sessions sit above the switch's top option — treat Admin as on.
+          const on = role === r.key || (role === "superadmin" && r.key === "admin");
           return (
             <button
               key={r.key}
               onClick={() => setRole(r.key)}
-              className={`rounded-full px-2.5 py-1 text-[12px] font-semibold transition ${on ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}
+              aria-pressed={on}
+              className={`min-h-[32px] rounded-full px-2.5 py-1 text-[12px] font-semibold transition ${on ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}
             >
               {r.label}
             </button>

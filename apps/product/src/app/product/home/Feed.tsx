@@ -6,7 +6,8 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowRight, Gift, Heart, ImageIcon, MessageSquare, Newspaper, Pin, Share2, BarChart3 } from "lucide-react";
 import { Avatar, Badge, Button, type BadgeTone } from "@vadal/design-system";
-import { feed as seedFeed, celebrations, me, type FeedPost } from "@/lib/data";
+import { feed as seedFeed, celebrations, type FeedPost } from "@/lib/data";
+import { useMe } from "../useSession";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { toast } from "../Toaster";
 
@@ -23,6 +24,7 @@ type Tab = (typeof TABS)[number];
 type Post = FeedPost & { id: string };
 
 export function Feed({ className = "", empty = false, showMore = false }: { className?: string; empty?: boolean; showMore?: boolean }) {
+  const me = useMe();
   const idRef = React.useRef(0);
   const [mine, setMine] = usePersistentState<Post[]>("vadal:feed-mine", []);
   const [liked, setLiked] = usePersistentState<string[]>("vadal:feed-liked", []);

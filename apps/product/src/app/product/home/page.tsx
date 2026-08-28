@@ -4,27 +4,14 @@
    a focus/feed bento, neutral surfaces + violet accent, narrative metrics,
    a live AI moment, and real states (loading · first-time · empty).
    First-time/new-joiner preview: /product/home?view=new
+
+   The view lives in ./HomeContent (client) — see the note there for why the
+   ?view=new query is read on the client rather than awaited here.
    ════════════════════════════════════════════════════════════════════ */
 
-import Link from "next/link";
-import { ArrowRight, Award, Clock, Gift, Heart, Trophy } from "lucide-react";
-import { Avatar, Badge, Button, Trend } from "@vadal/design-system";
-import { Sparkline } from "@/components/charts";
+import { Suspense } from "react";
 import { Shell } from "../shell";
-import { org, me, myRecognition, communities, myDay, engagementTrend, myCalendar } from "@/lib/data";
-import { MoodCheck } from "./MoodCheck";
-import { MyDay } from "./MyDay";
-import { QuickPoll } from "./QuickPoll";
-import { Feed } from "./Feed";
-import { AskAi } from "./AskAi";
-import { HomeBrandLayer, VadalBadge } from "./HomeBrandLayer";
-import { CalendarCard } from "./CalendarCard";
-import { HooksCard } from "./HooksCard";
-import { ViewAsSwitch, ManagerSnapshot } from "./HomeRole";
-
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
-}
+import { HomeContent } from "./HomeContent";
 
 function greetingFor(hour: number) {
   if (hour < 12) return "Good morning";
@@ -32,231 +19,16 @@ function greetingFor(hour: number) {
   return "Good evening";
 }
 
-export default async function HomePage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
-  // Home §1–7: client-brand band, conversational mood, calendar, hooks, view-as role.
-  const firstTime = (await searchParams)?.view === "new";
+export default function HomePage() {
+  // Computed here so the clock is read once, on the server — a client-side
+  // read would risk a hydration mismatch on the greeting.
+  const greeting = greetingFor(new Date().getHours());
   return (
     <Shell active="Home" breadcrumb="Home">
-      <RitualHero firstTime={firstTime} />
-      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
-        {/* LEFT (wider, action-first) — what you need to do, then who you are */}
-        <div className="flex flex-col gap-6 xl:col-span-7">
-          <ManagerSnapshot />
-          <MyDay empty={firstTime} />
-          <CalendarCard />
-          <YouCard firstTime={firstTime} />
-          <HooksCard />
-          <QuickPoll className="card-lift" firstTime={firstTime} />
-          <RecognitionCard firstTime={firstTime} />
-          <CommunitiesCard />
-        </div>
-        {/* RIGHT (narrower) — AI on top, then the feed (natural height) */}
-        <div className="flex flex-col gap-6 xl:col-span-5">
-          <AskAi />
-          <Feed empty={firstTime} showMore />
-        </div>
-      </div>
+      {/* useSearchParams needs a Suspense boundary of its own */}
+      <Suspense fallback={null}>
+        <HomeContent greeting={greeting} />
+      </Suspense>
     </Shell>
-  );
-}
-
-/* ── 1 · Ritual hero — greeting + mood, with a focal "Up next" ── */
-function RitualHero({ firstTime }: { firstTime: boolean }) {
-  const greeting = greetingFor(new Date().getHours());
-  const upNext = myCalendar.find((e) => e.now) ?? myCalendar.find((e) => e.prep) ?? myCalendar[0];
-  return (
-    <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)]">
-      <HomeBrandLayer />
-      <div
-        className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl"
-        style={{ background: "radial-gradient(circle, var(--client-brand, var(--purple)), transparent 70%)" }}
-        aria-hidden
-      />
-      <div className="relative flex flex-wrap items-center justify-between gap-3 px-7 pt-5 sm:px-9">
-        <ViewAsSwitch />
-        <VadalBadge />
-      </div>
-      <div className="relative grid gap-8 px-7 pb-7 pt-4 sm:px-9 sm:pb-9 lg:grid-cols-[1.25fr_0.85fr] lg:items-start lg:gap-12">
-        <div>
-          <Eyebrow>{org.date}</Eyebrow>
-          <h1 className="mt-3 text-[clamp(30px,4.4vw,46px)] font-bold leading-[1.03] tracking-[-0.025em]">
-            {firstTime ? "Welcome" : greeting}, <span style={{ color: "var(--client-brand, var(--purple))" }}>{me.name}</span> <span aria-hidden>👋</span>
-          </h1>
-          <p className="mt-3 max-w-md text-[16px] leading-relaxed text-muted">
-            {firstTime ? (
-              <>Let’s set up your day — start with a quick mood check-in. We’ll fill the rest as you go.</>
-            ) : (
-              <>You’ve got <b className="font-semibold text-ink">{myDay.length} things</b> today, and you’re on a <b className="font-semibold text-ink">{me.streak}-day</b> streak. 🔥</>
-            )}
-          </p>
-        </div>
-        <div className="lg:border-l lg:border-line lg:pl-12">
-          <MoodCheck firstTime={firstTime} />
-        </div>
-      </div>
-      {!firstTime && (
-        <div className="relative flex flex-wrap items-center justify-between gap-3 border-t border-line bg-soft px-7 py-4 sm:px-9">
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[var(--lav)] text-[var(--purple)]">
-              <Clock className="h-[18px] w-[18px]" />
-            </span>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <Eyebrow>Up next</Eyebrow>
-                <span className="flex items-center gap-1 text-[11px] font-medium text-faint"><span aria-hidden>📅</span> Google Calendar</span>
-              </div>
-              <p className="truncate text-[14px] font-semibold">
-                {upNext.title} <span className="font-normal text-faint">· {upNext.time} · {upNext.with}</span>
-              </p>
-            </div>
-          </div>
-          <Button variant="brand" size="sm">{upNext.now ? "Join" : upNext.prep ? "Prep" : "View"}</Button>
-        </div>
-      )}
-    </header>
-  );
-}
-
-/* ── 2 · You — personal panel with a narrative engagement trend ── */
-function YouCard({ className = "", firstTime = false }: { className?: string; firstTime?: boolean }) {
-  const es = engagementTrend.series;
-  const engScore = es[es.length - 1];
-  const engDelta = engScore - es[es.length - 4];
-  const stats: [React.ReactNode, string][] = firstTime
-    ? [["0", "Points"], ["0", "Day streak"], ["—", "Team rank"]]
-    : [[me.points.toLocaleString(), "Points"], [me.streak, "Day streak"], [`#${me.rank}`, "Team rank"]];
-  return (
-    <section className={`card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>
-      <div className="flex items-center gap-3">
-        <span className="grid place-items-center rounded-full p-[2.5px]" style={{ background: "linear-gradient(135deg,var(--purple),#a99df9)" }}>
-          <span className="rounded-full ring-2 ring-card">
-            <Avatar src={me.img} name={me.name} size="lg" />
-          </span>
-        </span>
-        <div>
-          <h3 className="text-[16px] font-bold tracking-tight">{me.name}</h3>
-          <p className="text-[12px] text-faint">{me.role}</p>
-        </div>
-      </div>
-
-      <div className="mt-6 grid grid-cols-3 divide-x divide-line">
-        {stats.map(([value, label]) => (
-          <div key={label} className="px-2 text-center first:pl-0 last:pr-0">
-            <div className="text-[22px] font-bold tracking-tight">{value}</div>
-            <div className="mt-0.5 text-[12px] text-faint">{label}</div>
-          </div>
-        ))}
-      </div>
-
-      {firstTime ? (
-        <div className="mt-5 rounded-2xl border border-dashed border-line p-4 text-center">
-          <p className="text-[14px] font-semibold">Your engagement insights appear after your first week 📈</p>
-          <p className="mt-1 text-[14px] text-faint">Check in daily and recognise teammates to get started.</p>
-        </div>
-      ) : (
-        <div className="mt-5 rounded-2xl border border-line p-4">
-          <div className="flex items-center justify-between">
-            <Eyebrow>Your engagement</Eyebrow>
-            <span className="flex items-center gap-1.5">
-              <span className="text-[16px] font-bold tracking-tight">{engScore}</span>
-              <Trend direction={engDelta >= 0 ? "up" : "down"} value={String(Math.abs(engDelta))} />
-            </span>
-          </div>
-          <Sparkline values={engagementTrend.series} benchmark={engagementTrend.benchmark} color="#6d5df0" id="you-eng" height={42} className="mt-2.5" />
-          <div className="mt-1.5 flex items-center gap-3 text-[12px] text-faint">
-            <span className="flex items-center gap-1.5"><span className="h-[2px] w-4 rounded-full bg-[#6d5df0]" /> You</span>
-            <span className="flex items-center gap-1.5"><span className="h-0 w-4 border-t border-dashed border-faint" /> Benchmark</span>
-          </div>
-          <p className="mt-2 text-[14px] leading-snug text-faint">{engagementTrend.insight}</p>
-        </div>
-      )}
-
-      <div className="mt-4 rounded-2xl bg-soft p-4">
-        <div className="flex items-center gap-2 text-[14px] font-semibold">
-          <Award className="h-4 w-4 text-[var(--purple)]" /> {firstTime ? "Earn points to unlock badges" : `${me.nextBadge.left} more to “${me.nextBadge.name}”`}
-        </div>
-        <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-line">
-          <span className="block h-full rounded-full bg-[var(--purple)]" style={{ width: firstTime ? "4%" : "66%" }} />
-        </div>
-      </div>
-
-      <Link href="/product/recognition" className="mt-auto block">
-        <Button variant="tertiary" leadingIcon={<Trophy className="h-4 w-4 text-[var(--purple)]" />} className="w-full">
-          View leaderboard
-        </Button>
-      </Link>
-    </section>
-  );
-}
-
-/* ── 3 · Recognition ── */
-function RecognitionCard({ className = "", firstTime = false }: { className?: string; firstTime?: boolean }) {
-  return (
-    <section className={`card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>
-      <div className="flex items-end justify-between">
-        <div>
-          <Eyebrow>Kudos</Eyebrow>
-          <h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Recognition for you</h2>
-        </div>
-        <Heart className="h-4 w-4 text-[var(--purple)]" />
-      </div>
-      {firstTime ? (
-        <div className="mt-4 flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line py-12 text-center">
-          <Gift className="h-7 w-7 text-[var(--purple)]" />
-          <p className="text-[14px] font-semibold">No kudos yet</p>
-          <p className="text-[14px] text-faint">Give recognition first — it usually comes back around.</p>
-        </div>
-      ) : (
-        <ul className="mt-4 space-y-3">
-          {myRecognition.map((r) => (
-            <li key={r.from} className="rounded-2xl border border-line p-4">
-              <div className="flex items-center gap-2.5">
-                <Avatar src={r.img} name={r.from} size="sm" />
-                <span className="text-[14px] font-semibold">{r.from}</span>
-                <Badge tone="brand" variant="soft" size="sm">{r.value}</Badge>
-                <span className="ml-auto text-[12px] text-faint">{r.time}</span>
-              </div>
-              <p className="mt-2 text-[16px] leading-relaxed text-muted">{r.text}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-      <Link href="/product/recognition" className="mt-auto block">
-        <Button variant="tertiary" leadingIcon={<Gift className="h-4 w-4 text-[var(--purple)]" />} className="w-full">
-          Recognise a teammate
-        </Button>
-      </Link>
-    </section>
-  );
-}
-
-/* ── 4 · Communities ── */
-function CommunitiesCard({ className = "" }: { className?: string }) {
-  return (
-    <section className={`card-lift rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>
-      <div className="flex items-end justify-between">
-        <div>
-          <Eyebrow>Belong</Eyebrow>
-          <h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Your communities</h2>
-        </div>
-        <button className="flex items-center gap-1 text-[14px] font-semibold text-[var(--purple)] transition hover:gap-1.5">
-          Explore <ArrowRight className="h-3.5 w-3.5" />
-        </button>
-      </div>
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {communities.map((c) => (
-          <button key={c.name} className="flex items-center gap-3 rounded-2xl border border-line p-3.5 text-left transition hover:bg-soft">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-[16px] font-bold text-white" style={{ background: c.color }}>{c.name[0]}</span>
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-[14px] font-semibold">{c.name}</div>
-              <div className="mt-0.5 flex items-center gap-1.5 text-[12px] text-faint">
-                <span>{c.members} members</span>
-                {c.fresh > 0 && <span className="font-semibold text-[var(--purple)]">· {c.fresh} new</span>}
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-    </section>
   );
 }

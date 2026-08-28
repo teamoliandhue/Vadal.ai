@@ -3,72 +3,27 @@
    interactive parts: a working WorkspaceSwitcher + WorkspaceMenu dropdown (the
    top-of-sidebar identity), an AI-briefing that opens the AI dock, a Health card
    that routes to Pulse, and the nav groups. `active` highlights the current item.
-   The Vadal wordmark is intentionally not shown here (client decision). */
+   The Vadal wordmark is intentionally not shown here (client decision).
+
+   Nav comes from ./nav-model filtered by the effective role, so people are never
+   shown a destination they cannot open. Desktop only — MobileNav takes over
+   below lg. */
 import * as React from "react";
-import {
-  BarChart3, BookOpen, ClipboardList, FolderKanban, Gauge, HeartHandshake,
-  House, LogOut, Megaphone, Newspaper, Radio, Repeat, Settings, Smile,
-  UserPlus, UsersRound, type LucideIcon,
-} from "lucide-react";
+import { LogOut, Repeat, Settings, UserPlus } from "lucide-react";
 import {
   Sidebar, NavGroup, NavItem, WorkspaceSwitcher, WorkspaceMenu, WorkspaceMenuDivider,
   MenuItem, AIBriefing, Health,
 } from "@vadal/design-system";
 import { org, health } from "@/lib/data";
+import { canAccess } from "@/lib/access";
+import { navFor } from "./nav-model";
+import { useViewAs } from "./useViewAs";
 import { toast } from "./Toaster";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 
-type RailItem = { label: string; icon: LucideIcon; href: string; soon?: boolean };
-type RailGroup = { label: string; items: RailItem[] };
-
-/* Module-aligned IA (strategy doc) — intelligence-forward. "Soon" marks the
-   post-go-live / not-yet-built sections; built surfaces (Home, Pulse, Analytics,
-   Feed) carry no chip. */
-const RAIL: RailGroup[] = [
-  {
-    label: "My space",
-    items: [
-      { label: "Home", icon: House, href: "/product/home" },
-      { label: "Feed", icon: Newspaper, href: "/product/feed" },
-    ],
-  },
-  {
-    label: "Intelligence",
-    items: [
-      { label: "Pulse", icon: Gauge, href: "/product" },
-      { label: "Analytics", icon: BarChart3, href: "/product/analytics" },
-    ],
-  },
-  {
-    label: "Listen",
-    items: [
-      { label: "Surveys", icon: ClipboardList, href: "/product/surveys" },
-      { label: "Sentiment", icon: Smile, href: "/product/sentiment" },
-      { label: "Always-on listening", icon: Radio, href: "/product/listening" },
-    ],
-  },
-  {
-    label: "Engage",
-    items: [
-      { label: "Recognition", icon: HeartHandshake, href: "/product/recognition" },
-      { label: "Campaigns", icon: Megaphone, href: "/product/campaigns" },
-    ],
-  },
-  {
-    label: "Operations",
-    items: [
-      { label: "Manager hub", icon: UsersRound, href: "/product/managers" },
-      { label: "Cases", icon: FolderKanban, href: "/product/cases" },
-    ],
-  },
-  {
-    label: "Knowledge",
-    items: [{ label: "Knowledge", icon: BookOpen, href: "/product/knowledge" }],
-  },
-];
-
 export function Rail({ active }: { active: string }) {
+  const [role, , meta] = useViewAs();
   const [wsOpen, setWsOpen] = React.useState(false);
   const wsRef = React.useRef<HTMLDivElement>(null);
 
@@ -81,9 +36,15 @@ export function Rail({ active }: { active: string }) {
     return () => { document.removeEventListener("mousedown", onDown); window.removeEventListener("keydown", onKey); };
   }, [wsOpen]);
 
-  const meta = `${org.headcount.toLocaleString()} people`;
+  const wsMeta = `${org.headcount.toLocaleString()} people`;
+  const groups = navFor(role);
+  const canSettings = canAccess(role, "Settings");
   // eslint-disable-next-line @next/next/no-img-element
   const wsLogo = <img src={org.logo} alt={org.name} className="h-full w-full object-cover" />;
+
+  // Render nothing until the session resolves — a flash of the full admin nav
+  // followed by it collapsing is worse than a beat of empty rail.
+  if (!meta.ready) return <div className="w-[264px] shrink-0 border-r border-line max-lg:hidden" aria-hidden />;
 
   return (
     <Sidebar
@@ -92,14 +53,18 @@ export function Rail({ active }: { active: string }) {
          switcher below is the top-of-sidebar identity. */
       workspace={
         <div ref={wsRef} className="relative">
-          <WorkspaceSwitcher name={org.name} meta={meta} logo={wsLogo} open={wsOpen} onClick={() => setWsOpen((o) => !o)} />
+          <WorkspaceSwitcher name={org.name} meta={wsMeta} logo={wsLogo} open={wsOpen} onClick={() => setWsOpen((o) => !o)} />
           {wsOpen && (
             <div className="absolute inset-x-0 top-full z-50 mt-1.5">
               {/* No identity header here — the switcher above already shows it (avoids the repeat). */}
               <WorkspaceMenu className="w-full">
-                <MenuItem icon={<Settings className="h-4 w-4" />} label="Workspace settings" href="/product/settings" />
-                <MenuItem icon={<UserPlus className="h-4 w-4" />} label="Invite people" onClick={() => { setWsOpen(false); toast("Invite link copied ✓"); }} />
-                <WorkspaceMenuDivider />
+                {canSettings && (
+                  <>
+                    <MenuItem icon={<Settings className="h-4 w-4" />} label="Workspace settings" href="/product/settings" />
+                    <MenuItem icon={<UserPlus className="h-4 w-4" />} label="Invite people" onClick={() => { setWsOpen(false); toast("Invite link copied ✓"); }} />
+                    <WorkspaceMenuDivider />
+                  </>
+                )}
                 <MenuItem icon={<Repeat className="h-4 w-4" />} label="Switch workspace" onClick={() => { setWsOpen(false); toast("Only oliandhue is connected in this demo"); }} />
                 <MenuItem icon={<LogOut className="h-4 w-4" />} label="Sign out" onClick={() => { setWsOpen(false); toast("Signed out (demo)"); }} />
               </WorkspaceMenu>
@@ -108,10 +73,10 @@ export function Rail({ active }: { active: string }) {
         </div>
       }
       briefing={<AIBriefing title="Today's AI briefing" subtitle="3 new insights" onClick={() => ask("Walk me through today's AI briefing.")} />}
-      health={<Health value={health.score} label="Health" trend={{ direction: "up", value: String(health.delta) }} href="/product" />}
-      footer={<NavItem icon={<Settings className="size-[18px]" strokeWidth={1.85} />} label="Settings" active={active === "Settings"} href="/product/settings" />}
+      health={canAccess(role, "Pulse") ? <Health value={health.score} label="Health" trend={{ direction: "up", value: String(health.delta) }} href="/product" /> : undefined}
+      footer={canSettings ? <NavItem icon={<Settings className="size-[18px]" strokeWidth={1.85} />} label="Settings" active={active === "Settings"} href="/product/settings" /> : undefined}
     >
-      {RAIL.map((group) => (
+      {groups.map((group) => (
         <NavGroup key={group.label} label={group.label}>
           {group.items.map((it) => (
             <NavItem

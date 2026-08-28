@@ -7,6 +7,7 @@
    real warehouse cut without one. Notion spec: "📈 Analytics". */
 import * as React from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Bookmark, Download, Grid3x3, X } from "lucide-react";
 import { Button, SparkMark } from "@vadal/design-system";
 import { Sparkline, TrendChart } from "@/components/charts";
@@ -85,7 +86,14 @@ function benchmarkFor(metric: MetricKey): number[] {
   return Array.from({ length: 14 }, () => b);
 }
 
-export function AnalyticsExplorer({ initialMetric, initialDim, initialPeriod }: { initialMetric?: string; initialDim?: string; initialPeriod?: string }) {
+export function AnalyticsExplorer() {
+  // Deep-links from Pulse (?metric=&dim=&period=) are read here rather than on
+  // the server — see the note in page.tsx. Read once, for the initial slice; the
+  // explorer owns the state from then on.
+  const sp = useSearchParams();
+  const initialMetric = sp.get("metric") ?? undefined;
+  const initialDim = sp.get("dim") ?? undefined;
+  const initialPeriod = sp.get("period") ?? undefined;
   const startMetric = (initialMetric && initialMetric in METRICS ? initialMetric : "engagement") as MetricKey;
   const startDim = (initialDim && initialDim in DIMS ? initialDim : "team") as DimKey;
   const startPeriod = initialPeriod && (PERIODS as readonly string[]).includes(initialPeriod) ? initialPeriod : "6 months";
@@ -95,9 +103,16 @@ export function AnalyticsExplorer({ initialMetric, initialDim, initialPeriod }: 
   const [views, setViews] = usePersistentState<SavedView[]>("vadal:analytics-views", []);
 
   // Reflect the current slice in the URL so views are shareable / bookmarkable.
+  //
+  // Two things matter here. The URL must be absolute-from-root: the App Router
+  // patches history.replaceState to keep its own state in sync, and a bare
+  // "?query" gets re-resolved into a real navigation — which re-runs this effect
+  // and loops until the route tree collapses to a blank page. And it must no-op
+  // when nothing changed, so the sync cannot feed itself.
   React.useEffect(() => {
-    const qs = `?metric=${metric}&dim=${dim}&period=${encodeURIComponent(period)}`;
-    window.history.replaceState(null, "", qs);
+    const next = `${window.location.pathname}?metric=${metric}&dim=${dim}&period=${encodeURIComponent(period)}`;
+    if (window.location.pathname + window.location.search === next) return;
+    window.history.replaceState(null, "", next);
   }, [metric, dim, period]);
 
   const M = METRICS[metric];

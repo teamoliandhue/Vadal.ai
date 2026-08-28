@@ -65,12 +65,12 @@ export const TENANTS: Tenant[] = [
 ];
 
 /** Seeded directory — known people and their roles (normally HRMS/SCIM). */
-export const DIRECTORY: Record<string, { name: string; role: Role; img: string; team: string }> = {
-  "priya@oliandhue.com": { name: "Priya Sharma", role: "admin", img: "/avatars/user-8.svg", team: "People" },
-  "anita@oliandhue.com": { name: "Anita Desai", role: "manager", img: "/avatars/user-5.svg", team: "Design" },
-  "aarav@oliandhue.com": { name: "Aarav Sharma", role: "employee", img: "/avatars/user-2.svg", team: "Engineering" },
-  "pradeep@oliandhue.com": { name: "Pradeep Kumar", role: "admin", img: "/avatars/user-6.svg", team: "Leadership" },
-  "ops@vadal.ai": { name: "Vadal Ops", role: "superadmin", img: "/avatars/user-3.svg", team: "Vadal" },
+export const DIRECTORY: Record<string, { name: string; role: Role; img: string; team: string; title: string }> = {
+  "priya@oliandhue.com": { name: "Priya Sharma", role: "admin", img: "/avatars/user-8.svg", team: "People", title: "People Partner" },
+  "anita@oliandhue.com": { name: "Anita Desai", role: "manager", img: "/avatars/user-5.svg", team: "Design", title: "Design Lead" },
+  "aarav@oliandhue.com": { name: "Aarav Sharma", role: "employee", img: "/avatars/user-2.svg", team: "Engineering", title: "Software Engineer" },
+  "pradeep@oliandhue.com": { name: "Pradeep Kumar", role: "admin", img: "/avatars/user-6.svg", team: "Leadership", title: "Head of People" },
+  "ops@vadal.ai": { name: "Vadal Ops", role: "superadmin", img: "/avatars/user-3.svg", team: "Vadal", title: "Platform Operations" },
 };
 
 /** Quick demo personas surfaced on the sign-in screen. */
@@ -103,6 +103,7 @@ export type Session = {
   tenant: string; // slug
   img: string;
   team: string;
+  title: string;
   onboarded: boolean;
   method: "sso" | "otp";
 };
@@ -118,7 +119,9 @@ export function setSession(s: Session | null) {
   try {
     if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s));
     else localStorage.removeItem(SESSION_KEY);
-    // keep the product's role scoping (view-as) in lock-step with the session
+    // Seed "view as" to the real role. It is only ever a way to scope DOWN —
+    // lib/access.effectiveRole() re-caps it on every read, so a stale or
+    // hand-edited value can never raise anyone's privileges.
     if (s) localStorage.setItem("vadal:view-as", JSON.stringify(s.role === "superadmin" ? "admin" : s.role));
     window.dispatchEvent(new Event("vadal:viewas"));
     window.dispatchEvent(new Event("vadal:session"));
@@ -138,6 +141,7 @@ export function sessionFor(email: string, tenant: Tenant, method: "sso" | "otp")
     tenant: tenant.slug,
     img: known?.img ?? "/avatars/user-1.svg",
     team: known?.team ?? "New joiner",
+    title: known?.title ?? "Team member",
     onboarded,
     method,
   };

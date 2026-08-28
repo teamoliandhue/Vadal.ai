@@ -7,7 +7,7 @@ import { Search, Sparkles } from "lucide-react";
 import { Avatar, Button, SparkMark, Switch } from "@vadal/design-system";
 import { Drawer } from "../Drawer";
 import { toast } from "../Toaster";
-import { me } from "@/lib/data";
+import { useMe } from "../useSession";
 import { values, teammates, draftLines, type Kudos, type Person } from "@/lib/recognize";
 
 const POINTS: Record<string, number> = { Ownership: 50, Collaboration: 40, Innovation: 40, "Customer focus": 40 };
@@ -24,6 +24,7 @@ export function GiveRecognition({
   onClose: () => void;
   onGive: (k: Kudos) => void;
 }) {
+  const me = useMe();
   const [to, setTo] = React.useState<Person | null>(null);
   const [query, setQuery] = React.useState("");
   const [value, setValue] = React.useState<string>(values[0].name);

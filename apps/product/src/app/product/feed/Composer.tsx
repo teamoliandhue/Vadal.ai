@@ -5,7 +5,7 @@
 import * as React from "react";
 import { BarChart3, ChevronDown, Award, ImageIcon, Sparkles, X } from "lucide-react";
 import { Avatar, Badge, Button } from "@vadal/design-system";
-import { me } from "@/lib/data";
+import { useMe } from "../useSession";
 import { channels, type FeedItem, type Person } from "@/lib/feed";
 import { toast } from "../Toaster";
 
@@ -27,6 +27,7 @@ const AI_DRAFTS = [
 ];
 
 export function Composer({ onPost }: { onPost: (item: FeedItem) => void }) {
+  const me = useMe();
   const [open, setOpen] = React.useState(false);
   const [mode, setMode] = React.useState<Mode>("text");
   const [text, setText] = React.useState("");

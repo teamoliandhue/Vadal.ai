@@ -10,7 +10,7 @@ import { usePersistentState } from "@/lib/usePersistentState";
 import {
   feedItems, type Comment, type FeedItem, type ReactionEmoji,
 } from "@/lib/feed";
-import { me } from "@/lib/data";
+import { useMe } from "../useSession";
 import { Composer } from "./Composer";
 import { PostCard } from "./PostCard";
 import { PostDrawer } from "./PostDrawer";
@@ -40,6 +40,7 @@ const FRESH: FeedItem[] = [
 ];
 
 export function FeedHub() {
+  const me = useMe();
   const [mine, setMine] = usePersistentState<FeedItem[]>("vadal:feed2-mine", []);
   const [reacts, setReacts] = usePersistentState<Record<string, ReactionEmoji>>("vadal:feed2-reacts", {});
   const [votes, setVotes] = usePersistentState<Record<string, string>>("vadal:feed2-votes", {});
