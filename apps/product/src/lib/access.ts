@@ -1,12 +1,19 @@
 /**
- * Role-based access model — the single source of truth for who can reach what.
+ * Role-based access model — the single source of truth for who can reach what,
+ * and how much of it they can see once they are there.
+ *
+ * Reconciled against §9 "Roles & Permissions Summary" of the AI Feature Product
+ * Inputs brief. Where the brief and the build disagreed, the brief wins; where
+ * the brief is silent or self-contradictory, the decision is recorded below so
+ * it can be argued with rather than discovered.
  *
  * Sections are keyed by their sidebar label, which is also the `active` value
- * every product page passes to <Shell>. That one key drives three things at
- * once, so they can never disagree:
+ * every product page passes to <Shell>. That one key drives four things at once,
+ * so they can never disagree:
  *   1. which nav items render (Rail + MobileNav)
  *   2. which routes are reachable (SectionGuard)
- *   3. how far "Viewing as" can be turned up (useViewAs)
+ *   3. how much data the surface shows (scopeFor)
+ *   4. how far "Viewing as" can be turned up (useViewAs)
  *
  * SCOPE OF ENFORCEMENT (be honest about this): the guard is client-side, because
  * there is no backend yet — the RSC payload for a page is still produced on the
@@ -30,15 +37,25 @@ const ADMIN_UP: Role[] = ["admin", "superadmin"];
 /**
  * Which roles may reach each section.
  *
- * The reasoning, so this is arguable rather than arbitrary:
- * - Everyone gets the daily-ritual surfaces (Home, Feed, Recognition, Knowledge).
- *   These are the reason a frontline employee opens the app at all.
- * - Org-wide intelligence (Pulse, Analytics, Sentiment, Surveys) is manager-and-up:
- *   a manager sees it to act on their team, an employee has no business reading
- *   aggregate sentiment about their colleagues.
- * - Configuration and confidential operations (Campaigns, Cases, Settings,
- *   Always-on listening) are admin-and-up. Cases especially — it holds grievance
- *   and harassment records, and the screen promises restricted visibility.
+ * Mapped from the brief's capability table:
+ *   Take surveys / quick pulse ............ everyone  → Home, Feed
+ *   Post to Connect feed .................. everyone  → Feed, Recognition
+ *   View team-level Pulse dashboard ....... manager (own team) / admin (all)
+ *   Author Broadcast announcements ........ manager (team-only) / admin (all)
+ *   Moderate content ...................... admin only
+ *   Configure survey templates / integrations  admin only
+ *
+ * Three decisions the brief does not cover, recorded here:
+ *
+ * - SURVEYS is the template builder and integration surface, which the brief
+ *   puts squarely at admin. A manager reads their team's results through Pulse
+ *   and Sentiment, not by opening the builder.
+ * - ANALYTICS is our free-slicing org-wide explorer and has no equivalent in the
+ *   brief. It cannot be honestly team-scoped on the current data model, so it is
+ *   admin-and-up rather than pretending to filter. Pulse is the manager's view.
+ * - CASES holds grievance and harassment records and has no home in the brief at
+ *   all. Admin-and-up, including for managers who raised the flag. If managers
+ *   should see cases they opened, that is a separate scoping decision.
  */
 export const SECTION_ACCESS: Record<string, Role[]> = {
   Home: ALL_ROLES,
@@ -47,13 +64,13 @@ export const SECTION_ACCESS: Record<string, Role[]> = {
   Knowledge: ALL_ROLES,
 
   Pulse: MANAGER_UP,
-  Analytics: MANAGER_UP,
   Sentiment: MANAGER_UP,
-  Surveys: MANAGER_UP,
   "Manager hub": MANAGER_UP,
+  Campaigns: MANAGER_UP, // brief: managers author team-only — scoped by scopeFor
 
+  Analytics: ADMIN_UP,
+  Surveys: ADMIN_UP,
   "Always-on listening": ADMIN_UP,
-  Campaigns: ADMIN_UP,
   Cases: ADMIN_UP,
   Settings: ADMIN_UP,
 };
@@ -80,8 +97,51 @@ export const ROLE_ARTICLE: Record<Role, string> = {
   superadmin: "a Vadal super admin",
 };
 
+/* ─────────────────────────── data scope ───────────────────────────
+   Access answers "can you open it". Scope answers "how much of it do
+   you see" — the brief's "Own team" column, which is a different rule
+   and was previously not modelled at all. */
+
+export type DataScope = "self" | "own-team" | "all";
+
 /**
- * The role that actually governs the UI.
+ * How much of a section this role sees.
+ *
+ * A manager reaching Pulse, Sentiment, Manager hub or Campaigns is limited to
+ * their own team — per the brief, and because a manager reading another team's
+ * sentiment is the same class of problem as an employee reading Cases.
+ */
+export function scopeFor(role: Role | null | undefined, section: string): DataScope {
+  if (!role) return "self";
+  if (role === "admin" || role === "superadmin") return "all";
+  if (role === "manager") return canAccess("manager", section) && section !== "Home" && section !== "Feed"
+    ? "own-team"
+    : "self";
+  return "self";
+}
+
+/* ───────────────────── presentation profile ─────────────────────
+   The brief lists four roles, but its own permissions table lists three.
+   The fourth — "Frontline employee (field/factory) — mobile-only,
+   offline-first, larger touch targets, voice input, minimal typing" — has
+   exactly the same PERMISSIONS as a desk employee. What differs is how the
+   product is presented.
+
+   Modelling it as a fifth permission tier would be wrong: it would imply
+   frontline workers can see less, which is not what the brief says and not
+   what we want. It is a presentation profile carried alongside the role, so
+   permissions and presentation can vary independently — a frontline manager
+   is a real person we will meet on a factory floor. */
+
+export type Profile = "desk" | "frontline";
+
+export const PROFILE_LABEL: Record<Profile, string> = {
+  desk: "Desk-based",
+  frontline: "Frontline · field/factory",
+};
+
+/**
+ * The effective role that governs the UI.
  *
  * "Viewing as" is a real feature the founders asked for — an admin previewing
  * what an employee sees. It may only ever scope DOWN. Before this, the switch

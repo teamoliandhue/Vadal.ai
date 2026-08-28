@@ -9,6 +9,7 @@ import { Button, SparkMark } from "@vadal/design-system";
 import { Drawer } from "../Drawer";
 import { toast } from "../Toaster";
 import { objectives, channels, audiences, starterSteps, type Campaign, type Step } from "@/lib/campaigns";
+import { useScope } from "../useViewAs";
 
 export type CampaignSeed =
   | { name: string; objective: string; audience?: string; duration?: string; steps?: string[] }
@@ -23,7 +24,16 @@ const newStep = (label = ""): Step & { id: string } => ({ id: `s${sid++}`, label
 export function CampaignBuilder({ seed, onClose, onLaunch }: { seed: CampaignSeed; onClose: () => void; onLaunch: (c: Campaign) => void }) {
   const [name, setName] = React.useState("");
   const [objective, setObjective] = React.useState(objectives[0].key);
-  const [audience, setAudience] = React.useState<string>(audiences[0]);
+  // Brief §9: managers author Broadcast announcements "Team-only". The audience
+  // list is narrowed rather than the whole builder withheld — a shift supervisor
+  // running a campaign on their own line is exactly the use case.
+  const { scope: dataScope, team: myTeam } = useScope("Campaigns");
+  const teamOnly = dataScope === "own-team" && !!myTeam;
+  const options = React.useMemo<readonly string[]>(
+    () => (teamOnly ? audiences.filter((a) => a === myTeam || a.includes(myTeam!)) : audiences),
+    [teamOnly, myTeam],
+  );
+  const [audience, setAudience] = React.useState<string>(teamOnly ? myTeam! : audiences[0]);
   const [duration, setDuration] = React.useState<string>(DURATIONS[1]);
   const [chans, setChans] = React.useState<string[]>(["feed"]);
   const [steps, setSteps] = React.useState<(Step & { id: string })[]>([]);
@@ -33,7 +43,9 @@ export function CampaignBuilder({ seed, onClose, onLaunch }: { seed: CampaignSee
     if (!seed) return;
     setName(seed.name);
     setObjective(seed.objective);
-    setAudience(seed.audience ?? audiences[0]);
+    // A seeded (AI-suggested) audience is still capped by what this role may target.
+    const wanted = seed.audience ?? audiences[0];
+    setAudience(teamOnly ? (options.includes(wanted) ? wanted : myTeam!) : wanted);
     setDuration(seed.duration ?? DURATIONS[1]);
     setChans(["feed"]);
     const s = seed.steps ?? starterSteps[seed.objective] ?? [];
@@ -114,8 +126,11 @@ export function CampaignBuilder({ seed, onClose, onLaunch }: { seed: CampaignSee
         <label className="block">
           <span className="text-[12px] font-semibold text-faint">Audience</span>
           <select value={audience} onChange={(e) => setAudience(e.target.value)} className="mt-1.5 w-full rounded-xl border border-line bg-card px-3 py-2.5 text-[14px] outline-none focus:border-[var(--purple)]">
-            {audiences.map((a) => <option key={a} value={a}>{a}</option>)}
+            {(options.length ? options : [myTeam!]).map((a) => <option key={a} value={a}>{a}</option>)}
           </select>
+          {teamOnly && (
+            <p className="mt-1.5 text-[12px] text-faint">You can run campaigns for {myTeam}. Company-wide sends are an HR admin action.</p>
+          )}
         </label>
         <label className="block">
           <span className="text-[12px] font-semibold text-faint">Duration</span>

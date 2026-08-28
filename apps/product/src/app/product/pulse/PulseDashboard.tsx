@@ -14,6 +14,8 @@ import {
 import { Avatar, Badge, Button, SparkMark, Trend, type BadgeTone } from "@vadal/design-system";
 import { ArcGauge, Sparkline, TrendChart } from "@/components/charts";
 import { usePersistentState } from "@/lib/usePersistentState";
+import { useScope } from "../useViewAs";
+import { ScopeNotice } from "../ScopeNotice";
 import { toast } from "../Toaster";
 import { Drawer } from "../Drawer";
 import {
@@ -464,15 +466,23 @@ const TABS = ["Overview", "Engagement", "Attrition & risk", "Recognition", "Mana
 type Tab = (typeof TABS)[number];
 
 export function PulseDashboard() {
+  // A manager sees their own team only (brief §9: "View team-level Pulse
+  // dashboard — Manager: Own team"). The scope control is replaced by a static
+  // label rather than a select with one option, and the stored scope is ignored
+  // so a value left over from an admin session cannot widen the view.
+  const { scope: dataScope, team: myTeam, ready: scopeReady } = useScope("Pulse");
   const [tab, setTab] = React.useState<Tab>("Overview");
-  const [scope, setScope] = usePersistentState<string>("vadal:pulse-scope", ALL_TEAMS);
+  const [storedScope, setScope] = usePersistentState<string>("vadal:pulse-scope", ALL_TEAMS);
   const [period, setPeriod] = usePersistentState<string>("vadal:pulse-period", "30 days");
   const [detail, setDetail] = React.useState<Detail | null>(null);
+  const pinned = dataScope === "own-team" && myTeam ? myTeam : null;
+  const scope = pinned ?? storedScope;
   const view = React.useMemo(() => derivePulse(scope, period), [scope, period]);
   const scopes = [ALL_TEAMS, ...departments.map((d) => d.name)];
 
   return (
     <div className="flex flex-col gap-6">
+      {scopeReady && pinned && <ScopeNotice team={pinned} what="people intelligence" />}
       <Briefing v={view} setTab={(t) => setTab(t as Tab)} period={period} setPeriod={setPeriod} />
 
       {/* tabs + scope */}
@@ -484,11 +494,17 @@ export function PulseDashboard() {
         </div>
         <div className="flex items-center gap-3">
           <Link href={analyticsHref("engagement")} className="hidden items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5 sm:flex">Slice in Analytics <ArrowUpRight className="h-3 w-3" /></Link>
-          <label className="flex items-center gap-2 text-[12px] text-faint">Scope
-            <select value={scope} onChange={(e) => setScope(e.target.value)} className="rounded-full border border-line bg-card px-3 py-1.5 text-[14px] font-medium text-ink outline-none transition hover:border-faint/40">
-              {scopes.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </label>
+          {pinned ? (
+            <span className="flex items-center gap-2 text-[12px] text-faint">Scope
+              <span className="rounded-full border border-line bg-soft px-3 py-1.5 text-[14px] font-medium text-ink">{pinned}</span>
+            </span>
+          ) : (
+            <label className="flex items-center gap-2 text-[12px] text-faint">Scope
+              <select value={scope} onChange={(e) => setScope(e.target.value)} className="rounded-full border border-line bg-card px-3 py-1.5 text-[14px] font-medium text-ink outline-none transition hover:border-faint/40">
+                {scopes.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </label>
+          )}
         </div>
       </div>
 

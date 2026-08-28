@@ -22,3 +22,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 002 | [Auth split-screen redesign (Fireflies pattern)](./002-auth-split-screen-redesign.md) | Built · needs Figma |
 | 003 | [Auth imagery + motion layer](./003-auth-imagery-motion.md) | Built · needs Figma |
 | 004 | [Role-based access, mobile nav & session identity](./004-role-access-mobile-nav-identity.md) | Built · needs Figma |
+| 005 | [Permissions reconciled to the brief · team scope · frontline profile](./005-permissions-reconciled-team-scope.md) | Built · needs Figma |

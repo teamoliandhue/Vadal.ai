@@ -11,7 +11,7 @@
    every read, so a stale or hand-edited key cannot raise anyone's privileges. */
 import * as React from "react";
 import type { Role } from "@/lib/auth";
-import { ROLE_RANK, effectiveRole } from "@/lib/access";
+import { ROLE_RANK, effectiveRole, scopeFor, type DataScope } from "@/lib/access";
 import { useSession } from "./useSession";
 
 export type ViewRole = "employee" | "manager" | "admin";
@@ -83,4 +83,24 @@ export function useViewAs() {
   );
 
   return [role, update, meta] as const;
+}
+
+/**
+ * How much of a section the current person may see.
+ *
+ * Access answers "can you open it" (SectionGuard); this answers "how much of it
+ * do you get" — the brief's "Own team" column. A manager on Pulse, Sentiment,
+ * Manager hub or Campaigns is limited to their own team.
+ */
+export function useScope(section: string) {
+  const [role, , meta] = useViewAs();
+  const { session } = useSession();
+  const scope: DataScope = scopeFor(role, section);
+  return {
+    scope,
+    /** The team a manager is pinned to; null for admins and for scope "all". */
+    team: scope === "own-team" ? session?.team ?? null : null,
+    role,
+    ready: meta.ready,
+  } as const;
 }

@@ -20,6 +20,10 @@
 
 export type Role = "employee" | "manager" | "admin" | "superadmin";
 
+/* Presentation profile — see lib/access for why the brief's "frontline
+   employee" is modelled here rather than as a fifth Role. */
+export type Profile = "desk" | "frontline";
+
 export const ROLE_LABEL: Record<Role, string> = {
   employee: "Employee",
   manager: "Manager",
@@ -65,18 +69,25 @@ export const TENANTS: Tenant[] = [
 ];
 
 /** Seeded directory — known people and their roles (normally HRMS/SCIM). */
-export const DIRECTORY: Record<string, { name: string; role: Role; img: string; team: string; title: string }> = {
-  "priya@oliandhue.com": { name: "Priya Sharma", role: "admin", img: "/avatars/user-8.svg", team: "People", title: "People Partner" },
-  "anita@oliandhue.com": { name: "Anita Desai", role: "manager", img: "/avatars/user-5.svg", team: "Design", title: "Design Lead" },
-  "aarav@oliandhue.com": { name: "Aarav Sharma", role: "employee", img: "/avatars/user-2.svg", team: "Engineering", title: "Software Engineer" },
-  "pradeep@oliandhue.com": { name: "Pradeep Kumar", role: "admin", img: "/avatars/user-6.svg", team: "Leadership", title: "Head of People" },
-  "ops@vadal.ai": { name: "Vadal Ops", role: "superadmin", img: "/avatars/user-3.svg", team: "Vadal", title: "Platform Operations" },
+export const DIRECTORY: Record<string, { name: string; role: Role; img: string; team: string; title: string; profile: Profile }> = {
+  "priya@oliandhue.com": { name: "Priya Sharma", role: "admin", img: "/avatars/user-8.svg", team: "People", title: "People Partner", profile: "desk" },
+  "anita@oliandhue.com": { name: "Anita Desai", role: "manager", img: "/avatars/user-5.svg", team: "Design", title: "Design Lead", profile: "desk" },
+  "aarav@oliandhue.com": { name: "Aarav Sharma", role: "employee", img: "/avatars/user-2.svg", team: "Engineering", title: "Software Engineer", profile: "desk" },
+  "pradeep@oliandhue.com": { name: "Pradeep Kumar", role: "admin", img: "/avatars/user-6.svg", team: "Leadership", title: "Head of People", profile: "desk" },
+  // The brief's fourth role: same permissions as a desk employee, different
+  // presentation. Seeded so the frontline experience is testable from day one
+  // rather than designed for an abstraction.
+  "ravi@oliandhue.com": { name: "Ravi Prasad", role: "employee", img: "/avatars/user-4.svg", team: "Plant Ops", title: "Line Operator", profile: "frontline" },
+  "sunita@oliandhue.com": { name: "Sunita Rao", role: "manager", img: "/avatars/user-7.svg", team: "Night shift", title: "Shift Supervisor", profile: "frontline" },
+  "ops@vadal.ai": { name: "Vadal Ops", role: "superadmin", img: "/avatars/user-3.svg", team: "Vadal", title: "Platform Operations", profile: "desk" },
 };
 
 /** Quick demo personas surfaced on the sign-in screen. */
 export const DEMO_PERSONAS: { email: string; label: string }[] = [
   { email: "aarav@oliandhue.com", label: "Employee" },
+  { email: "ravi@oliandhue.com", label: "Frontline employee" },
   { email: "anita@oliandhue.com", label: "Manager" },
+  { email: "sunita@oliandhue.com", label: "Frontline manager" },
   { email: "priya@oliandhue.com", label: "HR admin" },
   { email: "ops@vadal.ai", label: "Vadal super admin" },
 ];
@@ -104,6 +115,7 @@ export type Session = {
   img: string;
   team: string;
   title: string;
+  profile: Profile;
   onboarded: boolean;
   method: "sso" | "otp";
 };
@@ -142,6 +154,7 @@ export function sessionFor(email: string, tenant: Tenant, method: "sso" | "otp")
     img: known?.img ?? "/avatars/user-1.svg",
     team: known?.team ?? "New joiner",
     title: known?.title ?? "Team member",
+    profile: known?.profile ?? "desk",
     onboarded,
     method,
   };

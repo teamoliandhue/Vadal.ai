@@ -11,6 +11,8 @@ import { ArcGauge, TrendChart } from "@/components/charts";
 import { toast } from "../Toaster";
 import { Drawer } from "../Drawer";
 import { sentiment, sentimentScopes, MIN_N } from "@/lib/listen";
+import { useScope } from "../useViewAs";
+import { ScopeNotice } from "../ScopeNotice";
 
 const TONE = { good: "var(--success)", bad: "var(--danger)", warn: "var(--warning)", purple: "var(--purple)", muted: "var(--muted)" } as const;
 const soft = (c: string, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
@@ -60,15 +62,22 @@ function Card({ className = "", children }: { className?: string; children: Reac
 }
 
 export function SentimentDashboard() {
+  // A manager reads their own team's sentiment only. The min-N anonymity
+  // threshold still applies on top: a small team stays hidden even from its own
+  // manager, which is the point of the threshold.
+  const { scope: dataScope, team: myTeam, ready: scopeReady } = useScope("Sentiment");
   const [period, setPeriod] = React.useState<string>("6 months");
   const [themeFilter, setThemeFilter] = React.useState<(typeof THEME_FILTERS)[number]>("All");
-  const [scope, setScope] = React.useState<string>("All teams");
+  const [storedScope, setScope] = React.useState<string>("All teams");
   const [openTheme, setOpenTheme] = React.useState<Theme | null>(null);
+  const pinned = dataScope === "own-team" && myTeam ? myTeam : null;
+  const scope = pinned ?? storedScope;
   const v = deriveSentiment(scope);
   const scopes = sentimentScopes.map((s) => s.name);
 
   return (
     <div className="flex flex-col gap-6">
+      {scopeReady && pinned && <ScopeNotice team={pinned} what="sentiment" />}
       {/* header */}
       <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card p-7 shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)] sm:p-9">
         <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
@@ -79,11 +88,17 @@ export function SentimentDashboard() {
             <p className="mt-2 flex flex-wrap items-center gap-x-2 text-[14px] text-muted">{v.hidden ? <span>Pick a larger group to view sentiment.</span> : <><span className="text-[20px] font-bold tracking-tight text-ink">{v.net}</span><span>net sentiment · +{v.netDelta} vs last period · {v.respondents.toLocaleString()} responses</span></>}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-2 text-[12px] text-faint">Scope
-              <select value={scope} onChange={(e) => setScope(e.target.value)} className="rounded-full border border-line bg-card px-3 py-1.5 text-[14px] font-medium text-ink outline-none transition hover:border-faint/40">
-                {scopes.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </label>
+            {pinned ? (
+              <span className="flex items-center gap-2 text-[12px] text-faint">Scope
+                <span className="rounded-full border border-line bg-soft px-3 py-1.5 text-[14px] font-medium text-ink">{pinned}</span>
+              </span>
+            ) : (
+              <label className="flex items-center gap-2 text-[12px] text-faint">Scope
+                <select value={scope} onChange={(e) => setScope(e.target.value)} className="rounded-full border border-line bg-card px-3 py-1.5 text-[14px] font-medium text-ink outline-none transition hover:border-faint/40">
+                  {scopes.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </label>
+            )}
             <div className="flex items-center gap-1 rounded-full border border-line bg-soft p-1">
               {PERIODS.map((p) => <button key={p} onClick={() => setPeriod(p)} className={`rounded-full px-3 py-1.5 text-[14px] font-semibold transition ${period === p ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}>{p}</button>)}
             </div>
