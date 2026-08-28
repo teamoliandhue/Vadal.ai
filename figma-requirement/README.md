@@ -23,3 +23,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 003 | [Auth imagery + motion layer](./003-auth-imagery-motion.md) | Built · needs Figma |
 | 004 | [Role-based access, mobile nav & session identity](./004-role-access-mobile-nav-identity.md) | Built · needs Figma |
 | 005 | [Permissions reconciled to the brief · team scope · frontline profile](./005-permissions-reconciled-team-scope.md) | Built · needs Figma |
+| 006 | [AI runtime — citations, refusals, agentic confirmation](./006-ai-runtime-citations-agentic-confirmation.md) | Built · needs Figma |
