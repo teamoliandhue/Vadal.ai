@@ -42,7 +42,12 @@ const MODULES: Record<string, Record<string, unknown>> = {
 
 export type Verification = {
   total: number;
+  /** Implementation exists. */
   wired: number;
+  /** Something a person can reach actually calls it. */
+  reachable: number;
+  /** Built and verified, but nothing calls it yet. */
+  notWired: { id: string; pillar: string; brief: string }[];
   missing: { id: string; module: string; entry: string }[];
   blocked: { id: string; reason: string }[];
   byPillar: { pillar: string; total: number; agentic: number; copilot: number; screen: number; engineOnly: number }[];
@@ -84,13 +89,21 @@ export function verifyFeatures(): Verification {
     ...registered.filter((t) => !declaredTools.includes(t)).map((t) => `registered but not declared: ${t}`),
   ];
 
+  const notWired = FEATURES.filter((f) => f.wiredTo === null).map((f) => ({
+    id: f.id, pillar: f.pillar, brief: f.brief,
+  }));
+
   return {
     total: FEATURES.length,
     wired: FEATURES.length - missing.length,
+    reachable: FEATURES.filter((f) => f.wiredTo).length,
+    notWired,
     missing,
     blocked: FEATURES.filter((f) => f.blocked).map((f) => ({ id: f.id, reason: f.blocked! })),
     byPillar,
     agenticTools: { registered: registered.length, declared: declaredTools.length, unregistered },
+    // `ok` stays about correctness of the registry itself. Unwired features are
+    // reported, not treated as failures — they are a real state of the build.
     ok: missing.length === 0 && unregistered.length === 0,
   };
 }

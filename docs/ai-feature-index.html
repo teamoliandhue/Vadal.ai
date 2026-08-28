@@ -1,0 +1,510 @@
+<title>Where the AI lives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+  /* ── tokens ──────────────────────────────────────────────────────
+     Palette inherited from Vadal's own Signal identity rather than invented:
+     periwinkle #5D63E1, Aurora violet #7C5CF8, signal red #FB4B43, near-black
+     #0A0A0C. Neutrals carry a faint periwinkle bias so they read as chosen. */
+  :root {
+    --ground:      #FAFAFC;
+    --surface:     #FFFFFF;
+    --surface-2:   #F4F4F8;
+    --line:        #E6E6EE;
+    --line-soft:   #EFEFF5;
+    --ink:         #16161C;
+    --muted:       #6C6C7D;
+    --faint:       #9797A6;
+
+    --brand:       #5D63E1;   /* on a screen */
+    --brand-bg:    #EEEFFC;
+    --ai:          #7C5CF8;   /* ask the Copilot */
+    --ai-bg:       #F1ECFE;
+    --amber:       #9A6B08;   /* built, not wired */
+    --amber-bg:    #FBF2DF;
+    --signal:      #C4362F;   /* blocked by the brief */
+    --signal-bg:   #FCECEB;
+
+    --shadow: 0 1px 2px rgba(20,20,40,.04), 0 12px 32px -22px rgba(20,20,40,.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+    --ground:    #0A0A0C;
+    --surface:   #141419;
+    --surface-2: #1B1B22;
+    --line:      #26262F;
+    --line-soft: #1F1F27;
+    --ink:       #ECECF2;
+    --muted:     #9A9AAB;
+    --faint:     #6E6E7E;
+
+    --brand:     #96A5FF;
+    --brand-bg:  #1C1D33;
+    --ai:        #B49BFF;
+    --ai-bg:     #221B36;
+    --amber:     #E0B152;
+    --amber-bg:  #2A2213;
+    --signal:    #FF8079;
+    --signal-bg: #2E1917;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -22px rgba(0,0,0,.7);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:    #0A0A0C;
+    --surface:   #141419;
+    --surface-2: #1B1B22;
+    --line:      #26262F;
+    --line-soft: #1F1F27;
+    --ink:       #ECECF2;
+    --muted:     #9A9AAB;
+    --faint:     #6E6E7E;
+
+    --brand:     #96A5FF;
+    --brand-bg:  #1C1D33;
+    --ai:        #B49BFF;
+    --ai-bg:     #221B36;
+    --amber:     #E0B152;
+    --amber-bg:  #2A2213;
+    --signal:    #FF8079;
+    --signal-bg: #2E1917;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -22px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 96px; }
+
+  /* ── masthead ── */
+  .masthead { padding: 72px 0 36px; }
+  h1 {
+    font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    font-size: clamp(38px, 6vw, 62px);
+    line-height: 1.02;
+    letter-spacing: -0.032em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .standfirst {
+    margin: 16px 0 0;
+    max-width: 60ch;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  /* ── the three counts ── */
+  .tally {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 40px;
+    margin-top: 34px;
+    padding-top: 26px;
+    border-top: 1px solid var(--line);
+  }
+  .tally div { display: flex; flex-direction: column; gap: 2px; }
+  .tally b {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-size: 30px; font-weight: 700; letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .tally span { font-size: 13px; color: var(--faint); }
+  .tally .t-reach b { color: var(--brand); }
+  .tally .t-open  b { color: var(--amber); }
+
+  /* ── prose blocks ── */
+  .note {
+    margin-top: 34px;
+    padding: 20px 22px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+  }
+  .note h3 {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-size: 15px; font-weight: 600; margin: 0 0 8px;
+    letter-spacing: -0.005em;
+  }
+  .note p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--muted); max-width: 68ch; }
+  .note p + p { margin-top: 10px; }
+
+  /* ── personas ── */
+  .who { margin-top: 46px; }
+  .who-grid {
+    display: grid; gap: 10px; margin-top: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(228px, 1fr));
+  }
+  .who-card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 14px 16px;
+  }
+  .who-card strong { display: block; font-size: 15px; font-weight: 600; }
+  .who-card code { display: block; margin-top: 3px; font-size: 12px; color: var(--faint); }
+  .who-card em {
+    display: inline-block; margin-top: 8px; font-style: normal;
+    font-size: 12px; color: var(--muted);
+  }
+
+  /* ── sticky controls ── */
+  .controls {
+    position: sticky; top: 0; z-index: 20;
+    margin-top: 48px;
+    padding: 14px 0;
+    background: color-mix(in srgb, var(--ground) 92%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  }
+  .search {
+    flex: 1 1 220px; min-width: 0;
+    font: inherit; font-size: 15px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .search::placeholder { color: var(--faint); }
+  .search:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; border-color: transparent; }
+
+  .chip {
+    font: inherit; font-size: 13.5px; font-weight: 500;
+    padding: 8px 14px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line);
+    background: var(--surface); color: var(--muted);
+    display: inline-flex; align-items: center; gap: 7px;
+    white-space: nowrap;
+  }
+  .chip:hover { color: var(--ink); }
+  .chip .dot { width: 7px; height: 7px; border-radius: 999px; background: currentColor; }
+  .chip[aria-pressed="true"] { color: var(--ink); border-color: currentColor; }
+  .chip[data-k="screen"][aria-pressed="true"]  { color: var(--brand);  background: var(--brand-bg); }
+  .chip[data-k="copilot"][aria-pressed="true"] { color: var(--ai);     background: var(--ai-bg); }
+  .chip[data-k="under"][aria-pressed="true"]   { color: var(--ink);    background: var(--surface-2); }
+  .chip[data-k="open"][aria-pressed="true"]    { color: var(--amber);  background: var(--amber-bg); }
+  .chip[data-k="agentic"][aria-pressed="true"] { color: var(--ink);    background: var(--surface-2); }
+  .chip:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+  .count { margin-left: auto; font-size: 13px; color: var(--faint); font-variant-numeric: tabular-nums; }
+
+  /* ── pillar sections ── */
+  .pillar { margin-top: 44px; scroll-margin-top: 76px; }
+  .pillar-head { display: flex; align-items: baseline; gap: 12px; padding-bottom: 12px; }
+  .pillar-no {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums;
+  }
+  .pillar h2 {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-size: 23px; font-weight: 600; letter-spacing: -0.018em; margin: 0;
+  }
+  .pillar-sub { font-size: 14px; color: var(--faint); margin-left: auto; text-align: right; }
+
+  /* ── feature rows ── */
+  .rows {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px 28px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--line-soft);
+    align-items: start;
+  }
+  .row:first-child { border-top: 0; }
+  .row-l { min-width: 0; }
+  .row-name {
+    font-size: 15.5px; font-weight: 600; letter-spacing: -0.004em;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .row-brief { margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
+  .row-r { min-width: 0; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+
+  .where {
+    display: inline-flex; align-items: baseline; gap: 8px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px;
+    padding: 5px 10px; border-radius: 8px;
+    max-width: 100%; overflow-wrap: anywhere;
+  }
+  .where.screen  { background: var(--brand-bg); color: var(--brand); }
+  .where.copilot { background: var(--ai-bg);    color: var(--ai); }
+  .where.under   { background: var(--surface-2); color: var(--muted); }
+  .where.open    { background: var(--amber-bg); color: var(--amber); }
+  .where-lead { font-family: "Hanken Grotesk", sans-serif; font-size: 12px; opacity: .78; }
+
+  .tag {
+    font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    padding: 3px 7px; border-radius: 5px;
+  }
+  .tag.agentic { background: var(--ai-bg); color: var(--ai); }
+  .tag.blocked { background: var(--signal-bg); color: var(--signal); }
+  .tag.role    { background: var(--surface-2); color: var(--muted); }
+
+  .blocked-why {
+    font-size: 13px; line-height: 1.5; color: var(--signal);
+    background: var(--signal-bg); padding: 8px 11px; border-radius: 8px;
+    max-width: 60ch;
+  }
+
+  .empty { padding: 40px 20px; text-align: center; color: var(--faint); font-size: 15px; }
+
+  footer {
+    margin-top: 64px; padding-top: 26px;
+    border-top: 1px solid var(--line);
+    font-size: 14px; color: var(--muted);
+  }
+  footer code {
+    font-family: "JetBrains Mono", monospace; font-size: 12.5px;
+    background: var(--surface-2); padding: 2px 6px; border-radius: 5px; color: var(--ink);
+  }
+  footer p { max-width: 70ch; }
+
+  @media (max-width: 720px) {
+    .row { grid-template-columns: 1fr; gap: 10px; }
+    .masthead { padding-top: 48px; }
+    .pillar-sub { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>Where the AI lives</h1>
+    <p class="standfirst">
+      Every AI feature named in the Vadal product brief, and how to actually get to it —
+      the screen it sits on, or the sentence to type into the Copilot. Built to sit open
+      on a second monitor while you click through the product.
+    </p>
+
+    <div class="tally">
+      <div><b id="tallyTotal">57</b><span>named in the brief, all implemented</span></div>
+      <div class="t-reach"><b id="tallyReach">44</b><span>you can reach today</span></div>
+      <div class="t-open"><b id="tallyOpen">13</b><span>built, not yet wired to anything</span></div>
+    </div>
+
+    <div class="note">
+      <h3>The thirteen are not a rounding error</h3>
+      <p>
+        They are written, type-checked and covered by the registry — and nothing calls them,
+        so no amount of clicking will find them. They were reported as reachable until a
+        call-site audit caught it, because the original check only proved the code existed.
+        <code style="font-family:'JetBrains Mono',monospace;font-size:12.5px">scripts/ai-reachability.mjs</code>
+        now recomputes this from the source on demand, so the list stays honest.
+      </p>
+      <p>
+        The model is also not connected yet. Retrieval, citations, refusals, confirmation
+        and undo are all real; the language is generated deterministically until an API key
+        is set. Nothing on this page changes when it is.
+      </p>
+    </div>
+  </header>
+
+  <section class="who">
+    <div class="pillar-head" style="padding-bottom:2px">
+      <h2>Sign in as the right person first</h2>
+    </div>
+    <p class="row-brief" style="max-width:62ch;margin-top:2px">
+      Role decides what exists. An employee cannot see Pulse at all, so half of this page is
+      invisible signed in as one. Pick the persona that matches what you want to look at —
+      any of these on <code style="font-family:'JetBrains Mono',monospace;font-size:12.5px">/auth</code>, no password.
+    </p>
+    <div class="who-grid">
+      <div class="who-card"><strong>Aarav Sharma</strong><code>aarav@oliandhue.com</code><em>Employee · desk</em></div>
+      <div class="who-card"><strong>Ravi Prasad</strong><code>ravi@oliandhue.com</code><em>Employee · frontline, Plant Ops</em></div>
+      <div class="who-card"><strong>Anita Desai</strong><code>anita@oliandhue.com</code><em>Manager · Design</em></div>
+      <div class="who-card"><strong>Sunita Rao</strong><code>sunita@oliandhue.com</code><em>Manager · frontline, Night shift</em></div>
+      <div class="who-card"><strong>Priya Sharma</strong><code>priya@oliandhue.com</code><em>HR admin — sees everything</em></div>
+      <div class="who-card"><strong>Vadal Ops</strong><code>ops@vadal.ai</code><em>Super admin</em></div>
+    </div>
+  </section>
+
+  <div class="controls">
+    <input id="q" class="search" type="search" placeholder="Search features, routes, phrases…" aria-label="Search features">
+    <button class="chip" data-k="screen"  aria-pressed="false"><span class="dot"></span>On a screen</button>
+    <button class="chip" data-k="copilot" aria-pressed="false"><span class="dot"></span>Ask the Copilot</button>
+    <button class="chip" data-k="under"   aria-pressed="false"><span class="dot"></span>Runs underneath</button>
+    <button class="chip" data-k="open"    aria-pressed="false"><span class="dot"></span>Not wired</button>
+    <button class="chip" data-k="agentic" aria-pressed="false">Agentic only</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <main id="list"></main>
+
+  <footer>
+    <p>
+      Generated from <code>src/lib/ai/features.ts</code>, the registry the product itself
+      serves at <code>/api/ai/features</code>. Every row resolves to a named export, and the
+      “where” column is computed from real call sites rather than written by hand — that is
+      the difference between this list and the one before it.
+    </p>
+  </footer>
+</div>
+
+<script>
+/* Data mirrors src/lib/ai/features.ts. `where` is derived from the reachability
+   audit; `how` is the literal route or the phrase that triggers it. */
+const F = [
+ {p:"Onboarding",n:"Conversational onboarding",b:"Replaces static forms — asks role, team, location and language, then orders the home screen.",w:"open",how:"engines/onboarding · the auth flow still uses the old form"},
+ {p:"Onboarding",n:"Progressive profiling",b:"Two or three light questions per session over a fortnight instead of one long form.",w:"open",how:"engines/onboarding · nothing calls nextTurn() yet"},
+ {p:"Onboarding",n:"Locale & reading level",b:"Content simplified and localised per person, not just translated.",w:"open",how:"engines/text · localise() has no caller"},
+
+ {p:"Pulse",n:"Conversational check-in",b:"Tell it how the week went; it converts that into a structured Pulse entry to confirm.",w:"copilot",how:"“It's been a rough week”"},
+ {p:"Pulse",n:"Log the check-in",b:"Writes the entry to your private history — after you confirm it.",w:"copilot",how:"Confirm the card that follows the check-in",a:1},
+ {p:"Pulse",n:"Launch a quick pulse",b:"Drafts a three-question micro-survey for a segment, sends on confirm, undoable.",w:"copilot",how:"“Launch a quick pulse to Design about the new tooling”",a:1,r:"Manager+"},
+ {p:"Pulse",n:"Anomaly detection",b:"Compares a team against its own rolling baseline and drafts the manager's next step.",w:"copilot",how:"“Why did Sales sentiment drop?”",r:"Manager+"},
+ {p:"Pulse",n:"Diagnose the dip",b:"Sends an anonymous diagnostic micro-survey to the affected team.",w:"copilot",how:"Same question — confirm the card it proposes",a:1,r:"Manager+"},
+ {p:"Pulse",n:"Chase non-responders",b:"Reminds only the people who haven't answered, in the channel each of them reads.",w:"copilot",how:"“Chase everyone who hasn't completed the survey”",a:1,r:"Manager+"},
+ {p:"Pulse",n:"Wave summary",b:"Plain-language summary of a survey wave, with the source quotes kept.",w:"copilot",how:"“Summarise what people said in the last wave”",r:"Manager+"},
+ {p:"Pulse",n:"Theme extraction",b:"Clusters open text into themes, with an anonymity floor so small teams stay unnamed.",w:"open",how:"Sentiment still uses its own seeded data, not extractThemes()"},
+ {p:"Pulse",n:"Adaptive survey length",b:"A happy respondent answers two questions; a struggling one answers five.",w:"open",how:"engines/survey · no survey UI calls nextQuestion()"},
+ {p:"Pulse",n:"Smart send time",b:"Picks the hour and channel each person actually responds on, respecting quiet hours.",w:"open",how:"engines/timing · planSend() has no caller"},
+
+ {p:"Connect",n:"Write it up as a post",b:"Drafts a publishable post from the underlying workspace data.",w:"copilot",how:"“Write up the Line 2 safety streak as a post”",a:1,r:"Manager+"},
+ {p:"Connect",n:"Post composition",b:"Turns a voice note or a couple of phrases into clean prose.",w:"copilot",how:"Runs inside the post draft above"},
+ {p:"Connect",n:"Moderation",b:"Checks the draft for abuse or targeting before it can publish.",w:"under",how:"Shown as “Moderation: Passed” on the post card"},
+ {p:"Connect",n:"Schedule a milestone post",b:"Spots a work anniversary or certification and queues a post for the morning.",w:"copilot",how:"“Schedule a post for Anita's work anniversary”",a:1,r:"Manager+"},
+ {p:"Connect",n:"Send recognition",b:"Drafts the kudos, posts it on confirm, undoable.",w:"copilot",how:"“Give kudos to Meera”",a:1},
+ {p:"Connect",n:"Auto-tagging",b:"Tags posts by team, topic and sentiment.",w:"open",how:"engines/text · tagPost() has no caller"},
+ {p:"Connect",n:"Feed ranking",b:"Balances what's relevant to you against company-wide moments nobody should miss.",w:"open",how:"engines/personalize · the feed is still chronological"},
+ {p:"Connect",n:"Kudos-spotting",b:"Surfaces moments worth recognising and prompts the manager.",w:"open",how:"engines/signals · scanAnomalies() is never called"},
+
+ {p:"Amplify",n:"Caption in your voice",b:"Four tones, editable, drafted for the platform you're posting to.",w:"screen",how:"/product/amplify → opt in → Share this"},
+ {p:"Amplify",n:"Best time to post",b:"Peak engagement window per platform, weekday and weekend.",w:"screen",how:"/product/amplify → under the caption"},
+ {p:"Amplify",n:"Advocacy impact",b:"Modelled reach and the contributors worth recognising. Labelled as modelled.",w:"screen",how:"/product/amplify → admin only",r:"Admin"},
+ {p:"Amplify",n:"Share to your profile",b:"Drafts the caption and the timing — then stops.",w:"copilot",how:"“Share that last company post for me on LinkedIn”",a:1,bl:"Needs a per-platform feasibility spike and your own OAuth grant. The brief requires the spike before this is committed to."},
+ {p:"Amplify",n:"Queue for advocacy",b:"Builds the curated card with caption options and a send time.",w:"copilot",how:"“Queue this for advocacy”",a:1,r:"Admin"},
+
+ {p:"Thrive",n:"Personalised nudges",b:"Timed to the hour you actually act, not the hour it was generated.",w:"screen",how:"/product/thrive → top right of the hero"},
+ {p:"Thrive",n:"Fair challenge cohorts",b:"Groups by how much your job already moves you, so a picker and a designer compete fairly.",w:"screen",how:"/product/thrive → Your leaderboard group"},
+ {p:"Thrive",n:"Wellbeing check",b:"Activity drop plus a mood dip offers a gentle handoff. Consent-gated, never seen by a manager.",w:"screen",how:"/product/thrive → switch on “Allow wellbeing checks”"},
+ {p:"Thrive",n:"Financial guidance",b:"Education by income band and region. Refuses to recommend a product — that's regulated advice.",w:"screen",how:"/product/thrive → Ask about money · try “which fund should I buy?”"},
+ {p:"Thrive",n:"Log activity",b:"Conversational logging instead of a form.",w:"copilot",how:"“I ran 5k this morning”",a:1},
+ {p:"Thrive",n:"Renegotiate a goal",b:"Sets a target about 15% above what you've actually been hitting.",w:"copilot",how:"“That step goal feels too easy, change it”",a:1},
+ {p:"Thrive",n:"Unused benefit",b:"Flags what you haven't used before enrolment closes and offers to book a call.",w:"copilot",how:"“Do I have any unused benefits?”",a:1},
+
+ {p:"Broadcast",n:"Policy Q&A",b:"Answers only from your own approved documents, cites the sentence, refuses when it can't ground.",w:"copilot",how:"“How many paid leaves do I get?” — then try something not in the docs"},
+ {p:"Broadcast",n:"Drafting assistant",b:"Bullet points into an announcement in the company's tone at the right reading level.",w:"copilot",how:"“Draft the PPE update for Plant Ops”",r:"Manager+"},
+ {p:"Broadcast",n:"Draft an announcement",b:"Queues it pending approval — an AI-assisted draft cannot send itself.",w:"copilot",how:"Confirm the card from the draft above",a:1,r:"Manager+"},
+ {p:"Broadcast",n:"Chase acknowledgement",b:"Reminds only those who haven't confirmed. Critical messages ignore the fatigue limit.",w:"copilot",how:"“Chase acknowledgement on the safety policy”",a:1,r:"Manager+"},
+ {p:"Broadcast",n:"Weekly digest",b:"What you missed while on leave or off-shift, critical items first.",w:"copilot",how:"“What did I miss while I was on leave?”"},
+ {p:"Broadcast",n:"Translation & reading level",b:"Per-recipient language and literacy, not one broadcast for everyone.",w:"open",how:"engines/text · localise() has no caller"},
+ {p:"Broadcast",n:"Delivery optimisation",b:"Best channel and hour per segment, with quiet hours enforced.",w:"open",how:"engines/timing · planSegment() has no caller"},
+
+ {p:"Grow",n:"Course from a document",b:"Paste an SOP, get modules, timings and draft quiz questions — each traceable to its source sentence. Safety-critical content cannot publish without a named reviewer, enforced in code.",w:"screen",how:"/product/grow → Create a course → Generate",r:"Manager+"},
+ {p:"Grow",n:"Path recommendations",b:"Driven by what your team said in Pulse and incidents on your line, with the reason shown.",w:"screen",how:"/product/grow → Suggested for you"},
+ {p:"Grow",n:"Adaptive quizzing",b:"Difficulty follows recent accuracy; spaced repetition decides what returns.",w:"screen",how:"/product/grow → Adaptive practice"},
+ {p:"Grow",n:"Module tutor",b:"Answers only from that module's source content, and says so when it can't.",w:"screen",how:"/product/grow → Ask about this module"},
+ {p:"Grow",n:"Make this a course",b:"Same generator, reached by asking.",w:"copilot",how:"“Make this a course from the lockout tagout SOP”",a:1,r:"Manager+"},
+ {p:"Grow",n:"Assign a path",b:"Enrols a team when Pulse flags a gap, with a note explaining why.",w:"copilot",how:"“Assign learning to Plant Ops”",a:1,r:"Manager+"},
+
+ {p:"One-to-One Help",n:"Crisis resources",b:"First on the page, above the AI. Takes no conversation and no risk score as input.",w:"screen",how:"/product/help → top of the screen, always"},
+ {p:"One-to-One Help",n:"Empathetic intake",b:"Reflects back what it heard in plain language, then asks one gentle question.",w:"screen",how:"/product/help → “Talk it through”"},
+ {p:"One-to-One Help",n:"Urgency triage",b:"Bands the conversation for routing. Never a diagnosis, and says so on screen.",w:"screen",how:"Type “I've been overwhelmed and can't cope”"},
+ {p:"One-to-One Help",n:"Resource matching",b:"A short exercise or script for lower-stakes moments — never instead of a human in the acute band.",w:"screen",how:"Appears under the conversation"},
+ {p:"One-to-One Help",n:"Consented handoff",b:"A short factual summary for the counsellor, built only if you tick the box.",w:"screen",how:"/product/help → “Share a short summary”"},
+ {p:"One-to-One Help",n:"Book a counsellor",b:"Books and passes the summary, with consent.",w:"copilot",how:"Any wellbeing message opens the card",a:1,bl:"Clinical, legal and HR sign-off on the triage thresholds and data-access rules is a hard blocker on launch, not a fast-follow."},
+ {p:"One-to-One Help",n:"Acute-risk escalation",b:"Surfaces crisis resources always; notifies a responder only under a signed policy.",w:"copilot",how:"Handled by the engine on acute phrasing",a:1,bl:"The escalation policy is unsigned, so no third party is notified. assertLaunchable() throws without it."},
+
+ {p:"Cross-cutting",n:"The Copilot",b:"One assistant on every screen — answers, drafts, proposes actions, cites its sources.",w:"copilot",how:"The dock, bottom right of any product page"},
+ {p:"Cross-cutting",n:"Guardrails",b:"Outputs labelled AI-assisted; a tool that reaches people must confirm and must undo.",w:"under",how:"Enforced at build — assertRegistryIsSafe() throws otherwise"},
+ {p:"Cross-cutting",n:"Personalization engine",b:"One profile ranking the feed, ordering home and choosing learning.",w:"open",how:"engines/personalize · orderHome() has no caller"},
+ {p:"Cross-cutting",n:"Signal engine",b:"One employee-experience score from all three listening surfaces.",w:"open",how:"engines/signals · employeeExperienceScore() has no caller"},
+];
+
+const PILLARS = ["Onboarding","Pulse","Connect","Amplify","Thrive","Broadcast","Grow","One-to-One Help","Cross-cutting"];
+const LEAD = { screen:"Go to", copilot:"Ask", under:"Runs", open:"Where it is" };
+
+const list = document.getElementById("list");
+const countEl = document.getElementById("count");
+const q = document.getElementById("q");
+const chips = [...document.querySelectorAll(".chip")];
+const active = new Set();
+
+function esc(s){ return s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+
+function render() {
+  const term = q.value.trim().toLowerCase();
+  const wantAgentic = active.has("agentic");
+  const wheres = [...active].filter(k => k !== "agentic");
+
+  let shown = 0;
+  list.innerHTML = PILLARS.map((p, i) => {
+    const rows = F.filter(f =>
+      f.p === p &&
+      (!wheres.length || wheres.includes(f.w)) &&
+      (!wantAgentic || f.a) &&
+      (!term || (f.n + " " + f.b + " " + f.how).toLowerCase().includes(term))
+    );
+    if (!rows.length) return "";
+    shown += rows.length;
+
+    const body = rows.map(f => `
+      <div class="row">
+        <div class="row-l">
+          <div class="row-name">${esc(f.n)}
+            ${f.a  ? '<span class="tag agentic">Agentic</span>' : ""}
+            ${f.bl ? '<span class="tag blocked">Blocked</span>' : ""}
+            ${f.r  ? `<span class="tag role">${esc(f.r)}</span>` : ""}
+          </div>
+          <p class="row-brief">${esc(f.b)}</p>
+        </div>
+        <div class="row-r">
+          <span class="where ${f.w}"><span class="where-lead">${LEAD[f.w]}</span>${esc(f.how)}</span>
+          ${f.bl ? `<span class="blocked-why">${esc(f.bl)}</span>` : ""}
+        </div>
+      </div>`).join("");
+
+    const open = rows.filter(f => f.w === "open").length;
+    return `
+      <section class="pillar" id="p${i}">
+        <div class="pillar-head">
+          <span class="pillar-no">${String(i).padStart(2,"0")}</span>
+          <h2>${esc(p)}</h2>
+          <span class="pillar-sub">${rows.length} feature${rows.length===1?"":"s"}${open?` · ${open} not wired`:""}</span>
+        </div>
+        <div class="rows">${body}</div>
+      </section>`;
+  }).join("") || `<p class="empty">Nothing matches that.</p>`;
+
+  countEl.textContent = `${shown} of ${F.length}`;
+}
+
+chips.forEach(c => c.addEventListener("click", () => {
+  const k = c.dataset.k;
+  const on = c.getAttribute("aria-pressed") === "true";
+  c.setAttribute("aria-pressed", String(!on));
+  on ? active.delete(k) : active.add(k);
+  render();
+}));
+q.addEventListener("input", render);
+
+document.getElementById("tallyTotal").textContent = F.length;
+document.getElementById("tallyReach").textContent = F.filter(f => f.w !== "open").length;
+document.getElementById("tallyOpen").textContent  = F.filter(f => f.w === "open").length;
+render();
+</script>
