@@ -67,6 +67,63 @@ export function activityNudges(a: ActivityState): Nudge[] {
   return out;
 }
 
+/* ── what actually matters for this person ─────────────────────────
+   The same reasoning that makes the leaderboard fair, applied to the goal
+   itself. buildCohorts() already knows a picker walking 18,000 steps at
+   work has not tried harder than a designer walking 8,000 — but the screen
+   was still setting both of them a step target, and telling a Line Operator
+   he was "3,800 steps short" of a number his job clears by Tuesday.
+
+   A step goal is only a goal for someone whose job keeps them still. For
+   everyone else the thing worth watching is recovery: sleep, and movement
+   that is theirs rather than the shift's. */
+
+export type Focus = {
+  metric: "steps" | "recovery";
+  /** Headline figure and its unit. */
+  value: number;
+  unit: string;
+  /** The target, where one is meaningful. */
+  goal?: number;
+  /** Said on the screen, because an unexplained goal feels arbitrary. */
+  why: string;
+  /** The single next thing worth doing. */
+  suggestion: string;
+};
+
+export function chooseFocus(
+  surface: "desk" | "frontline",
+  a: ActivityState,
+  atWorkStepsPerDay = 0,
+): Focus {
+  // Their job already moves them more than any target we would set.
+  if (surface === "frontline" || atWorkStepsPerDay > 12000) {
+    const debt = Math.max(0, Math.round((7.5 - a.sleepHoursAvg) * 10) / 10);
+    return {
+      metric: "recovery",
+      value: a.sleepHoursAvg,
+      unit: "hours of sleep",
+      goal: 7.5,
+      why: `Your shift already puts ${atWorkStepsPerDay.toLocaleString()} steps a day on you. Setting you a step target would be scoring you on your job.`,
+      suggestion: debt > 0.5
+        ? `You're about ${debt}h short most nights. One earlier night this week is worth more than any step goal.`
+        : "Sleep is holding up. Keep it there — it is the thing that makes the shift survivable.",
+    };
+  }
+
+  const remaining = Math.max(0, a.stepGoal - a.stepsThisWeek);
+  return {
+    metric: "steps",
+    value: a.stepsThisWeek,
+    unit: "steps this week",
+    goal: a.stepGoal,
+    why: "Desk work leaves the moving to you, so this is a goal worth having.",
+    suggestion: remaining > 0
+      ? `${remaining.toLocaleString()} to go — one walk would do it.`
+      : "Goal cleared. Anything else this week is a bonus.",
+  };
+}
+
 /* ── financial guidance (regulated — read the constraint) ─────── */
 
 export type IncomeBand = "entry" | "mid" | "senior";

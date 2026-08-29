@@ -16,6 +16,21 @@ export const myActivity: ActivityState = {
   activeHours: [7, 12, 13, 18, 19, 19, 20],
 };
 
+/**
+ * Steps the shift itself puts on you, per day.
+ *
+ * The number that makes a step goal meaningless for a Line Operator — and the
+ * one the screen never used to know about.
+ */
+export const atWorkStepsPerDay = 17400;
+
+/** Seven days, oldest first. A wellbeing product with no history is a snapshot. */
+export const weekSteps = [7400, 6100, 8300, 5200, 6900, 4100, 3200];
+/** The plant's week, for anyone whose job does the walking. */
+export const weekStepsFrontline = [16800, 18200, 17100, 19400, 16200, 8600, 5900];
+export const weekSleep = [5.4, 6.1, 5.2, 5.8, 4.9, 7.2, 6.4];
+export const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
+
 export const devices = [
   { name: "Google Fit", connected: true, syncs: "steps · active minutes · sleep" },
   { name: "Apple Health", connected: false, syncs: "steps · workouts · sleep" },
