@@ -23,7 +23,7 @@
      until it has something to say. */
 import * as React from "react";
 import Link from "next/link";
-import { Activity, ArrowRight, CalendarClock, GraduationCap, HeartPulse, Moon, Plus, Trophy, Wallet, Watch } from "lucide-react";
+import { Activity, ArrowRight, CalendarClock, GraduationCap, HeartPulse, Plus, Trophy, Wallet, Watch } from "lucide-react";
 import { Badge, Button, SparkMark, Switch } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { activityNudges, buildCohorts, chooseFocus, contentFor, financialTips, moneyMoment, unusedBenefits, wellbeingCheck } from "@/lib/ai/engines/wellbeing";
@@ -31,6 +31,7 @@ import {
   myActivity, devices, challenges, participants, benefits, wealthArticles, points, mySignals,
   atWorkStepsPerDay, weekSteps, weekStepsFrontline, weekSleep, weekDays, moneyConfig,
 } from "@/lib/thrive";
+import { GoalRing, DayArea } from "@/components/charts";
 import { useSession } from "../useSession";
 import { toast } from "../Toaster";
 
@@ -39,40 +40,6 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 function Card({ className = "", children }: { className?: string; children: React.ReactNode }) {
   return <section className={`card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>{children}</section>;
-}
-
-/* ── seven days, so a bad week looks like a bad week ────────────── */
-function WeekBars({ values, goal, unit }: { values: number[]; goal?: number; unit: string }) {
-  const max = Math.max(...values, goal ?? 0) * 1.08;
-  return (
-    <div className="flex items-end gap-1.5" role="img" aria-label={`Last seven days, ${unit}`}>
-      {values.map((v, i) => {
-        const met = goal !== undefined && v >= goal;
-        const today = i === values.length - 1;
-        return (
-          <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
-            <div className="relative flex h-16 w-full items-end justify-center">
-              <span
-                className="w-full rounded-[4px] transition-[height] duration-500"
-                style={{
-                  height: `${Math.max(6, (v / max) * 100)}%`,
-                  /* A day below the goal still happened — at --line it was
-                     invisible against the card and six of seven bars vanished. */
-                  background: today
-                    ? "var(--client-brand, var(--purple))"
-                    : met
-                      ? "color-mix(in srgb, var(--client-brand, var(--purple)) 48%, transparent)"
-                      : "color-mix(in srgb, var(--muted) 34%, transparent)",
-                }}
-                title={`${v} ${unit}`}
-              />
-            </div>
-            <span className={`text-[11px] ${today ? "font-semibold text-ink" : "text-faint"}`}>{weekDays[i]}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
 }
 
 export function ThriveHub() {
@@ -109,66 +76,78 @@ export function ThriveHub() {
   const shiftContent = contentFor(surface, session?.team ?? "");
   const [moved, setMoved] = React.useState(false);
 
-  const pct = focus.goal ? Math.min(100, Math.round((focus.value / focus.goal) * 100)) : 0;
 
   return (
     <div className="flex flex-col gap-6">
 
-      {/* ══ HERO ══ the metric that is actually theirs, and why ══ */}
-      <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card p-7 shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)] sm:p-9">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, var(--client-brand, var(--purple)), transparent 70%)" }} aria-hidden />
+      {/* ══ HERO ══ the metric that is actually theirs, and why ══
+          Depth here is deliberate: this is the one thing on the page that
+          should feel like a made object rather than a container. An Aurora
+          wash on the surface, the brand glow behind it, and a hairline of
+          gradient at the top edge — the same signature the AI dock uses,
+          because this number is chosen by the same engine. */}
+      <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card shadow-[0_1px_2px_rgba(20,20,40,0.04),0_24px_56px_-32px_rgba(20,20,40,0.32)]">
+        <span aria-hidden className="ai-grad absolute inset-x-0 top-0 h-[2px] opacity-70" />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "radial-gradient(120% 100% at 100% 0%, color-mix(in srgb, var(--client-brand, var(--purple)) 9%, transparent), transparent 62%)" }}
+          aria-hidden
+        />
 
-        <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+        <div className="relative grid gap-8 p-7 sm:p-9 lg:grid-cols-[auto_1fr_1.05fr] lg:items-center">
+          {/* the ratio, as a ratio */}
+          <GoalRing
+            id="thrive-goal"
+            value={focus.value}
+            goal={focus.goal ?? 1}
+            size={132}
+            label={isRecovery ? `of ${focus.goal}h` : `of ${(focus.goal ?? 0) / 1000}k`}
+            format={(v) => (isRecovery ? `${v}h` : `${(v / 1000).toFixed(1)}k`)}
+          />
+
           <div className="min-w-0">
             <Eyebrow>{isRecovery ? "Your recovery" : "Your week"}</Eyebrow>
-            <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">
-              {isRecovery ? `${focus.value}h` : focus.value.toLocaleString()}{" "}
-              <span className="text-muted">
-                {isRecovery ? `a night · aiming for ${focus.goal}h` : `of ${focus.goal?.toLocaleString()} steps`}
+            {/* weight contrast rather than size alone — the number is the
+                subject, the unit is grammar. */}
+            <h1 className="mt-2 text-[clamp(26px,3.2vw,38px)] font-bold leading-[1.02] tracking-[-0.03em]">
+              {isRecovery ? `${focus.value} hours` : focus.value.toLocaleString()}
+              <span className="block text-[16px] font-normal leading-snug tracking-normal text-muted">
+                {isRecovery ? `a night · aiming for ${focus.goal}` : `of ${focus.goal?.toLocaleString()} steps this week`}
               </span>
             </h1>
 
-            {focus.goal !== undefined && (
-              <div className="mt-3 h-2 w-full max-w-md overflow-hidden rounded-full bg-line">
-                <span className="block h-full rounded-full transition-[width] duration-700" style={{ width: `${pct}%`, background: "var(--client-brand, var(--purple))" }} />
-              </div>
-            )}
-
-            {/* Why this is the number, not a step target. The screen used to
-                measure a Line Operator on his own shift. */}
-            <p className="mt-3 max-w-md text-[14px] leading-relaxed text-muted">{focus.why}</p>
+            <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-muted">{focus.why}</p>
 
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] text-muted">
               {isRecovery && (
-                <span className="flex items-center gap-1.5"><Activity className="h-3.5 w-3.5 text-faint" />{atWorkStepsPerDay.toLocaleString()} steps on shift</span>
+                <span className="flex items-center gap-1.5"><Activity className="h-3.5 w-3.5 text-faint" />{atWorkStepsPerDay.toLocaleString()} on shift</span>
               )}
-              <span className="flex items-center gap-1.5"><Moon className="h-3.5 w-3.5 text-faint" />{myActivity.sleepHoursAvg}h average sleep</span>
               <span className="flex items-center gap-1.5"><Trophy className="h-3.5 w-3.5 text-faint" />{points.balance.toLocaleString()} pts · #{points.rank}</span>
             </div>
           </div>
 
-          {/* seven days — the dimension the screen was missing entirely */}
+          {/* the week, as a week — a shape, not seven rectangles */}
           <div className="min-w-0">
             <div className="flex items-baseline justify-between gap-2">
               <Eyebrow>Last 7 days</Eyebrow>
               <span className="text-[12px] text-faint">{isRecovery ? "hours slept" : "steps"}</span>
             </div>
-            {/* The bars are DAILY; the step goal is weekly. Comparing the two
-                scaled every bar to about 15% and the chart read as flat. Sleep
-                is already a nightly target, so it passes through. */}
-            <div className="mt-3">
-              <WeekBars
-                values={series}
-                goal={isRecovery ? focus.goal : focus.goal ? Math.round(focus.goal / 7) : undefined}
-                unit={isRecovery ? "hours" : "steps"}
-              />
-            </div>
+            <DayArea
+              id="thrive-week"
+              className="mt-2"
+              values={series}
+              labels={weekDays}
+              unit={isRecovery ? "hours" : "steps"}
+              goal={isRecovery ? focus.goal : focus.goal ? Math.round(focus.goal / 7) : undefined}
+            />
           </div>
         </div>
 
-        {/* one thing to do, as an action rather than a card to read */}
-        <div className="relative mt-6 flex flex-wrap items-center gap-3 border-t border-line pt-5">
-          <span className="ai-grad grid h-8 w-8 shrink-0 place-items-center rounded-full"><SparkMark size={16} tone="solid" /></span>
+        {/* one thing to do, on its own ground so it reads as the action */}
+        <div className="relative flex flex-col gap-4 border-t border-line bg-soft/60 px-7 py-5 sm:flex-row sm:items-center sm:gap-3 sm:px-9">
+          <span className="ai-grad ai-aura grid h-8 w-8 shrink-0 place-items-center rounded-full"><SparkMark size={16} tone="solid" /></span>
+          {/* full width on a phone: sharing a row with the button squeezed this
+              to one word per line. */}
           <p className="min-w-0 flex-1 text-[16px] leading-snug">{focus.suggestion}</p>
           <Button
             variant="brand"
@@ -184,7 +163,9 @@ export function ThriveHub() {
         </div>
 
         {logged.length > 0 && (
-          <p className="relative mt-3 text-[12px] text-faint">{logged.length} logged today. Undo from the Copilot if that was a mistake.</p>
+          <p className="relative border-t border-line px-7 py-3 text-[12px] text-faint sm:px-9">
+            {logged.length} logged today. Undo from the Copilot if that was a mistake.
+          </p>
         )}
       </header>
 

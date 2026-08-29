@@ -1,4 +1,8 @@
-/* Hand-rolled SVG chart primitives — no chart library, full visual control. */
+"use client";
+/* Hand-rolled SVG chart primitives — no chart library, full visual control.
+   Client-only: the charts below carry their own hover state. Every consumer is
+   already a client component, so this costs nothing. */
+import * as React from "react";
 
 function smoothPath(
   values: number[],
@@ -316,5 +320,224 @@ export function BlobArt({ className = "" }: { className?: string }) {
         }}
       />
     </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Thrive charts.
+
+   Form before colour, per the house method. Two jobs, two forms:
+
+   · "am I hitting my goal" is a RATIO, not a series — a ring reads a
+     ratio in one glance where a linear bar reads as a slot to fill.
+   · "how has my week gone" is CHANGE OVER TIME with a target. That is
+     an area with a reference line, not two-tone bars: the bars encoded
+     above/below in colour alone, which is both less legible and less
+     beautiful than simply drawing the line they are above or below.
+
+   One series, so one hue and no legend — the heading names it. The goal
+   is a dashed rule, so above/below is read from position rather than
+   from colour, and today is the only labelled point.
+   ══════════════════════════════════════════════════════════════════ */
+
+/** Progress toward a goal, as a ratio. Brand gradient, draws in on mount. */
+export function GoalRing({
+  value,
+  goal,
+  size = 132,
+  stroke = 10,
+  label,
+  format = (v: number) => String(v),
+  id = "goal",
+}: {
+  value: number;
+  goal: number;
+  size?: number;
+  stroke?: number;
+  label?: string;
+  format?: (v: number) => string;
+  id?: string;
+}) {
+  const r = (size - stroke) / 2 - 2;
+  const c = size / 2;
+  const circ = 2 * Math.PI * r;
+  const pct = Math.max(0, Math.min(1, value / goal));
+  const dash = circ * pct;
+
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} aria-hidden>
+        <defs>
+          <linearGradient id={`${id}-ring`} x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" stopColor="var(--client-brand, var(--brand))" stopOpacity="0.75" />
+            <stop offset="1" stopColor="var(--brand-light)" />
+          </linearGradient>
+        </defs>
+        {/* track sits at low opacity so the ring reads on both grounds */}
+        <circle cx={c} cy={c} r={r} fill="none" stroke="var(--line)" strokeWidth={stroke} />
+        <circle
+          cx={c} cy={c} r={r}
+          fill="none"
+          stroke={`url(#${id}-ring)`}
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={`${dash} ${circ - dash}`}
+          transform={`rotate(-90 ${c} ${c})`}
+          className="ring-animate"
+          style={{ ["--ring-circ" as string]: `${circ}` }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-[26px] font-bold leading-none tracking-[-0.02em] text-ink tabular-nums">
+          {format(value)}
+        </span>
+        {label && <span className="mt-1.5 text-[12px] text-faint">{label}</span>}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Seven days against a daily target.
+ *
+ * Area + reference line rather than bars: the goal line does the work the
+ * two-tone bars were doing badly, and a filled curve carries a week's shape
+ * far better than seven separate rectangles.
+ */
+export function DayArea({
+  values,
+  goal,
+  labels,
+  height = 96,
+  unit = "",
+  id = "week",
+  className = "",
+}: {
+  values: number[];
+  goal?: number;
+  labels: string[];
+  height?: number;
+  unit?: string;
+  id?: string;
+  className?: string;
+}) {
+  const [hover, setHover] = React.useState<number | null>(null);
+  const w = 320;
+  const padY = 14;
+  const max = Math.max(...values, goal ?? 0) * 1.12;
+  const min = 0;
+  /* Inset the plot by 2% each side. The endpoint marker is centred on its
+     point, so a series running to exactly 100% hangs half a marker outside the
+     frame — and the curve looked cramped against both edges. */
+  const INSET = 0.02;
+  const x = (i: number) => (INSET + (i / (values.length - 1)) * (1 - INSET * 2)) * w;
+  const y = (v: number) => padY + (1 - (v - min) / (max - min)) * (height - padY * 2);
+
+  // Catmull–Rom → cubic bézier. A week has a shape; straight segments hide it.
+  const path = values
+    .map((v, i) => {
+      if (i === 0) return `M ${x(0)} ${y(v)}`;
+      const p0 = { x: x(i - 1), y: y(values[i - 1]) };
+      const p1 = { x: x(i), y: y(v) };
+      const cx = (p0.x + p1.x) / 2;
+      return `C ${cx} ${p0.y} ${cx} ${p1.y} ${p1.x} ${p1.y}`;
+    })
+    .join(" ");
+  const area = `${path} L ${x(values.length - 1)} ${height} L ${x(0)} ${height} Z`;
+  const last = values.length - 1;
+  const active = hover ?? last;
+
+  const pctX = (INSET + (active / (values.length - 1)) * (1 - INSET * 2)) * 100;
+  const pctY = ((y(values[active]) - 0) / height) * 100;
+
+  return (
+    <figure className={`m-0 ${className}`}>
+      {/* The path is stretched to fill the width, which is fine for a curve and
+          wrong for a circle — preserveAspectRatio="none" would turn the endpoint
+          marker into an ellipse and clip it at the edge. So the marker lives in
+          an HTML overlay positioned by percentage instead: always round, never
+          cropped, at any width. */}
+      <div className="relative" style={{ height }} onMouseLeave={() => setHover(null)}>
+        <svg
+          viewBox={`0 0 ${w} ${height}`}
+          width="100%"
+          height={height}
+          preserveAspectRatio="none"
+          role="img"
+          aria-label={`Last ${values.length} days${unit ? `, ${unit}` : ""}`}
+          className="block"
+        >
+          <defs>
+            <linearGradient id={`${id}-fill`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="var(--client-brand, var(--brand))" stopOpacity="0.30" />
+              <stop offset="1" stopColor="var(--client-brand, var(--brand))" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+
+          <path d={area} fill={`url(#${id}-fill)`} />
+
+          {/* the target, as a rule — this is what replaces the two-tone bars */}
+          {goal !== undefined && (
+            <line
+              x1={x(0)} x2={x(values.length - 1)} y1={y(goal)} y2={y(goal)}
+              stroke="var(--faint)" strokeWidth="1" strokeDasharray="3 4" opacity="0.7"
+              vectorEffect="non-scaling-stroke"
+            />
+          )}
+
+          <path
+            d={path}
+            fill="none"
+            stroke="var(--client-brand, var(--brand))"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+            className="draw-animate"
+          />
+        </svg>
+
+        {/* endpoint marker — round at any width */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute z-10 block h-[11px] w-[11px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[2.5px] bg-card transition-[left,top] duration-200"
+          style={{ left: `${pctX}%`, top: `${pctY}%`, borderColor: "var(--client-brand, var(--brand))" }}
+        />
+
+        {/* generous hit targets */}
+        <div className="absolute inset-0 flex">
+          {values.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-label={`${labels[i]}: ${values[i]} ${unit}`}
+              className="h-full flex-1 cursor-default"
+              onMouseEnter={() => setHover(i)}
+              onFocus={() => setHover(i)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-1.5 flex items-center justify-between">
+        {labels.map((l, i) => (
+          <span
+            key={i}
+            className={`flex-1 text-center text-[11px] tabular-nums transition-colors ${
+              i === active ? "font-semibold text-ink" : "text-faint"
+            }`}
+          >
+            {l}
+          </span>
+        ))}
+      </div>
+
+      <figcaption className="mt-1 text-[12px] text-faint tabular-nums">
+        {values[active].toLocaleString()} {unit}
+        {goal !== undefined && (
+          <span className="text-faint"> · target {goal.toLocaleString()}</span>
+        )}
+      </figcaption>
+    </figure>
   );
 }

@@ -190,3 +190,68 @@ it hides the fact that Grow is where learning lives.
 1. `MoneyMoment` — four states, with and without the timing chip
 2. `ShiftContent` — two variants, plus the Grow handoff row
 3. The desk case, which has neither card — worth drawing to show the difference
+
+---
+
+# 011c · Visual pass — charts, depth and the hero as a composition
+
+The logic was right and the craft was plain: eight identical cards, a linear
+progress bar, and seven grey rectangles. This raises the visual quality, and the
+two new chart primitives are for the whole product, not just Thrive.
+
+## 10 · Form before colour
+
+Two data jobs on this screen, and both had the wrong form.
+
+| Job | Was | Is | Why |
+|---|---|---|---|
+| "Am I hitting my goal?" | Linear progress bar | **`GoalRing`** | It is a *ratio*, and a ring reads a ratio in one glance where a bar reads as a slot to fill |
+| "How was my week?" | Seven two-tone bars | **`DayArea`** | It is *change over time with a target*. A week has a shape; seven rectangles hide it |
+
+The two-tone bars encoded above/below target **in colour alone**. The area draws
+the target as a dashed rule instead, so the same information is read from
+position — legible without colour, and better looking.
+
+### 10.1 `Component / Chart / GoalRing`
+
+132px, 10px stroke. Track in `--line`; the arc a gradient from
+`--client-brand` at 75% to `--brand-light`, `stroke-linecap: round`, starting at
+12 o'clock. Value centred at 26px/700 `tabular-nums`, unit beneath at 12px
+`--faint`. Sweeps in on mount via the existing `ring-animate`.
+
+### 10.2 `Component / Chart / DayArea`
+
+- Curve: 2.5px, `--client-brand`, `non-scaling-stroke`, Catmull–Rom smoothing
+- Fill: vertical gradient, brand at 30% → 2%
+- Target: 1px dashed `--faint` at 70%, spanning the plot only
+- Endpoint: 11px ring, `--card` centre, 2.5px brand border
+- Day labels beneath; the active one goes `--ink` and 600
+- Caption reads the active value and the target
+- Hover moves the marker and the caption; every day is a focusable hit target
+
+**Two build rules that are not cosmetic.** The plot is **inset 2% each side** —
+a series running to exactly 100% hangs half a marker outside the frame. And the
+**endpoint marker is an HTML overlay, not an SVG circle**: the chart stretches to
+fill its width, which is fine for a curve and turns a circle into a clipped
+ellipse. Position it by percentage over the SVG.
+
+## 11 · The hero as a composition
+
+Three columns — ring · type · chart — instead of a number and a bar.
+
+- **Aurora hairline** across the top edge at 2px, 70% opacity: the same signature
+  the AI dock uses, because this number is chosen by the same engine
+- **A brand wash** — `radial-gradient(120% 100% at 100% 0%, brand 9%, transparent 62%)`
+  over the card, so the surface has direction rather than being flat white
+- **Deeper elevation** than any other card: `0 24px 56px -32px`, against the standard
+  `0 18px 42px -26px`. The hero should feel like a made object; the rest are containers.
+- **Weight contrast in the type**: the value at 38px/700 `-0.03em`, the unit dropped
+  to a 16px/400 `--muted` line beneath it. The number is the subject; the unit is grammar.
+- **The action row sits on `bg-soft/60`** with its own top border, so it reads as a
+  footer to the composition rather than another paragraph.
+
+## 12 · What to draw
+
+1. `Chart / GoalRing` and `Chart / DayArea` — as design-system primitives, not Thrive parts
+2. `Thrive / Hero` — the three-column composition, both profile variants
+3. The elevation ladder: hero → primary card → quiet row, as three shadow tokens
