@@ -79,6 +79,28 @@ export const wealthArticles = [
   { id: "debt", title: "Paying down debt without going without", minutes: 5, topic: "Debt" },
 ];
 
+/**
+ * The three fields a money moment needs. Not a payroll integration —
+ * a pay day, a deadline and a regional window.
+ */
+export const moneyConfig = {
+  /**
+   * DEMO ONLY. A real workspace stores a fixed pay day (the 1st, the last
+   * working day). Seeding it as "two days ago" means the payday moment — the
+   * strongest thing this pillar does — is actually visible whenever someone
+   * opens the demo, instead of only in the first week of the month.
+   * Replace with the tenant's real pay day at integration.
+   */
+  demoPaydayDaysAgo: 2,
+  paydayDayOfMonth: 1,
+  /** What the person told us they would set aside, and whether it has moved. */
+  commitment: { amount: "₹3,000", movedThisCycle: false },
+  /** Mirrors the dental add-on in `benefits`. */
+  enrolmentClosesInDays: 21,
+  /** A real, recurring financial event that no competitor's product notices. */
+  festival: { name: "Diwali", opensInDays: 38 },
+};
+
 export const points = { balance: 4180, thisMonth: 340, rank: 7, of: 240 };
 
 /** Consent for the wellbeing check — off until the person turns it on. */

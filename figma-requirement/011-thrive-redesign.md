@@ -115,3 +115,78 @@ you.
 3. Wellbeing check — Off · On-quiet · Triggered
 4. `Money this week` card
 5. The collapsed devices line and the points link
+
+---
+
+# 011b · Money moments and shift-aware content
+
+Added after the redesign. The first pass made the *metric* fit the person. These
+two make the *content* fit the person, and the *timing* fit the week.
+
+## 7 · Money moments — `Component / Thrive / MoneyMoment`
+
+The brief asks for tips "tailored to income band, role and region". Band and
+region still produce an article that is equally true on any day of any year.
+What actually moves money is **timing**.
+
+> "An emergency fund comes first" is a fact.
+> "Your pay landed on Thursday and the ₹3,000 you said you'd move hasn't moved"
+> is a product.
+
+Four states, ranked by how time-sensitive they are. The card shows whichever is
+highest — never more than one.
+
+| State | When it wins | Timing chip | Action |
+|---|---|---|---|
+| **Payday** | Pay landed ≤ 4 days ago and a commitment hasn't moved | day name, brand tint | **Move ₹3,000 now** |
+| **Enrolment** | Closes within 30 days | "in 21 days", soft | **Review what you're on** |
+| **Festival** | India, advance window within 45 days | "in 38 days", soft | **How advances are repaid** |
+| **Steady** | Nothing time-sensitive | *no chip* | none — it is a read |
+
+**The timing chip is the component.** `CalendarClock` icon + the relative time,
+`rounded-full`, brand-tinted at `now` urgency and `bg-soft` otherwise. Without it
+the card is just another tip; with it, it is the reason to open the screen today
+rather than in general.
+
+Under the payday action, a reassurance line at 12px: *"Sets it up once. You can
+stop it any time."* The action is a standing instruction, and people are right to
+be wary of those.
+
+The disclaimer and handoff stay on every state. Timing changes what we say, never
+whether we are allowed to say it — `financialTips()` still refuses to name a
+product, and this sits on top of it.
+
+**Note for the build:** the demo seeds pay day as "two days ago" so the payday
+state is visible whenever someone opens it. A real tenant has a fixed pay day and
+will see the honest ranking.
+
+## 8 · Made for your shift — `Component / Thrive / ShiftContent`
+
+The metric knew Ravi works nights. The content did not — a night-shift Line
+Operator and a desk engineer were offered the same four articles.
+
+Card appears **only for frontline profiles**, at the top of the health column.
+
+- Aurora circle + eyebrow **MADE FOR YOUR SHIFT**
+- Headline 18px/700 — *"Working nights is a different problem"*
+- Body naming the three real problems: sleeping in daylight, eating at 3am, the
+  Monday reset — and *"None of them are willpower problems."* The tone matters:
+  this is the difference between wellbeing content that lands on a factory floor
+  and content that reads as a lecture.
+- **A handoff row into Grow**, not a duplicate article: 36px `bg-soft` tile with a
+  graduation-cap icon, course title, "7 min · in Grow", chevron. Links to
+  `/product/grow`.
+
+Two variants: `Team = Night shift` and `Profile = Frontline (other)`. A desk
+worker sees no card — their default content is already the right content, and an
+empty "made for you" card is worse than none.
+
+**Why the handoff rather than the article:** the material already exists one pillar
+over. Writing a second copy in Thrive would mean two things to keep current, and
+it hides the fact that Grow is where learning lives.
+
+## 9 · What to draw
+
+1. `MoneyMoment` — four states, with and without the timing chip
+2. `ShiftContent` — two variants, plus the Grow handoff row
+3. The desk case, which has neither card — worth drawing to show the difference

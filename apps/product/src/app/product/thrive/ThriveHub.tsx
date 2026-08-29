@@ -23,13 +23,13 @@
      until it has something to say. */
 import * as React from "react";
 import Link from "next/link";
-import { Activity, ArrowRight, HeartPulse, Moon, Plus, Trophy, Wallet, Watch } from "lucide-react";
+import { Activity, ArrowRight, CalendarClock, GraduationCap, HeartPulse, Moon, Plus, Trophy, Wallet, Watch } from "lucide-react";
 import { Badge, Button, SparkMark, Switch } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
-import { activityNudges, buildCohorts, chooseFocus, financialTips, unusedBenefits, wellbeingCheck } from "@/lib/ai/engines/wellbeing";
+import { activityNudges, buildCohorts, chooseFocus, contentFor, financialTips, moneyMoment, unusedBenefits, wellbeingCheck } from "@/lib/ai/engines/wellbeing";
 import {
   myActivity, devices, challenges, participants, benefits, wealthArticles, points, mySignals,
-  atWorkStepsPerDay, weekSteps, weekStepsFrontline, weekSleep, weekDays,
+  atWorkStepsPerDay, weekSteps, weekStepsFrontline, weekSleep, weekDays, moneyConfig,
 } from "@/lib/thrive";
 import { useSession } from "../useSession";
 import { toast } from "../Toaster";
@@ -94,8 +94,20 @@ export function ThriveHub() {
   const myCohort = cohorts.find((c) => c.members.some((m) => m.email === session?.email)) ?? cohorts[0];
   const check = wellbeingCheck({ ...mySignals, consented: consent });
   const benefitNudges = unusedBenefits(benefits);
-  const money = financialTips(surface === "frontline" ? "entry" : "mid", "IN");
-  const moneyOfWeek = Array.isArray(money) ? money[0] : null;
+  const band = surface === "frontline" ? "entry" : "mid";
+  /* Read once per mount rather than per render — a Date created in render
+     would differ between server and client and break hydration. */
+  const [today] = React.useState(() => new Date());
+  // See moneyConfig: the demo pay day is relative so the payday moment is
+  // visible on any day someone opens this. A real tenant has a fixed date.
+  const paydayDayOfMonth = React.useMemo(() => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - moneyConfig.demoPaydayDaysAgo);
+    return d.getDate();
+  }, [today]);
+  const moment = moneyMoment({ ...moneyConfig, today, band, region: "IN", paydayDayOfMonth });
+  const shiftContent = contentFor(surface, session?.team ?? "");
+  const [moved, setMoved] = React.useState(false);
 
   const pct = focus.goal ? Math.min(100, Math.round((focus.value / focus.goal) * 100)) : 0;
 
@@ -212,6 +224,32 @@ export function ThriveHub() {
 
         {/* ── health ── */}
         <div className="flex flex-col gap-6">
+          {/* The metric already knew Ravi works nights; the content did not.
+              The material for it exists one pillar over, so hand it over rather
+              than writing a second copy of it here. */}
+          {shiftContent && (
+            <Card>
+              <div className="flex items-center gap-2">
+                <span className="ai-grad grid h-7 w-7 place-items-center rounded-full"><SparkMark size={15} tone="solid" /></span>
+                <Eyebrow>Made for your shift</Eyebrow>
+              </div>
+              <h2 className="mt-2 text-[18px] font-bold leading-snug tracking-[-0.015em]">{shiftContent.headline}</h2>
+              <p className="mt-2 text-[16px] leading-relaxed text-muted">{shiftContent.body}</p>
+              {shiftContent.course && (
+                <Link href="/product/grow" className="mt-4 flex min-h-[44px] items-center gap-3 rounded-2xl border border-line p-4 transition hover:bg-soft">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-soft text-[var(--purple)]">
+                    <GraduationCap className="h-[18px] w-[18px]" strokeWidth={1.85} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[14px] font-semibold">{shiftContent.course.title}</span>
+                    <span className="block text-[12px] text-faint">{shiftContent.course.minutes} min · in Grow</span>
+                  </span>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-faint" />
+                </Link>
+              )}
+            </Card>
+          )}
+
           <Card>
             <Eyebrow>Challenges</Eyebrow>
             <ul className="mt-4 flex flex-col gap-3">
@@ -270,46 +308,80 @@ export function ThriveHub() {
 
         {/* ── money — equal billing, per the brief ── */}
         <div className="flex flex-col gap-6">
-          {moneyOfWeek && (
-            <Card>
-              <div className="flex items-center gap-2">
-                <Wallet className="h-4 w-4 text-[var(--purple)]" />
-                <Eyebrow>Money this week</Eyebrow>
-              </div>
-              <h2 className="mt-2 text-[20px] font-bold leading-snug tracking-[-0.015em]">{moneyOfWeek.title}</h2>
-              <p className="mt-2 text-[16px] leading-relaxed text-muted">{moneyOfWeek.body}</p>
-              <p className="mt-3 text-[12px] leading-snug text-faint">{moneyOfWeek.disclaimer} {moneyOfWeek.handoff}</p>
+          {/* The money moment. An article is equally true on any day; this is
+              the one that is true TODAY, and the reason the wealth half is
+              worth opening rather than worth having. */}
+          <Card>
+            <div className="flex flex-wrap items-center gap-2">
+              <Wallet className="h-4 w-4 text-[var(--purple)]" />
+              <Eyebrow>Money</Eyebrow>
+              {moment.kind !== "steady" && (
+                <span
+                  className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold"
+                  style={{
+                    background: moment.urgency === "now"
+                      ? "color-mix(in srgb, var(--client-brand, var(--purple)) 14%, transparent)"
+                      : "var(--soft)",
+                    color: moment.urgency === "now" ? "var(--client-brand, var(--purple))" : "var(--muted)",
+                  }}
+                >
+                  <CalendarClock className="h-3 w-3" /> {moment.when}
+                </span>
+              )}
+            </div>
 
-              <div className="mt-5 rounded-2xl bg-[var(--ai-surface)] p-4 ring-1 ring-[var(--ai-border)]">
-                <Eyebrow>Ask about money</Eyebrow>
-                <form onSubmit={(e) => { e.preventDefault(); setMoneyAnswer(financialTips(surface === "frontline" ? "entry" : "mid", "IN", askedMoney)); }} className="mt-2 flex items-center gap-2">
-                  <input value={askedMoney} onChange={(e) => setAskedMoney(e.target.value)} placeholder="e.g. how much should I save?"
-                    className="min-h-[44px] min-w-0 flex-1 rounded-full border border-line bg-card px-3.5 text-[16px] outline-none focus:border-[var(--ai-accent)]" />
-                  <Button type="submit" size="sm" variant="brand" className="min-h-[44px]">Ask</Button>
-                </form>
-                {moneyAnswer && ("refused" in moneyAnswer ? (
-                  <p className="mt-3 text-[14px] leading-relaxed">{moneyAnswer.refused}</p>
-                ) : (
-                  <div className="mt-3">
-                    <p className="text-[14px] font-semibold">{moneyAnswer[0].title}</p>
-                    <p className="mt-1 text-[14px] leading-relaxed text-muted">{moneyAnswer[0].body}</p>
-                    <p className="mt-2 text-[12px] leading-snug text-faint">{moneyAnswer[0].disclaimer}</p>
-                  </div>
-                ))}
-              </div>
+            <h2 className="mt-2 text-[20px] font-bold leading-snug tracking-[-0.015em]">{moment.title}</h2>
+            <p className="mt-2 text-[16px] leading-relaxed text-muted">{moment.body}</p>
 
-              <ul className="mt-4 flex flex-col gap-2">
-                {wealthArticles.slice(0, 4).map((a) => (
-                  <li key={a.id}>
-                    <button onClick={() => toast(`Opening “${a.title}”`)} className="flex min-h-[44px] w-full items-center gap-2 rounded-xl border border-line px-3.5 text-left transition hover:bg-soft">
-                      <span className="min-w-0 flex-1 truncate text-[14px] font-medium">{a.title}</span>
-                      <span className="shrink-0 text-[12px] text-faint">{a.minutes} min</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          )}
+            {moment.action && (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <Button
+                  variant={moved ? "tertiary" : "brand"}
+                  className="min-h-[44px]"
+                  onClick={() => {
+                    setMoved(true);
+                    toast(moment.kind === "payday" ? "Standing instruction set — it'll move on payday from now on" : "Opening the details");
+                  }}
+                >
+                  {moved ? "Done" : moment.action}
+                </Button>
+                {moment.kind === "payday" && !moved && (
+                  <span className="text-[12px] text-faint">Sets it up once. You can stop it any time.</span>
+                )}
+              </div>
+            )}
+
+            <p className="mt-3 text-[12px] leading-snug text-faint">{moment.disclaimer} {moment.handoff}</p>
+
+            <div className="mt-5 rounded-2xl bg-[var(--ai-surface)] p-4 ring-1 ring-[var(--ai-border)]">
+              <Eyebrow>Ask about money</Eyebrow>
+              <form onSubmit={(e) => { e.preventDefault(); setMoneyAnswer(financialTips(band, "IN", askedMoney)); }} className="mt-2 flex items-center gap-2">
+                <input value={askedMoney} onChange={(e) => setAskedMoney(e.target.value)} placeholder="e.g. how much should I save?"
+                  className="min-h-[44px] min-w-0 flex-1 rounded-full border border-line bg-card px-3.5 text-[16px] outline-none focus:border-[var(--ai-accent)]" />
+                <Button type="submit" size="sm" variant="brand" className="min-h-[44px]">Ask</Button>
+              </form>
+              {moneyAnswer && ("refused" in moneyAnswer ? (
+                <p className="mt-3 text-[14px] leading-relaxed">{moneyAnswer.refused}</p>
+              ) : (
+                <div className="mt-3">
+                  <p className="text-[14px] font-semibold">{moneyAnswer[0].title}</p>
+                  <p className="mt-1 text-[14px] leading-relaxed text-muted">{moneyAnswer[0].body}</p>
+                  <p className="mt-2 text-[12px] leading-snug text-faint">{moneyAnswer[0].disclaimer}</p>
+                </div>
+              ))}
+            </div>
+
+            <ul className="mt-4 flex flex-col gap-2">
+              {wealthArticles.slice(0, 4).map((a) => (
+                <li key={a.id}>
+                  <button onClick={() => toast(`Opening “${a.title}”`)} className="flex min-h-[44px] w-full items-center gap-2 rounded-xl border border-line px-3.5 text-left transition hover:bg-soft">
+                    <span className="min-w-0 flex-1 truncate text-[14px] font-medium">{a.title}</span>
+                    <span className="shrink-0 text-[12px] text-faint">{a.minutes} min</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </Card>
 
           <Card>
             <Eyebrow>Benefits you haven&apos;t used</Eyebrow>

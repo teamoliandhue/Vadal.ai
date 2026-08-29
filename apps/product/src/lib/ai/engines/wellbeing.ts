@@ -186,6 +186,164 @@ export function financialTips(band: IncomeBand, region: Region, question?: strin
   return [...byBand[band], regional[region]];
 }
 
+
+/* ── money moments ─────────────────────────────────────────────────
+   The brief asks for financial tips "tailored to income band, role and
+   region". Band and region are a start; they still produce an article that
+   is equally true on any day of any year. What actually moves money is
+   TIMING — the tip arriving on the day the money does.
+
+   "An emergency fund comes first" is a fact. "Your salary landed on Friday
+   and the ₹3,000 you said you'd move hasn't moved" is a product.
+
+   Nothing here needs a payroll integration: a pay day-of-month, an
+   enrolment deadline and a festival window are three fields. All of it
+   stays education with a handoff — see financialTips() for why that line
+   is not crossable. */
+
+export type MoneyMomentKind = "payday" | "enrolment" | "festival" | "steady";
+
+export type MoneyMoment = {
+  kind: MoneyMomentKind;
+  /** "Friday" · "in 6 days" — said in the copy, so it reads as timely. */
+  when: string;
+  urgency: "now" | "soon" | "background";
+  title: string;
+  body: string;
+  /** One thing to do. Absent for the steady state, which is a read. */
+  action?: string;
+  disclaimer: string;
+  handoff: string;
+};
+
+export type MoneyContext = {
+  today: Date;
+  /** Day of the month salary lands. */
+  paydayDayOfMonth: number;
+  band: IncomeBand;
+  region: Region;
+  /** What they told us they'd set aside, and whether it has moved yet. */
+  commitment?: { amount: string; movedThisCycle: boolean };
+  enrolmentClosesInDays?: number;
+  /** Regional advance window — a real, recurring financial event in India. */
+  festival?: { name: string; opensInDays: number };
+};
+
+function daysSince(today: Date, dayOfMonth: number): number {
+  const d = new Date(today);
+  const thisMonth = new Date(d.getFullYear(), d.getMonth(), dayOfMonth);
+  if (thisMonth <= d) return Math.floor((+d - +thisMonth) / 86_400_000);
+  const lastMonth = new Date(d.getFullYear(), d.getMonth() - 1, dayOfMonth);
+  return Math.floor((+d - +lastMonth) / 86_400_000);
+}
+
+const DAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+/**
+ * The financially relevant thing right now, or steady education when nothing
+ * is happening. Ranked by how time-sensitive it is — a closing enrolment beats
+ * a general saving habit, and money that has just landed beats both.
+ */
+export function moneyMoment(ctx: MoneyContext): MoneyMoment {
+  const disclaimer = "General education, not financial advice. Rules vary by country and by your own circumstances.";
+  const handoff = "For anything specific to you, the benefits team can refer you to a licensed advisor.";
+
+  const sincePay = daysSince(ctx.today, ctx.paydayDayOfMonth);
+  const payDate = new Date(ctx.today);
+  payDate.setDate(payDate.getDate() - sincePay);
+
+  // 1 · Money has just landed and a commitment has not been honoured.
+  //     The single highest-leverage moment in financial wellbeing.
+  if (sincePay <= 4 && ctx.commitment && !ctx.commitment.movedThisCycle) {
+    return {
+      kind: "payday",
+      when: sincePay === 0 ? "today" : `${DAY[payDate.getDay()]}`,
+      urgency: "now",
+      title: sincePay === 0 ? "Your pay landed today" : `Your pay landed on ${DAY[payDate.getDay()]}`,
+      body: `You said you'd set aside ${ctx.commitment.amount} a month. It hasn't moved yet this cycle — and the week after payday is when it is easiest.`,
+      action: `Move ${ctx.commitment.amount} now`,
+      disclaimer, handoff,
+    };
+  }
+
+  // 2 · A deadline that closes and does not come back for a year.
+  if (ctx.enrolmentClosesInDays !== undefined && ctx.enrolmentClosesInDays <= 30) {
+    return {
+      kind: "enrolment",
+      when: `in ${ctx.enrolmentClosesInDays} days`,
+      urgency: ctx.enrolmentClosesInDays <= 10 ? "now" : "soon",
+      title: "Benefits enrolment closes soon",
+      body: `You have ${ctx.enrolmentClosesInDays} days left to change your cover. Whatever you pick now is what you have for the year — including the parts you never use.`,
+      action: "Review what you're on",
+      disclaimer, handoff,
+    };
+  }
+
+  // 3 · Regional: the advance is offered, taken, and regretted every year.
+  if (ctx.region === "IN" && ctx.festival && ctx.festival.opensInDays <= 45) {
+    return {
+      kind: "festival",
+      when: `in ${ctx.festival.opensInDays} days`,
+      urgency: "soon",
+      title: `${ctx.festival.name} advance opens soon`,
+      body: `An advance is money you have already earned, paid early — it is not extra. Worth deciding now what you actually need, before the month decides for you.`,
+      action: "How advances are repaid",
+      disclaimer, handoff,
+    };
+  }
+
+  // 4 · Nothing time-sensitive: fall back to the education for their band.
+  const tips = financialTips(ctx.band, ctx.region);
+  const tip = Array.isArray(tips) ? tips[0] : null;
+  return {
+    kind: "steady",
+    when: `${sincePay} days since payday`,
+    urgency: "background",
+    title: tip?.title ?? "Money, explained plainly",
+    body: tip?.body ?? "Short explainers on saving, cover and what your payslip already gives you.",
+    disclaimer, handoff,
+  };
+}
+
+/* ── what this person's shift actually needs ───────────────────────
+   chooseFocus() made the METRIC fit the person. The content did not
+   follow: a night-shift Line Operator and a desk engineer were still
+   offered the same articles, on a screen that already knew they were
+   different. And the answer for nights already existed one pillar over,
+   in Grow. */
+
+export type ShiftContent = {
+  headline: string;
+  body: string;
+  /** Hand off to Grow rather than duplicating the material here. */
+  course?: { id: string; title: string; minutes: number };
+  topics: string[];
+};
+
+export function contentFor(surface: "desk" | "frontline", team: string): ShiftContent | null {
+  const nights = /night/i.test(team);
+
+  if (nights) {
+    return {
+      headline: "Working nights is a different problem",
+      body: "Sleeping in daylight, eating at 3am, and the Monday reset are the three things that actually wear people down on this pattern. None of them are willpower problems.",
+      course: { id: "shift", title: "Looking after yourself on nights", minutes: 7 },
+      topics: ["sleep", "shift"],
+    };
+  }
+
+  if (surface === "frontline") {
+    return {
+      headline: "Your job is already the workout",
+      body: "On your feet all shift, the thing that goes first is recovery — sleep, water, and the knees. Ten minutes of the right stretching beats any step target.",
+      course: { id: "shift", title: "Looking after yourself on shift", minutes: 7 },
+      topics: ["recovery", "sleep"],
+    };
+  }
+
+  return null; // a desk worker's default content is already the right content
+}
+
 /* ── anomaly-aware wellbeing check ─────────────────────────────── */
 
 export type WellbeingSignals = {

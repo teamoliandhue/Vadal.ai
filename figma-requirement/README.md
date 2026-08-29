@@ -28,4 +28,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 008 | [Feed photography — art direction and placement](./008-feed-photography.md) | Built · needs Figma |
 | 009 | [Form-field rules — bare-field padding, 16px mobile floor](./009-form-field-rules.md) | Built · needs Figma |
 | 010 | [Amplify redesign — hero, composer, share routes, decline](./010-amplify-redesign.md) | Built · needs Figma |
-| 011 | [Thrive redesign — the goal adapts to the person](./011-thrive-redesign.md) | Built · needs Figma |
+| 011 | [Thrive — the goal, content and timing adapt to the person](./011-thrive-redesign.md) | Built · needs Figma |
