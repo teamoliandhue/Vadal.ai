@@ -20,10 +20,14 @@ export function IntelligenceMenu() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex items-center gap-1.5 rounded-full bg-card px-3.5 py-2 text-[14px] font-semibold ring-1 ring-[var(--ai-border)] transition hover:shadow-[0_4px_16px_rgba(124,92,248,0.28)] aria-expanded:shadow-[0_4px_16px_rgba(124,92,248,0.28)]"
+        aria-label="Intelligence"
+        /* The label costs 84px, which is the difference between the bar fitting
+           on a phone and not. The mark alone carries it below sm — it is the
+           same Aurora mark used everywhere else for exactly this. */
+        className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center gap-1.5 rounded-full bg-card px-2 py-2 text-[14px] font-semibold ring-1 ring-[var(--ai-border)] transition hover:shadow-[0_4px_16px_rgba(124,92,248,0.28)] aria-expanded:shadow-[0_4px_16px_rgba(124,92,248,0.28)] sm:px-3.5"
       >
         <SparkMark size={14} />
-        Intelligence
+        <span className="max-sm:hidden">Intelligence</span>
       </button>
 
       {open && (

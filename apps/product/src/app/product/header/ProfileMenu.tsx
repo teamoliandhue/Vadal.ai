@@ -36,7 +36,7 @@ export function ProfileMenu() {
   }
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative shrink-0">
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="Account menu"

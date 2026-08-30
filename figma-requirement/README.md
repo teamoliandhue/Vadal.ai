@@ -30,3 +30,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 010 | [Amplify redesign — hero, composer, share routes, decline](./010-amplify-redesign.md) | Built · needs Figma |
 | 011 | [Thrive — the goal, content and timing adapt to the person](./011-thrive-redesign.md) | Built · needs Figma |
 | 012 | [The scroll model — app shell, two-pane pages](./012-scroll-model.md) | Built · needs Figma |
+| 013 | [Amplify — the other direction, and the programme behind it](./013-amplify-both-directions.md) | Built · needs Figma |

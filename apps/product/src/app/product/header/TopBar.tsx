@@ -16,14 +16,21 @@ function openSearch() {
 
 export function TopBar({ domain, breadcrumb }: { domain: string; breadcrumb: string }) {
   return (
-    <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-line bg-card/85 px-6 py-3 backdrop-blur-md transition-colors sm:px-10">
-      <nav aria-label="Breadcrumb" className="text-[14px] font-medium text-faint">
-        <Link href="/product" className="transition-colors hover:text-ink">{domain}</Link>
-        <span className="mx-1.5 text-line">/</span>
-        <span className="font-semibold text-ink">{breadcrumb}</span>
+    /* Tighter gutters and gaps below sm rather than dropping a control. The
+       theme toggle is the only theme control in the app, so hiding it on a
+       phone would strand the setting entirely — 46px of spacing is the cheaper
+       thing to give up, and it is enough for the breadcrumb to read. */
+    <header className="sticky top-0 z-30 flex items-center gap-1.5 border-b border-line bg-card/85 px-4 py-3 backdrop-blur-md transition-colors sm:gap-3 sm:px-10">
+      {/* min-w-0 + truncate so the breadcrumb is what gives way when the bar is
+          tight. Without it the controls were crushed instead — the theme toggle
+          rendered 0px wide on a 375px screen, and the bar still overflowed. */}
+      <nav aria-label="Breadcrumb" className="flex min-w-0 items-baseline text-[14px] font-medium text-faint">
+        <Link href="/product" className="truncate transition-colors hover:text-ink max-sm:hidden">{domain}</Link>
+        <span className="mx-1.5 text-line max-sm:hidden">/</span>
+        <span className="truncate font-semibold text-ink">{breadcrumb}</span>
       </nav>
 
-      <div className="flex-1" />
+      <div className="min-w-0 flex-1" />
 
       {/* search */}
       <button
@@ -38,7 +45,7 @@ export function TopBar({ domain, breadcrumb }: { domain: string; breadcrumb: str
       <button
         onClick={openSearch}
         aria-label="Search"
-        className="grid h-9 w-9 place-items-center rounded-full text-muted transition hover:bg-soft md:hidden"
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-muted transition hover:bg-soft md:hidden"
       >
         <Search className="h-[16px] w-[16px]" strokeWidth={1.9} />
       </button>

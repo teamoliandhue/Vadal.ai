@@ -74,6 +74,17 @@ export const FEATURES: FeatureStatus[] = [
   { id: "amp-share", pillar: "Amplify", brief: "AGENTIC — 'share that last company post for me'", module: "tools", entry: "share_to_social", agentic: true, surface: "copilot", blocked: "Needs a per-platform feasibility spike and per-employee OAuth — the brief requires the spike before committing.", wiredTo: "lib/ai/mock.ts" },
   { id: "amp-queue", pillar: "Amplify", brief: "AGENTIC — 'queue this for advocacy' builds the curated card automatically", module: "tools", entry: "queue_for_advocacy", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
 
+  /* The brief's second clause — "and let employee moments go out". Every entry
+     above serves the first half only; these are the other direction. */
+  { id: "amp-moments", pillar: "Amplify", brief: "Surface the person's OWN shareable moments — kudos, launches, certifications, milestones", module: "engines/advocacy", entry: "rankMoments", agentic: false, surface: "screen", wiredTo: "app/product/amplify/AmplifyHub.tsx" },
+  { id: "amp-moment-caption", pillar: "Amplify", brief: "Caption written for the employee's own moment, crediting the people involved", module: "engines/advocacy", entry: "draftFromMoment", agentic: false, surface: "screen", wiredTo: "app/product/amplify/Composer.tsx" },
+  { id: "amp-policy", pillar: "Amplify", brief: "Social-policy check before a caption goes public — blocks financials and people data, warns on the rest", module: "engines/advocacy", entry: "checkPolicy", agentic: false, surface: "screen", wiredTo: "app/product/amplify/Composer.tsx" },
+  { id: "amp-tags", pillar: "Amplify", brief: "Two or three real hashtags drawn from what the post is about", module: "engines/advocacy", entry: "hashtagsFor", agentic: false, surface: "screen", wiredTo: "app/product/amplify/Composer.tsx" },
+  { id: "amp-referral", pillar: "Amplify", brief: "Referral code on a shared hiring post, so an application is attributable", module: "engines/advocacy", entry: "referralLinkFor", agentic: false, surface: "screen", wiredTo: "app/product/amplify/Composer.tsx" },
+  { id: "amp-forecast", pillar: "Amplify", brief: "Reach forecast BEFORE comms queue a post, as a band rather than a false-precision number", module: "engines/advocacy", entry: "forecastReach", agentic: false, surface: "screen", wiredTo: "app/product/amplify/Programme.tsx" },
+  { id: "amp-declines", pillar: "Amplify", brief: "Reads the decline signal — says whether it is a writing problem, a targeting problem or healthy", module: "engines/advocacy", entry: "declineInsight", agentic: false, surface: "screen", wiredTo: "app/product/amplify/Programme.tsx" },
+  { id: "amp-streak", pillar: "Amplify", brief: "Quiet advocacy streak — counts up, never warns you that you are about to lose it", module: "engines/advocacy", entry: "advocacyStreak", agentic: false, surface: "screen", wiredTo: "app/product/amplify/AmplifyHub.tsx" },
+
   /* ── Pillar 4 · Thrive ───────────────────────────────────── */
   { id: "thrive-nudge", pillar: "Thrive", brief: "Personalised nudges timed to when the person is likely to act", module: "engines/wellbeing", entry: "activityNudges", agentic: false, surface: "screen", wiredTo: "app/product/thrive/ThriveHub.tsx" },
   { id: "thrive-money", pillar: "Thrive", brief: "AI financial tips by income band, role and region — guidance only", module: "engines/wellbeing", entry: "financialTips", agentic: false, surface: "screen", wiredTo: "app/product/thrive/ThriveHub.tsx" },

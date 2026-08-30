@@ -25,7 +25,7 @@ export function ThemeToggle() {
     <button
       onClick={toggle}
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-      className="relative grid h-9 w-9 place-items-center overflow-hidden rounded-full text-muted transition hover:bg-soft"
+      className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full text-muted transition hover:bg-soft"
     >
       <Sun
         className={`absolute h-[16px] w-[16px] transition-all duration-300 ${

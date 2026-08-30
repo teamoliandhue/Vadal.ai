@@ -9,7 +9,7 @@
  * auto-mirroring is committed to, and an explicit human tap on every action —
  * see lib/ai/engines/advocacy.canAutoMirror().
  */
-import type { Platform, ShareRecord } from "./ai/engines/advocacy";
+import type { Moment, Platform, ShareRecord } from "./ai/engines/advocacy";
 
 export type CompanyPost = {
   id: string;
@@ -115,3 +115,120 @@ export const declineSignal = [
   { reason: "Not right now", count: 4 },
   { reason: "Rather not share work posts", count: 2 },
 ];
+
+/* ════════════════════════════════════════════════════════════════════
+   "...and let employee moments go out"
+   ════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Priya's own moments — things that already happened to her internally and are
+ * worth the outside seeing.
+ *
+ * Every one of these is derived, not invented: the kudos come from the
+ * Recognition wall, the shipped launch from the #wins feed, the certification
+ * from Grow. Amplify does not create moments; it notices the ones the product
+ * already knows about and offers to carry them further.
+ */
+export const myMoments: Moment[] = [
+  {
+    id: "m1", kind: "kudos",
+    what: "Shipped the onboarding flow ahead of schedule — calm under pressure and zero shortcuts on craft",
+    when: "yesterday",
+    withPeople: ["Aarav", "Dev"],
+    image: "/feed/ship.jpg",
+    why: "Neha recognised you for this publicly yesterday. It is the most recent thing anyone said about your work — and it is about craft, which reads well outside.",
+  },
+  {
+    id: "m2", kind: "shipped",
+    what: "Cut new-joiner onboarding from nine days to four",
+    when: "last week",
+    withPeople: ["the Design team"],
+    why: "The company posted about this publicly. You built it — a first-hand account will out-reach the company's own post.",
+  },
+  {
+    id: "m3", kind: "certification",
+    what: "Finished the accessibility certification",
+    when: "2 weeks ago",
+    why: "You completed this in Grow. Certifications are the single most-shared moment type on LinkedIn.",
+  },
+  {
+    id: "m4", kind: "milestone",
+    what: "Three years at oliandhue",
+    when: "in 6 days",
+    image: "/feed/milestone.jpg",
+    why: "Coming up. We will remind you the morning it lands, which is when these get engagement.",
+  },
+];
+
+/** Weeks she has shared in, oldest → newest. Feeds the quiet streak. */
+export const myActiveWeeks = [false, true, true, false, true, true, true, true];
+
+/** Her modelled reach, week by week — the same 8 weeks. */
+export const myReachSeries = [0, 84, 130, 0, 96, 148, 171, 204];
+export const reachWeekLabels = ["8w", "7w", "6w", "5w", "4w", "3w", "2w", "This"];
+
+/** Her referral code — appended to any hiring post she shares. */
+export const myReferralCode = "PS-4180";
+
+/* ── admin: the programme side ─────────────────────────────────── */
+
+/**
+ * Posts waiting on a decision before they enter the advocacy queue.
+ *
+ * The current build has HR pushing posts with no review step, which is how a
+ * post nobody wants their name on ends up in front of 12,000 people.
+ */
+export type QueueCandidate = {
+  id: string;
+  platform: Platform;
+  text: string;
+  image?: string;
+  suggestedBy: string;
+  /** Teams it is most relevant to — the fix for "not my area". */
+  audience: string[];
+  avgFollowers: number;
+};
+
+export const queueCandidates: QueueCandidate[] = [
+  {
+    id: "q1", platform: "LinkedIn",
+    text: "Our apprenticeship intake doubled this year. Sixteen people started on the floor in March who had never worked in manufacturing.",
+    image: "/feed/plant.jpg",
+    suggestedBy: "Comms", audience: ["Plant Ops", "HR", "Logistics"], avgFollowers: 890,
+  },
+  {
+    id: "q2", platform: "Instagram",
+    text: "Diwali on the night shift. The canteen team cooked for 400 people at 2am so nobody missed it.",
+    image: "/feed/milestone.jpg",
+    suggestedBy: "Comms", audience: ["Night shift", "Plant Ops"], avgFollowers: 640,
+  },
+];
+
+/** A coordinated burst tied to a moment, rather than a steady drip. */
+export const advocacyCampaign = {
+  name: "Apprenticeship intake",
+  goal: "Fill 40 floor roles before the October intake closes",
+  window: "12–26 Sept",
+  targetShares: 120,
+  shares: 47,
+  /** Referral applications attributable to employee shares. */
+  applications: 31,
+  hires: 4,
+  /** What one hire costs through an agency, for the comparison that matters. */
+  agencyFeePerHire: 180000,
+};
+
+/** Referral attribution on the hiring post — the P&L defence. */
+export const referrals = [
+  { employee: "Anita Desai", clicks: 210, applications: 12, hired: 2 },
+  { employee: "Ravi Prasad", clicks: 64, applications: 9, hired: 1 },
+  { employee: "Meera Pillai", clicks: 118, applications: 7, hired: 1 },
+  { employee: "Aarav Sharma", clicks: 41, applications: 3, hired: 0 },
+];
+
+/** The rules the policy check enforces, stated plainly for the person. */
+export const socialPolicy = {
+  updated: "March 2026",
+  url: "/product/knowledge",
+  summary: "Post as yourself, not as the company. Do not put unreleased numbers, customer names or people data in a public post.",
+};

@@ -37,7 +37,7 @@ export function NotificationsMenu() {
   const markRead = (id: string) => setItems((x) => x.map((n) => (n.id === id ? { ...n, read: true } : n)));
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative shrink-0">
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label={`Notifications${unread ? `, ${unread} unread` : ""}`}
