@@ -53,7 +53,12 @@ export function AmplifyHub() {
   const isAdmin = canAccess(role, "Campaigns");
   const [tab, setTab] = React.useState<"share" | "programme">("share");
 
-  const [optIn, setOptIn] = usePersistentState<boolean>("vadal:advocacy-optin", false);
+  /* `=== true` is deliberate. A consent flag whose stored value is anything
+     other than a literal true must read as OFF — never on. Demo sessions from
+     before the fix above hold a truthy event object here, and the safe reading
+     of an unreadable consent value is "they did not consent". */
+  const [optInRaw, setOptIn] = usePersistentState<boolean>("vadal:advocacy-optin", false);
+  const optIn = optInRaw === true;
   const [open, setOpen] = React.useState<string | null>(null);
   const [openMoment, setOpenMoment] = React.useState<string | null>(null);
   const [showPlatforms, setShowPlatforms] = React.useState(false);
@@ -359,7 +364,19 @@ function OptInHero({
           </div>
 
           <div className="mt-7 flex flex-wrap items-center gap-4">
-            <Switch checked={optIn} onChange={(v: boolean) => { setOptIn(v); toast("You're in — captions are yours to edit"); }} label="Take part in advocacy" />
+            {/* Switch is an <input type="checkbox">, so onChange hands us a
+                ChangeEvent. Storing it raw put a 279-byte React event in
+                localStorage where a boolean belongs — truthy, so opting IN
+                worked by accident and opting OUT stored another truthy event.
+                The switch could never be turned off. */}
+            <Switch
+              checked={optIn}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setOptIn(e.target.checked);
+                toast(e.target.checked ? "You're in — captions are yours to edit" : "Opted out. Nothing will be put in front of you.");
+              }}
+              label="Take part in advocacy"
+            />
             <span className="flex items-center gap-1.5 text-[12px] text-faint">
               <ShieldCheck className="h-3.5 w-3.5" /> Opt out any time. Nothing posts without your tap.
             </span>

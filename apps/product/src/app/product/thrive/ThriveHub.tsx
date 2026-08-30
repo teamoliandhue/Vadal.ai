@@ -46,7 +46,11 @@ export function ThriveHub() {
   const { session } = useSession();
   const surface = session?.profile === "frontline" ? "frontline" : "desk";
 
-  const [consent, setConsent] = usePersistentState<boolean>("vadal:wellbeing-consent", false);
+  /* `=== true` is deliberate — see the same guard in amplify/AmplifyHub. This
+     one gates reading someone's wellbeing signals, so an unreadable stored
+     value must mean "no consent", never "yes". */
+  const [consentRaw, setConsent] = usePersistentState<boolean>("vadal:wellbeing-consent", false);
+  const consent = consentRaw === true;
   const [joined, setJoined] = usePersistentState<string[]>("vadal:thrive-joined", ["monsoon"]);
   const [logged, setLogged] = usePersistentState<string[]>("vadal:thrive-log-today", []);
   const [askedMoney, setAskedMoney] = React.useState("");
@@ -177,7 +181,7 @@ export function ThriveHub() {
             <b className="font-semibold text-ink">Wellbeing checks are off.</b> If your sleep and your own check-ins
             dip together, Vadal can offer you something gentle — only ever you, never your manager.
           </p>
-          <Switch checked={consent} onChange={(v: boolean) => { setConsent(v); toast("Wellbeing checks on — private to you"); }} label="Turn on" />
+          <Switch checked={consent} onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setConsent(e.target.checked); toast(e.target.checked ? "Wellbeing checks on — private to you" : "Wellbeing checks off"); }} label="Turn on" />
         </div>
       ) : check.triggered ? (
         <Card>
@@ -189,14 +193,14 @@ export function ThriveHub() {
           <p className="mt-2 text-[12px] text-faint">Noticed: {check.reason}. Not shared with anyone.</p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Link href="/product/help"><Button variant="brand" className="min-h-[44px]">Talk to someone, privately</Button></Link>
-            <Switch checked={consent} onChange={(v: boolean) => { setConsent(v); toast("Wellbeing checks off"); }} label="Keep checks on" />
+            <Switch checked={consent} onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setConsent(e.target.checked); toast(e.target.checked ? "Wellbeing checks on" : "Wellbeing checks off"); }} label="Keep checks on" />
           </div>
         </Card>
       ) : (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-line bg-card px-5 py-4">
           <HeartPulse className="h-4 w-4 shrink-0 text-[var(--success)]" />
           <p className="min-w-0 flex-1 text-[14px] text-muted">Wellbeing checks are on. Nothing to raise right now.</p>
-          <Switch checked={consent} onChange={(v: boolean) => { setConsent(v); toast("Wellbeing checks off"); }} label="On" />
+          <Switch checked={consent} onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setConsent(e.target.checked); toast(e.target.checked ? "Wellbeing checks on" : "Wellbeing checks off"); }} label="On" />
         </div>
       )}
 
