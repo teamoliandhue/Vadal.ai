@@ -16,6 +16,7 @@ import { PostCard } from "./PostCard";
 import { PostDrawer } from "./PostDrawer";
 import { RightRail } from "./RightRail";
 import { type DisplayItem } from "./parts";
+import { PANE, SPLIT } from "../panes";
 import { toast } from "../Toaster";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
@@ -110,12 +111,28 @@ export function FeedHub() {
   const menu = (label: string) => toast(label === "Report" ? "Reported — thank you" : `${label} ✓`);
   const addPost = (item: FeedItem) => { setMine((m) => [item, ...m]); setChannel(null); setSort("recent"); };
 
-  const refresh = () => { setExtra(FRESH); setShowNew(false); setSort("recent"); topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  const refresh = () => {
+    setExtra(FRESH); setShowNew(false); setSort("recent");
+    /* The stream is its own scroll region at xl and just part of the page
+       below it, so ask the right thing to move. */
+    const el = topRef.current;
+    if (!el) return;
+    if (getComputedStyle(el).overflowY === "auto") el.scrollTop = 0;
+    else el.scrollIntoView({ block: "start" });
+    /* Deliberately not a smooth glide. You pressed "2 new posts" to see the two
+       new posts, and the list has just been re-sorted underneath you — sliding
+       through 2,000px of reshuffling content is neither faster nor calmer than
+       arriving. (It is also not honoured on a nested scroller everywhere.) */
+  };
 
   return (
-    <div ref={topRef} className="mx-auto flex w-full max-w-[1100px] justify-center gap-6">
-      {/* main column */}
-      <div className="w-full max-w-[640px] space-y-4">
+    /* Two scroll regions from xl up (see ../panes): the stream and the rail
+       each keep their own place. Before this the rail rode along with the
+       stream and then jammed against the top of the window, which put the
+       bottom of the channel list permanently out of reach. */
+    <div className={`${SPLIT} mx-auto max-w-[1100px] justify-center`}>
+      {/* the stream */}
+      <div ref={topRef} tabIndex={0} aria-label="Feed" className={`${PANE} w-full max-w-[640px] space-y-4`}>
         {/* header */}
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>

@@ -127,6 +127,19 @@ body {
 .lumen .ai-aura { animation: aura 2.6s ease-in-out infinite; }
 .lumen .canvas-glow { position: absolute; inset: 0 0 auto 0; height: 420px; pointer-events: none; background: radial-gradient(560px 300px at 22% -8%, rgba(246, 161, 75, 0.08), transparent 64%), radial-gradient(640px 320px at 78% -12%, rgba(139, 124, 248, 0.08), transparent 64%); }
 .dark .lumen .canvas-glow { height: 520px; background: radial-gradient(640px 360px at 18% -12%, rgba(45, 212, 191, 0.13), transparent 64%), radial-gradient(720px 380px at 60% -16%, rgba(168, 85, 247, 0.17), transparent 66%), radial-gradient(560px 320px at 94% -10%, rgba(244, 114, 182, 0.12), transparent 62%); }
+/* ── scroll panes ───────────────────────────────────────────────────
+   The app shell scrolls in panes rather than moving the document (see
+   app/product/panes.ts). A two-pane page would otherwise show two loud
+   gutters side by side, so the scrollbar is quieted to a hairline that
+   firms up when the pane is hovered. macOS overlay scrollbars ignore all
+   of this and stay invisible until you scroll, which is the target. */
+.lumen .pane { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--muted) 26%, transparent) transparent; }
+.lumen .pane::-webkit-scrollbar { width: 10px; height: 10px; }
+.lumen .pane::-webkit-scrollbar-track { background: transparent; }
+.lumen .pane::-webkit-scrollbar-thumb { border-radius: 999px; border: 3px solid transparent; background-clip: content-box; background-color: color-mix(in srgb, var(--muted) 22%, transparent); }
+.lumen .pane:hover::-webkit-scrollbar-thumb { background-color: color-mix(in srgb, var(--muted) 40%, transparent); }
+.lumen .pane::-webkit-scrollbar-corner { background: transparent; }
+
 .lumen .animate-floaty { animation: floaty 7s ease-in-out infinite; }
 .lumen .animate-floaty2 { animation: floaty2 9s ease-in-out infinite; }
 .lumen .ring-animate { animation: ring-in 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }

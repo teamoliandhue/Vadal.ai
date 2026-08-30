@@ -486,7 +486,7 @@ export function PulseDashboard() {
       <Briefing v={view} setTab={(t) => setTab(t as Tab)} period={period} setPeriod={setPeriod} />
 
       {/* tabs + scope */}
-      <div className="sticky top-[57px] z-10 -mx-2 flex flex-wrap items-center justify-between gap-3 border-b border-line bg-canvas/85 px-2 py-2 backdrop-blur-md">
+      <div className="sticky top-[57px] z-10 -mx-2 flex flex-wrap lg:top-0 items-center justify-between gap-3 border-b border-line bg-canvas/85 px-2 py-2 backdrop-blur-md">
         <div role="tablist" aria-label="Pulse sections" className="flex flex-wrap gap-1">
           {TABS.map((t) => (
             <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`rounded-full px-3.5 py-1.5 text-[14px] font-semibold transition ${tab === t ? "bg-ink text-[var(--card)]" : "text-muted hover:bg-soft hover:text-ink"}`}>{t}</button>

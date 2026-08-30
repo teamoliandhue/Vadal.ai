@@ -1,6 +1,12 @@
 "use client";
 /* Feed context rail — the AI "Catch me up" digest (Aurora), channel switcher,
-   celebrations, trending topics and new joiners. Sticky on wide screens. */
+   celebrations, trending topics and new joiners.
+
+   Its own scroll region from xl up (see ../panes). It used to be `sticky`,
+   which looks right until the rail is taller than the window: it pins, and
+   everything past the fold — the trending topics, the new joiners — can never
+   be reached at all. A pane scrolls to its own end and stays where you left
+   it while the stream moves. */
 import * as React from "react";
 import { ArrowRight } from "lucide-react";
 import { Avatar, SparkMark } from "@vadal/design-system";
@@ -8,6 +14,7 @@ import { celebrations } from "@/lib/data";
 import { channels, feedDigest, trendingTopics, whosNew } from "@/lib/feed";
 import { renderRich } from "./parts";
 import { toast } from "../Toaster";
+import { PANE } from "../panes";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 
@@ -15,8 +22,8 @@ export function RightRail({
   activeChannel, onPickChannel,
 }: { activeChannel: string | null; onPickChannel: (id: string | null) => void }) {
   return (
-    <aside className="hidden w-[320px] shrink-0 xl:block">
-      <div className="sticky top-6 space-y-4">
+    <aside tabIndex={0} aria-label="Feed context" className={`hidden w-[320px] shrink-0 xl:block ${PANE}`}>
+      <div className="space-y-4">
         {/* AI catch-me-up */}
         <section className="overflow-hidden rounded-[22px] border border-[var(--ai-border)] bg-[var(--ai-surface)] p-5">
           <div className="flex items-center gap-2">
