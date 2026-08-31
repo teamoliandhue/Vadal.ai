@@ -28,6 +28,9 @@ export type Course = {
   completion: number; // % of enrolled who finished
   /** Set when Pulse drove the assignment — the brief's listening→learning loop. */
   assignedBecause?: string;
+  /** Why this is compulsory. Unexplained mandatory training reads as punishment,
+   *  and the Pulse-driven suggestions on the same screen explain themselves. */
+  mandatoryBecause?: string;
 };
 
 export const paths: LearningPath[] = [
@@ -45,6 +48,7 @@ export const courses: Course[] = [
     blurb: "Your rights, what counts, and exactly how to raise something.",
     minutes: 8, status: "overdue", progress: 40, mandatory: true, dueIn: -3,
     enrolled: 12480, completion: 71,
+    mandatoryBecause: "Required of everyone at oliandhue, and renewed every 12 months. Yours lapsed on 28 August.",
     lessons: [
       { id: "l1", title: "What the law actually covers", minutes: 3, kind: "read" },
       { id: "l2", title: "Recognising it in practice", minutes: 3, kind: "video" },
@@ -56,6 +60,7 @@ export const courses: Course[] = [
     blurb: "Isolating a machine safely, and the check that proves it.",
     minutes: 6, status: "not-started", progress: 0, mandatory: true, dueIn: 9,
     safetyCritical: true, enrolled: 3120, completion: 58,
+    mandatoryBecause: "Required before anyone works unsupervised on a line. This one is safety-critical, so there is no grace period.",
     lessons: [
       { id: "l1", title: "Isolate every energy source", minutes: 2, kind: "read" },
       { id: "l2", title: "One person, one lock", minutes: 2, kind: "video" },
@@ -66,6 +71,7 @@ export const courses: Course[] = [
     id: "itsec", title: "IT security in five minutes", path: "compliance",
     blurb: "Phishing, passwords, and the one habit that prevents most incidents.",
     minutes: 5, status: "complete", progress: 100, mandatory: true, dueIn: 40,
+    mandatoryBecause: "Required of everyone with a company login. Renews annually.",
     enrolled: 12480, completion: 88,
     lessons: [
       { id: "l1", title: "Spotting a phish", minutes: 2, kind: "video" },
@@ -132,13 +138,57 @@ export const sampleQuiz = [
   },
 ];
 
-/** Retention history driving spaced repetition. */
-export const retention = [
-  { questionId: "posh-1", correct: 3, wrong: 0, lastSeenDaysAgo: 12 },
-  { questionId: "lockout-2", correct: 0, wrong: 2, lastSeenDaysAgo: 4 },
-  { questionId: "itsec-1", correct: 2, wrong: 1, lastSeenDaysAgo: 9 },
-  { questionId: "equip-3", correct: 1, wrong: 2, lastSeenDaysAgo: 6 },
-  { questionId: "posh-3", correct: 4, wrong: 0, lastSeenDaysAgo: 20 },
+/**
+ * Retention history driving spaced repetition.
+ *
+ * `prompt` and `course` are not decoration. The review queue was rendered
+ * straight from `questionId`, so the screen said "lockout-2 — 0 right, 2 wrong,
+ * last seen 4d ago": a debug line shipped as a feature, naming an internal key
+ * to the one person who cannot act on it. Spaced repetition is the most
+ * valuable mechanic in a learning product and it was presented as a log file.
+ *
+ * A record needs to carry what the question was ABOUT, in the words the learner
+ * would use, or the queue can never be shown to them.
+ */
+export type RetentionRecord = {
+  questionId: string;
+  correct: number;
+  wrong: number;
+  lastSeenDaysAgo: number;
+  /** What it tested, in plain words. Shown instead of the id. */
+  prompt: string;
+  /** Which course it came from, so the queue is traceable. */
+  course: string;
+};
+
+export const retention: RetentionRecord[] = [
+  { questionId: "posh-1", correct: 3, wrong: 0, lastSeenDaysAgo: 12,
+    prompt: "Who you can raise a POSH complaint with", course: "POSH — what it means day to day" },
+  { questionId: "lockout-2", correct: 0, wrong: 2, lastSeenDaysAgo: 4,
+    prompt: "Why one lock means one person", course: "Lockout Tagout" },
+  { questionId: "itsec-1", correct: 2, wrong: 1, lastSeenDaysAgo: 9,
+    prompt: "The two things that make a phishing email obvious", course: "IT security in five minutes" },
+  { questionId: "equip-3", correct: 1, wrong: 2, lastSeenDaysAgo: 6,
+    prompt: "What comes first when you hear an unusual noise mid-run", course: "Equipment handling refresher" },
+  { questionId: "posh-3", correct: 4, wrong: 0, lastSeenDaysAgo: 20,
+    prompt: "How long you have to raise a complaint", course: "POSH — what it means day to day" },
+];
+
+/**
+ * Which of the last seven days had any learning on them.
+ *
+ * growStats.streak was the number 5 printed on the page — the single most
+ * motivating figure in a learning product, rendered as a digit. A streak is a
+ * pattern; you cannot see a pattern in a number.
+ */
+export const learningDays: { day: string; minutes: number }[] = [
+  { day: "M", minutes: 6 },
+  { day: "T", minutes: 0 },
+  { day: "W", minutes: 4 },
+  { day: "T", minutes: 8 },
+  { day: "F", minutes: 5 },
+  { day: "S", minutes: 3 },
+  { day: "S", minutes: 6 },
 ];
 
 export const growStats = {

@@ -33,3 +33,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 013 | [Amplify — the other direction, and the programme behind it](./013-amplify-both-directions.md) | Built · needs Figma |
 | 014 | [Thrive — everything below the hero](./014-thrive-below-the-hero.md) | Built · needs Figma |
 | 015 | [One-to-One Help — ways in, and the person who isn't you](./015-help-ways-in-and-the-other-person.md) | Built · needs Figma |
+| 016 | [Grow — where you are, and why you're here](./016-grow-where-you-are.md) | Built · needs Figma |

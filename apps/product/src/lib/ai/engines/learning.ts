@@ -303,3 +303,56 @@ export function tutor(question: string, module: Module): TutorAnswer {
   }
   return { answer: best.s, source: best.s, grounded: true };
 }
+
+/* ── the review queue, as something a person can act on ───────────
+   nextReview() ranks correctly and returns raw Retention records, so the screen
+   rendered what it was given: "lockout-2 — 0 right, 2 wrong, last seen 4d ago".
+   An internal key, a pair of counters and an interval, shown to the one person
+   who cannot do anything with any of it.
+
+   Ranking is not the same as explaining. This says WHY a thing is coming back —
+   and the two reasons are genuinely different, so they should not look alike:
+   something you keep getting wrong is a gap, something you have not seen in
+   three weeks is just fade. */
+
+export type ReviewItem<T extends Retention = Retention> = {
+  item: T;
+  /** "shaky" — got it wrong more than right. "fading" — known once, going. */
+  reason: "shaky" | "fading";
+  /** Plain sentence for the learner. Never mentions intervals or accuracy. */
+  why: string;
+  /** How overdue against its own interval, in days. Sorts the queue. */
+  overdueBy: number;
+};
+
+export function reviewQueue<T extends Retention>(history: T[], take = 3): ReviewItem<T>[] {
+  return nextReview(history, take).map((r) => {
+    const attempts = r.correct + r.wrong;
+    const interval = Math.max(1, Math.round(2 ** r.correct));
+    const overdueBy = r.lastSeenDaysAgo - interval;
+    const shaky = r.wrong > r.correct;
+
+    return {
+      item: r as T,
+      reason: shaky ? "shaky" : "fading",
+      why: shaky
+        ? attempts === r.wrong
+          ? "You haven't got this one right yet."
+          : `You've missed this ${r.wrong} of ${attempts} times.`
+        : `You knew this ${r.lastSeenDaysAgo} days ago. This is about when it starts to go.`,
+      overdueBy,
+    };
+  });
+}
+
+/**
+ * Minutes of published material in a path.
+ *
+ * LearningPath.minutes is a planning figure entered when the path is created,
+ * and the library rendered it beside a live count of published courses — so a
+ * path with nothing in it read "0 courses · 48 min total", which is not a thing
+ * that can be true. Count what exists.
+ */
+export function pathMinutes(courses: { path: string; minutes: number }[], pathId: string): number {
+  return courses.filter((c) => c.path === pathId).reduce((n, c) => n + c.minutes, 0);
+}
