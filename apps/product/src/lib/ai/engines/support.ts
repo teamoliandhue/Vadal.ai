@@ -115,22 +115,28 @@ export type Triage = {
  * lists cannot express how people actually write about this. Erring toward a
  * human is the cheap mistake here; missing one is not. */
 const ACUTE: RegExp[] = [
-  // "myself", not "me": "the deadline is killing me" is ordinary work speech and
-  // tripping on it would make the whole pillar look broken. Nobody in genuine
-  // distress writes "I want to kill me".
-  /\b(kill|killing|hurt|hurting|harm|harming)\s+myself\b/i,
-  /\b(end|ending|ended)\s+(my|it)\s+(life|all)\b/i,
-  /\bend\s+it\s+all\b/i,
-  /\bwant(ed|ing)?\s+to\s+(die|disappear|not\s+wake\s+up)\b/i,
-  /\bdon'?t\s+want\s+to\s+(be\s+here|live|wake\s+up|go\s+on)\b/i,
+  // Reflexive, never the object pronoun: "the deadline is killing me" and "that
+  // project is killing him" are ordinary work speech, and tripping on either
+  // would make the whole pillar look broken. Nobody says "this is killing
+  // himself", so the reflexive is the safe discriminator in every person.
+  /\b(kill|kills|killing|hurt|hurts|hurting|harm|harms|harming)\s+(my|him|her|them|our|your)sel(f|ves)\b/i,
+  /\b(end|ends|ending|ended)\s+(my|his|her|their|your|it)\s+(life|lives|all)\b/i,
+  /\bend(s|ing|ed)?\s+it\s+all\b/i,
+  // THIRD PERSON. Found by testing the "worried about a colleague" path: the
+  // conjugation "wants" was missing, so "my colleague said he wants to die" was
+  // banded self-serve and answered with "what would make the next few days a
+  // little easier?". Every expression of intent below is person-agnostic now —
+  // most people who report this are reporting somebody else.
+  /\bwant(s|ed|ing)?\s+to\s+(die|disappear|not\s+wake\s+up)\b/i,
+  /\b(don'?t|doesn'?t|didn'?t)\s+want\s+to\s+(be\s+here|live|wake\s+up|go\s+on)\b/i,
   /\b(suicide|suicidal)\b/i,
-  /\bself[\s-]?harm(ing|ed)?\b/i,
+  /\bself[\s-]?harm(ing|ed|s)?\b/i,
   /\bno\s+(reason|point)\s+(to\s+live|in\s+living|anymore|any\s+more)\b/i,
-  /\bbetter\s+off\s+without\s+me\b/i,
-  /\b(overdose|overdosing)\b/i,
+  /\bbetter\s+off\s+without\s+(me|him|her|them)\b/i,
+  /\b(overdose|overdosing|overdosed)\b/i,
   /\bcan'?t\s+(go\s+on|do\s+this\s+anymore|do\s+this\s+any\s+more)\b/i,
   // Not "I want it to stop beeping" — a trailing gerund means they mean a thing.
-  /\bwant\s+(it|this|the\s+pain)\s+to\s+stop\b(?!\s+\w+ing)/i,
+  /\bwant(s|ed)?\s+(it|this|the\s+pain)(\s+all)?\s+to\s+stop\b(?!\s+\w+ing)/i,
 ];
 
 const HIGH: RegExp[] = [
@@ -345,4 +351,159 @@ export function escalate(t: Triage, policy: EscalationPolicy): Escalation {
     responder: policy.crisisResponder,
     note: `Crisis resources shown and ${policy.crisisResponder.name} alerted, per this workspace's signed escalation policy.`,
   };
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   "I'm worried about someone else"
+   ════════════════════════════════════════════════════════════════════
+   A large share of the people who open a support screen are not there for
+   themselves. Nothing here served them, and worse, the page actively got it
+   wrong: triage() reads the text it is given as a first-person account, so
+   "my colleague said he wants to die" hit the acute band and answered the
+   SPEAKER as though they were the one at risk.
+
+   That is not a cosmetic gap. It fails the person who is actually in danger,
+   because the one human who noticed gets told to look after themselves and is
+   handed nothing to act on.
+
+   So this is a separate intake. It still detects acuteness — more carefully, if
+   anything — but everything it returns is about getting help to the third
+   person: what to say, what not to say, who to call, and the one instruction
+   that matters most, which is not to leave them alone. */
+
+export type ConcernTurn = {
+  reflection: string;
+  /** Concrete things to do, in order. Never a script to read out. */
+  steps: string[];
+  /** What NOT to do — the part people get wrong with the best intentions. */
+  avoid: string[];
+  crisis: CrisisResource[];
+  /** True when the description suggests immediate risk to the other person. */
+  urgent: boolean;
+  /** Always offered: the worried person may need support of their own. */
+  alsoForYou: string;
+};
+
+export function concernIntake(said: string, region = "IN"): ConcernTurn {
+  const t = triage(said);
+  const crisis = crisisResources(region);
+
+  if (t.acute) {
+    return {
+      urgent: true,
+      reflection:
+        "That sounds serious, and you were right to take it seriously. The most useful thing you can do now is stay with them and get a trained person on the line — you do not have to be the one with the answers.",
+      steps: [
+        "Stay with them, or stay on the call. Do not leave them on their own.",
+        "Ask them directly and plainly whether they are thinking about ending their life. Asking does not put the idea there — it is the question that lets someone say yes.",
+        `Call ${crisis[0]?.label.split("(")[0].trim() ?? "a crisis line"} on ${crisis[0]?.number ?? ""} — with them if they will let you, for advice if they will not.`,
+        "If they are in immediate physical danger, call emergency services.",
+        "Tell someone else you trust. Carrying this alone is not something you should have to do.",
+      ],
+      avoid: [
+        "Do not promise to keep it secret. It is the one promise you may not be able to keep.",
+        "Do not try to talk them out of how they feel, or argue the logic of it.",
+        "Do not leave finding help until tomorrow because it feels awkward today.",
+      ],
+      crisis,
+      alsoForYou: "When they are safe, come back. Hearing this from someone lands hard, and you are allowed support of your own.",
+    };
+  }
+
+  return {
+    urgent: false,
+    reflection:
+      "Noticing is the hard part, and you have already done it. You do not need to fix anything — most of what helps is asking properly and then listening without rushing to solve it.",
+    steps: [
+      "Pick a private moment with no clock on it. Not in front of the team, not on the way to something else.",
+      "Say what you noticed, not what you concluded: “You've seemed quiet the last couple of weeks” lands better than “Are you depressed?”",
+      "Ask twice. The first “I'm fine” is usually reflex — “I mean it, how are you actually doing?” is where people start talking.",
+      "Let the silence sit. The urge to fill it is the thing that closes the conversation.",
+      "Tell them this page exists, and that the counsellors are free and confidential. Offer to sit with them while they book.",
+    ],
+    avoid: [
+      "Do not diagnose. You are not doing them a favour by naming a condition.",
+      "Do not report it to HR on their behalf unless someone is at risk — being handled behind your back is how people learn not to tell anyone.",
+      "Do not take on being their only support. Pointing at real help is more useful than becoming it.",
+    ],
+    crisis,
+    alsoForYou: "You can also book a counsellor yourself, to talk through how to handle it. Supporting someone is work.",
+  };
+}
+
+/* ── browsing the library without saying anything first ───────────
+   matchResources() only ever fires off the back of a conversation, so six
+   perfectly good resources were invisible to anyone who was not ready to type
+   anything — which is precisely the person most likely to be here. */
+
+export type ResourceBucket = "stress" | "sleep" | "conflict" | "money" | "workload" | "alone";
+
+export const BUCKETS: { key: ResourceBucket; label: string; ids: string[] }[] = [
+  { key: "stress", label: "Anxious or on edge", ids: ["breathe"] },
+  { key: "sleep", label: "Not sleeping", ids: ["sleep"] },
+  { key: "workload", label: "Burnt out", ids: ["workload"] },
+  { key: "conflict", label: "Trouble with someone at work", ids: ["conflict"] },
+  { key: "money", label: "Money worries", ids: ["money"] },
+  { key: "alone", label: "Feeling alone", ids: ["lonely"] },
+];
+
+export function resourcesIn(bucket: ResourceBucket): Resource[] {
+  const b = BUCKETS.find((x) => x.key === bucket);
+  return b ? RESOURCES.filter((r) => b.ids.includes(r.id)) : [];
+}
+
+/* ── the crisis patterns, tested ───────────────────────────────────
+   These cases are here rather than in a test file nobody runs because this is
+   the one piece of matching in the product where a miss is not a bug report,
+   it is a person who asked for help and was answered about their work-from-home
+   policy. Two misses have already happened:
+
+     · "thinking about ENDING my life" did not match the literal "end my life"
+     · "my colleague said he WANTS to die" — the third-person conjugation was
+       absent, so the sentence was banded self-serve and answered with "what
+       would make the next few days a little easier?"
+
+   Both were found by trying sentences, not by reading the list. Add to it
+   whenever a new phrasing occurs to you; `checkTriage()` is exposed through
+   /api/ai/features so it runs rather than sits here. */
+
+export const MUST_BE_ACUTE = [
+  "I want to die",
+  "he wants to die",
+  "my colleague said he wants to die",
+  "she wants to kill herself",
+  "he is going to hurt himself",
+  "they want to end their life",
+  "my friend doesn't want to be here anymore",
+  "she would be better off without her",
+  "I have been thinking about ending my life",
+  "he talked about suicide",
+  "she is self-harming",
+  "he says there is no point in living",
+  "my teammate wants it all to stop",
+  "they overdosed last month",
+  "he can't go on",
+];
+
+/** Ordinary speech that must never trip the crisis path. A product that cries
+ *  wolf at "this deadline is killing me" is one people stop typing into. */
+export const MUST_NOT_BE_ACUTE = [
+  "this deadline is killing me",
+  "my back is killing me",
+  "that project is killing him",
+  "the printer keeps dying",
+  "I want it to stop beeping",
+  "I could murder a coffee",
+  "she wants to dye her hair",
+  "my laptop battery died",
+  "I am dead tired",
+  "we killed the feature",
+];
+
+export type TriageCheck = { ok: boolean; missed: string[]; falseAlarms: string[] };
+
+export function checkTriage(): TriageCheck {
+  const missed = MUST_BE_ACUTE.filter((t) => !triage(t).acute);
+  const falseAlarms = MUST_NOT_BE_ACUTE.filter((t) => triage(t).acute);
+  return { ok: missed.length === 0 && falseAlarms.length === 0, missed, falseAlarms };
 }
