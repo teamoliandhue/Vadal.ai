@@ -202,3 +202,49 @@ export const growStats = {
 /** What Pulse flagged, feeding recommendPaths(). */
 export const pulseThemes = ["equipment", "workload", "manager"];
 export const incidents = ["Line 2 equipment fault — 12 Jun"];
+
+/* ── what fills the rail ───────────────────────────────────────────
+   The rail held two cards against a 2,091px column. Each of these is something
+   the screen already knew and never said. */
+
+/**
+ * Your compliance record.
+ *
+ * The thing an employee actually needs when somebody asks whether they are
+ * cleared — a date and an expiry, not a progress bar. The page tracked
+ * mandatory status and due dates and never produced the one artefact the
+ * tracking exists for.
+ */
+export type ComplianceEntry = {
+  courseId: string;
+  title: string;
+  completedOn?: string;
+  validUntil?: string;
+  state: "clear" | "due" | "lapsed";
+};
+
+export const complianceRecord: ComplianceEntry[] = [
+  { courseId: "itsec", title: "IT security in five minutes", completedOn: "12 Aug 2026", validUntil: "12 Aug 2027", state: "clear" },
+  { courseId: "posh", title: "POSH — what it means day to day", completedOn: "28 Aug 2025", validUntil: "28 Aug 2026", state: "lapsed" },
+  { courseId: "lockout", title: "Lockout Tagout", state: "due" },
+];
+
+/**
+ * Badges, with the next one in reach.
+ *
+ * growStats.badges was three strings rendered as three grey pills. A badge with
+ * no path to the next one is a trophy cabinet, not a mechanic — the whole value
+ * is in the one you are close to.
+ */
+export type Badge = { id: string; label: string; earned: boolean; hint: string; at?: number; of?: number };
+
+export const badges: Badge[] = [
+  { id: "safety", label: "Safety first", earned: true, hint: "Every safety course finished" },
+  { id: "streak5", label: "Five-day streak", earned: true, hint: "Learned on five days running" },
+  { id: "clear", label: "Compliance clear", earned: true, hint: "Nothing overdue — until POSH lapsed" },
+  { id: "streak10", label: "Ten-day streak", earned: false, hint: "Five more days", at: 5, of: 10 },
+  { id: "curious", label: "Curious", earned: false, hint: "Finish three courses nobody assigned you", at: 1, of: 3 },
+];
+
+/** How long you have actually spent, which is the promise being kept. */
+export const minutesThisMonth = 47;

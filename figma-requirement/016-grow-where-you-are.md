@@ -105,3 +105,66 @@ the quiz answers at 48.
 3. `Grow / StreakBars` — seven days including a zero
 4. `Grow / PathCard` — populated and the scoped-but-empty state
 5. Every tab, chip and answer at 44px minimum; quiz answers 48
+
+---
+
+# 016b · The rail
+
+## 9 · Two cards against a 2,091px column
+
+The rail held **Suggested for you** and **Badges** — 814px, leaving **1,277px blank**. Each thing
+added is something this screen already knew and never said.
+
+### 9.1 "How long have you got?" — the headline, as a control
+
+The pillar's promise is in its own title: **five minutes is enough.** Nothing let anyone act on
+it. The claim was a sentence.
+
+Now it is a picker — 2 / 5 / 10 / 15 — and the answer works at **lesson** granularity, not
+course. That distinction is the whole feature: a 12-minute course is useless to someone with four
+minutes, but the next 4-minute lesson *of that same course* is exactly what they want, and the
+data to offer it was already on the page.
+
+Ranked so an **overdue mandatory** lesson beats an optional first one, and never returns something
+that does not fit — offering a lesson someone cannot finish is how "five minutes is enough" stops
+being true. Each result says why it was picked: *"Overdue, and this is the next piece of it"* ·
+*"Picks up where you stopped — lesson 2 of 3"*.
+
+Closes with minutes done this month, because that is the promise being kept.
+
+`Grow / TimeFit` — a result, and the nothing-fits state.
+
+### 9.2 Your record — what the tracking was for
+
+The page tracked mandatory status, due dates and completion, and never produced the **one artefact
+all of that exists for**: proof. An employee asked whether they are cleared needs a date and an
+expiry, not a progress bar.
+
+Three states, and the dates are the content: **Clear** (done 12 Aug 2026, valid to 12 Aug 2027) ·
+**Lapsed** (expired 28 Aug 2026) · **Not done** (never completed). Downloadable.
+
+`Grow / ComplianceRecord` — all three states.
+
+### 9.3 How everyone else is doing
+
+Every course carries `enrolled` and `completion` — **12,480 people, 71% finished** — and both were
+rendered nowhere.
+
+For compliance especially this does more work than a deadline: *most of your colleagues have
+already done this* is a better reason than *this was due Tuesday*. Nobody is named and nobody is
+ranked, and the card says so.
+
+### 9.4 Badges, with something in reach
+
+Three grey pills. **A badge with no path to the next one is a trophy cabinet, not a mechanic** —
+the entire value is in the one you are close to. Earned badges stay as pills; below them,
+"Closest to next" with real progress (5/10 days, 1/3 courses) and what it takes.
+
+Result: rail **814 → 2,184px**. The two columns now end within 93px of each other.
+
+## 10 · What to draw (rail)
+
+1. `Grow / TimeFit` — the four durations, a result card, and the nothing-fits state
+2. `Grow / ComplianceRecord` — clear · lapsed · not done
+3. `Grow / TeamProgress` — three bars with the "nobody is named" footnote
+4. `Grow / Badges` — earned pills plus the in-reach list

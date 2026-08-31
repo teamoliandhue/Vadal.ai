@@ -12,13 +12,14 @@
    The mandatory human-review step is enforced, not described: a generated course
    is born a draft, and a safety-critical one needs a named reviewer to publish. */
 import * as React from "react";
-import { Award, BookOpen, Check, Clock, FileText, GraduationCap, Lock, RotateCcw, Sparkles, TriangleAlert } from "lucide-react";
+import { BookOpen, Check, Clock, FileText, GraduationCap, Lock, RotateCcw, Sparkles, TriangleAlert } from "lucide-react";
 import { Badge, Button, SparkMark, type BadgeTone } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { generateCourse, recommendPaths, reviewQueue, nextDifficulty, tutor, publishCourse, pathMinutes, type Course as GenCourse } from "@/lib/ai/engines/learning";
 import { courses, learningDays, paths, sampleQuiz, retention, growStats, pulseThemes, incidents } from "@/lib/grow";
 import { canAccess } from "@/lib/access";
 import { useViewAs } from "../useViewAs";
+import { Badges, ComplianceRecord, TeamProgress, TimeFit } from "./Rail";
 import { useSession } from "../useSession";
 import { toast } from "../Toaster";
 
@@ -252,16 +253,14 @@ export function GrowHub() {
               </p>
             </Card>
 
-            <Card>
-              <Eyebrow>Badges</Eyebrow>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {growStats.badges.map((b) => (
-                  <span key={b} className="inline-flex items-center gap-1.5 rounded-full bg-soft px-3 py-1.5 text-[14px] font-semibold">
-                    <Award className="h-3.5 w-3.5 text-[var(--purple)]" /> {b}
-                  </span>
-                ))}
-              </div>
-            </Card>
+            {/* The pillar's headline promise, finally as a control. */}
+            <TimeFit done={done} />
+
+            <ComplianceRecord />
+
+            <TeamProgress />
+
+            <Badges />
           </div>
         </div>
       )}

@@ -356,3 +356,76 @@ export function reviewQueue<T extends Retention>(history: T[], take = 3): Review
 export function pathMinutes(courses: { path: string; minutes: number }[], pathId: string): number {
   return courses.filter((c) => c.path === pathId).reduce((n, c) => n + c.minutes, 0);
 }
+
+/* ── "I've got a few minutes" ──────────────────────────────────────
+   This pillar's whole promise is in its headline — "five minutes is enough" —
+   and nothing on the screen let anyone act on it. The claim was a sentence,
+   not a control.
+
+   Answering it properly means working at LESSON granularity, not course. A
+   12-minute course is useless to someone with four minutes; the next 4-minute
+   lesson of that same course is exactly what they want, and the data to offer
+   it was already there. */
+
+export type FitCandidate = {
+  courseId: string;
+  courseTitle: string;
+  /** The specific lesson to do — not the whole course. */
+  lessonTitle: string;
+  minutes: number;
+  kind: "video" | "read" | "quiz";
+  /** Where this sits in the course, for "lesson 2 of 3". */
+  index: number;
+  total: number;
+  /** Ranks it: overdue mandatory beats an optional first lesson. */
+  priority: number;
+  why: string;
+};
+
+type FitCourse = {
+  id: string; title: string; minutes: number; progress: number;
+  mandatory?: boolean; dueIn?: number;
+  lessons: { id: string; title: string; minutes: number; kind: "video" | "read" | "quiz" }[];
+};
+
+/**
+ * What can actually be finished in the time available.
+ *
+ * Returns the NEXT unfinished lesson of each course that fits, ranked so an
+ * overdue mandatory lesson comes before an optional one. Never returns a lesson
+ * that does not fit — offering something someone cannot finish is how "five
+ * minutes is enough" stops being true.
+ */
+export function whatFitsIn(minutes: number, courses: FitCourse[], completedIds: string[] = []): FitCandidate[] {
+  return courses
+    .filter((c) => !completedIds.includes(c.id))
+    .map((c) => {
+      const doneCount = Math.round((c.progress / 100) * c.lessons.length);
+      const lesson = c.lessons[doneCount];
+      if (!lesson || lesson.minutes > minutes) return null;
+
+      const overdue = c.dueIn !== undefined && c.dueIn < 0;
+      const priority =
+        (overdue ? 100 : 0) +
+        (c.mandatory ? 40 : 0) +
+        (c.progress > 0 ? 20 : 0) + // finishing beats starting
+        (minutes - lesson.minutes === 0 ? 5 : 0); // an exact fit is satisfying
+
+      const why = overdue
+        ? "Overdue, and this is the next piece of it"
+        : c.progress > 0
+          ? `Picks up where you stopped — lesson ${doneCount + 1} of ${c.lessons.length}`
+          : c.mandatory
+            ? "Mandatory, and this is the first piece"
+            : "Fits the time you have";
+
+      return {
+        courseId: c.id, courseTitle: c.title,
+        lessonTitle: lesson.title, minutes: lesson.minutes, kind: lesson.kind,
+        index: doneCount + 1, total: c.lessons.length,
+        priority, why,
+      } satisfies FitCandidate;
+    })
+    .filter((x): x is FitCandidate => x !== null)
+    .sort((a, b) => b.priority - a.priority || b.minutes - a.minutes);
+}
