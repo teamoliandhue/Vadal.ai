@@ -111,3 +111,35 @@ export const mySignals = {
   sleepChangeHours: -1.2,
   moodTrend: -0.31,
 };
+
+/**
+ * Where you actually are in the challenge you joined.
+ *
+ * The list showed three challenges and a Join button, and for the one you were
+ * already in it said "Joined" and nothing else. A challenge with no progress on
+ * it is a signup form — the whole substance of joining is the daily result, and
+ * that was the one thing missing.
+ *
+ * The numbers run above this person's baseline week (see weekSteps, which
+ * averages ~6,000) on purpose: they joined, and joining changed the behaviour.
+ * That is the point of a challenge and it is what the card should show.
+ */
+export const challengeProgress = {
+  id: "monsoon",
+  /** The daily bar to clear. */
+  target: 10000,
+  totalDays: 15,
+  /** Steps logged each day since it started, oldest first. */
+  days: [10400, 8900, 11200, 6100, 9700, 12300],
+  /** Their usual day before joining — the comparison that makes this worth it. */
+  baselineDaily: 6000,
+  rank: 412,
+};
+
+/** Colour and icon identity per challenge kind, so three cards are not one card
+ *  three times. Hues are drawn from the Signal palette, not invented. */
+export const CHALLENGE_TONE: Record<Challenge["kind"], { hue: string; label: string }> = {
+  steps:            { hue: "#5D63E1", label: "Steps" },
+  "active-minutes": { hue: "#17a35e", label: "Active minutes" },
+  distance:         { hue: "#E0803A", label: "Distance" },
+};

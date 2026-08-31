@@ -31,3 +31,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 011 | [Thrive — the goal, content and timing adapt to the person](./011-thrive-redesign.md) | Built · needs Figma |
 | 012 | [The scroll model — app shell, two-pane pages](./012-scroll-model.md) | Built · needs Figma |
 | 013 | [Amplify — the other direction, and the programme behind it](./013-amplify-both-directions.md) | Built · needs Figma |
+| 014 | [Thrive — everything below the hero](./014-thrive-below-the-hero.md) | Built · needs Figma |

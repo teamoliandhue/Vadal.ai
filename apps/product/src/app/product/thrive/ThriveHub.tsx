@@ -24,7 +24,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Activity, ArrowRight, CalendarClock, GraduationCap, HeartPulse, Plus, Trophy, Wallet, Watch } from "lucide-react";
-import { Badge, Button, SparkMark, Switch } from "@vadal/design-system";
+import { Button, SparkMark, Switch } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { activityNudges, buildCohorts, chooseFocus, contentFor, financialTips, moneyMoment, unusedBenefits, wellbeingCheck } from "@/lib/ai/engines/wellbeing";
 import {
@@ -32,15 +32,11 @@ import {
   atWorkStepsPerDay, weekSteps, weekStepsFrontline, weekSleep, weekDays, moneyConfig,
 } from "@/lib/thrive";
 import { GoalRing, DayArea } from "@/components/charts";
+import { Card, Eyebrow, HalfHeader } from "./parts";
+import { Challenges } from "./Challenges";
+import { Cohorts } from "./Cohorts";
 import { useSession } from "../useSession";
 import { toast } from "../Toaster";
-
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
-}
-function Card({ className = "", children }: { className?: string; children: React.ReactNode }) {
-  return <section className={`card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>{children}</section>;
-}
 
 export function ThriveHub() {
   const { session } = useSession();
@@ -62,7 +58,11 @@ export function ThriveHub() {
 
   const nudges = activityNudges(myActivity);
   const cohorts = buildCohorts(participants);
-  const myCohort = cohorts.find((c) => c.members.some((m) => m.email === session?.email)) ?? cohorts[0];
+  /* No `?? cohorts[0]` fallback. If we cannot find this person among the
+     participants we do not know which group is theirs, and badging one "You"
+     anyway tells them their effort is being compared against a set of people it
+     is not. Undefined is the honest answer; Cohorts renders without the badge. */
+  const myCohort = cohorts.find((c) => c.members.some((m) => m.email === session?.email));
   const check = wellbeingCheck({ ...mySignals, consented: consent });
   const benefitNudges = unusedBenefits(benefits);
   const band = surface === "frontline" ? "entry" : "mid";
@@ -209,6 +209,14 @@ export function ThriveHub() {
 
         {/* ── health ── */}
         <div className="flex flex-col gap-6">
+          <HalfHeader
+            hue="#5D63E1"
+            icon={<HeartPulse className="h-[19px] w-[19px]" strokeWidth={1.9} />}
+            title="Your body"
+            state={isRecovery
+              ? `${myActivity.sleepHoursAvg}h average sleep · ${challenges.filter((c) => joined.includes(c.id)).length} challenge running`
+              : `${myActivity.activeMinutes} active minutes this week · ${challenges.filter((c) => joined.includes(c.id)).length} challenge running`}
+          />
           {/* The metric already knew Ravi works nights; the content did not.
               The material for it exists one pillar over, so hand it over rather
               than writing a second copy of it here. */}
@@ -235,64 +243,19 @@ export function ThriveHub() {
             </Card>
           )}
 
-          <Card>
-            <Eyebrow>Challenges</Eyebrow>
-            <ul className="mt-4 flex flex-col gap-3">
-              {challenges.map((c) => {
-                const isIn = joined.includes(c.id);
-                return (
-                  <li key={c.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-line p-4">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[16px] font-semibold">{c.name}</p>
-                      <p className="mt-0.5 text-[14px] text-muted">{c.blurb}</p>
-                      <p className="mt-1 text-[12px] text-faint">{c.participants.toLocaleString()} taking part · ends in {c.endsIn} days</p>
-                    </div>
-                    <Button size="sm" variant={isIn ? "tertiary" : "brand"} className="min-h-[44px] lg:min-h-0"
-                      onClick={() => { setJoined((j) => (isIn ? j.filter((x) => x !== c.id) : [...j, c.id])); toast(isIn ? `Left ${c.name}` : `Joined ${c.name} 🎉`); }}>
-                      {isIn ? "Joined" : "Join"}
-                    </Button>
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
+          <Challenges joined={joined} setJoined={setJoined} />
 
-          <Card>
-            <div className="flex items-center gap-2">
-              <span className="ai-grad grid h-7 w-7 place-items-center rounded-full"><SparkMark size={15} tone="solid" /></span>
-              <Eyebrow>Your leaderboard group</Eyebrow>
-            </div>
-            <p className="mt-2 text-[14px] leading-relaxed text-muted">{myCohort?.basis}</p>
-            <div className="mt-4 flex flex-col gap-4">
-              {cohorts.map((co) => (
-                <div key={co.name} className={`rounded-2xl border p-4 ${co === myCohort ? "border-[var(--purple)]" : "border-line"}`}>
-                  <div className="flex items-center gap-2">
-                    <p className="text-[14px] font-semibold">{co.name}</p>
-                    {co === myCohort && <Badge tone="brand" variant="soft" size="sm">You</Badge>}
-                    <span className="ml-auto text-[12px] text-faint">{co.members.length} people</span>
-                  </div>
-                  <ul className="mt-2.5 flex flex-col gap-1.5">
-                    {[...co.members].sort((a, b) => b.avgDailySteps - a.avgDailySteps).map((m, i) => (
-                      <li key={m.email} className="flex items-center gap-2 text-[14px]">
-                        <span className="w-4 shrink-0 text-[12px] font-semibold text-faint">{i + 1}</span>
-                        <span className="truncate">{m.email.split("@")[0].replace(/\b\w/g, (c) => c.toUpperCase())}</span>
-                        <span className="truncate text-[12px] text-faint">· {m.role}</span>
-                        <span className="ml-auto shrink-0 text-[12px] font-semibold tabular-nums">{m.avgDailySteps.toLocaleString()}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-            <p className="mt-3 text-[12px] leading-snug text-faint">
-              A warehouse picker walks 18,000 steps doing their job. A designer walking 8,000 has tried much harder.
-              Ranking them together makes the effort invisible, so we don&apos;t.
-            </p>
-          </Card>
+          <Cohorts cohorts={cohorts} myCohort={myCohort} myEmail={session?.email} />
         </div>
 
         {/* ── money — equal billing, per the brief ── */}
         <div className="flex flex-col gap-6">
+          <HalfHeader
+            hue="#17a35e"
+            icon={<Wallet className="h-[19px] w-[19px]" strokeWidth={1.9} />}
+            title="Your money"
+            state={`${benefitNudges.length} benefit${benefitNudges.length === 1 ? "" : "s"} you haven\u2019t claimed`}
+          />
           {/* The money moment. An article is equally true on any day; this is
               the one that is true TODAY, and the reason the wealth half is
               worth opening rather than worth having. */}
@@ -356,32 +319,67 @@ export function ThriveHub() {
               ))}
             </div>
 
-            <ul className="mt-4 flex flex-col gap-2">
+            {/* Four identical grey rows said nothing about what any of them
+                were. The topic is the useful sort key — someone comes here with
+                a question about pay or about cover, not for "an article". */}
+            <ul className="mt-5 flex flex-col">
               {wealthArticles.slice(0, 4).map((a) => (
-                <li key={a.id}>
-                  <button onClick={() => toast(`Opening “${a.title}”`)} className="flex min-h-[44px] w-full items-center gap-2 rounded-xl border border-line px-3.5 text-left transition hover:bg-soft">
-                    <span className="min-w-0 flex-1 truncate text-[14px] font-medium">{a.title}</span>
-                    <span className="shrink-0 text-[12px] text-faint">{a.minutes} min</span>
+                <li key={a.id} className="border-t border-line first:border-t-0">
+                  <button
+                    onClick={() => toast(`Opening “${a.title}”`)}
+                    className="group flex min-h-[52px] w-full items-center gap-3 py-2.5 text-left"
+                  >
+                    <span className="w-[74px] shrink-0 text-[11px] font-semibold uppercase tracking-[0.1em] text-faint">
+                      {a.topic}
+                    </span>
+                    <span className="min-w-0 flex-1 text-[14px] font-medium leading-snug transition group-hover:text-[var(--purple)]">
+                      {a.title}
+                    </span>
+                    <span className="shrink-0 text-[12px] tabular-nums text-faint">{a.minutes} min</span>
+                    <ArrowRight className="h-3.5 w-3.5 shrink-0 text-faint transition group-hover:translate-x-0.5 group-hover:text-[var(--purple)]" />
                   </button>
                 </li>
               ))}
             </ul>
           </Card>
 
+          {/* Money already paid for on your behalf and going unclaimed. The
+              worth was buried mid-sentence and the deadline read as trivia —
+              they are the two things that decide whether anyone acts, so they
+              carry the weight now. */}
           <Card>
             <Eyebrow>Benefits you haven&apos;t used</Eyebrow>
-            <ul className="mt-3 flex flex-col gap-2.5">
-              {benefitNudges.map(({ benefit, nudge }) => (
-                <li key={benefit.id} className="rounded-2xl border border-line p-4">
-                  <p className="text-[14px] font-semibold">{benefit.name}</p>
-                  <p className="mt-1 text-[14px] leading-snug text-muted">{nudge.text}</p>
-                  <Button size="sm" variant="tertiary" className="mt-2.5 min-h-[44px] lg:min-h-0" onClick={() => toast(`Call requested about ${benefit.name}`)}>
-                    Book a call
-                  </Button>
-                </li>
-              ))}
+            <ul className="mt-3.5 flex flex-col gap-3">
+              {benefitNudges.map(({ benefit }) => {
+                const days = benefit.enrolmentClosesInDays ?? 0;
+                const soon = days > 0 && days <= 30;
+                return (
+                  <li key={benefit.id} className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-line p-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[15px] font-semibold leading-snug">{benefit.name}</p>
+                      {benefit.worth && (
+                        <p className="mt-1 text-[20px] font-bold leading-none tracking-tight tabular-nums text-[var(--success)]">
+                          {benefit.worth}
+                        </p>
+                      )}
+                      <p className="mt-1.5 flex items-center gap-1.5 text-[12px]">
+                        <CalendarClock className="h-3 w-3 shrink-0" style={{ color: soon ? "var(--warning)" : "var(--faint)" }} />
+                        <span style={soon ? { color: "var(--warning)", fontWeight: 600 } : { color: "var(--faint)" }}>
+                          Enrolment closes in {days} days
+                        </span>
+                      </p>
+                    </div>
+                    <Button size="sm" variant="secondary" className="min-h-[44px] lg:min-h-0" onClick={() => toast(`Call requested about ${benefit.name}`)}>
+                      Book a call
+                    </Button>
+                  </li>
+                );
+              })}
               {benefitNudges.length === 0 && <li className="text-[14px] text-faint">Nothing closing soon.</li>}
             </ul>
+            <p className="mt-3 text-[12px] leading-snug text-faint">
+              You are already paying for these through your package. Unused, they are money left behind.
+            </p>
           </Card>
 
           {/* Devices collapsed to one honest line — three rows saying "Connect"

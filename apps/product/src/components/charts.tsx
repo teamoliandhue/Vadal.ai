@@ -541,3 +541,116 @@ export function DayArea({
     </figure>
   );
 }
+
+/* ══════════════════════ StreakStrip ══════════════════════
+   A daily challenge is not a trend and it is not a total — it is a run of
+   pass/fail days against a fixed bar, and the only question anyone asks of it
+   is "which days did I get it?". A line chart answers the wrong question and a
+   single percentage throws away the pattern.
+
+   So: one mark per day, its height carrying how far you got and its fill
+   carrying whether you cleared the bar. Days not yet played are drawn as empty
+   slots rather than omitted, because "9 days left" is the motivating half of
+   the picture and a strip that stops at today hides it.
+
+   Deliberately not colour-only: a cleared day is taller AND solid, a missed day
+   is shorter AND hollow. The pattern survives being printed in grey. */
+export function StreakStrip({
+  values,
+  target,
+  totalDays,
+  hue = "var(--client-brand, var(--purple))",
+  height = 64,
+  className = "",
+}: {
+  /** Results so far, oldest first. */
+  values: number[];
+  /** The bar to clear each day. */
+  target: number;
+  /** Length of the whole challenge, including days not yet played. */
+  totalDays: number;
+  hue?: string;
+  height?: number;
+  className?: string;
+}) {
+  const [hover, setHover] = React.useState<number | null>(null);
+  const max = Math.max(target, ...values) * 1.1;
+  const played = values.length;
+  const hits = values.filter((v) => v >= target).length;
+
+  const active = hover != null && hover < played ? hover : null;
+
+  // Where the bar to clear actually sits, as a fraction of the plot.
+  const targetPct = (target / max) * 100;
+
+  return (
+    <div className={className}>
+      <div className="relative flex items-end gap-[3px]" style={{ height }}>
+        {/* The bar to clear, drawn. Without it the marks encode pass/fail in
+            fill alone — day 5 at 9,700 is almost exactly as tall as day 1 at
+            10,400, and the whole question this chart answers is which side of
+            the line each day fell. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 z-10 border-t border-dashed"
+          style={{ bottom: `${targetPct}%`, borderColor: `color-mix(in srgb, ${hue} 45%, transparent)` }}
+        />
+        {Array.from({ length: totalDays }, (_, i) => {
+          const v = values[i];
+          const done = i < played;
+          const hit = done && v >= target;
+          // Even a bad day gets a visible stub, or the strip reads as broken.
+          const pct = done ? Math.max(0.12, Math.min(1, v / max)) : 1;
+
+          return (
+            <button
+              key={i}
+              type="button"
+              onMouseEnter={() => setHover(i)}
+              onMouseLeave={() => setHover(null)}
+              onFocus={() => setHover(i)}
+              onBlur={() => setHover(null)}
+              aria-label={done ? `Day ${i + 1}: ${v.toLocaleString()}${hit ? " — cleared" : ""}` : `Day ${i + 1}: still to come`}
+              className="group relative flex h-full flex-1 items-end rounded-[3px] outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
+            >
+              <span
+                className="block w-full rounded-[3px] transition-[height,opacity] duration-500"
+                style={{
+                  height: `${pct * 100}%`,
+                  background: !done
+                    ? "color-mix(in srgb, var(--line) 70%, transparent)"
+                    : hit
+                      ? hue
+                      : `color-mix(in srgb, ${hue} 16%, transparent)`,
+                  boxShadow: done && !hit ? `inset 0 0 0 1.5px color-mix(in srgb, ${hue} 34%, transparent)` : undefined,
+                  opacity: active != null && active !== i ? 0.45 : 1,
+                }}
+              />
+              {/* The bar to clear, drawn once across the whole strip by the
+                  parent would be cleaner, but it has to sit above the marks. */}
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="mt-2 flex flex-wrap items-center gap-x-2 text-[12px] text-faint">
+        <span className="flex items-center gap-1.5">
+          <span aria-hidden className="inline-block w-3 border-t border-dashed" style={{ borderColor: `color-mix(in srgb, ${hue} 55%, transparent)` }} />
+          {target.toLocaleString()} a day
+        </span>
+        <span aria-hidden>·</span>
+        {active != null ? (
+          <>
+            Day {active + 1} · <b className="font-semibold text-ink tabular-nums">{values[active].toLocaleString()}</b>
+            {values[active] >= target ? " — cleared" : ` — ${(target - values[active]).toLocaleString()} short`}
+          </>
+        ) : (
+          <>
+            <b className="font-semibold text-ink tabular-nums">{hits}</b> of {played} days cleared ·{" "}
+            {totalDays - played} still to come
+          </>
+        )}
+      </p>
+    </div>
+  );
+}
