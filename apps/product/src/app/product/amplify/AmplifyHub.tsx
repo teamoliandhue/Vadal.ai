@@ -28,22 +28,20 @@
    click. */
 import * as React from "react";
 import Image from "next/image";
-import { ChevronDown, Copy, Flame, Heart, MessageCircle, Repeat2, ShieldCheck, ThumbsDown } from "lucide-react";
+import { Copy, Heart, MessageCircle, Repeat2, ShieldCheck, ThumbsDown } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark, Switch } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
+import { draftCaption, rankMoments, scoreAdvocacy, type Voice } from "@/lib/ai/engines/advocacy";
 import {
-  advocacyStreak, draftCaption, rankMoments, scoreAdvocacy, FEASIBILITY,
-} from "@/lib/ai/engines/advocacy";
-import {
-  advocacyStats, companyPosts, companyPostReach, myActiveWeeks, myAdvocacy, myMoments,
-  myReachSeries, reachWeekLabels, recentSharers, shares, type CompanyPost,
+  advocacyStats, companyPosts, companyPostReach, myMoments, recentSharers, shares,
+  DEFAULT_PREFS, type CompanyPost,
 } from "@/lib/amplify";
 import { DECLINE_REASONS, type DeclineReason } from "@/lib/share";
-import { DayArea } from "@/components/charts";
 import { canAccess } from "@/lib/access";
 import { useViewAs } from "../useViewAs";
 import { toast } from "../Toaster";
-import { Card, Eyebrow, Mark, PlatformLine } from "./parts";
+import { Eyebrow, Mark, PlatformLine } from "./parts";
+import { AmplifyRail, type Prefs } from "./Rail";
 import { Composer } from "./Composer";
 import { MomentHero, MomentStrip } from "./Moments";
 import { Programme } from "./Programme";
@@ -61,7 +59,10 @@ export function AmplifyHub() {
   const optIn = optInRaw === true;
   const [open, setOpen] = React.useState<string | null>(null);
   const [openMoment, setOpenMoment] = React.useState<string | null>(null);
-  const [showPlatforms, setShowPlatforms] = React.useState(false);
+  /* How the person wants to be asked — see Rail.VoiceCard. These are not
+     decorative settings: `scope` decides what this screen is allowed to put in
+     front of them at all. */
+  const [prefs, setPrefs] = usePersistentState<Prefs>("vadal:advocacy-prefs", DEFAULT_PREFS);
   /* Declines persist. Being shown the same post you already passed on is the
      fastest way to make an optional feature feel like nagging. */
   const [passed, setPassed] = usePersistentState<string[]>("vadal:advocacy-passed", []);
@@ -69,11 +70,17 @@ export function AmplifyHub() {
   const [declining, setDeclining] = React.useState(false);
 
   const impact = scoreAdvocacy(shares, companyPostReach);
-  const live = companyPosts.filter((p) => !passed.includes(p.id));
+
+  /* "Only my own" and "only the company's" are real filters, not labels. A
+     person who said they never want a marketing post put in front of them
+     should not see one, anywhere on the screen. */
+  const wantsCompany = prefs.scope !== "mine";
+  const wantsMine = prefs.scope !== "company";
+
+  const live = wantsCompany ? companyPosts.filter((p) => !passed.includes(p.id)) : [];
   const featured = live.find((p) => p.featured) ?? live[0] ?? null;
-  const moments = rankMoments(myMoments, passedMoments);
+  const moments = wantsMine ? rankMoments(myMoments, passedMoments) : [];
   const heroMoment = optIn ? moments[0] ?? null : null;
-  const streak = advocacyStreak(myActiveWeeks);
 
   /* When a moment takes the hero, the company's pick does not vanish — it drops
      into the browse list, still marked. Yours first, theirs still there. */
@@ -105,11 +112,14 @@ export function AmplifyHub() {
       ) : heroMoment ? (
         <MomentHero
           moment={heroMoment}
+          defaultVoice={prefs.voice}
+          defaultPlatform={prefs.platform}
           onPass={() => { setPassedMoments((a) => [...a, heroMoment.id]); toast("Skipped — we'll leave that one alone"); }}
         />
       ) : featured ? (
         <CompanyHero
           post={featured}
+          defaultVoice={prefs.voice}
           declining={declining}
           setDeclining={setDeclining}
           onDecline={decline}
@@ -140,7 +150,7 @@ export function AmplifyHub() {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
         <div className="flex flex-col gap-6 xl:col-span-8">
           {/* ══ the rest of your own moments ══ */}
-          {optIn && <MomentStrip moments={moments.slice(1)} openId={openMoment} onOpen={setOpenMoment} />}
+          {optIn && <MomentStrip moments={moments.slice(1)} openId={openMoment} onOpen={setOpenMoment} defaultVoice={prefs.voice} defaultPlatform={prefs.platform} />}
 
           {/* ══ the rest of what the company said ══ */}
           {rest.length > 0 && (
@@ -185,7 +195,7 @@ export function AmplifyHub() {
                         </div>
 
                         {isOpen && optIn && (
-                          <div className="mt-4"><Composer subject={{ kind: "post", post: p }} /></div>
+                          <div className="mt-4"><Composer subject={{ kind: "post", post: p }} defaultVoice={prefs.voice} /></div>
                         )}
                       </div>
                     </article>
@@ -197,100 +207,13 @@ export function AmplifyHub() {
         </div>
 
         {/* ══ right rail ══ the person's own record, and nothing of anyone else's ══ */}
-        <div className="flex flex-col gap-6 xl:col-span-4">
-          {optIn && (
-            <Card>
-              <div className="flex items-baseline justify-between gap-2">
-                <Eyebrow>Your reach</Eyebrow>
-                <span className="text-[12px] text-faint">8 weeks</span>
-              </div>
-              <div className="mt-2 flex items-end gap-2">
-                <span className="text-[32px] font-bold leading-none tracking-tight tabular-nums">
-                  {myAdvocacy.estimatedReach.toLocaleString()}
-                </span>
-                <span className="pb-1 text-[14px] text-faint">people, from {myAdvocacy.shares} shares</span>
-              </div>
-
-              {/* The shape of it, not just the total — a flat total hides that
-                  this has been building. */}
-              <DayArea
-                id="amp-reach"
-                className="mt-3"
-                values={myReachSeries}
-                labels={reachWeekLabels}
-                unit="people reached"
-                height={84}
-              />
-
-              {/* Quiet on purpose. A streak on an OPTIONAL, public-facing action
-                  is a pressure device if it shouts — nobody should feel they owe
-                  their own social account to their employer. It counts up and
-                  never warns you that you are about to lose it. */}
-              {streak.current > 1 && (
-                <p className="mt-3 flex items-center gap-1.5 text-[13px] text-muted">
-                  <Flame className="h-3.5 w-3.5 text-[var(--client-brand,var(--purple))]" />
-                  {streak.current} weeks running{streak.best > streak.current ? ` · best ${streak.best}` : ""}
-                </p>
-              )}
-
-              <p className="mt-3 text-[14px] leading-relaxed text-muted">
-                You&apos;re {myAdvocacy.rank}th of {myAdvocacy.of}{" "}
-                colleagues taking part. Advocacy counts as a contribution — it shows up in
-                Recognition, not just marketing&apos;s dashboard.
-              </p>
-              <p className="mt-2 text-[12px] leading-snug text-faint">
-                Reach is modelled from follower counts, not measured.
-              </p>
-            </Card>
-          )}
-
-          <Card>
-            <Eyebrow>Sharing this week</Eyebrow>
-            <div className="mt-3 flex items-center gap-3">
-              <div className="flex -space-x-2">
-                {recentSharers.map((s) => (
-                  <span key={s.name} className="rounded-full ring-2 ring-[var(--card)]" title={s.name}>
-                    <Avatar src={s.img} name={s.name} size="sm" />
-                  </span>
-                ))}
-              </div>
-              <p className="text-[14px] leading-snug text-muted">
-                <b className="font-semibold text-ink">{advocacyStats.participants}</b> colleagues,{" "}
-                {advocacyStats.resharesThisMonth} shares this month.
-              </p>
-            </div>
-          </Card>
-
-          {/* Collapsed to one line. Four warning badges made a working feature
-              look broken; the detail is still one tap away for whoever needs it. */}
-          <Card>
-            <button
-              onClick={() => setShowPlatforms((v) => !v)}
-              aria-expanded={showPlatforms}
-              className="flex w-full items-center gap-2 text-left"
-            >
-              <div className="min-w-0 flex-1">
-                <Eyebrow>Posting for you</Eyebrow>
-                <p className="mt-1 text-[14px] leading-snug text-muted">
-                  Not enabled on any platform yet — the brief asks for a feasibility spike first.
-                </p>
-              </div>
-              <ChevronDown className={`h-4 w-4 shrink-0 text-faint transition-transform ${showPlatforms ? "rotate-180" : ""}`} />
-            </button>
-            {showPlatforms && (
-              <ul className="mt-4 flex flex-col gap-2">
-                {FEASIBILITY.map((f) => (
-                  <li key={f.platform} className="rounded-xl bg-soft px-3.5 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <Mark platform={f.platform} size={16} />
-                      <span className="text-[14px] font-semibold">{f.platform}</span>
-                    </div>
-                    <p className="mt-1 text-[12px] leading-snug text-faint">{f.note}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
+        <div className="xl:col-span-4">
+          <AmplifyRail
+            optIn={optIn}
+            prefs={prefs}
+            setPrefs={setPrefs}
+            onOptOut={() => { setOptIn(false); toast("Opted out. Nothing will be put in front of you."); }}
+          />
         </div>
       </div>
     </div>
@@ -407,9 +330,9 @@ function OptInHero({
 
 /* ── opted in, nothing of your own: today's company pick ── */
 function CompanyHero({
-  post, declining, setDeclining, onDecline,
+  post, defaultVoice, declining, setDeclining, onDecline,
 }: {
-  post: CompanyPost; declining: boolean;
+  post: CompanyPost; defaultVoice?: Voice; declining: boolean;
   setDeclining: (f: (v: boolean) => boolean) => void;
   onDecline: (r: DeclineReason) => void;
 }) {
@@ -463,7 +386,7 @@ function CompanyHero({
 
           <p className="mt-3 text-[18px] font-semibold leading-relaxed tracking-[-0.01em]">{post.text}</p>
           <div className="mt-3"><PlatformLine p={post.platform} posted={post.posted} /></div>
-          <div className="mt-5"><Composer subject={{ kind: "post", post }} /></div>
+          <div className="mt-5"><Composer subject={{ kind: "post", post }} defaultVoice={defaultVoice} /></div>
         </div>
       </div>
     </header>

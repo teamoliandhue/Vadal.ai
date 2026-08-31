@@ -9,7 +9,7 @@
  * auto-mirroring is committed to, and an explicit human tap on every action —
  * see lib/ai/engines/advocacy.canAutoMirror().
  */
-import type { Moment, Platform, ShareRecord } from "./ai/engines/advocacy";
+import type { Moment, Platform, ShareRecord, Voice } from "./ai/engines/advocacy";
 
 export type CompanyPost = {
   id: string;
@@ -231,4 +231,104 @@ export const socialPolicy = {
   updated: "March 2026",
   url: "/product/knowledge",
   summary: "Post as yourself, not as the company. Do not put unreleased numbers, customer names or people data in a public post.",
+};
+
+/* ── what fills the context rail ───────────────────────────────────
+   The rail held three cards against a 2,245px column — a third of the screen
+   was blank, and one of the three was a disclaimer. */
+
+/**
+ * Your own sending history.
+ *
+ * Note what is NOT here: engagement counts. We have no platform APIs and are not
+ * getting them before the feasibility spike, so likes and comments on a personal
+ * post are genuinely invisible to us. Estimating them and putting them next to
+ * a real date would be inventing a number, which is the one thing this pillar
+ * cannot afford — every other figure on this screen is already modelled and
+ * labelled as such.
+ *
+ * What we honestly know: that you told us it went out, when, where, what you
+ * said, and — only for a hiring post carrying your code — the clicks our own
+ * redirect counted.
+ */
+export type SentShare = {
+  id: string;
+  platform: Platform;
+  when: string;
+  caption: string;
+  /** Counted by our own redirect. Only exists on hiring posts. */
+  referralClicks?: number;
+  /** Whether this was your own moment or the company's post. */
+  source: "moment" | "company";
+};
+
+export const mySentShares: SentShare[] = [
+  { id: "s1", platform: "LinkedIn", when: "8 days ago", source: "moment",
+    caption: "Aarav, Dev and I just cut new-joiner onboarding from nine days to four. Good week." },
+  { id: "s2", platform: "LinkedIn", when: "3 weeks ago", source: "company", referralClicks: 34,
+    caption: "We're hiring across engineering, ops and people — genuinely good team to land in." },
+  { id: "s3", platform: "X", when: "5 weeks ago", source: "company",
+    caption: "Sharing this from our team: 200 days without a lost-time incident on Plant Ops." },
+];
+
+/**
+ * What good looks like.
+ *
+ * The most useful thing we can put in front of someone who has opted in and
+ * then frozen: three captions colleagues actually sent. Nobody knows what to
+ * write, and 58% of the people who passed on a post said it read too corporate
+ * — showing what doesn't is a better fix than any amount of instruction.
+ */
+export const exemplarShares = [
+  {
+    name: "Anita Desai", img: "/avatars/user-5.svg", platform: "LinkedIn" as Platform, when: "last week",
+    caption: "Spent Tuesday watching a new starter get set up in four days instead of nine. Small thing. Felt like the best day I've had here in a while.",
+    why: "Specific and small. No adjectives about the company.",
+  },
+  {
+    name: "Ravi Prasad", img: "/avatars/user-2.svg", platform: "X" as Platform, when: "2 weeks ago",
+    caption: "200 days, no lost-time incidents on our line. That's a thousand small decisions made properly at 5am. Proud of this crew.",
+    why: "First person, and it credits the people rather than the milestone.",
+  },
+  {
+    name: "Meera Pillai", img: "/avatars/user-7.svg", platform: "Instagram" as Platform, when: "3 weeks ago",
+    caption: "Three years today. Still the same reason I stayed.",
+    why: "Eleven words. Length is not what makes a post land.",
+  },
+];
+
+/**
+ * The questions people actually ask before they opt in.
+ *
+ * These are the real objections and nothing in the product answered them. The
+ * rail is emptiest in exactly the state where the job is reassurance rather
+ * than statistics, which is where these belong.
+ */
+export const advocacyFaq: { q: string; a: string }[] = [
+  {
+    q: "Can my employer see my account?",
+    a: "No. We never connect to your personal accounts and cannot read them. We do not know your handle, your follower count, or whether you posted — unless you tell us.",
+  },
+  {
+    q: "Can Vadal post as me?",
+    a: "No, and it is not a setting we can turn on. Every route ends with you pressing publish in the platform's own app. Posting on your behalf would need a permission you have not granted and a feasibility review that has not happened.",
+  },
+  {
+    q: "Where does the reach number come from?",
+    a: "It is modelled from typical follower counts and organic reach per platform — not measured. We show it as an order of magnitude and label it every time.",
+  },
+  {
+    q: "What if I share something and regret it?",
+    a: "It is your post on your account, so you delete it like any other. Nothing here can remove it for you, and nothing here keeps a copy of what you posted.",
+  },
+  {
+    q: "Does declining count against me?",
+    a: "No. Declines are never attributed to a person — comms only see the reasons in aggregate, so they can write better posts. Being able to say no is what keeps the yes worth having.",
+  },
+];
+
+/** How the person wants to be asked. Defaults chosen so the first run is gentle. */
+export type AdvocacyScope = "both" | "mine" | "company";
+export const DEFAULT_PREFS: { scope: AdvocacyScope; voice: Voice; platform: Platform } = {
+  scope: "both", voice: "warm", platform: "LinkedIn",
 };

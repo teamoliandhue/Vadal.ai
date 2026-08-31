@@ -164,3 +164,98 @@ is the mark alone, 16px gutters, 6px gaps.
 4. `Amplify / Programme` — campaign hero, queue card with forecast, decline verdict (three tones)
 5. `Component / TopBar` — the Mobile variant
 6. Note the `min-w-0` rule in the description of every truncating component
+
+---
+
+# 013b · The context rail
+
+## 7 · A third of the screen was blank
+
+The rail held three cards — **709px against a 2,245px column** — and one of the three was a
+disclaimer. Filling it was not the point. Each card that went in was something the pillar
+already owed the person.
+
+### 7.1 Your voice — the promise with nothing behind it
+
+**The opt-out control disappeared the moment you opted in.** It only ever existed inside the
+opted-out hero, so the copy *"Opt out any time"* pointed at a control that was no longer on the
+page. For a consent feature, that is the defect, not a gap.
+
+It also fixes a second thing: **consent was all-or-nothing.** Someone happy to share their own
+wins but not marketing's posts had no way to say so — and that is exactly the person we lose.
+**58% of declines are "reads too corporate."** A narrowed opt-in beats a churned one.
+
+| Setting | Options | What it does |
+|---|---|---|
+| What should we ask you about? | Both · Only my own · Only the company's | **A real filter.** "Only my own" removes the company section and the company hero entirely |
+| Start drafts in | Plain · Warm · Proud · Technical | Seeds every composer, and updates a draft you have not edited |
+| Default platform | The four marks | Seeds the platform picker on your own moments |
+
+These are not decorative settings. `scope` decides what the screen is allowed to put in front of
+you at all — the hero itself changes.
+
+`Amplify / Rail / Voice` — collapsed (one summary line: `Both · Warm · LinkedIn`) and expanded.
+The opt-out sits below a divider, full width, and goes danger-coloured on hover.
+
+### 7.2 What you've sent
+
+We ask *"Did you post it?"*, count it, and then never mention it again.
+
+**Note what is deliberately absent: engagement counts.** We have no platform APIs and are not
+getting them before the feasibility spike, so likes and comments on a personal post are genuinely
+invisible to us. Estimating them and setting them beside a real date would be inventing a
+number — and every other figure on this screen is already modelled and labelled as such.
+
+What we honestly know: that you said it went out, when, where, what you wrote, and — only on a
+hiring post carrying your code — **the clicks our own redirect counted.** The card says the rest
+out loud rather than filling the gap.
+
+### 7.3 What good looks like
+
+Three captions colleagues actually sent, one at a time, each with a line on *why* it works
+("Eleven words. Length is not what makes a post land."). Nobody knows what to write, and showing
+what doesn't read as corporate beats any amount of instruction.
+
+The old **Sharing this week** card is folded in as this card's header — two thin cards saying
+adjacent things is worse than one that says both.
+
+`Amplify / Rail / Exemplar` — quote block, attribution row, rationale line, dot pagination. **The
+dot is 6px; the tap target is 44px.**
+
+### 7.4 Before you decide
+
+The five questions people actually ask, none of which the product answered: *Can my employer see
+my account? Can Vadal post as me? Where does the reach number come from? What if I share
+something and regret it? Does declining count against me?*
+
+## 8 · The rail's job changes with state
+
+**Opted out, it is reassurance — not statistics.** The questions come first and none of the
+personal numbers appear at all. Quoting somebody's reach at them before they have agreed to
+anything is the wrong kind of persuasion.
+
+| | Opted out | Opted in |
+|---|---|---|
+| 1 | **Before you decide** | Your reach |
+| 2 | What good looks like | What you've sent |
+| 3 | Posting for you | What good looks like |
+| 4 | — | **Your voice** |
+| 5 | — | Before you decide |
+| 6 | — | Posting for you |
+
+Result: rail **709 → 1,868px**; dead space **1,536 → 377px**.
+
+## 9 · One more JSX rule, because it bit twice
+
+`{" "}` after an expression is load-bearing. **When a JSX text node spans lines, every line is
+trimmed — including the first** — so a space sitting immediately after an expression is eaten:
+`148colleagues`. It is the same defect as [009](./009-form-field-rules.md)'s clipped Q — invisible
+until the exact content that exposes it appears.
+
+## 10 · What to draw
+
+1. `Amplify / Rail / Voice` — collapsed and expanded; scope options as selected/unselected cards
+2. `Amplify / Rail / Sent` — with and without the referral-clicks line
+3. `Amplify / Rail / Exemplar` — three states via the dots
+4. `Amplify / Rail / FAQ` — closed and one-open
+5. The **two rail orders** above, as separate frames — this is the point, not a detail

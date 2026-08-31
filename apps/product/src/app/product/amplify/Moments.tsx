@@ -20,7 +20,8 @@ import * as React from "react";
 import Image from "next/image";
 import { Award, GraduationCap, PartyPopper, Rocket, Sparkles } from "lucide-react";
 import { Badge, SparkMark } from "@vadal/design-system";
-import type { Moment, MomentKind } from "@/lib/ai/engines/advocacy";
+import type { Moment, MomentKind, Voice } from "@/lib/ai/engines/advocacy";
+import type { Platform } from "@/lib/ai/engines/timing";
 import { Composer } from "./Composer";
 import { Eyebrow } from "./parts";
 
@@ -37,7 +38,11 @@ const KIND: Record<MomentKind, { icon: React.ElementType; label: string }> = {
    suggestion about someone's own public profile feels presumptuous, and one
    sentence of "because Neha said this about you yesterday" turns it into an
    offer. */
-export function MomentHero({ moment, onPass }: { moment: Moment; onPass: () => void }) {
+export function MomentHero({
+  moment, onPass, defaultVoice, defaultPlatform,
+}: {
+  moment: Moment; onPass: () => void; defaultVoice?: Voice; defaultPlatform?: Platform;
+}) {
   const K = KIND[moment.kind];
   const Icon = K.icon;
 
@@ -89,7 +94,7 @@ export function MomentHero({ moment, onPass }: { moment: Moment; onPass: () => v
           </p>
 
           <div className="mt-5">
-            <Composer subject={{ kind: "moment", moment }} title="Written as you" />
+            <Composer subject={{ kind: "moment", moment }} title="Written as you" defaultVoice={defaultVoice} defaultPlatform={defaultPlatform} />
           </div>
         </div>
       </div>
@@ -101,8 +106,11 @@ export function MomentHero({ moment, onPass }: { moment: Moment; onPass: () => v
    One at a time in the hero, the others in a quiet row. Showing four asks at
    once turns an offer into a backlog. */
 export function MomentStrip({
-  moments, openId, onOpen,
-}: { moments: Moment[]; openId: string | null; onOpen: (id: string | null) => void }) {
+  moments, openId, onOpen, defaultVoice, defaultPlatform,
+}: {
+  moments: Moment[]; openId: string | null; onOpen: (id: string | null) => void;
+  defaultVoice?: Voice; defaultPlatform?: Platform;
+}) {
   if (moments.length === 0) return null;
 
   return (
@@ -152,7 +160,7 @@ export function MomentStrip({
 
               {isOpen && (
                 <div className="px-5 pb-5">
-                  <Composer subject={{ kind: "moment", moment: m }} title="Written as you" />
+                  <Composer subject={{ kind: "moment", moment: m }} title="Written as you" defaultVoice={defaultVoice} defaultPlatform={defaultPlatform} />
                 </div>
               )}
             </article>

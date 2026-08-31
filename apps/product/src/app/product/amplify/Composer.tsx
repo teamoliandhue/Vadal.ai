@@ -196,15 +196,28 @@ function Detail({
   );
 }
 
-export function Composer({ subject, title }: { subject: Subject; title?: string }) {
+export function Composer({
+  subject, title, defaultVoice = "warm", defaultPlatform = "LinkedIn",
+}: {
+  subject: Subject; title?: string;
+  /** From the person's own settings — see Rail.VoiceCard. */
+  defaultVoice?: Voice; defaultPlatform?: Platform;
+}) {
   const { session } = useSession();
-  const [voice, setVoice] = React.useState<Voice>("warm");
+  /* Derived rather than initialised-once, so changing your default voice in the
+     rail updates a draft you have not touched. An effect syncing state would do
+     the same thing and would also clobber an edit in progress; null here means
+     "still following the default", exactly as `edited` below means "still
+     following the generated draft". */
+  const [voiceOverride, setVoiceOverride] = React.useState<Voice | null>(null);
+  const voice = voiceOverride ?? defaultVoice;
+  const setVoice = setVoiceOverride;
   const [edited, setEdited] = React.useState<string | null>(null);
   const [openDetail, setOpenDetail] = React.useState<null | "tags" | "image" | "timing">(null);
   const [scheduled, setScheduled] = React.useState(false);
 
   // A moment has no platform of its own — where it goes is the person's call.
-  const [momentPlatform, setMomentPlatform] = React.useState<Platform>("LinkedIn");
+  const [momentPlatform, setMomentPlatform] = React.useState<Platform>(defaultPlatform);
   const platform = subject.kind === "post" ? subject.post.platform : momentPlatform;
   const url = subject.kind === "post" ? subject.post.url : undefined;
   const image = subject.kind === "post" ? subject.post.image : subject.moment.image;
