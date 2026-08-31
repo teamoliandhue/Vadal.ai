@@ -5,12 +5,13 @@
    and a team scope that re-scopes the read — gated by a min-N anonymity threshold.
    Same Lumen shell + Aurora AI accents. Seeded data (lib/listen). */
 import * as React from "react";
-import { ShieldAlert, TriangleAlert } from "lucide-react";
+import { Lock, ShieldAlert, TriangleAlert } from "lucide-react";
 import { Button, SparkMark } from "@vadal/design-system";
 import { ArcGauge, TrendChart } from "@/components/charts";
 import { toast } from "../Toaster";
 import { Drawer } from "../Drawer";
 import { sentiment, sentimentScopes, MIN_N } from "@/lib/listen";
+import { extractThemes } from "@/lib/ai/engines/text";
 import { useScope } from "../useViewAs";
 import { ScopeNotice } from "../ScopeNotice";
 
@@ -29,16 +30,39 @@ const THEME_FILTERS = ["All", "Positive", "Negative", "Rising"] as const;
 
 type Theme = (typeof sentiment.themes)[number];
 
-/* re-scope the read by team, gated by the anonymity threshold */
+/* re-scope the read by team, gated by the anonymity threshold.
+
+   The per-theme floor here used to be `Math.max(4, …)`, which did two things
+   that should not survive on this screen:
+
+     · it INVENTED a number — a theme genuinely mentioned once was drawn as four
+     · it guaranteed every theme appeared, at any scope
+
+   The second is the serious one. The brief's requirement is that a theme
+   carried by fewer than the threshold is DROPPED, because on a team of nine,
+   naming the theme identifies the person who raised it. The floor existed to
+   stop the panel looking empty, which is a layout problem being solved by
+   overstating data on the one screen whose entire promise is anonymity.
+
+   extractThemes() takes that threshold as its `minN` argument and has done all
+   along. Themes are counted honestly now and withheld when thin, and the panel
+   says how many it withheld rather than quietly padding them. */
 function deriveSentiment(scope: string) {
   const sc = sentimentScopes.find((s) => s.name === scope);
   const respondents = sc?.respondents ?? sentiment.comments;
-  if (respondents < MIN_N) return { hidden: true as const, respondents };
-  if (scope === "All teams") return { hidden: false as const, respondents, ...sentiment };
+  if (respondents < MIN_N) return { hidden: true as const, respondents, withheld: 0 };
+  if (scope === "All teams") return { hidden: false as const, respondents, withheld: 0, ...sentiment };
   const shift = (hash(scope) % 16) - 8;
   const positive = clamp(sentiment.positive + shift, 25, 85);
   const negative = clamp(sentiment.negative - Math.round(shift * 0.6), 4, 45);
   const frac = respondents / sentiment.comments;
+
+  /* No floor. A theme that scopes below the anonymity threshold is withheld,
+     not rounded up to look presentable. */
+  const scoped = sentiment.themes
+    .map((t) => ({ ...t, occurrences: Math.round(t.occurrences * frac * 3) }))
+    .filter((t) => t.occurrences >= MIN_N);
+
   return {
     hidden: false as const,
     respondents,
@@ -50,9 +74,31 @@ function deriveSentiment(scope: string) {
     posSeries: sentiment.posSeries.map((v) => clamp(v + shift, 20, 92)),
     negSeries: sentiment.negSeries.map((v) => clamp(v - Math.round(shift * 0.6), 3, 45)),
     months: sentiment.months,
-    themes: sentiment.themes.map((t) => ({ ...t, occurrences: Math.max(4, Math.round(t.occurrences * frac * 3)) })),
+    themes: scoped,
+    withheld: sentiment.themes.length - scoped.length,
   };
 }
+
+/* Sentiment per theme, read from the comments themselves rather than taken from
+   a hand-typed label. extractThemes() is the brief's own clustering — this is
+   where it earns its place: the label on a theme is now an output, not an
+   opinion someone typed next to it. */
+/* ── what the extractor makes of the comments themselves ──────────
+   The counts in the table above are survey aggregates: 4,120 comments summed in
+   the warehouse, arriving pre-totalled. extractThemes() cannot reproduce them
+   and should not pretend to — it reads the comments actually on file, which is
+   eleven.
+
+   Shown as a separate read rather than folded into the table, because it is a
+   different claim with a different sample, and merging the two would make an
+   eleven-comment observation look like a four-thousand-comment finding. Its
+   real value is the check: where the extractor disagrees with a hand-typed
+   label, one of them is wrong. */
+const CORPUS = [
+  ...Object.values(sentiment.themeComments).flat(),
+  ...Object.values(sentiment.voices).flat(),
+].map((c) => c.text);
+const DERIVED = extractThemes(CORPUS, 1);
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
@@ -163,6 +209,49 @@ export function SentimentDashboard() {
                   ))}
                 </tbody>
               </table>
+
+              {/* the extractor's own read, kept visibly separate from the aggregate */}
+              {scope === "All teams" && DERIVED.length > 0 && (
+                <div className="mt-4 rounded-2xl bg-[var(--ai-surface)] p-4 ring-1 ring-[var(--ai-border)]">
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <SparkMark size={13} tone="solid" />
+                    <Eyebrow>Read from the comments</Eyebrow>
+                    <span className="text-[12px] text-faint">{CORPUS.length} on file</span>
+                  </div>
+                  <p className="mt-1.5 text-[13px] leading-snug text-muted">
+                    The counts above are survey aggregates. This is what the extractor makes of the
+                    verbatim comments themselves — a much smaller sample, and a check on the labels
+                    rather than a replacement for them.
+                  </p>
+                  <ul className="mt-3 flex flex-wrap gap-1.5">
+                    {DERIVED.map((d) => {
+                      const tone = d.sentiment > 0.1 ? TONE.good : d.sentiment < -0.1 ? TONE.bad : TONE.muted;
+                      return (
+                        <li key={d.key} className="rounded-full px-2.5 py-1 text-[12px] font-semibold" style={{ background: soft(tone), color: tone }}>
+                          {d.label} · {d.mentions}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+
+              {v.withheld > 0 && (
+                <p className="mt-3 flex items-start gap-2 border-t border-line pt-3 text-[12px] leading-snug text-faint">
+                  <Lock className="mt-[2px] h-3 w-3 shrink-0" />
+                  <span>
+                    <b className="font-semibold text-muted">{v.withheld} theme{v.withheld === 1 ? "" : "s"} withheld.</b>{" "}
+                    Fewer than {MIN_N} comments carried {v.withheld === 1 ? "it" : "them"} at this scope — naming a
+                    theme that thin would identify whoever raised it.
+                  </span>
+                </p>
+              )}
+
+              {v.themes.length === 0 && (
+                <p className="py-8 text-center text-[14px] text-faint">
+                  Nothing can be shown at this scope without identifying someone.
+                </p>
+              )}
             </Card>
 
             {/* drivers + alerts */}

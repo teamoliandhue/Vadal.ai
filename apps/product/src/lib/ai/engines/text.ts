@@ -75,7 +75,12 @@ export function analyseSentiment(text: string): Sentiment {
 /** The themes HR actually acts on. Matched on stems so plurals work. */
 const THEMES: { key: string; label: string; stems: string[] }[] = [
   { key: "workload", label: "Workload & burnout", stems: ["workload", "burnout", "overtime", "hours", "exhaust", "understaff", "capacity", "shift"] },
-  { key: "recognition", label: "Recognition", stems: ["recognis", "recogniz", "appreciat", "kudos", "thank", "credit", "praise"] },
+  /* "recogni", not "recognis"/"recogniz": those two cover the verb in both
+     spellings and miss RECOGNITION, the noun — which is the form people
+     overwhelmingly write, and the name of a whole pillar of this product. Found
+     by running the extractor over the real comments and getting zero hits on a
+     theme the dashboard lists as a top positive driver. */
+  { key: "recognition", label: "Recognition", stems: ["recogni", "appreciat", "kudos", "thank", "credit", "praise"] },
   { key: "growth", label: "Career growth", stems: ["growth", "career", "promot", "learn", "training", "skill", "develop"] },
   { key: "manager", label: "Manager support", stems: ["manager", "supervisor", "lead", "1:1", "one-on-one", "feedback", "micromanag"] },
   { key: "pay", label: "Pay & benefits", stems: ["pay", "salary", "compensat", "bonus", "increment", "benefit", "insurance"] },
