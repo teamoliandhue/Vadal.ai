@@ -16,6 +16,15 @@ export const org = {
 };
 
 export const health = {
+  /**
+   * SUPERSEDED as the org-wide figure — see lib/experience.experienceScore(),
+   * which computes it from Pulse mood, real Feed sentiment, campaign reach and
+   * participation, and recognition coverage. This value was typed here and was
+   * the most prominent number in the product with nothing behind it.
+   *
+   * Kept only as the fallback the type still requires; the computed score comes
+   * out around 76, not 82, because 82 was never derived from anything.
+   */
   score: 82,
   delta: 4,
   benchmarkDelta: 7,

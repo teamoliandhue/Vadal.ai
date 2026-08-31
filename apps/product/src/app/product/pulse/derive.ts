@@ -8,6 +8,7 @@
      · deltas (movement vs last period)             — grow with the WINDOW
    This is seeded demo data, not a live warehouse — but every figure is derived,
    internally consistent, and changes the way a real cut would. */
+import { experienceScore } from "@/lib/experience";
 import {
   health, engagementTrend, attrition, voice, recognitionBoard, briefingImpact,
   experience, flightRisks, managers, departments,
@@ -35,7 +36,13 @@ export function derivePulse(scope: string, period: string) {
   const w = isTeam ? weight(scope) : 1;
   const flow = FLOW[period] ?? 1;
   const move = MOVE[period] ?? 1;
-  const score = d ? d.score : health.score;
+  /* Org-wide, the score is COMPUTED from the three listening surfaces rather
+     than read from data.ts, where it was the number 82 with nothing behind it.
+     See lib/experience — the inputs all trace to something visible elsewhere in
+     the product, which is what makes the figure arguable. A team scope still
+     uses that department's own score. */
+  const ex = experienceScore();
+  const score = d ? d.score : ex.score;
   const headcount = isTeam ? Math.round(12480 * w) : 12480;
 
   /* ── headline / health ── */
@@ -51,14 +58,25 @@ export function derivePulse(scope: string, period: string) {
             ? "Engagement is holding, but workload and growth clarity need watching."
             : "Workload pressure and thin manager coverage are dragging the score — act this week."
       }`
-    : health.narrative;
+    /* Org-wide, the narrative is derived from the same computation as the score.
+       health.narrative is hand-written and now contradicts it — it credits
+       recognition for "lifting the score" when recognition coverage is one of
+       the weaker inputs, and blames workload, which this model does not measure
+       at all. A headline sentence that argues with the breakdown beneath it is
+       worse than no sentence. */
+    : `The organisation sits at ${score} — ${percentile} against the GCC benchmark. ${
+        ex.contributions.slice().sort((a, b) => b.points - a.points)[0].label
+      } is carrying it; ${ex.weakest.toLowerCase()} is the weakest input and the first place to act.`;
   const drivers = d
     ? [
         { label: `Recognition ${score >= 75 ? "+" : "−"}${4 + (hash(scope) % 12)}%`, tone: score >= 75 ? "good" : "bad" },
         { label: `1:1s ${clamp(score + 6, 40, 96)}%`, tone: score >= 72 ? "good" : "warn" },
         { label: score < 72 ? "Workload pressure" : "Growth clarity", tone: score < 72 ? "bad" : "neutral" },
       ]
-    : health.drivers.map((x) => ({ label: x.label, tone: x.tone as string }));
+    : ex.contributions.map((c) => ({
+        label: `${c.label} +${c.points}`,
+        tone: c.label === ex.weakest ? "bad" : c.points >= 15 ? "good" : "neutral",
+      }));
 
   /* ── engagement trend — level-shift the org curve toward the team's score ── */
   const shift = score - engagementTrend.series[engagementTrend.series.length - 1];
@@ -197,7 +215,13 @@ export function derivePulse(scope: string, period: string) {
 
   return {
     scope, period, isTeam,
-    health: { score, delta, benchmarkDelta, percentile, narrative, drivers },
+    health: {
+      score, delta, benchmarkDelta, percentile, narrative, drivers,
+      /* Only org-wide: the per-input breakdown, so the number can be taken apart
+         on screen instead of trusted. */
+      contributions: isTeam ? null : ex.contributions,
+      weakest: isTeam ? null : ex.weakest,
+    },
     trend: { series, benchmark: engagementTrend.benchmark, months: engagementTrend.months, insight },
     signals,
     attrition: { predicted, predictedDelta, segmentation, drivers: aDrivers },

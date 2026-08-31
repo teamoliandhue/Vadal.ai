@@ -24,6 +24,7 @@ import {
   campaigns, impact, knowledge, aiUsage,
 } from "@/lib/data";
 import { derivePulse, ALL_TEAMS, type PulseView } from "./derive";
+import { SCORE_SOURCES } from "@/lib/experience";
 
 // Semantic tones as Lumen tokens so they adapt across light/dark.
 const TONE = { good: "var(--success)", bad: "var(--danger)", warn: "var(--warning)", purple: "var(--purple)" } as const;
@@ -141,6 +142,49 @@ function HealthCard({ v, className = "" }: { v: PulseView; className?: string })
         {h.drivers.map((d) => <span key={d.label} className="rounded-full px-2.5 py-1 text-[12px] font-semibold" style={{ background: soft(toneOf(d.tone)), color: d.tone === "neutral" ? "var(--muted)" : toneOf(d.tone) }}>{d.label}</span>)}
       </div>
       <p className="mt-3 text-[14px] leading-relaxed text-muted">{h.narrative}</p>
+
+      {/* ══ what the number is made of ══
+          The engine returns its weighted inputs precisely so the score can be
+          argued with rather than trusted, and they were thrown away. A headline
+          figure nobody can take apart is one nobody can act on: "engagement is
+          76" leads nowhere; "participation is carrying it and recognition
+          coverage is the weakest input" is a decision. */}
+      {h.contributions && (
+        <div className="mt-4 border-t border-line pt-3.5">
+          <div className="flex items-baseline justify-between gap-2">
+            <Eyebrow>What it&apos;s made of</Eyebrow>
+            <span className="text-[12px] text-faint">weighted, out of 100</span>
+          </div>
+          <ul className="mt-2.5 flex flex-col gap-2">
+            {h.contributions.map((c) => {
+              const isWeakest = c.label === h.weakest;
+              return (
+                <li key={c.label}>
+                  <div className="flex items-baseline gap-2 text-[13px]">
+                    <span className={isWeakest ? "font-semibold" : ""}>{c.label}</span>
+                    {isWeakest && <span className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: TONE.bad }}>weakest</span>}
+                    <span className="ml-auto shrink-0 text-[12px] font-semibold tabular-nums text-muted">+{c.points}</span>
+                  </div>
+                  <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-soft">
+                    <span
+                      className="block h-full rounded-full transition-[width] duration-700"
+                      style={{
+                        width: `${(c.points / Math.max(...h.contributions!.map((x) => x.points))) * 100}%`,
+                        background: isWeakest ? TONE.bad : TONE.purple,
+                      }}
+                    />
+                  </div>
+                  <p className="mt-1 text-[12px] text-faint">{SCORE_SOURCES[c.label]}</p>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-3 text-[12px] leading-snug text-faint">
+            Computed from your own Pulse, Feed, Campaigns and Recognition data — not a benchmark
+            and not a constant. Change any of them and this moves.
+          </p>
+        </div>
+      )}
     </Card>
   );
 }
