@@ -69,7 +69,7 @@ export const FEATURES: FeatureStatus[] = [
 
   /* ── Pillar 3 · Amplify ──────────────────────────────────── */
   { id: "amp-caption", pillar: "Amplify", brief: "AI-suggested personal caption in the employee's own voice", module: "engines/advocacy", entry: "draftCaption", agentic: false, surface: "screen", wiredTo: "app/product/amplify/AmplifyHub.tsx" },
-  { id: "amp-timing", pillar: "Amplify", brief: "Best-time-to-post recommendation per platform", module: "engines/timing", entry: "bestTimeToPost", agentic: false, surface: "screen", wiredTo: "app/product/amplify/AmplifyHub.tsx" },
+  { id: "amp-timing", pillar: "Amplify", brief: "Best-time-to-post recommendation per platform", module: "engines/timing", entry: "bestTimeToPost", agentic: false, surface: "screen", wiredTo: "app/product/amplify/Composer.tsx" },
   { id: "amp-impact", pillar: "Amplify", brief: "Advocacy impact scoring — estimated reach/engagement uplift", module: "engines/advocacy", entry: "scoreAdvocacy", agentic: false, surface: "screen", wiredTo: "app/product/amplify/AmplifyHub.tsx" },
   { id: "amp-share", pillar: "Amplify", brief: "AGENTIC — 'share that last company post for me'", module: "tools", entry: "share_to_social", agentic: true, surface: "copilot", blocked: "Needs a per-platform feasibility spike and per-employee OAuth — the brief requires the spike before committing.", wiredTo: "lib/ai/mock.ts" },
   { id: "amp-queue", pillar: "Amplify", brief: "AGENTIC — 'queue this for advocacy' builds the curated card automatically", module: "tools", entry: "queue_for_advocacy", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
@@ -83,7 +83,7 @@ export const FEATURES: FeatureStatus[] = [
   { id: "amp-referral", pillar: "Amplify", brief: "Referral code on a shared hiring post, so an application is attributable", module: "engines/advocacy", entry: "referralLinkFor", agentic: false, surface: "screen", wiredTo: "app/product/amplify/Composer.tsx" },
   { id: "amp-forecast", pillar: "Amplify", brief: "Reach forecast BEFORE comms queue a post, as a band rather than a false-precision number", module: "engines/advocacy", entry: "forecastReach", agentic: false, surface: "screen", wiredTo: "app/product/amplify/Programme.tsx" },
   { id: "amp-declines", pillar: "Amplify", brief: "Reads the decline signal — says whether it is a writing problem, a targeting problem or healthy", module: "engines/advocacy", entry: "declineInsight", agentic: false, surface: "screen", wiredTo: "app/product/amplify/Programme.tsx" },
-  { id: "amp-streak", pillar: "Amplify", brief: "Quiet advocacy streak — counts up, never warns you that you are about to lose it", module: "engines/advocacy", entry: "advocacyStreak", agentic: false, surface: "screen", wiredTo: "app/product/amplify/AmplifyHub.tsx" },
+  { id: "amp-streak", pillar: "Amplify", brief: "Quiet advocacy streak — counts up, never warns you that you are about to lose it", module: "engines/advocacy", entry: "advocacyStreak", agentic: false, surface: "screen", wiredTo: "app/product/amplify/Rail.tsx" },
 
   /* ── Pillar 4 · Thrive ───────────────────────────────────── */
   { id: "thrive-nudge", pillar: "Thrive", brief: "Personalised nudges timed to when the person is likely to act", module: "engines/wellbeing", entry: "activityNudges", agentic: false, surface: "screen", wiredTo: "app/product/thrive/ThriveHub.tsx" },
@@ -106,19 +106,29 @@ export const FEATURES: FeatureStatus[] = [
   /* ── Pillar 6 · Grow ─────────────────────────────────────── */
   { id: "grow-generate", pillar: "Grow", brief: "Course generation from a PDF/SOP/deck with quiz questions drafted for review", module: "engines/learning", entry: "generateCourse", agentic: false, surface: "screen", wiredTo: "app/product/grow/GrowHub.tsx" },
   { id: "grow-paths", pillar: "Grow", brief: "Personalised path recommendations from role, Pulse feedback and incident data", module: "engines/learning", entry: "recommendPaths", agentic: false, surface: "screen", wiredTo: "app/product/grow/GrowHub.tsx" },
-  { id: "grow-adaptive", pillar: "Grow", brief: "Adaptive quizzing with spaced repetition", module: "engines/learning", entry: "nextReview", agentic: false, surface: "screen", wiredTo: "app/product/grow/GrowHub.tsx" },
+  /* Points at reviewQueue, not nextReview: the screen calls the explaining
+     wrapper now, and the reachability script correctly stopped seeing the inner
+     function at any call site. */
+  { id: "grow-adaptive", pillar: "Grow", brief: "Adaptive quizzing with spaced repetition", module: "engines/learning", entry: "reviewQueue", agentic: false, surface: "screen", wiredTo: "app/product/grow/GrowHub.tsx" },
+  { id: "grow-timefit", pillar: "Grow", brief: "Match learning to the time actually available, at lesson granularity", module: "engines/learning", entry: "whatFitsIn", agentic: false, surface: "screen", wiredTo: "app/product/grow/Rail.tsx" },
   { id: "grow-tutor", pillar: "Grow", brief: "AI tutor answering only from that module's source content", module: "engines/learning", entry: "tutor", agentic: false, surface: "screen", wiredTo: "app/product/grow/GrowHub.tsx" },
   { id: "grow-make", pillar: "Grow", brief: "AGENTIC — 'make this a course' from pasted notes or an SOP", module: "tools", entry: "make_course", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
   { id: "grow-assign", pillar: "Grow", brief: "AGENTIC — auto-assign a matching path when Pulse flags a skills gap", module: "tools", entry: "assign_learning", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
 
   /* ── Pillar 7 · One-to-One Help ──────────────────────────── */
-  { id: "help-intake", pillar: "One-to-One Help", brief: "Empathetic conversational intake in plain, warm language", module: "engines/support", entry: "intake", agentic: false, surface: "screen", wiredTo: "app/product/help/HelpHub.tsx" },
-  { id: "help-triage", pillar: "One-to-One Help", brief: "Need and urgency triage into a band — never a clinical diagnosis", module: "engines/support", entry: "triage", agentic: false, surface: "screen", wiredTo: "app/product/help/HelpHub.tsx" },
+  { id: "help-intake", pillar: "One-to-One Help", brief: "Empathetic conversational intake in plain, warm language", module: "engines/support", entry: "intake", agentic: false, surface: "screen", wiredTo: "app/product/help/Companion.tsx" },
+  { id: "help-triage", pillar: "One-to-One Help", brief: "Need and urgency triage into a band — never a clinical diagnosis", module: "engines/support", entry: "triage", agentic: false, surface: "screen", wiredTo: "app/api/ai/features/route.ts" },
   { id: "help-handoff", pillar: "One-to-One Help", brief: "Consent-based handoff summary, with explicit sign-off", module: "engines/support", entry: "buildHandoff", agentic: false, surface: "screen", wiredTo: "app/product/help/HelpHub.tsx" },
-  { id: "help-resources", pillar: "One-to-One Help", brief: "Self-serve resource matching for lower-stakes moments", module: "engines/support", entry: "matchResources", agentic: false, surface: "screen", wiredTo: "app/product/help/HelpHub.tsx" },
+  { id: "help-resources", pillar: "One-to-One Help", brief: "Self-serve resource matching for lower-stakes moments", module: "engines/support", entry: "matchResources", agentic: false, surface: "screen", wiredTo: "app/product/help/Companion.tsx" },
   { id: "help-crisis", pillar: "One-to-One Help", brief: "Always-visible crisis resources, never gated behind a conversation", module: "engines/support", entry: "crisisResources", agentic: false, surface: "screen", wiredTo: "app/product/help/HelpHub.tsx" },
   { id: "help-book", pillar: "One-to-One Help", brief: "AGENTIC — book a session and pass the handoff summary, with consent", module: "tools", entry: "book_counsellor", agentic: true, surface: "copilot", blocked: "Clinical, legal and HR sign-off on triage thresholds and data-access rules is a hard blocker on launch.", wiredTo: "lib/ai/mock.ts" },
   { id: "help-escalate", pillar: "One-to-One Help", brief: "AGENTIC — acute-risk escalation per the org's configured, human-reviewed policy", module: "engines/support", entry: "escalate", agentic: true, surface: "copilot", blocked: "Requires a signed escalation policy — assertLaunchable() throws without one.", wiredTo: "lib/ai/mock.ts" },
+
+  /* Built with the third-person crisis fix. Registered because they are real
+     features with real surfaces — the registry exists so "is it built" has a
+     checkable answer, and two of them were only in my head. */
+  { id: "help-concern", pillar: "One-to-One Help", brief: "Separate intake for someone worried about a COLLEAGUE — triage reads its input as first-person, so a third-party report was mis-banded", module: "engines/support", entry: "concernIntake", agentic: false, surface: "screen", wiredTo: "app/product/help/Companion.tsx" },
+  { id: "help-crisis-tests", pillar: "One-to-One Help", brief: "Executable crisis-phrasing cases — 15 that must trip the crisis path, 10 ordinary phrases that must not", module: "engines/support", entry: "checkTriage", agentic: false, surface: "engine-only", wiredTo: "app/api/ai/features/route.ts" },
 
   /* ── §8 Cross-cutting AI layer ───────────────────────────── */
   { id: "x-personalize", pillar: "Cross-cutting", brief: "Personalization engine — one profile ranking feed, home order and Grow recommendations", module: "engines/personalize", entry: "orderHome", agentic: false, surface: "engine-only", wiredTo: null },
