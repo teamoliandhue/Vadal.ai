@@ -21,7 +21,7 @@ import { Clock } from "lucide-react";
 import { Button } from "@vadal/design-system";
 import { org, me, myDay, myCalendar } from "@/lib/data";
 import { MoodCheck } from "./MoodCheck";
-import { DayLine } from "./DayLine";
+import { Showcase } from "./Showcase";
 import { HomeBrandLayer, VadalBadge } from "./HomeBrandLayer";
 import { ViewAsSwitch } from "./HomeRole";
 import { MyFirstName } from "./Identity";
@@ -36,7 +36,7 @@ export function HomeContent({ greeting }: { greeting: string }) {
   return (
     <>
       <RitualHero firstTime={firstTime} greeting={greeting} />
-      <DayLine />
+      <Showcase />
     </>
   );
 }

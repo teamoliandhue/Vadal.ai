@@ -127,13 +127,6 @@ body {
 .lumen .ai-aura { animation: aura 2.6s ease-in-out infinite; }
 .lumen .canvas-glow { position: absolute; inset: 0 0 auto 0; height: 420px; pointer-events: none; background: radial-gradient(560px 300px at 22% -8%, rgba(246, 161, 75, 0.08), transparent 64%), radial-gradient(640px 320px at 78% -12%, rgba(139, 124, 248, 0.08), transparent 64%); }
 .dark .lumen .canvas-glow { height: 520px; background: radial-gradient(640px 360px at 18% -12%, rgba(45, 212, 191, 0.13), transparent 64%), radial-gradient(720px 380px at 60% -16%, rgba(168, 85, 247, 0.17), transparent 66%), radial-gradient(560px 320px at 94% -10%, rgba(244, 114, 182, 0.12), transparent 62%); }
-/* ── the day-line lanes ──
-   Column count follows how many beats the role can see, so a manager's four
-   sit in four columns rather than the left half of eight. */
-@media (min-width: 1024px) {
-  .lumen [data-cols] { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); }
-}
-
 /* ── scroll panes ───────────────────────────────────────────────────
    The app shell scrolls in panes rather than moving the document (see
    app/product/panes.ts). A two-pane page would otherwise show two loud
