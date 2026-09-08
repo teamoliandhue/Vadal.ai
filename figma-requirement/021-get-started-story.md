@@ -103,7 +103,29 @@ note that says what reaches them and what never does. The tour is now thirteen s
 the role cannot open renders as a dashed pill with a lock — kept, not hidden. The window chrome
 and the caption now name the pillar. The opening scene lists the seven by name.
 
-## 7 · Figma
+## 7 · Fourth pass — the cards
+
+Every demo is now one composed card that can carry a screen: a hero figure, one visual that
+explains it, and one line the assistant would say (the `AiLine` footer — Aurora surface,
+SparkMark, 12.5px `--muted`). Cards are `--card` on `--line`, 16px radius, sections divided by
+hairlines; the hero figure is 24–28px/700 tabular; eyebrows 11px caps `0.14em`.
+
+| Scene | Composition |
+|---|---|
+| 01 Welcome | `ai-grad` header band (SparkMark · Vadal · org · Live) over three icon-stat tiles divided by hairlines |
+| 02 Ritual | header: *Daily check-in* · streak count · seven dots for the week; the real `MoodCheck` |
+| 03 Pulse | `ScoreRing` (150, gradient) beside a **composition bar** — one segment per input, weakest in `--danger` — with a legend of `+points` |
+| 04 Connect | social card: author row · two-line post · reaction pills (❤️ 214 · 🙌 76 · 🎉 22) · reactor avatar stack · comments/views; then a brand-bordered recognition card with the heart tile, the quote, value badge and **Recognise someone** |
+| 05 Amplify | LinkedIn mark · *You · drafted by Vadal, in your voice* · **Policy check passed** pill · the moment as a post · reach stat + `Sparkline` |
+| 06 Thrive | `GoalRing` beside a `DayArea` of the week's steps against the target; a Wealth row (₹3,000 commitment · payday) |
+| 07 Broadcast | campaign header with lift stat · two-bar **funnel** (reached 91% → took part 76%) · five-step track with ticks; then the Aurora ask box with three suggested questions |
+| 08 Grow | completion `GoalRing` beside a `StreakStrip` of minutes vs a 5-min bar; the review queue |
+| 09 Help | danger-tinted crisis row with tel pills; the first counsellor (avatar · credentials · next available) with **Talk to a person**; three ways-in quotes |
+| 10 Managers | team 74 vs org 82 · driver chips · three reports each with a `Sparkline`, sentiment and trend arrow; the highest-impact action as the AiLine |
+| 11 Cases | id · title · priority badge · **SLA ring** (days left) · team / owner / source · three-entry timeline with a brand dot on the latest |
+| 12 Copilot | assistant bubble · four prompt chips · a real composer that fires `vadal:ask` |
+
+## 8 · Figma
 
 Scenes 01, 03 (locked variant for employee), 09 (ask box asked / cited / refused) and 11 at
 1440 × 900 and 375; the spine in three dot states with the hover pill; the mobile hairline.
