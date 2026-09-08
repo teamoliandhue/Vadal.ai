@@ -89,7 +89,14 @@ Knowledge, and named sections rather than pillars.
 | 07 | **Pillar 5 · Broadcast** · Communication Hub | One trusted channel for everything the company needs employees to know. | Campaigns · Knowledge | live campaign (reach · took part · lift · steps acknowledged) + the ask box |
 | 08 | **Pillar 6 · Grow** · Bite-Sized Learning | Learning that fits into a five-minute break, not a training day. | Grow | learning days + review queue |
 | 09 | **Pillar 7 · One-to-One Help** · AI Companion | A private first door to support, with a real person always one step away. | One-to-One Help | crisis lines |
-| 10 | **The AI layer** · Personalisation · Sentiment · Copilot · Guardrails | One AI layer, not seven integrations — and it can act. | — | four prompts into the real assistant |
+| 10 | **Pillar 8 · Managers** · Manager Enablement | Insight is only worth what a manager does with it by Friday. | Manager hub | team health beside the org's, the drivers, the highest-impact action + its coaching nudge |
+| 11 | **Pillar 9 · Cases** · Case Management & Issue Resolution | Nothing an employee raises gets lost. | Cases | a live case: id · priority · status · SLA · owner · source (auto-opened from Pulse) · first timeline entry · avg days to resolution |
+| 12 | **The AI layer** · Personalisation · Sentiment · Copilot · Guardrails | One AI layer, not seven integrations — and it can act. | — | four prompts into the real assistant |
+
+Pillars 8 and 9 come from the second brief (*Product Strategy & Priority Summary* — Manager
+Enablement and Case Management), which closes the loop the AI brief opens: what the company
+does with what it heard. Both are manager/admin views, so the employee sees them locked with a
+note that says what reaches them and what never does. The tour is now thirteen scenes.
 
 **Chips** are the sections that make the pillar up: 36px pills (44px on touch), `--card`/80 on
 `--line`, brand border on hover, each a link that also counts as exploring the step. A section

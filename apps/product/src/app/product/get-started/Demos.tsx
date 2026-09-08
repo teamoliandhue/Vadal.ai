@@ -7,7 +7,7 @@
    tour beats a feature list. */
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight, BookOpen, CheckCheck, Clock, Heart, Megaphone, RotateCcw, Search, Smile } from "lucide-react";
+import { ArrowRight, BookOpen, CheckCheck, Clock, FolderKanban, Heart, Megaphone, RotateCcw, Search, Smile, UsersRound } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark } from "@vadal/design-system";
 import { NAV } from "../nav-model";
 import { MoodCheck } from "../home/MoodCheck";
@@ -18,6 +18,8 @@ import { FEATURES } from "@/lib/ai/features";
 import { org, myRecognition } from "@/lib/data";
 import { feedItems } from "@/lib/feed";
 import { campaigns } from "@/lib/campaigns";
+import { team, managerActions, coachingNudges } from "@/lib/manager";
+import { cases, caseStats } from "@/lib/cases";
 import { experienceScore, SCORE_SOURCES } from "@/lib/experience";
 import { myMoments } from "@/lib/amplify";
 import { myActivity, atWorkStepsPerDay } from "@/lib/thrive";
@@ -289,6 +291,59 @@ function Copilot() {
   );
 }
 
+function Managers() {
+  const a = managerActions[0];
+  const tone = (t: string) => t === "bad" ? "var(--danger)" : t === "warn" ? "var(--warning)" : "var(--success)";
+  return (
+    <div className="flex flex-col gap-3">
+      <Frame>
+        <div className="flex items-center gap-2">
+          <span className="grid h-7 w-7 place-items-center rounded-lg bg-soft text-[var(--client-brand,var(--purple))]"><UsersRound className="h-3.5 w-3.5" /></span>
+          <span className="text-[13.5px] font-semibold">{team.name}</span>
+          <span className="text-[12px] text-faint">· {team.size} people</span>
+        </div>
+        <div className="mt-3 flex flex-wrap items-end gap-x-6 gap-y-3">
+          <div>
+            <div className="text-[34px] font-bold leading-none tracking-[-0.03em] tabular-nums">{team.health}</div>
+            <div className="mt-1 text-[12px] text-faint">team health · org {team.orgHealth}</div>
+          </div>
+          <ul className="flex flex-wrap gap-1.5">
+            {team.drivers.map((d) => (
+              <li key={d.label} className="flex items-center gap-1.5 rounded-full bg-soft px-2.5 py-1 text-[12px]"><span className="h-1.5 w-1.5 rounded-full" style={{ background: tone(d.tone) }} /> {d.label}</li>
+            ))}
+          </ul>
+        </div>
+      </Frame>
+      <Frame tone="ai">
+        <div className="flex items-center gap-2"><SparkMark size={13} tone="solid" /><Eyebrow>Your highest-impact action</Eyebrow></div>
+        <p className="mt-2 text-[14.5px] font-semibold leading-snug">{a.title} <span className="font-normal text-faint">· {a.due}</span></p>
+        <p className="mt-1 text-[13px] leading-snug text-muted">{coachingNudges[0]}</p>
+      </Frame>
+    </div>
+  );
+}
+
+function Cases() {
+  const c = cases[0];
+  const first = c.timeline[0];
+  return (
+    <Frame>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-soft text-[var(--client-brand,var(--purple))]"><FolderKanban className="h-3.5 w-3.5" /></span>
+        <span className="text-[12px] font-semibold tabular-nums text-faint">{c.id}</span>
+        <span className="text-[13.5px] font-semibold">{c.title}</span>
+        <Badge tone="danger" variant="soft" size="sm">{c.priority}</Badge>
+        <span className="ml-auto text-[12px] text-faint">{c.status} · SLA in {c.slaDays}d</span>
+      </div>
+      <p className="mt-2.5 text-[13px] text-muted"><span className="font-semibold text-ink">{c.team}</span> · owned by {c.owner.name} · opened {c.opened} from {c.source}</p>
+      <ol className="mt-3 border-l border-line pl-3 text-[12.5px] leading-snug">
+        <li><span className="text-faint">{first.when} · {first.who}</span><br />{first.text}</li>
+      </ol>
+      <p className="mt-3 flex items-center gap-1.5 text-[12px] text-faint"><Clock className="h-3.5 w-3.5" /> Cases resolve in {caseStats.avgResolutionDays} days on average — the number the people team is measured on.</p>
+    </Frame>
+  );
+}
+
 /* ── the last step: what is left, and three things worth doing first ── */
 export function Done({ steps, explored, onRestart, onGo }: { steps: TourStepView[]; explored: DemoKey[]; onRestart: () => void; onGo: (i: number) => void }) {
   const left = steps.filter((s) => s.id !== "done" && !explored.includes(s.id) && !s.locked);
@@ -357,6 +412,8 @@ export function Demo({ id }: { id: DemoKey }) {
     case "help": return <Help />;
     case "grow": return <Learn />;
     case "broadcast": return <Broadcast />;
+    case "managers": return <Managers />;
+    case "cases": return <Cases />;
     case "copilot": return <Copilot />;
     default: return null;
   }

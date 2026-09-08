@@ -261,7 +261,7 @@ const Scene = React.forwardRef<
               A company stays human when every employee has a daily ritual worth keeping.
             </h1>
             <p className="story-in story-in-3 mx-auto mt-6 max-w-[58ch] text-[clamp(16px,1.4vw,20px)] leading-relaxed text-muted">
-              …and the people who run it can hear what that ritual produces. Vadal is both halves in one product: seven pillars — Pulse, Connect, Amplify, Thrive, Broadcast, Grow, One-to-One Help — with one AI layer running through all of them. Each shown live on your own workspace.
+              …and the people who run it can hear what that ritual produces. Vadal is both halves in one product: nine pillars — Pulse, Connect, Amplify, Thrive, Broadcast, Grow, One-to-One Help, Managers, Cases — with one AI layer running through all of them. Each shown live on your own workspace.
             </p>
             <div className="story-in story-in-4 mx-auto mt-10 max-w-[640px]">{children}</div>
             <div className="story-in story-in-4 mt-10 flex flex-wrap items-center justify-center gap-3">
@@ -293,7 +293,7 @@ const Scene = React.forwardRef<
                   <span className="ai-text-grad text-[15px] tabular-nums">{n}</span>
                   {step.pillar ? (
                     <>
-                      <span className="text-ink">{step.pillar.n <= 7 ? `Pillar ${step.pillar.n} · ` : ""}{step.pillar.name}</span>
+                      <span className="text-ink">{step.pillar.n ? `Pillar ${step.pillar.n} · ` : ""}{step.pillar.name}</span>
                       <span className="normal-case tracking-normal">{step.pillar.tag}</span>
                     </>
                   ) : (

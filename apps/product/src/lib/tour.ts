@@ -6,12 +6,14 @@
  * those and the only permanent one — a walkthrough of what the product is and
  * what each part does, for someone seeing it for the first time.
  *
- * The shape is the product brief's shape. "Vadal.ai — Product Specification &
+ * The shape is the product briefs' shape. "Vadal.ai — Product Specification &
  * AI Feature Brief" defines the product as seven pillars and one AI layer:
  * Pulse · Connect · Amplify · Thrive · Broadcast · Grow · One-to-One Help, with
- * the Copilot running through all of them. The tour walks those, by name and
- * in that order, and each scene lists the sections of the app that make the
- * pillar up — so what the product *is* and where it *lives* are the same list.
+ * the Copilot running through all of them. The strategy summary adds the two
+ * pillars that close the loop on what was heard — Manager Enablement and Case
+ * Management. The tour walks all nine, by name and in that order, and each
+ * scene lists the sections of the app that make the pillar up — so what the
+ * product *is* and where it *lives* are the same list.
  *
  * Two audiences, one need. A new joiner does not know what the product can do;
  * neither does an investor. Both need the meaning first and the features as
@@ -27,7 +29,7 @@ import { canAccess } from "./access";
 
 export type DemoKey =
   | "welcome" | "ritual" | "pulse" | "connect" | "amplify"
-  | "thrive" | "broadcast" | "grow" | "help" | "copilot" | "done";
+  | "thrive" | "broadcast" | "grow" | "help" | "managers" | "cases" | "copilot" | "done";
 
 /** Something a person actually does in the product. A step that names one is
     explored when the action happens — anywhere, not only on the tour page —
@@ -43,8 +45,9 @@ export type TourStep = {
   title: string;
   /** The idea behind it, in one short paragraph. Meaning before mechanism. */
   meaning: string;
-  /** The brief's pillar this scene is: number, name, and its one-line tag. */
-  pillar?: { n: number; name: string; tag: string };
+  /** The brief's pillar this scene is: number (none for the layer that runs
+      through them), name, and its one-line tag. */
+  pillar?: { n?: number; name: string; tag: string };
   /** The sections of the app that make the pillar up. Gated per role. */
   parts?: TourPart[];
   /** The section this step opens, if any. Gated through access.ts. */
@@ -66,7 +69,7 @@ export const TOUR: TourStep[] = [
     id: "welcome",
     title: "What Vadal is",
     meaning:
-      "A company stays human when every employee has a daily ritual worth keeping, and the people who run it can hear what that ritual produces. Vadal is both halves in one product: seven pillars, with one assistant running through all of them.",
+      "A company stays human when every employee has a daily ritual worth keeping, and the people who run it can hear what that ritual produces. Vadal is both halves in one product: nine pillars, with one assistant running through all of them.",
   },
   {
     id: "ritual",
@@ -161,18 +164,40 @@ export const TOUR: TourStep[] = [
     completesOn: "open:One-to-One Help", actionLabel: "open One-to-One Help", doneLabel: "opened One-to-One Help",
   },
   {
+    id: "managers",
+    title: "Insight is only worth what a manager does with it by Friday.",
+    meaning:
+      "Every people manager gets their team's health beside the org's, the drivers behind it, and the three actions that would move it most — a 1:1 that has slipped, a report with no recognition in 30 days. Coaching nudges are written from the team's own data, not a leadership course.",
+    pillar: { n: 8, name: "Managers", tag: "Manager Enablement" },
+    parts: [{ label: "Manager hub", href: "/product/managers" }],
+    section: "Manager hub", href: "/product/managers",
+    lockedNote: "You don't see this view — it is your manager's, about their team as a whole. What you say in a check-in reaches it only as an aggregate, never as a quote with your name on it.",
+    completesOn: "open:Manager hub", actionLabel: "open the Manager hub", doneLabel: "opened the Manager hub",
+  },
+  {
+    id: "cases",
+    title: "Nothing an employee raises gets lost.",
+    meaning:
+      "A concern found through listening becomes a case — auto-opened from a Pulse risk, owned by a named person, with an SLA that counts down and a timeline anyone accountable can read. Confidential ones stay confidential. The measure is not tickets closed but days to resolution.",
+    pillar: { n: 9, name: "Cases", tag: "Case Management & Issue Resolution" },
+    parts: [{ label: "Cases", href: "/product/cases" }],
+    section: "Cases", href: "/product/cases",
+    lockedNote: "You don't see the case queue — it is the people team's. If something you raised became a case, you hear from the person who owns it, not from a dashboard.",
+    completesOn: "open:Cases", actionLabel: "open Cases", doneLabel: "opened Cases",
+  },
+  {
     id: "copilot",
     title: "One AI layer, not seven integrations — and it can act.",
     meaning:
       "One profile ranks the feed, orders Home and picks what to learn next. One sentiment engine reads surveys, posts and acknowledgements into one score. And one Copilot on every screen answers, drafts, and proposes actions — launch a pulse, chase a survey, give kudos — confirming before anything reaches a real person, enforced in code, not left to the prompt.",
-    pillar: { n: 8, name: "The AI layer", tag: "Personalisation · Sentiment · Copilot · Guardrails" },
+    pillar: { name: "The AI layer", tag: "Personalisation · Sentiment · Copilot · Guardrails" },
     completesOn: "ask", actionLabel: "ask the assistant anything", doneLabel: "asked the assistant",
   },
   {
     id: "done",
     title: "You're set",
     meaning:
-      "That is the whole product: seven pillars and the layer that runs through them, every one live on your workspace's data. From here, the assistant will use this space to surface what it thinks you should look at next.",
+      "That is the whole product: nine pillars and the layer that runs through them, every one live on your workspace's data. From here, the assistant will use this space to surface what it thinks you should look at next.",
   },
 ];
 
