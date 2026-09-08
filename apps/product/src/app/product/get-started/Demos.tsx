@@ -222,7 +222,7 @@ function Amplify() {
         <p className="mt-1.5 text-[12.5px] text-faint">{m.withPeople?.length ? `with ${m.withPeople.join(" and ")} · ` : ""}{m.when}</p>
         <div className="mt-4 flex items-end gap-4">
           <Stat value={reach} label="reach this week" sub="from your own shares" />
-          <Sparkline id="tour-reach" values={myReachSeries} color={mark.color} height={40} className="min-w-0 flex-1" />
+          <span className="min-w-0 flex-1"><Sparkline id="tour-reach" values={myReachSeries} color={mark.color} height={40} /></span>
         </div>
       </div>
       <AiLine>{m.why}</AiLine>
@@ -410,7 +410,7 @@ function Managers() {
           <li key={r.id} className="flex items-center gap-2.5 px-4 py-2">
             <Avatar src={r.img} name={r.name} size="xs" />
             <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium">{r.name} <span className="font-normal text-faint">· {r.role}</span></span>
-            <Sparkline id={`tour-rep-${r.id}`} values={r.spark} color={r.trend === "down" ? "var(--danger)" : "var(--success)"} height={22} className="w-16 shrink-0" />
+            <span className="w-16 shrink-0"><Sparkline id={`tour-rep-${r.id}`} values={r.spark} color={r.trend === "down" ? "var(--danger)" : "var(--success)"} height={22} /></span>
             <span className="w-8 shrink-0 text-right text-[12.5px] font-semibold tabular-nums">{r.sentiment}</span>
             {r.trend === "down" ? <TrendingDown className="h-3.5 w-3.5 shrink-0 text-[var(--danger)]" /> : <TrendingUp className="h-3.5 w-3.5 shrink-0 text-[var(--success)]" />}
           </li>
