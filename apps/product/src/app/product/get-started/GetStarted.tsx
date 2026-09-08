@@ -258,10 +258,10 @@ const Scene = React.forwardRef<
               <span className="ai-grad grid h-6 w-6 place-items-center rounded-full"><SparkMark size={13} tone="solid" /></span> Vadal.ai · Get started
             </p>
             <h1 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-6 text-[clamp(34px,5.2vw,68px)] font-bold leading-[1.0] tracking-[-0.035em]">
-              A company stays human when every employee has a daily ritual worth keeping.
+              Keep your company human, every day.
             </h1>
             <p className="story-in story-in-3 mx-auto mt-6 max-w-[58ch] text-[clamp(16px,1.4vw,20px)] leading-relaxed text-muted">
-              …and the people who run it can hear what that ritual produces. Vadal is both halves in one product: nine pillars — Pulse, Connect, Amplify, Thrive, Broadcast, Grow, One-to-One Help, Managers, Cases — with one AI layer running through all of them. Each shown live on your own workspace.
+              Employees get a daily ritual. Leaders hear what it produces. Nine pillars, one assistant — each shown live on your own workspace.
             </p>
             <div className="story-in story-in-4 mx-auto mt-10 max-w-[640px]">{children}</div>
             <div className="story-in story-in-4 mt-10 flex flex-wrap items-center justify-center gap-3">
@@ -279,7 +279,7 @@ const Scene = React.forwardRef<
             <div className="relative">
               <p className="story-in text-[13px] font-semibold uppercase tracking-[0.18em] text-faint">{n} — the end</p>
               <h2 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-4 text-[clamp(34px,4.6vw,60px)] font-bold leading-[1.02] tracking-[-0.032em]">{step.title}</h2>
-              <p className="story-in story-in-3 mt-5 max-w-[52ch] text-[clamp(16px,1.3vw,19px)] leading-relaxed text-muted">{step.meaning}</p>
+              <p className="story-in story-in-3 mt-5 max-w-[44ch] text-[clamp(17px,1.4vw,21px)] leading-relaxed text-muted">{step.meaning}</p>
               <div className="story-in story-in-4 mt-10">{children}</div>
             </div>
           </div>
@@ -302,7 +302,7 @@ const Scene = React.forwardRef<
                   {step.locked && <Lock className="h-3.5 w-3.5" aria-label="Not available to your role" />}
                 </p>
                 <h2 id={`scene-${step.id}-title`} className={`story-in story-in-2 mt-4 font-bold leading-[1.04] tracking-[-0.032em] ${step.title.length > 48 ? "text-[clamp(28px,3.6vw,48px)]" : "text-[clamp(34px,4.6vw,60px)]"}`}>{step.title}</h2>
-                <p className="story-in story-in-3 mt-5 max-w-[46ch] text-[clamp(16px,1.3vw,19px)] leading-relaxed text-muted">{step.meaning}</p>
+                <p className="story-in story-in-3 mt-5 max-w-[40ch] text-[clamp(17px,1.4vw,21px)] leading-relaxed text-muted">{step.meaning}</p>
 
                 {step.partsView.length > 0 && (
                   <ul className="story-in story-in-3 mt-5 flex flex-wrap gap-1.5" aria-label="Sections in this pillar">
@@ -335,9 +335,9 @@ const Scene = React.forwardRef<
                 {byDoing && (
                   <p className="story-in story-in-4 mt-4 flex items-center gap-2 text-[13px] text-muted" aria-live="polite">
                     {isExplored ? (
-                      <><Check className="h-3.5 w-3.5 shrink-0 text-[var(--success)]" strokeWidth={2.5} /> Explored — you {step.doneLabel}.</>
+                      <><Check className="h-3.5 w-3.5 shrink-0 text-[var(--success)]" strokeWidth={2.5} /> Done — you {step.doneLabel}.</>
                     ) : (
-                      <><Circle className="h-3.5 w-3.5 shrink-0 text-faint" /> Explored when you {step.actionLabel}{step.href ? " — here, or from the menu" : ""}.</>
+                      <><Circle className="h-3.5 w-3.5 shrink-0 text-faint" /> Done when you {step.actionLabel}.</>
                     )}
                   </p>
                 )}
@@ -357,7 +357,7 @@ const Scene = React.forwardRef<
                   </div>
                   <div className="flex min-h-[220px] flex-col justify-center p-3 sm:p-4">{children}</div>
                 </div>
-                <p className="mt-3 text-[12px] leading-snug text-faint">The real component on real data — what you would see in {step.pillar?.name ?? step.section ?? "the product"} right now, not a picture of it.</p>
+                <p className="mt-3 text-[12px] leading-snug text-faint">Live from your workspace — the real {step.pillar?.name ?? step.section ?? "product"}, not a picture.</p>
               </div>
             </div>
           </>

@@ -125,7 +125,32 @@ hairlines; the hero figure is 24–28px/700 tabular; eyebrows 11px caps `0.14em`
 | 11 Cases | id · title · priority badge · **SLA ring** (days left) · team / owner / source · three-entry timeline with a brand dot on the latest |
 | 12 Copilot | assistant bubble · four prompt chips · a real composer that fires `vadal:ask` |
 
-## 8 · Figma
+## 8 · Fifth pass — the words
+
+Nobody reads a paragraph on a slide. Every scene is now a headline of three to six words and
+a meaning of eight to fifteen, set one size larger (`clamp(17px, 1.4vw, 21px)`, 40ch):
+
+| # | Headline | Meaning |
+|---|---|---|
+| 01 | Keep your company human, every day. | Employees get a daily ritual. Leaders hear what it produces. Nine pillars, one assistant — each shown live on your own workspace. |
+| 02 | Your daily ritual | Five seconds a day: how are you feeling? Private to you. Everything else starts here. |
+| 03 | Hear how people really feel. | Surveys, check-ins and comments become one health score — with every input shown. |
+| 04 | A feed where people share wins. | Post, celebrate, recognise. Tied to your values, visible to everyone. |
+| 05 | Your moments, shared outside. | Vadal drafts your wins in your voice. You choose what goes out. |
+| 06 | Health and wealth, side by side. | A goal that fits your job, and money guidance right next to it. |
+| 07 | One channel everyone trusts. | Announcements that get acknowledged, campaigns that report reach, and a policy library you can ask. |
+| 08 | Learning in five minutes. | Short lessons, quick quizzes, and reminders for what you keep missing. |
+| 09 | A private door to support. | Talk it through confidentially. A real person is always one tap away. |
+| 10 | Insight managers act on. | Team health, what is driving it, and the one action to take this week. |
+| 11 | Nothing raised gets lost. | Concerns become cases — owned, timed, and resolved. |
+| 12 | One assistant. It can act. | Ask, draft, launch a pulse, give kudos. It confirms before anything reaches a person. |
+| 13 | You're set | Nine pillars, one assistant, all live on your own data. |
+
+Status rows read *Done when you open Pulse.* / *Done — you opened Pulse.*; the caption under the
+window reads *Live from your workspace — the real Pulse, not a picture.*; the locked notes and every
+card's assistant line are one sentence.
+
+## 9 · Figma
 
 Scenes 01, 03 (locked variant for employee), 09 (ask box asked / cited / refused) and 11 at
 1440 × 900 and 375; the spine in three dot states with the hover pill; the mobile hairline.

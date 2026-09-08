@@ -68,23 +68,20 @@ export const TOUR: TourStep[] = [
   {
     id: "welcome",
     title: "What Vadal is",
-    meaning:
-      "A company stays human when every employee has a daily ritual worth keeping, and the people who run it can hear what that ritual produces. Vadal is both halves in one product: nine pillars, with one assistant running through all of them.",
+    meaning: "Employees get a daily ritual. Leaders hear what it produces. One product, nine pillars, one assistant.",
   },
   {
     id: "ritual",
     title: "Your daily ritual",
-    meaning:
-      "Five seconds, once a day: how are you feeling? It is private to you, it builds a streak, and it is the only thing the product asks of you every day. Everything else follows from it — it is the front door to Pulse.",
+    meaning: "Five seconds a day: how are you feeling? Private to you. Everything else starts here.",
     section: "Home", href: "/product/home",
     parts: [{ label: "Home", href: "/product/home" }],
     completesOn: "checkin", actionLabel: "log today's check-in", doneLabel: "logged today's check-in",
   },
   {
     id: "pulse",
-    title: "Listening, structured and ambient, across the whole employee lifecycle.",
-    meaning:
-      "Onboarding, day 30/60/90, the biannual and annual cycles — and the check-ins in between. Free text becomes themes, a dip in a team's mood is flagged before it becomes resignations, and everything reconciles into one health score you can argue with rather than trust.",
+    title: "Hear how people really feel.",
+    meaning: "Surveys, check-ins and comments become one health score — with every input shown.",
     pillar: { n: 1, name: "Pulse", tag: "Listening & Feedback" },
     parts: [
       { label: "Pulse", href: "/product" },
@@ -94,14 +91,13 @@ export const TOUR: TourStep[] = [
       { label: "Analytics", href: "/product/analytics" },
     ],
     section: "Pulse", href: "/product",
-    lockedNote: "You don't see this view — it is the people team's, and your own check-ins reach it only as an anonymous part of the whole. That is by design.",
+    lockedNote: "The people team's view. Your check-ins reach it only anonymously.",
     completesOn: "open:Pulse", actionLabel: "open Pulse", doneLabel: "opened Pulse",
   },
   {
     id: "connect",
-    title: "An internal feed where people share wins, not just HR pushes updates.",
-    meaning:
-      "Every employee — including the field and factory workers who never get a LinkedIn moment for their work — gets a place to post, celebrate and be recognised. Kudos are tied to the company's own values, visible where colleagues see them, and counted toward the health score.",
+    title: "A feed where people share wins.",
+    meaning: "Post, celebrate, recognise. Tied to your values, visible to everyone.",
     pillar: { n: 2, name: "Connect", tag: "Social & Showcase Feed" },
     parts: [
       { label: "Feed", href: "/product/feed" },
@@ -112,9 +108,8 @@ export const TOUR: TourStep[] = [
   },
   {
     id: "amplify",
-    title: "Bring the company's voice in, and let employee moments go out.",
-    meaning:
-      "Most advocacy tools only ask employees to carry the company's posts. Vadal notices moments that are yours — a launch you shipped, kudos you received — and drafts them in your voice, with a policy check that stops a revenue figure going public by accident. Every share is opt-in, by name.",
+    title: "Your moments, shared outside.",
+    meaning: "Vadal drafts your wins in your voice. You choose what goes out.",
     pillar: { n: 3, name: "Amplify", tag: "Company Social Media Integration" },
     parts: [{ label: "Amplify", href: "/product/amplify" }],
     section: "Amplify", href: "/product/amplify",
@@ -122,9 +117,8 @@ export const TOUR: TourStep[] = [
   },
   {
     id: "thrive",
-    title: "One wellness pillar: physical health and financial health, side by side.",
-    meaning:
-      "A line operator already walks 17,000 steps doing their job; a step target would be scoring them on their work. So the goal changes with the person — recovery for one, movement for another — and money sits beside health, because it is the other half of wellbeing.",
+    title: "Health and wealth, side by side.",
+    meaning: "A goal that fits your job, and money guidance right next to it.",
     pillar: { n: 4, name: "Thrive", tag: "Health & Wealth" },
     parts: [{ label: "Thrive", href: "/product/thrive" }],
     section: "Thrive", href: "/product/thrive",
@@ -132,9 +126,8 @@ export const TOUR: TourStep[] = [
   },
   {
     id: "broadcast",
-    title: "One trusted channel for everything the company needs employees to know.",
-    meaning:
-      "Announcements that are targeted, scheduled and — for the ones that matter — acknowledged, not just sent. Campaigns that report reach and lift, not opens. And a policy library you can ask questions of: the answer comes from the company's own approved documents with the sentence cited, and it refuses rather than guesses.",
+    title: "One channel everyone trusts.",
+    meaning: "Announcements that get acknowledged, campaigns that report reach, and a policy library you can ask.",
     pillar: { n: 5, name: "Broadcast", tag: "Communication Hub" },
     parts: [
       { label: "Campaigns", href: "/product/campaigns" },
@@ -145,9 +138,8 @@ export const TOUR: TourStep[] = [
   },
   {
     id: "grow",
-    title: "Learning that fits into a five-minute break, not a training day.",
-    meaning:
-      "Courses generated from a document, lessons that fit a break, and spaced repetition that brings back what you keep missing. Learning that happens between things, not instead of them — and suggested because of what your team flagged, not from a generic role template.",
+    title: "Learning in five minutes.",
+    meaning: "Short lessons, quick quizzes, and reminders for what you keep missing.",
     pillar: { n: 6, name: "Grow", tag: "Bite-Sized Learning" },
     parts: [{ label: "Grow", href: "/product/grow" }],
     section: "Grow", href: "/product/grow",
@@ -155,9 +147,8 @@ export const TOUR: TourStep[] = [
   },
   {
     id: "help",
-    title: "A private first door to support, with a real person always one step away.",
-    meaning:
-      "A confidential first conversation about stress, conflict, workload or something personal — one that listens well, never pretends to be a clinician, and hands off to a real counsellor whenever you want one. Crisis lines sit above the assistant and never depend on anything the AI decides.",
+    title: "A private door to support.",
+    meaning: "Talk it through confidentially. A real person is always one tap away.",
     pillar: { n: 7, name: "One-to-One Help", tag: "AI Companion" },
     parts: [{ label: "One-to-One Help", href: "/product/help" }],
     section: "One-to-One Help", href: "/product/help",
@@ -165,39 +156,35 @@ export const TOUR: TourStep[] = [
   },
   {
     id: "managers",
-    title: "Insight is only worth what a manager does with it by Friday.",
-    meaning:
-      "Every people manager gets their team's health beside the org's, the drivers behind it, and the three actions that would move it most — a 1:1 that has slipped, a report with no recognition in 30 days. Coaching nudges are written from the team's own data, not a leadership course.",
+    title: "Insight managers act on.",
+    meaning: "Team health, what is driving it, and the one action to take this week.",
     pillar: { n: 8, name: "Managers", tag: "Manager Enablement" },
     parts: [{ label: "Manager hub", href: "/product/managers" }],
     section: "Manager hub", href: "/product/managers",
-    lockedNote: "You don't see this view — it is your manager's, about their team as a whole. What you say in a check-in reaches it only as an aggregate, never as a quote with your name on it.",
+    lockedNote: "Your manager's view of the team as a whole — never your words with your name on them.",
     completesOn: "open:Manager hub", actionLabel: "open the Manager hub", doneLabel: "opened the Manager hub",
   },
   {
     id: "cases",
-    title: "Nothing an employee raises gets lost.",
-    meaning:
-      "A concern found through listening becomes a case — auto-opened from a Pulse risk, owned by a named person, with an SLA that counts down and a timeline anyone accountable can read. Confidential ones stay confidential. The measure is not tickets closed but days to resolution.",
+    title: "Nothing raised gets lost.",
+    meaning: "Concerns become cases — owned, timed, and resolved.",
     pillar: { n: 9, name: "Cases", tag: "Case Management & Issue Resolution" },
     parts: [{ label: "Cases", href: "/product/cases" }],
     section: "Cases", href: "/product/cases",
-    lockedNote: "You don't see the case queue — it is the people team's. If something you raised became a case, you hear from the person who owns it, not from a dashboard.",
+    lockedNote: "The people team's queue. If you raised something, you hear from its owner.",
     completesOn: "open:Cases", actionLabel: "open Cases", doneLabel: "opened Cases",
   },
   {
     id: "copilot",
-    title: "One AI layer, not seven integrations — and it can act.",
-    meaning:
-      "One profile ranks the feed, orders Home and picks what to learn next. One sentiment engine reads surveys, posts and acknowledgements into one score. And one Copilot on every screen answers, drafts, and proposes actions — launch a pulse, chase a survey, give kudos — confirming before anything reaches a real person, enforced in code, not left to the prompt.",
+    title: "One assistant. It can act.",
+    meaning: "Ask, draft, launch a pulse, give kudos. It confirms before anything reaches a person.",
     pillar: { name: "The AI layer", tag: "Personalisation · Sentiment · Copilot · Guardrails" },
     completesOn: "ask", actionLabel: "ask the assistant anything", doneLabel: "asked the assistant",
   },
   {
     id: "done",
     title: "You're set",
-    meaning:
-      "That is the whole product: nine pillars and the layer that runs through them, every one live on your workspace's data. From here, the assistant will use this space to surface what it thinks you should look at next.",
+    meaning: "Nine pillars, one assistant, all live on your own data.",
   },
 ];
 

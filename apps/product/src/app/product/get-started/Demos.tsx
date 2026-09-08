@@ -22,9 +22,9 @@ import { FEATURES } from "@/lib/ai/features";
 import { org, myRecognition, me } from "@/lib/data";
 import { feedItems } from "@/lib/feed";
 import { campaigns } from "@/lib/campaigns";
-import { team, reports, managerActions, coachingNudges } from "@/lib/manager";
+import { team, reports, managerActions } from "@/lib/manager";
 import { cases, caseStats } from "@/lib/cases";
-import { experienceScore, SCORE_SOURCES } from "@/lib/experience";
+import { experienceScore } from "@/lib/experience";
 import { myMoments, myReachSeries, PLATFORM_MARK } from "@/lib/amplify";
 import { myActivity, atWorkStepsPerDay, weekSteps, weekStepsFrontline, weekDays, moneyConfig, challengeProgress } from "@/lib/thrive";
 import { chooseFocus } from "@/lib/ai/engines/wellbeing";
@@ -94,7 +94,7 @@ function Welcome() {
           </div>
         ))}
       </dl>
-      <AiLine>Counted from the registry the product serves at <code className="rounded bg-card px-1 text-[11.5px]">/api/ai/features</code> — never typed.</AiLine>
+      <AiLine>Counted live from the product&apos;s own registry — never typed.</AiLine>
     </Card>
   );
 }
@@ -114,7 +114,7 @@ function Ritual() {
         </span>
       </div>
       <div className="px-5 py-4"><MoodCheck firstTime={false} /></div>
-      <AiLine>Private to you. Your manager sees a team mood, never yours — and the streak is the only thing the product asks of you every day.</AiLine>
+      <AiLine>Private to you. Your manager sees the team&apos;s mood, never yours.</AiLine>
     </Card>
   );
 }
@@ -154,7 +154,7 @@ function Pulse() {
           </ul>
         </div>
       </div>
-      <AiLine>{ex.weakest} is the weakest input — {SCORE_SOURCES[ex.weakest]?.toLowerCase()}. Every input is shown, so the number can be argued with rather than trusted.</AiLine>
+      <AiLine>{ex.weakest} is the weakest input. Every input is shown, so the score can be questioned.</AiLine>
     </Card>
   );
 }
@@ -225,7 +225,7 @@ function Amplify() {
           <span className="min-w-0 flex-1"><Sparkline id="tour-reach" values={myReachSeries} color={mark.color} height={40} /></span>
         </div>
       </div>
-      <AiLine>{m.why}</AiLine>
+      <AiLine>Recognised publicly yesterday — about craft, which reads well outside.</AiLine>
     </Card>
   );
 }
@@ -254,7 +254,7 @@ function Thrive() {
         <p className="min-w-0 text-[12.5px] leading-snug"><span className="font-semibold">{moneyConfig.commitment.amount} to savings</span> <span className="text-faint">· payday was {moneyConfig.demoPaydayDaysAgo} days ago · not moved yet</span></p>
         <span className="ml-auto text-[11.5px] font-semibold text-[var(--client-brand,var(--purple))]">Wealth</span>
       </div>
-      <AiLine>The ring measures {recovery ? "recovery, because this job already does the walking" : "movement, because this job does not"}. Switch roles and it changes.</AiLine>
+      <AiLine>Measures {recovery ? "recovery — this job already does the walking" : "movement — this job doesn't"}. Switch roles and it changes.</AiLine>
     </Card>
   );
 }
@@ -304,7 +304,7 @@ function Broadcast() {
             </li>
           ))}
         </ol>
-        <AiLine><CheckCheck className="mr-1 inline h-3.5 w-3.5" />{doneSteps} of {c.steps.length} steps sent, each acknowledged rather than just delivered. {c.aiReadout}</AiLine>
+        <AiLine><CheckCheck className="mr-1 inline h-3.5 w-3.5" />{doneSteps} of {c.steps.length} steps sent and acknowledged. {c.aiReadout.split(". ")[0]}.</AiLine>
       </Card>
       <Card className="border-[var(--ai-border)] bg-[var(--ai-surface)]">
         <form onSubmit={(e) => { e.preventDefault(); askIt(q); }} className="m-3 flex items-center gap-2 rounded-full bg-card p-1.5 pl-4 ring-1 ring-[var(--ai-border)] focus-within:ring-[var(--ai-accent)]">
@@ -353,7 +353,7 @@ function Grow() {
           </ul>
         </div>
       </div>
-      <AiLine>Spaced repetition brings back what you keep missing — red is a question you haven&apos;t got right yet, grey is one you knew and is starting to go.</AiLine>
+      <AiLine>Red: not right yet. Grey: fading. Both come back until they stick.</AiLine>
     </Card>
   );
 }
@@ -383,7 +383,7 @@ function Help() {
       <div className="flex flex-wrap gap-1.5 border-t border-line px-4 py-3">
         {WAYS_IN.slice(0, 3).map((w) => <span key={w} className="rounded-full bg-soft px-2.5 py-1 text-[12px] text-muted">“{w}”</span>)}
       </div>
-      <AiLine>Crisis lines sit above the assistant and take no conversation as input. EAP: {eap.provider} · {eap.helpline} · {eap.hours} · {eap.sessionsIncluded} sessions included.</AiLine>
+      <AiLine>Crisis lines come first, always. EAP: {eap.helpline}, {eap.hours}.</AiLine>
     </Card>
   );
 }
@@ -416,7 +416,7 @@ function Managers() {
           </li>
         ))}
       </ul>
-      <AiLine><span className="font-semibold text-ink">{a.title} · {a.due}.</span> {coachingNudges[0]}</AiLine>
+      <AiLine><span className="font-semibold text-ink">{a.title} · {a.due}.</span> Your highest-impact action this week.</AiLine>
     </Card>
   );
 }
@@ -455,7 +455,7 @@ function Cases() {
           </li>
         ))}
       </ol>
-      <AiLine>{c.aiSummary} Cases resolve in {caseStats.avgResolutionDays} days on average — the number the people team is measured on.</AiLine>
+      <AiLine>{c.aiSummary.split(". ")[0]}. Average resolution: {caseStats.avgResolutionDays} days.</AiLine>
     </Card>
   );
 }
@@ -469,7 +469,7 @@ function Copilot() {
       <div className="flex items-start gap-2.5 px-4 pt-4">
         <span className="ai-grad grid h-8 w-8 shrink-0 place-items-center rounded-full"><SparkMark size={15} tone="solid" /></span>
         <div className="rounded-2xl rounded-tl-md bg-card px-3.5 py-2.5 text-[13.5px] leading-snug shadow-sm">
-          Morning. Engineering engagement dropped 6 pts this week — worth a look. What are you looking for today?
+          Morning. Engineering dropped 6 pts this week. What do you need?
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-1.5 px-4">
@@ -483,7 +483,7 @@ function Copilot() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Ask Vadal anything, or tell it to do something…" aria-label="Ask the assistant" className="min-h-[40px] min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-faint" />
         <Button type="submit" variant="brand" size="sm" className="min-h-[40px] rounded-full" trailingIcon={<ArrowRight className="h-3.5 w-3.5" />}>Ask</Button>
       </form>
-      <AiLine>Anything that reaches a real person confirms before it runs, and can be undone — enforced in code, not left to the prompt.</AiLine>
+      <AiLine>Confirms before anything reaches a person. Always undoable.</AiLine>
     </Card>
   );
 }
