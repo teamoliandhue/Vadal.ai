@@ -8,7 +8,7 @@
    keys in lib/access.SECTION_ACCESS — that shared key is what keeps nav,
    routing and permissions in agreement. */
 import {
-  BarChart3, BookOpen, ClipboardList, FolderKanban, Gauge, GraduationCap,
+  BarChart3, BookOpen, CalendarCheck, ClipboardList, FolderKanban, Gauge, GraduationCap,
   HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio,
   Share2, Smile, UsersRound, type LucideIcon,
 } from "lucide-react";
@@ -23,6 +23,7 @@ export const NAV: NavGroupModel[] = [
     label: "My space",
     items: [
       { label: "Home", icon: House, href: "/product/home" },
+      { label: "My day", icon: CalendarCheck, href: "/product/myday" },
       { label: "Feed", icon: Newspaper, href: "/product/feed" },
     ],
   },
@@ -92,10 +93,10 @@ const MOBILE_PRIORITY: Record<Role, string[]> = {
   // Grow over Knowledge for the employee: a five-minute course on a break is the
   // thing this product is asking a frontline worker to do, and Knowledge is
   // reachable from the Copilot on any screen.
-  employee: ["Home", "Feed", "Grow", "Thrive"],
-  manager: ["Home", "Pulse", "Manager hub", "Feed"],
-  admin: ["Home", "Pulse", "Cases", "Feed"],
-  superadmin: ["Home", "Pulse", "Cases", "Feed"],
+  employee: ["Home", "My day", "Feed", "Thrive"],
+  manager: ["Home", "My day", "Pulse", "Manager hub"],
+  admin: ["Home", "My day", "Pulse", "Cases"],
+  superadmin: ["Home", "My day", "Pulse", "Cases"],
 };
 
 const FLAT = NAV.flatMap((g) => g.items);

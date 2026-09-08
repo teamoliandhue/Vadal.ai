@@ -22,7 +22,7 @@ import { SectionGuard } from "./SectionGuard";
 
 /* left-hand domain label per section (top-bar breadcrumb root) */
 const DOMAIN: Record<string, string> = {
-  Home: "My space", Feed: "My space", Pulse: "People intelligence", Analytics: "People intelligence",
+  Home: "My space", "My day": "My space", Feed: "My space", Pulse: "People intelligence", Analytics: "People intelligence",
   Surveys: "Listening", Sentiment: "Listening", "Always-on listening": "Listening",
   Recognition: "Engage", Campaigns: "Engage", Amplify: "Engage",
   Thrive: "Wellbeing", "One-to-One Help": "Wellbeing", Grow: "Learn",
