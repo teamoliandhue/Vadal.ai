@@ -60,7 +60,19 @@ sit invisible waiting for a callback.
 
 ---
 
-## 5 · Figma
+## 5 · Second pass — presence, and a demo that runs itself
+
+| Addition | Spec |
+|---|---|
+| **Watermark number** | `01`–`11` behind the text column: `clamp(150px, 20vw, 280px)` · 800 · tracking −0.06em · `--ink` at 4.5%. Fills the room without competing. |
+| **Product window** | The evidence sits in a window, not a card: a 40px chrome strip — SparkMark · **Vadal** · `· Pulse` · right-aligned green dot `Live · oliandhue` — over the demo (min-height 220px, centred). Caption beneath: *"The real component on real data — what you would see in Pulse right now, not a picture of it."* |
+| **Parallax** | Each scene knows its distance from centre (`--p`, −1…1, set on scroll); the window drifts `−48px × --p`, a touch slower than the page. Off under reduced motion. |
+| **Drifting light** | The two blobs travel 5–7% over 22s / 28s (reverse), so no scene is still. Off under reduced motion. |
+| **Scroll cue** | Scene 01, lg only: *"Scroll, or use the arrow keys"* with a softly bouncing ↓. |
+| **Keys** | → ↓ PageDown Space = next scene · ← ↑ PageUp Shift+Space = previous · Home / End. Ignored while typing (the ask box) or with a modifier held. |
+| **Present** | Pill above the spine (Play ▸ *Present* / Pause ‖ in `ai-grad` while running). Turns the page every 9s until the end; a wheel, a touch, a key or Esc stops it. A status pill at the bottom centre says so: *"Presenting · 9s per idea · scroll or press any key to stop"*. For the investor demo where the hands are busy talking. |
+
+## 6 · Figma
 
 Scenes 01, 03 (locked variant for employee), 09 (ask box asked / cited / refused) and 11 at
 1440 × 900 and 375; the spine in three dot states with the hover pill; the mobile hairline.

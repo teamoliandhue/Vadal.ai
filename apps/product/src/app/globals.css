@@ -225,3 +225,14 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .lumen .story-in { opacity: 1; transform: none; transition: none; }
 }
+.lumen .story-blob { animation: story-drift 22s ease-in-out infinite; }
+.lumen .story-blob:nth-child(2) { animation-duration: 28s; animation-direction: reverse; }
+@keyframes story-drift { 0%, 100% { translate: 0 0; } 50% { translate: 5% 7%; } }
+.lumen .story-num { position: absolute; left: -0.06em; top: -0.42em; z-index: 0; font-size: clamp(150px, 20vw, 280px); font-weight: 800; line-height: 1; letter-spacing: -0.06em; color: color-mix(in srgb, var(--ink) 4.5%, transparent); pointer-events: none; user-select: none; }
+.lumen .story-parallax { transform: translateY(calc(var(--p, 0) * -48px)); will-change: transform; }
+.lumen .story-cue { animation: story-cue 1.8s ease-in-out infinite; }
+@keyframes story-cue { 0%, 100% { transform: translateY(0); opacity: 0.55; } 50% { transform: translateY(6px); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .lumen .story-blob, .lumen .story-cue { animation: none; }
+  .lumen .story-parallax { transform: none; }
+}
