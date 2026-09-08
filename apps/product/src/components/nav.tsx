@@ -15,11 +15,7 @@ const SOON = ["DS Doc", "Assets", "Project Doc"];
 
 export function Nav() {
   const path = usePathname();
-  /* Also hidden on the front door: this nav exists for the brand/exploration
-     pages, and it lists three unbuilt things as "Soon" — which is the last
-     thing to put above a product someone is evaluating. */
   if (path?.startsWith("/product") || path?.startsWith("/auth")) return null;
-  if (path === "/" || path === "/overview") return null;
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white/80 backdrop-blur-md">
