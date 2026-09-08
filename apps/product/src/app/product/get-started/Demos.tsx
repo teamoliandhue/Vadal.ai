@@ -6,10 +6,12 @@
    thing is for; the demo proves it exists. That pairing is the whole reason a
    tour beats a feature list. */
 import * as React from "react";
-import { BookOpen, Clock, RotateCcw } from "lucide-react";
-import { Avatar, Badge, SparkMark } from "@vadal/design-system";
+import Link from "next/link";
+import { ArrowRight, BookOpen, Clock, Heart, RotateCcw, Search, Smile } from "lucide-react";
+import { Avatar, Badge, Button, SparkMark } from "@vadal/design-system";
 import { NAV } from "../nav-model";
 import { MoodCheck } from "../home/MoodCheck";
+import { GiveRecognition } from "../recognition/GiveRecognition";
 import { useSession } from "../useSession";
 import { GoalRing } from "@/components/charts";
 import { FEATURES } from "@/lib/ai/features";
@@ -21,8 +23,8 @@ import { chooseFocus } from "@/lib/ai/engines/wellbeing";
 import { crisisResources } from "@/lib/ai/engines/support";
 import { growStats, learningDays, retention } from "@/lib/grow";
 import { reviewQueue } from "@/lib/ai/engines/learning";
-import { findAnswer } from "@/lib/knowledge";
-import type { DemoKey } from "@/lib/tour";
+import { findAnswer, suggestedQuestions } from "@/lib/knowledge";
+import { didAction, type DemoKey, type TourStepView } from "@/lib/tour";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 
@@ -105,6 +107,8 @@ function Listen() {
 }
 
 function Engage() {
+  /* The real give-recognition drawer, so the step can be done from here. */
+  const [giving, setGiving] = React.useState(false);
   const r = myRecognition[0];
   return (
     <Frame tone="soft">
@@ -115,6 +119,11 @@ function Engage() {
         <Badge tone="brand" variant="soft" size="sm">{r.value}</Badge>
         <span className="ml-auto text-[12px] text-faint">{r.time}</span>
       </div>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <Button variant="brand" className="min-h-[44px]" leadingIcon={<Heart className="h-3.5 w-3.5" />} onClick={() => setGiving(true)}>Recognise someone</Button>
+        <span className="text-[12.5px] text-faint">Real drawer, real teammates — it reaches them today.</span>
+      </div>
+      <GiveRecognition open={giving} onClose={() => setGiving(false)} onGive={() => setGiving(false)} />
     </Frame>
   );
 }
@@ -196,13 +205,39 @@ function Learn() {
 }
 
 function Knowledge() {
-  const q = "How many paid leaves do I have?";
-  const a = findAnswer(q);
+  /* Ask it yourself. The step is explored by asking, not by reading a canned
+     answer — and the refusal is part of the demonstration. */
+  const [q, setQ] = React.useState("");
+  const [asked, setAsked] = React.useState<string | null>(null);
+  const a = asked ? findAnswer(asked) : null;
+  function ask(question: string) {
+    const t = question.trim();
+    if (!t) return;
+    setAsked(t);
+    setQ(t);
+    didAction("answer");
+  }
   return (
     <Frame tone="ai">
-      <p className="text-[13px] font-semibold">“{q}”</p>
-      <p className="mt-2 text-[13.5px] leading-relaxed text-muted">{a.answer.replace(/\*\*/g, "")}</p>
-      {a.sources.length > 0 && <p className="mt-2.5 flex items-center gap-1.5 text-[12px] text-faint"><BookOpen className="h-3 w-3" /> Cited from your own documents</p>}
+      <form onSubmit={(e) => { e.preventDefault(); ask(q); }} className="flex items-center gap-2 rounded-full bg-card p-1.5 pl-4 ring-1 ring-[var(--ai-border)] focus-within:ring-[var(--ai-accent)]">
+        <Search className="h-4 w-4 shrink-0 text-faint" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Ask about leave, pay, how anything works here…" aria-label="Ask the knowledge base" className="min-h-[40px] min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-faint" />
+        <Button type="submit" variant="brand" size="sm" className="min-h-[40px] rounded-full">Ask</Button>
+      </form>
+      <div className="mt-2.5 flex flex-wrap gap-1.5">
+        {suggestedQuestions.map((sq) => (
+          <button key={sq} type="button" onClick={() => ask(sq)} className="min-h-[36px] rounded-full bg-card px-3 text-[12.5px] text-muted transition hover:text-ink hover:ring-1 hover:ring-[var(--ai-border)]">{sq}</button>
+        ))}
+      </div>
+      {a && (
+        <div className="mt-4 rounded-2xl bg-card p-4" aria-live="polite">
+          <p className="text-[13px] font-semibold">“{asked}”</p>
+          <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">{a.answer.replace(/\*\*/g, "")}</p>
+          <p className="mt-2.5 flex items-center gap-1.5 text-[12px] text-faint">
+            <BookOpen className="h-3 w-3" /> {a.sources.length > 0 ? "Cited from your own documents" : "Not in your documents — so it said so, rather than guessing"}
+          </p>
+        </div>
+      )}
     </Frame>
   );
 }
@@ -220,6 +255,63 @@ function Copilot() {
         ))}
       </div>
     </Frame>
+  );
+}
+
+/* ── the last step: what is left, and three things worth doing first ── */
+export function Done({ steps, explored, onRestart, onGo }: { steps: TourStepView[]; explored: DemoKey[]; onRestart: () => void; onGo: (i: number) => void }) {
+  const left = steps.filter((s) => s.id !== "done" && !explored.includes(s.id) && !s.locked);
+  const NEXT: { icon: React.ReactNode; label: string; sub: string; href?: string; onClick?: () => void }[] = [
+    { icon: <Smile className="h-4 w-4" />, label: "Log today's check-in", sub: "Five seconds, private to you", href: "/product/home" },
+    { icon: <Heart className="h-4 w-4" />, label: "Recognise someone", sub: "It reaches them today", href: "/product/recognition" },
+    { icon: <SparkMark size={14} tone="solid" />, label: "Ask Vadal", sub: "“What should I look at first?”", onClick: () => ask("What should I look at first?") },
+  ];
+  return (
+    <div className="flex flex-col gap-4">
+      {left.length > 0 ? (
+        <Frame tone="soft">
+          <Eyebrow>Still to explore</Eyebrow>
+          <ul className="mt-2 flex flex-wrap gap-1.5">
+            {left.map((s) => (
+              <li key={s.id}>
+                <button type="button" onClick={() => onGo(s.index)} className="min-h-[36px] rounded-full bg-card px-3 text-[12.5px] font-medium transition hover:ring-1 hover:ring-line">{s.index + 1} · {s.title}</button>
+              </li>
+            ))}
+          </ul>
+        </Frame>
+      ) : (
+        <Frame tone="soft">
+          <p className="text-[14px] font-semibold">Everything explored — by doing it, not reading about it.</p>
+          <p className="mt-1 text-[13px] text-muted">Come back to this space: Vadal.ai will use it to put in front of you what it thinks you should see next.</p>
+        </Frame>
+      )}
+      <div>
+        <Eyebrow>Worth doing first</Eyebrow>
+        <ul className="mt-2 grid gap-2 sm:grid-cols-3">
+          {NEXT.map((n) => {
+            const inner = (
+              <>
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-soft text-[var(--client-brand,var(--purple))]">{n.icon}</span>
+                <span className="min-w-0">
+                  <span className="block text-[13.5px] font-semibold leading-tight">{n.label}</span>
+                  <span className="block truncate text-[12px] text-faint">{n.sub}</span>
+                </span>
+              </>
+            );
+            const cls = "flex min-h-[44px] w-full items-center gap-3 rounded-2xl border border-line bg-card p-3 text-left transition hover:bg-soft";
+            return (
+              <li key={n.label}>
+                {n.href ? <Link href={n.href} className={cls}>{inner}</Link> : <button type="button" onClick={n.onClick} className={cls}>{inner}</button>}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Link href="/product/home"><Button variant="brand" className="min-h-[44px]" trailingIcon={<ArrowRight className="h-3.5 w-3.5" />}>Open Home</Button></Link>
+        <Button variant="tertiary" className="min-h-[44px]" leadingIcon={<RotateCcw className="h-3.5 w-3.5" />} onClick={onRestart}>Start over</Button>
+      </div>
+    </div>
   );
 }
 

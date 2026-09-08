@@ -18,6 +18,7 @@ import { Sparkline } from "@/components/charts";
 import { org, me, myRecognition, communities, myDay, engagementTrend, myCalendar } from "@/lib/data";
 import { MoodCheck } from "./MoodCheck";
 import { MyDay } from "./MyDay";
+import { TourResume } from "../get-started/TourResume";
 import { QuickPoll } from "./QuickPoll";
 import { Feed } from "./Feed";
 import { AskAi } from "./AskAi";
@@ -37,6 +38,7 @@ export function HomeContent({ greeting }: { greeting: string }) {
   return (
     <>
       <RitualHero firstTime={firstTime} greeting={greeting} />
+      <TourResume />
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
         {/* LEFT (wider, action-first) — what you need to do, then who you are */}
         <div className="flex flex-col gap-6 xl:col-span-7">

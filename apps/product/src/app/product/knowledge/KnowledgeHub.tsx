@@ -8,6 +8,7 @@ import { ArrowRight, BookOpen, FileText, Search, Sparkles, ThumbsDown, ThumbsUp 
 import { Button, SparkMark } from "@vadal/design-system";
 import { toast } from "../Toaster";
 import { Drawer } from "../Drawer";
+import { didAction } from "@/lib/tour";
 import {
   collections, articles, suggestedQuestions, gaps, usage, findAnswer,
   type Article,
@@ -43,6 +44,7 @@ export function KnowledgeHub() {
     setResult(null);
     window.setTimeout(() => {
       setResult({ q: question, ...findAnswer(question) });
+      didAction("answer");
       setAsking(false);
     }, 750);
   };

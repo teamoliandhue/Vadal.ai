@@ -9,6 +9,7 @@ import { Drawer } from "../Drawer";
 import { toast } from "../Toaster";
 import { useMe } from "../useSession";
 import { values, teammates, draftLines, type Kudos, type Person } from "@/lib/recognize";
+import { didAction } from "@/lib/tour";
 
 const POINTS: Record<string, number> = { Ownership: 50, Collaboration: 40, Innovation: 40, "Customer focus": 40 };
 let kid = 100;
@@ -73,6 +74,7 @@ export function GiveRecognition({
       points: POINTS[value] ?? 40,
     };
     onGive(k);
+    didAction("kudos");
     toast(`Recognition sent to ${to.name.split(" ")[0]} 🎉${pub ? " · shared to the feed" : ""}`);
     onClose();
   }

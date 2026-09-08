@@ -22,6 +22,11 @@ export type DemoKey =
   | "welcome" | "ritual" | "listen" | "engage" | "amplify"
   | "wellbeing" | "help" | "learn" | "knowledge" | "copilot" | "done";
 
+/** Something a person actually does in the product. A step that names one is
+    explored when the action happens — anywhere, not only on the tour page —
+    because "explored" should mean you did the thing, not that you clicked Next. */
+export type TourAction = "checkin" | "kudos" | "ask" | "answer" | `open:${string}`;
+
 export type TourStep = {
   id: DemoKey;
   /** What it does for you — the step's title. */
@@ -33,6 +38,13 @@ export type TourStep = {
   href?: string;
   /** Shown instead of the open button when the role cannot open the section. */
   lockedNote?: string;
+  /** The action that explores this step, and how to name it. Steps without one
+      are pure ideas and are explored by reading them. */
+  completesOn?: TourAction;
+  /** "Explored when you …" — imperative, lowercase. */
+  actionLabel?: string;
+  /** "Explored — you …" — past tense, lowercase. */
+  doneLabel?: string;
 };
 
 export const TOUR: TourStep[] = [
@@ -48,6 +60,7 @@ export const TOUR: TourStep[] = [
     meaning:
       "Five seconds, once a day: how are you feeling? It is private to you, it builds a streak, and it is the only thing the product asks of you every day. Everything else follows from it.",
     section: "Home", href: "/product/home",
+    completesOn: "checkin", actionLabel: "log today's check-in", doneLabel: "logged today's check-in",
   },
   {
     id: "listen",
@@ -56,6 +69,7 @@ export const TOUR: TourStep[] = [
       "Check-ins, surveys, the feed, campaign reach and recognition are reconciled into one health score — not four dashboards that disagree. Every input is shown, so the number can be argued with rather than trusted.",
     section: "Pulse", href: "/product",
     lockedNote: "You don't see this view — it is the people team's, and your own check-ins reach it only as an anonymous part of the whole. That is by design.",
+    completesOn: "open:Pulse", actionLabel: "open Pulse", doneLabel: "opened Pulse",
   },
   {
     id: "engage",
@@ -63,6 +77,7 @@ export const TOUR: TourStep[] = [
     meaning:
       "Kudos tied to the company's own values, visible where colleagues see it, and counted toward the health score. Most recognition programmes are a form; this one is a feed.",
     section: "Recognition", href: "/product/recognition",
+    completesOn: "kudos", actionLabel: "recognise someone", doneLabel: "recognised someone",
   },
   {
     id: "amplify",
@@ -70,6 +85,7 @@ export const TOUR: TourStep[] = [
     meaning:
       "Most advocacy tools only ask employees to carry the company's posts. Vadal notices moments that are yours — a launch you shipped, kudos you received — and drafts them in your voice. A policy check stops a revenue figure going public by accident.",
     section: "Amplify", href: "/product/amplify",
+    completesOn: "open:Amplify", actionLabel: "open Amplify", doneLabel: "opened Amplify",
   },
   {
     id: "wellbeing",
@@ -77,6 +93,7 @@ export const TOUR: TourStep[] = [
     meaning:
       "A line operator already walks 17,000 steps doing their job; a step target would be scoring them on their work. So the goal changes with the person — recovery for one, movement for another — and money sits beside health, because it is the other half of wellbeing.",
     section: "Thrive", href: "/product/thrive",
+    completesOn: "open:Thrive", actionLabel: "open Thrive", doneLabel: "opened Thrive",
   },
   {
     id: "help",
@@ -84,6 +101,7 @@ export const TOUR: TourStep[] = [
     meaning:
       "A private first step toward support, with a real person one tap away on every screen. Crisis lines sit above the assistant, take no conversation as input, and never depend on anything the AI decides.",
     section: "One-to-One Help", href: "/product/help",
+    completesOn: "open:One-to-One Help", actionLabel: "open One-to-One Help", doneLabel: "opened One-to-One Help",
   },
   {
     id: "learn",
@@ -91,6 +109,7 @@ export const TOUR: TourStep[] = [
     meaning:
       "Courses generated from a document, lessons that fit a break, and spaced repetition that brings back what you keep missing. Learning that happens between things, not instead of them.",
     section: "Grow", href: "/product/grow",
+    completesOn: "open:Grow", actionLabel: "open Grow", doneLabel: "opened Grow",
   },
   {
     id: "knowledge",
@@ -98,12 +117,14 @@ export const TOUR: TourStep[] = [
     meaning:
       "Ask about leave, pay, or how anything works here. The answer comes from the company's own approved documents with the sentence cited — and it refuses rather than guesses when the answer is not in them.",
     section: "Knowledge", href: "/product/knowledge",
+    completesOn: "answer", actionLabel: "ask it something", doneLabel: "asked it something",
   },
   {
     id: "copilot",
     title: "One assistant — and it can act",
     meaning:
       "The Copilot is on every screen. It answers, drafts, and proposes actions: launch a pulse, chase a survey, give kudos. Anything that reaches a real person confirms before it runs and can be undone — enforced in code, not left to the prompt.",
+    completesOn: "ask", actionLabel: "ask the assistant anything", doneLabel: "asked the assistant",
   },
   {
     id: "done",
@@ -125,3 +146,21 @@ export function tourFor(role: Role | null): TourStepView[] {
 }
 
 export const TOUR_STORAGE_KEY = "vadal:tour-explored";
+/** Set once the person has seen the tour page; Home stops landing on it. */
+export const TOUR_SEEN_KEY = "vadal:tour-seen";
+/** Set when they hide the resume card on Home. */
+export const TOUR_DISMISSED_KEY = "vadal:tour-dismissed";
+
+export const TOUR_ACTION_EVENT = "vadal:did";
+
+/** Announce that the person did something. Fired by the real features
+    (check-in, recognition, knowledge, every section's shell) and read by
+    the tour, which marks the matching step explored wherever it happened. */
+export function didAction(action: TourAction) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(TOUR_ACTION_EVENT, { detail: { action } }));
+}
+
+export function stepForAction(action: TourAction): DemoKey | null {
+  return TOUR.find((s) => s.completesOn === action)?.id ?? null;
+}

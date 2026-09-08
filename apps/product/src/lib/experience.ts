@@ -44,7 +44,7 @@ function postSentiment(): number {
 
 /** Live campaigns only — a campaign that has not started has no reach to average. */
 function liveCampaigns() {
-  return campaigns.filter((c) => c.status === "live" || c.status === "complete");
+  return campaigns.filter((c) => c.status === "live" || c.status === "completed");
 }
 
 function meanOf(pick: (c: ReturnType<typeof liveCampaigns>[number]) => number): number {

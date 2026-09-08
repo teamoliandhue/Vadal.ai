@@ -46,7 +46,7 @@ export function derivePulse(scope: string, period: string) {
   const headcount = isTeam ? Math.round(12480 * w) : 12480;
 
   /* ── headline / health ── */
-  const delta = d ? Math.round((d.score - 74) / 3) : health.delta;
+  const delta = d ? Math.round((d.score - ex.score) / 3) : health.delta;
   const benchmarkDelta = score - 75;
   const percentile =
     score >= 82 ? "top 25%" : score >= 76 ? "top 40%" : score >= 68 ? "median band" : "bottom 30%";

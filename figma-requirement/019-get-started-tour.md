@@ -60,7 +60,7 @@ Step index persists (`vadal:tour-step`); explored set persists (`vadal:tour-expl
 |---|---|---|---|
 | 1 | What Vadal is | — | Org card: sections · AI features live · one assistant, counted from the registry |
 | 2 | Your daily ritual | Home | The real `MoodCheck` |
-| 3 | It listens, all the time | Pulse 🔒 employee | Health score 74 with every contribution bar (`SCORE_SOURCES`) |
+| 3 | It listens, all the time | Pulse 🔒 employee | Health score (computed, 70 today) with every contribution bar (`SCORE_SOURCES`) |
 | 4 | Recognition people actually feel | Recognition | A real recognition card |
 | 5 | Their words, going out | Amplify | A real moment card |
 | 6 | Wellbeing that fits the job | Thrive | `GoalRing` for *this* person's chosen focus |

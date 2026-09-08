@@ -6,6 +6,7 @@ import { Check, Sparkles } from "lucide-react";
 import { Button, SparkMark } from "@vadal/design-system";
 import { moods, me } from "@/lib/data";
 import { usePersistentState } from "@/lib/usePersistentState";
+import { didAction } from "@/lib/tour";
 import { toast } from "../Toaster";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -28,6 +29,7 @@ export function MoodCheck({ firstTime = false }: { firstTime?: boolean }) {
   function log(talk = false) {
     if (!selected) return;
     setLogged({ mood: selected });
+    didAction("checkin");
     const m = moods.find((x) => x.label === selected);
     if (talk) talkItThrough(selected, note.trim() || undefined);
     else toast(`Mood logged ${m?.emoji ?? ""} — ${streak}-day streak`);

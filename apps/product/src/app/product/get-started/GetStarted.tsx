@@ -15,13 +15,13 @@
    one of the product's strongest claims and belongs in the walkthrough. */
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check, Lock, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Circle, Lock, RotateCcw } from "lucide-react";
 import { Button, SparkMark } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
-import { tourFor } from "@/lib/tour";
+import { tourFor, TOUR_SEEN_KEY } from "@/lib/tour";
 import { useViewAs } from "../useViewAs";
 import { useTourProgress } from "../useTourProgress";
-import { Demo } from "./Demos";
+import { Demo, Done } from "./Demos";
 
 export function GetStarted() {
   const [role] = useViewAs();
@@ -33,12 +33,28 @@ export function GetStarted() {
   const step = steps[i];
   const done = steps.filter((s) => explored.includes(s.id)).length;
   const isLast = i === steps.length - 1;
+  const isExplored = explored.includes(step.id);
+  /* an idea step is explored by reading it; an action step only by doing it */
+  const byDoing = Boolean(step.completesOn) && !step.locked;
+
+  /* Home lands here once, for anyone who has never seen it. Now they have. */
+  React.useEffect(() => {
+    try {
+      window.localStorage.setItem(TOUR_SEEN_KEY, "true");
+    } catch {
+      /* ignore unavailable storage */
+    }
+  }, []);
+  /* the last step has nothing to do — reaching it is exploring it */
+  React.useEffect(() => {
+    if (step.id === "done") mark("done");
+  }, [step.id, mark]);
 
   function go(n: number) {
     setStepIdx(Math.min(Math.max(0, n), steps.length - 1));
   }
   function next() {
-    mark(step.id);
+    if (!byDoing) mark(step.id);
     if (!isLast) go(i + 1);
   }
 
@@ -63,7 +79,7 @@ export function GetStarted() {
           <div className="flex items-baseline justify-between text-[12px]">
             <span className="font-semibold">{done} of {steps.length} explored</span>
             {done > 0 && (
-              <button onClick={() => { reset(); go(0); }} className="flex items-center gap-1 text-faint transition hover:text-ink">
+              <button onClick={() => { reset(); go(0); }} className="flex min-h-[44px] items-center gap-1 text-faint transition hover:text-ink lg:min-h-0">
                 <RotateCcw className="h-3 w-3" /> Start over
               </button>
             )}
@@ -123,20 +139,21 @@ export function GetStarted() {
 
             <div className="mt-6">
               {step.id === "done" ? (
-                <div className="rounded-2xl bg-soft p-5">
-                  <p className="text-[15px] font-semibold">{done} of {steps.length} steps explored.</p>
-                  <p className="mt-1 text-[13.5px] leading-relaxed text-muted">
-                    Come back to this space — Vadal.ai will use it to put in front of you what it thinks you should see next.
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Link href="/product/home"><Button variant="brand" className="min-h-[44px]" trailingIcon={<ArrowRight className="h-3.5 w-3.5" />}>Go to Home</Button></Link>
-                    <Button variant="tertiary" className="min-h-[44px]" leadingIcon={<RotateCcw className="h-3.5 w-3.5" />} onClick={() => { reset(); go(0); }}>Start over</Button>
-                  </div>
-                </div>
+                <Done steps={steps} explored={explored} onRestart={() => { reset(); go(0); }} onGo={go} />
               ) : (
                 <Demo id={step.id} />
               )}
             </div>
+
+            {byDoing && (
+              <p className="mt-4 flex items-center gap-2 text-[13px] text-muted" aria-live="polite">
+                {isExplored ? (
+                  <><Check className="h-3.5 w-3.5 shrink-0 text-[var(--success)]" strokeWidth={2.5} /> Explored — you {step.doneLabel}.</>
+                ) : (
+                  <><Circle className="h-3.5 w-3.5 shrink-0 text-faint" /> Explored when you {step.actionLabel}{step.href ? " — here, or from the menu" : ""}.</>
+                )}
+              </p>
+            )}
 
             {step.locked && step.lockedNote && (
               <p className="mt-4 flex items-start gap-2 rounded-2xl bg-soft px-4 py-3 text-[13px] leading-snug text-muted">
@@ -160,7 +177,7 @@ export function GetStarted() {
               )}
               {!isLast && (
                 <Button variant="brand" className="min-h-[44px]" trailingIcon={<ArrowRight className="h-3.5 w-3.5" />} onClick={next}>
-                  {explored.includes(step.id) ? "Next" : "Got it, next"}
+                  {isExplored || byDoing ? "Next" : "Got it, next"}
                 </Button>
               )}
             </div>

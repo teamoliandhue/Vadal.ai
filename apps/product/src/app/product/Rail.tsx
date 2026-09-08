@@ -30,7 +30,7 @@ export function Rail({ active }: { active: string }) {
   const [wsOpen, setWsOpen] = React.useState(false);
   /* How much of the tour is left — a count on the nav item, so a first-time
      user has a nudge and a returning one does not. Gone once it is done. */
-  const { explored } = useTourProgress();
+  const { explored } = useTourProgress(active);
   const tourLeft = tourFor(role).filter((s) => !explored.includes(s.id)).length;
   const wsRef = React.useRef<HTMLDivElement>(null);
 
