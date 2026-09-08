@@ -301,7 +301,7 @@ const Scene = React.forwardRef<
                   )}
                   {step.locked && <Lock className="h-3.5 w-3.5" aria-label="Not available to your role" />}
                 </p>
-                <h2 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-4 text-[clamp(34px,4.6vw,60px)] font-bold leading-[1.02] tracking-[-0.032em]">{step.title}</h2>
+                <h2 id={`scene-${step.id}-title`} className={`story-in story-in-2 mt-4 font-bold leading-[1.04] tracking-[-0.032em] ${step.title.length > 48 ? "text-[clamp(28px,3.6vw,48px)]" : "text-[clamp(34px,4.6vw,60px)]"}`}>{step.title}</h2>
                 <p className="story-in story-in-3 mt-5 max-w-[46ch] text-[clamp(16px,1.3vw,19px)] leading-relaxed text-muted">{step.meaning}</p>
 
                 {step.partsView.length > 0 && (
