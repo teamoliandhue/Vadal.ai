@@ -19,6 +19,8 @@ import { experienceScore } from "@/lib/experience";
 import { canAccess } from "@/lib/access";
 import { navFor } from "./nav-model";
 import { useViewAs } from "./useViewAs";
+import { useTourProgress } from "./useTourProgress";
+import { tourFor } from "@/lib/tour";
 import { toast } from "./Toaster";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
@@ -26,6 +28,10 @@ const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { d
 export function Rail({ active }: { active: string }) {
   const [role, , meta] = useViewAs();
   const [wsOpen, setWsOpen] = React.useState(false);
+  /* How much of the tour is left — a count on the nav item, so a first-time
+     user has a nudge and a returning one does not. Gone once it is done. */
+  const { explored } = useTourProgress();
+  const tourLeft = tourFor(role).filter((s) => !explored.includes(s.id)).length;
   const wsRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -85,6 +91,7 @@ export function Rail({ active }: { active: string }) {
               href={it.href}
               active={it.label === active}
               label={it.label}
+              count={it.label === "Get Started" && tourLeft > 0 ? tourLeft : undefined}
               tag={it.soon ? "Soon" : undefined}
               icon={<it.icon className="size-[18px]" strokeWidth={it.label === active ? 2.1 : 1.85} />}
             />

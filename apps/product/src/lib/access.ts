@@ -58,6 +58,7 @@ const ADMIN_UP: Role[] = ["admin", "superadmin"];
  *   should see cases they opened, that is a separate scoping decision.
  */
 export const SECTION_ACCESS: Record<string, Role[]> = {
+  "Get Started": ALL_ROLES,
   Home: ALL_ROLES,
   Feed: ALL_ROLES,
   Recognition: ALL_ROLES,

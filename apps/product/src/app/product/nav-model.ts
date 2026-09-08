@@ -8,7 +8,7 @@
    keys in lib/access.SECTION_ACCESS — that shared key is what keeps nav,
    routing and permissions in agreement. */
 import {
-  BarChart3, BookOpen, ClipboardList, FolderKanban, Gauge, GraduationCap,
+  BarChart3, BookOpen, ClipboardList, Compass, FolderKanban, Gauge, GraduationCap,
   HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio,
   Share2, Smile, UsersRound, type LucideIcon,
 } from "lucide-react";
@@ -19,6 +19,15 @@ export type NavLeaf = { label: string; icon: LucideIcon; href: string; soon?: bo
 export type NavGroupModel = { label: string; items: NavLeaf[] };
 
 export const NAV: NavGroupModel[] = [
+  /* The assistant's own group. It sits above the person's space because it is
+     where Vadal.ai surfaces what it has tailored for them — and, later, the
+     temporary sections it builds from what the workspace is telling it. Get
+     Started is the first of those and the only permanent one: a walkthrough of
+     the product for anyone seeing it cold, whether a new joiner or an investor. */
+  {
+    label: "Vadal.ai",
+    items: [{ label: "Get Started", icon: Compass, href: "/product/get-started" }],
+  },
   {
     label: "My space",
     items: [
