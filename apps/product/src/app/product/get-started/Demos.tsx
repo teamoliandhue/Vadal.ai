@@ -226,7 +226,7 @@ function Knowledge() {
       </form>
       <div className="mt-2.5 flex flex-wrap gap-1.5">
         {suggestedQuestions.map((sq) => (
-          <button key={sq} type="button" onClick={() => ask(sq)} className="min-h-[36px] rounded-full bg-card px-3 text-[12.5px] text-muted transition hover:text-ink hover:ring-1 hover:ring-[var(--ai-border)]">{sq}</button>
+          <button key={sq} type="button" onClick={() => ask(sq)} className="min-h-[44px] rounded-full bg-card px-3 text-[12.5px] text-muted transition hover:text-ink hover:ring-1 hover:ring-[var(--ai-border)] lg:min-h-[36px]">{sq}</button>
         ))}
       </div>
       {a && (
@@ -274,7 +274,7 @@ export function Done({ steps, explored, onRestart, onGo }: { steps: TourStepView
           <ul className="mt-2 flex flex-wrap gap-1.5">
             {left.map((s) => (
               <li key={s.id}>
-                <button type="button" onClick={() => onGo(s.index)} className="min-h-[36px] rounded-full bg-card px-3 text-[12.5px] font-medium transition hover:ring-1 hover:ring-line">{s.index + 1} · {s.title}</button>
+                <button type="button" onClick={() => onGo(s.index)} className="min-h-[44px] rounded-full bg-card px-3 text-[12.5px] font-medium transition hover:ring-1 hover:ring-line lg:min-h-[36px]">{s.index + 1} · {s.title}</button>
               </li>
             ))}
           </ul>

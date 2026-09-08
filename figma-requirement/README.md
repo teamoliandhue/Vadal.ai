@@ -34,5 +34,6 @@ here for the product designer, so Figma stays in sync with the built product.
 | 014 | [Thrive — everything below the hero](./014-thrive-below-the-hero.md) | Built · needs Figma |
 | 015 | [One-to-One Help — ways in, and the person who isn't you](./015-help-ways-in-and-the-other-person.md) | Built · needs Figma |
 | 016 | [Grow — where you are, and why you're here](./016-grow-where-you-are.md) | Built · needs Figma |
-| 019 | [Vadal.ai › Get Started — a tour, one idea at a time](./019-get-started-tour.md) | Built · needs Figma |
+| 019 | [Vadal.ai › Get Started — a tour, one idea at a time](./019-get-started-tour.md) | Layout superseded by 021 |
 | 020 | [Get Started — explored by doing, and how the tour is shown](./020-get-started-by-doing.md) | Built · needs Figma |
+| 021 | [Get Started — a story, one screen per idea](./021-get-started-story.md) | Built · needs Figma |

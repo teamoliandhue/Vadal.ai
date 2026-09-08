@@ -212,3 +212,16 @@ body {
   .lumen .sheet-panel, .lumen .sheet-scrim { animation: none; transform: none; opacity: 1; }
   .toast-in { animation: none; }
 }
+
+/* ── story scenes (Get Started) — content rises as each scene enters view ── */
+.lumen .story-in { opacity: 0; transform: translateY(22px); transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+.lumen .story-in-2 { transition-delay: 0.1s; }
+.lumen .story-in-3 { transition-delay: 0.2s; }
+.lumen .story-in-4 { transition-delay: 0.32s; }
+.lumen [data-in="true"] .story-in { opacity: 1; transform: none; }
+.lumen .story-blob { position: absolute; border-radius: 999px; filter: blur(70px); pointer-events: none; transition: opacity 1.2s ease; opacity: 0.55; }
+.lumen [data-in="true"] .story-blob { opacity: 1; }
+.dark .lumen .story-blob { opacity: 0.7; }
+@media (prefers-reduced-motion: reduce) {
+  .lumen .story-in { opacity: 1; transform: none; transition: none; }
+}

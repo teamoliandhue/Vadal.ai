@@ -38,13 +38,15 @@ export function Shell({
   active: string;
   breadcrumb: string;
   /** "page" — one scroll region for the whole page (the default).
-   *  "split" — the page owns its own panes (see ../panes). */
-  pane?: "page" | "split";
+   *  "split" — the page owns its own panes (see ../panes).
+   *  "story" — full-bleed scenes that snap; the page sets its own rhythm. */
+  pane?: "page" | "split" | "story";
   children: React.ReactNode;
 }) {
   /* Below lg the document scrolls; from lg the chrome is fixed and the content
      scrolls in a pane underneath it. See ./panes for why. */
   const split = pane === "split";
+  const story = pane === "story";
   return (
     <AuthGuard>
     <div className="lumen flex min-h-dvh bg-canvas text-ink lg:h-dvh lg:min-h-0 lg:overflow-hidden" data-ds>
@@ -65,13 +67,17 @@ export function Shell({
         <div
           tabIndex={0}
           aria-label={breadcrumb}
-          className={`pane relative min-h-0 flex-1 focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--brand)] lg:overflow-y-auto ${split ? "xl:overflow-hidden" : ""}`}
+          className={`pane relative min-h-0 flex-1 focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--brand)] lg:overflow-y-auto ${split ? "xl:overflow-hidden" : ""} ${story ? "lg:snap-y lg:snap-proximity" : ""}`}
         >
           <main
-            className={[
-              "mx-auto w-full max-w-[1240px] px-6 pb-[calc(104px+env(safe-area-inset-bottom))] pt-8 sm:px-10 sm:pt-10 lg:pb-28",
-              split ? "flex flex-col xl:h-full xl:min-h-0 xl:pb-0 xl:pt-0" : "",
-            ].join(" ")}
+            className={
+              story
+                ? "w-full"
+                : [
+                    "mx-auto w-full max-w-[1240px] px-6 pb-[calc(104px+env(safe-area-inset-bottom))] pt-8 sm:px-10 sm:pt-10 lg:pb-28",
+                    split ? "flex flex-col xl:h-full xl:min-h-0 xl:pb-0 xl:pt-0" : "",
+                  ].join(" ")
+            }
           >
             <SectionGuard section={active}>{children}</SectionGuard>
           </main>
