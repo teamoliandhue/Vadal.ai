@@ -72,7 +72,31 @@ sit invisible waiting for a callback.
 | **Keys** | → ↓ PageDown Space = next scene · ← ↑ PageUp Shift+Space = previous · Home / End. Ignored while typing (the ask box) or with a modifier held. |
 | **Present** | Pill above the spine (Play ▸ *Present* / Pause ‖ in `ai-grad` while running). Turns the page every 9s until the end; a wheel, a touch, a key or Esc stops it. A status pill at the bottom centre says so: *"Presenting · 9s per idea · scroll or press any key to stop"*. For the investor demo where the hands are busy talking. |
 
-## 6 · Figma
+## 6 · Third pass — the scenes are the brief's pillars
+
+The product brief (*Vadal.ai — Product Specification & AI Feature Brief*) defines the product
+as **seven pillars and one AI layer**. The scenes now walk exactly that, by name and in that
+order; the earlier sequence showed Connect only through Recognition and Broadcast only through
+Knowledge, and named sections rather than pillars.
+
+| # | Eyebrow | Headline (the brief's own line) | Sections in the pillar (chips) | Evidence |
+|---|---|---|---|---|
+| 02 | Home | Your daily ritual | Home | live MoodCheck |
+| 03 | **Pillar 1 · Pulse** · Listening & Feedback | Listening, structured and ambient, across the whole employee lifecycle. | Pulse · Surveys · Sentiment · Always-on listening · Analytics | health score + contributions |
+| 04 | **Pillar 2 · Connect** · Social & Showcase Feed | An internal feed where people share wins, not just HR pushes updates. | Feed · Recognition | a real post (reactions/comments/views) + a real recognition + *Recognise someone* |
+| 05 | **Pillar 3 · Amplify** · Company Social Media Integration | Bring the company's voice in, and let employee moments go out. | Amplify | a moment that is yours |
+| 06 | **Pillar 4 · Thrive** · Health & Wealth | One wellness pillar: physical health and financial health, side by side. | Thrive | the person's goal ring |
+| 07 | **Pillar 5 · Broadcast** · Communication Hub | One trusted channel for everything the company needs employees to know. | Campaigns · Knowledge | live campaign (reach · took part · lift · steps acknowledged) + the ask box |
+| 08 | **Pillar 6 · Grow** · Bite-Sized Learning | Learning that fits into a five-minute break, not a training day. | Grow | learning days + review queue |
+| 09 | **Pillar 7 · One-to-One Help** · AI Companion | A private first door to support, with a real person always one step away. | One-to-One Help | crisis lines |
+| 10 | **The AI layer** · Personalisation · Sentiment · Copilot · Guardrails | One AI layer, not seven integrations — and it can act. | — | four prompts into the real assistant |
+
+**Chips** are the sections that make the pillar up: 36px pills (44px on touch), `--card`/80 on
+`--line`, brand border on hover, each a link that also counts as exploring the step. A section
+the role cannot open renders as a dashed pill with a lock — kept, not hidden. The window chrome
+and the caption now name the pillar. The opening scene lists the seven by name.
+
+## 7 · Figma
 
 Scenes 01, 03 (locked variant for employee), 09 (ask box asked / cited / refused) and 11 at
 1440 × 900 and 375; the spine in three dot states with the hover pill; the mobile hairline.

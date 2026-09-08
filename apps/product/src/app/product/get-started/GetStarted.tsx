@@ -261,7 +261,7 @@ const Scene = React.forwardRef<
               A company stays human when every employee has a daily ritual worth keeping.
             </h1>
             <p className="story-in story-in-3 mx-auto mt-6 max-w-[58ch] text-[clamp(16px,1.4vw,20px)] leading-relaxed text-muted">
-              …and the people who run it can hear what that ritual produces. Vadal is both halves in one product, with an assistant running through all of it. Ten ideas, each shown live on your own workspace.
+              …and the people who run it can hear what that ritual produces. Vadal is both halves in one product: seven pillars — Pulse, Connect, Amplify, Thrive, Broadcast, Grow, One-to-One Help — with one AI layer running through all of them. Each shown live on your own workspace.
             </p>
             <div className="story-in story-in-4 mx-auto mt-10 max-w-[640px]">{children}</div>
             <div className="story-in story-in-4 mt-10 flex flex-wrap items-center justify-center gap-3">
@@ -289,13 +289,34 @@ const Scene = React.forwardRef<
             <div className="relative min-w-0">
               <span aria-hidden className="story-num">{n}</span>
               <div className="relative">
-                <p className="story-in flex items-center gap-3 text-[13px] font-semibold uppercase tracking-[0.18em] text-faint">
+                <p className="story-in flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-semibold uppercase tracking-[0.18em] text-faint">
                   <span className="ai-text-grad text-[15px] tabular-nums">{n}</span>
-                  {step.section ?? "Everywhere"}
+                  {step.pillar ? (
+                    <>
+                      <span className="text-ink">{step.pillar.n <= 7 ? `Pillar ${step.pillar.n} · ` : ""}{step.pillar.name}</span>
+                      <span className="normal-case tracking-normal">{step.pillar.tag}</span>
+                    </>
+                  ) : (
+                    step.section ?? "Everywhere"
+                  )}
                   {step.locked && <Lock className="h-3.5 w-3.5" aria-label="Not available to your role" />}
                 </p>
                 <h2 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-4 text-[clamp(34px,4.6vw,60px)] font-bold leading-[1.02] tracking-[-0.032em]">{step.title}</h2>
                 <p className="story-in story-in-3 mt-5 max-w-[46ch] text-[clamp(16px,1.3vw,19px)] leading-relaxed text-muted">{step.meaning}</p>
+
+                {step.partsView.length > 0 && (
+                  <ul className="story-in story-in-3 mt-5 flex flex-wrap gap-1.5" aria-label="Sections in this pillar">
+                    {step.partsView.map((p) => (
+                      <li key={p.label}>
+                        {p.locked ? (
+                          <span className="flex min-h-[36px] items-center gap-1.5 rounded-full border border-dashed border-line px-3 text-[12.5px] text-faint" title="Not available to your role"><Lock className="h-3 w-3" /> {p.label}</span>
+                        ) : (
+                          <Link href={p.href} onClick={onOpen} className="flex min-h-[44px] items-center rounded-full border border-line bg-card/80 px-3 text-[12.5px] font-medium transition hover:border-[var(--client-brand,var(--purple))] hover:text-ink lg:min-h-[36px]">{p.label}</Link>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
 
                 {step.locked && step.lockedNote && (
                   <p className="story-in story-in-3 mt-5 flex max-w-[52ch] items-start gap-2 rounded-2xl border border-line bg-card/70 px-4 py-3 text-[13.5px] leading-snug text-muted backdrop-blur">
@@ -331,12 +352,12 @@ const Scene = React.forwardRef<
                   <div className="flex items-center gap-2 border-b border-line/70 px-4 py-2.5 text-[12px]">
                     <span className="ai-grad grid h-5 w-5 place-items-center rounded-full"><SparkMark size={11} tone="solid" /></span>
                     <span className="font-semibold">Vadal</span>
-                    <span className="text-faint">· {step.section ?? "Assistant"}</span>
+                    <span className="text-faint">· {step.pillar?.name ?? step.section ?? "Assistant"}</span>
                     <span className="ml-auto flex items-center gap-1.5 text-faint"><span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" /> Live · {org.name}</span>
                   </div>
                   <div className="flex min-h-[220px] flex-col justify-center p-3 sm:p-4">{children}</div>
                 </div>
-                <p className="mt-3 text-[12px] leading-snug text-faint">The real component on real data — what you would see in {step.section ?? "the product"} right now, not a picture of it.</p>
+                <p className="mt-3 text-[12px] leading-snug text-faint">The real component on real data — what you would see in {step.pillar?.name ?? step.section ?? "the product"} right now, not a picture of it.</p>
               </div>
             </div>
           </>

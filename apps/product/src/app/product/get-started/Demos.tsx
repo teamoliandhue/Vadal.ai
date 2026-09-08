@@ -7,7 +7,7 @@
    tour beats a feature list. */
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Clock, Heart, RotateCcw, Search, Smile } from "lucide-react";
+import { ArrowRight, BookOpen, CheckCheck, Clock, Heart, Megaphone, RotateCcw, Search, Smile } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark } from "@vadal/design-system";
 import { NAV } from "../nav-model";
 import { MoodCheck } from "../home/MoodCheck";
@@ -16,6 +16,8 @@ import { useSession } from "../useSession";
 import { GoalRing } from "@/components/charts";
 import { FEATURES } from "@/lib/ai/features";
 import { org, myRecognition } from "@/lib/data";
+import { feedItems } from "@/lib/feed";
+import { campaigns } from "@/lib/campaigns";
 import { experienceScore, SCORE_SOURCES } from "@/lib/experience";
 import { myMoments } from "@/lib/amplify";
 import { myActivity, atWorkStepsPerDay } from "@/lib/thrive";
@@ -106,25 +108,35 @@ function Listen() {
   );
 }
 
-function Engage() {
-  /* The real give-recognition drawer, so the step can be done from here. */
+function Connect() {
+  /* A real post from the feed, a real recognition, and the real give-recognition
+     drawer — the pillar is the three together. */
   const [giving, setGiving] = React.useState(false);
+  const post = feedItems[0];
   const r = myRecognition[0];
+  const hearts = Object.values(post.reactions).reduce((a, b) => a + (b ?? 0), 0);
   return (
-    <Frame tone="soft">
-      <blockquote className="text-[15px] leading-relaxed">{r.text}</blockquote>
-      <div className="mt-3 flex items-center gap-2">
-        <Avatar src={r.img} name={r.from} size="sm" />
-        <span className="text-[13px] font-semibold">{r.from}</span>
-        <Badge tone="brand" variant="soft" size="sm">{r.value}</Badge>
-        <span className="ml-auto text-[12px] text-faint">{r.time}</span>
-      </div>
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <Button variant="brand" className="min-h-[44px]" leadingIcon={<Heart className="h-3.5 w-3.5" />} onClick={() => setGiving(true)}>Recognise someone</Button>
-        <span className="text-[12.5px] text-faint">Real drawer, real teammates — it reaches them today.</span>
-      </div>
+    <div className="flex flex-col gap-3">
+      <Frame>
+        <div className="flex items-center gap-2">
+          <Avatar src={post.author.img} name={post.author.name} size="sm" />
+          <span className="text-[13px] font-semibold">{post.author.name}</span>
+          <span className="text-[12px] text-faint">· {post.author.role} · {post.time}</span>
+        </div>
+        <p className="mt-2 line-clamp-2 text-[13.5px] leading-relaxed text-muted">{post.text.replace(/\*\*/g, "")}</p>
+        <p className="mt-2 text-[12px] text-faint">{hearts.toLocaleString()} reactions · {post.comments.length} comments · {post.views.toLocaleString()} views</p>
+      </Frame>
+      <Frame tone="soft">
+        <blockquote className="text-[14px] leading-relaxed">{r.text}</blockquote>
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          <Avatar src={r.img} name={r.from} size="sm" />
+          <span className="text-[13px] font-semibold">{r.from}</span>
+          <Badge tone="brand" variant="soft" size="sm">{r.value}</Badge>
+          <Button variant="brand" size="sm" className="ml-auto min-h-[44px] lg:min-h-0" leadingIcon={<Heart className="h-3.5 w-3.5" />} onClick={() => setGiving(true)}>Recognise someone</Button>
+        </div>
+      </Frame>
       <GiveRecognition open={giving} onClose={() => setGiving(false)} onGive={() => setGiving(false)} />
-    </Frame>
+    </div>
   );
 }
 
@@ -204,8 +216,9 @@ function Learn() {
   );
 }
 
-function Knowledge() {
-  /* Ask it yourself. The step is explored by asking, not by reading a canned
+function Broadcast() {
+  /* A live campaign — reach, not opens — and a policy library you can ask.
+     Ask it yourself. The step is explored by asking, not by reading a canned
      answer — and the refusal is part of the demonstration. */
   const [q, setQ] = React.useState("");
   const [asked, setAsked] = React.useState<string | null>(null);
@@ -217,7 +230,24 @@ function Knowledge() {
     setQ(t);
     didAction("answer");
   }
+  const c = campaigns[0];
+  const doneSteps = c.steps.filter((st) => st.done).length;
   return (
+    <div className="flex flex-col gap-3">
+    <Frame>
+      <div className="flex items-center gap-2">
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-soft text-[var(--client-brand,var(--purple))]"><Megaphone className="h-3.5 w-3.5" /></span>
+        <span className="text-[13.5px] font-semibold">{c.name}</span>
+        <Badge tone="success" variant="soft" size="sm">Live</Badge>
+        <span className="ml-auto text-[12px] text-faint">{c.audience} · {c.window}</span>
+      </div>
+      <dl className="mt-3 grid grid-cols-3 gap-3">
+        {[[`${c.reach}%`, "reached"], [`${c.participation}%`, "took part"], [`+${c.lift}`, "engagement lift"]].map(([v, l]) => (
+          <div key={l}><dd className="text-[20px] font-bold leading-none tracking-tight tabular-nums">{v}</dd><dt className="mt-1 text-[11.5px] text-faint">{l}</dt></div>
+        ))}
+      </dl>
+      <p className="mt-2.5 flex items-center gap-1.5 text-[12px] text-faint"><CheckCheck className="h-3.5 w-3.5" /> {doneSteps} of {c.steps.length} steps sent · acknowledged, not just delivered</p>
+    </Frame>
     <Frame tone="ai">
       <form onSubmit={(e) => { e.preventDefault(); ask(q); }} className="flex items-center gap-2 rounded-full bg-card p-1.5 pl-4 ring-1 ring-[var(--ai-border)] focus-within:ring-[var(--ai-accent)]">
         <Search className="h-4 w-4 shrink-0 text-faint" />
@@ -239,6 +269,7 @@ function Knowledge() {
         </div>
       )}
     </Frame>
+    </div>
   );
 }
 
@@ -319,13 +350,13 @@ export function Demo({ id }: { id: DemoKey }) {
   switch (id) {
     case "welcome": return <Welcome />;
     case "ritual": return <Ritual />;
-    case "listen": return <Listen />;
-    case "engage": return <Engage />;
+    case "pulse": return <Listen />;
+    case "connect": return <Connect />;
     case "amplify": return <Amplify />;
-    case "wellbeing": return <Wellbeing />;
+    case "thrive": return <Wellbeing />;
     case "help": return <Help />;
-    case "learn": return <Learn />;
-    case "knowledge": return <Knowledge />;
+    case "grow": return <Learn />;
+    case "broadcast": return <Broadcast />;
     case "copilot": return <Copilot />;
     default: return null;
   }
