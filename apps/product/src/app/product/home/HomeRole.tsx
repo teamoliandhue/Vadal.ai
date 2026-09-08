@@ -33,7 +33,7 @@ export function ViewAsSwitch() {
               key={r.key}
               onClick={() => setRole(r.key)}
               aria-pressed={on}
-              className={`min-h-[44px] rounded-full px-3 text-[12px] font-semibold transition lg:min-h-[32px] lg:px-2.5 ${on ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}
+              className={`min-h-[32px] rounded-full px-2.5 py-1 text-[12px] font-semibold transition ${on ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}
             >
               {r.label}
             </button>
