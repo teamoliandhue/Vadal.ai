@@ -182,7 +182,28 @@ Every scene eyebrow reads **Product n · Name** (was *Pillar n*) — "pillar" is
 screen is part of what the tour is showing — but an unprompted popup about Engineering's
 sentiment landed on top of the product grid and answered a question nobody had asked yet.
 
-## 10 · Figma
+## 10 · The product tiles, in detail
+
+The grid is the one thing on the page that must look like a door, so it is the one thing that
+is drawn like a button.
+
+| | |
+|---|---|
+| **Tile** | 3×3, hairlines via `gap-px` on `--line`, tiles `--card`, min-height 96px (114px at 375, three across, no overflow) |
+| **Contents** | icon chip (32px, 12px radius) · `01` · lock glyph when gated · `→` on the right (hidden at rest) — then **Pulse** (14px/600) over *Surveys & sentiment* (11.5px `--faint`) |
+| **Icon** | the section's own nav icon — Gauge, Newspaper, Share2, HeartPulse, Megaphone, GraduationCap, LifeBuoy, UsersRound, FolderKanban — so what you meet here is what you recognise in the sidebar a minute later |
+| **Colour** | each tile carries its scene's hue (`--h = (index × 34 + 250) mod 360`), so the grid is nine distinct things and the colour you meet here is the colour of the room that idea lives in |
+| **Rest** | chip = hue at 15%, icon in the hue; name in `--ink` |
+| **Hover / focus** | tile tints to hue at 8% · chip fills solid, icon flips to `--canvas`, scales 1.08 and tilts −4° · name takes the hue · arrow fades in from the left |
+| **Entrance** | tiles cascade 45ms apart as the scene arrives; motion off under `prefers-reduced-motion` |
+
+**Lightness is solved, not picked.** Hue alone is not a colour — cyan and yellow at the lightness
+that suits blue vanish on white. Each tile walks its lightness toward the background until the
+icon clears **3.2:1** against it and stops, keeping as much colour as legibility allows. Measured:
+3.19–4.88 in light, 3.25–13.0 in dark. Figma should take the nine resolved values rather than one
+lightness for all nine.
+
+## 11 · Figma
 
 Scenes 01, 03 (locked variant for employee), 09 (ask box asked / cited / refused) and 11 at
 1440 × 900 and 375; the spine in three dot states with the hover pill; the mobile hairline.

@@ -9,8 +9,9 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  ArrowRight, BookOpen, CheckCheck, Clock, FolderKanban, Heart, Megaphone,
-  Lock, Phone, RotateCcw, Search, ShieldCheck, Smile, TrendingDown, TrendingUp, UsersRound, Wallet,
+  ArrowRight, BookOpen, CheckCheck, Clock, FolderKanban, Gauge, GraduationCap, Heart, HeartPulse,
+  LifeBuoy, Lock, Megaphone, Newspaper, Phone, RotateCcw, Search, Share2, ShieldCheck, Smile,
+  TrendingDown, TrendingUp, UsersRound, Wallet,
 } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark } from "@vadal/design-system";
 import { useViewAs } from "../useViewAs";
@@ -68,6 +69,52 @@ function Stat({ value, label, sub }: { value: React.ReactNode; label: string; su
    The opening frame has one job: someone who looks at it for five seconds
    should be able to say what this company sells. Counting features did not do
    that — an investor cannot repeat back "52". Nine names can be repeated. */
+/* A hue carries the product's identity, but hue alone is not a colour: cyan and
+   yellow at the lightness that suits blue are invisible on white. So each tile's
+   lightness is solved rather than guessed — walk toward the background until the
+   icon clears 3.2:1 against it, and stop, keeping as much colour as legibility
+   allows. Deterministic, so server and client agree. */
+const SRGB = (v: number) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+function hslLum(h: number, s: number, l: number) {
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+  };
+  return 0.2126 * SRGB(f(0)) + 0.7152 * SRGB(f(8)) + 0.0722 * SRGB(f(4));
+}
+function solveL(h: number, s: number, bgLum: number, dark: boolean) {
+  for (let i = 0; i <= 42; i++) {
+    const l = dark ? 0.56 + i * 0.01 : 0.58 - i * 0.01;
+    const lum = hslLum(h, s, l);
+    const cr = (Math.max(lum, bgLum) + 0.05) / (Math.min(lum, bgLum) + 0.05);
+    if (cr >= 3.2) return Math.round(l * 100);
+  }
+  return dark ? 84 : 26;
+}
+function tint(index: number) {
+  const h = (index * 34 + 250) % 360;
+  return {
+    "--h": String(h),
+    "--l": `${solveL(h, 0.62, 1, false)}%`,
+    "--ld": `${solveL(h, 0.75, 0.0089, true)}%`,
+  };
+}
+
+/** The nav's own icon for each product — so the thing you meet here is the
+    thing you will recognise in the sidebar a minute later. */
+const PRODUCT_ICON: Record<string, React.ReactNode> = {
+  Pulse: <Gauge className="h-[18px] w-[18px]" />,
+  Connect: <Newspaper className="h-[18px] w-[18px]" />,
+  Amplify: <Share2 className="h-[18px] w-[18px]" />,
+  Thrive: <HeartPulse className="h-[18px] w-[18px]" />,
+  Broadcast: <Megaphone className="h-[18px] w-[18px]" />,
+  Grow: <GraduationCap className="h-[18px] w-[18px]" />,
+  Help: <LifeBuoy className="h-[18px] w-[18px]" />,
+  Managers: <UsersRound className="h-[18px] w-[18px]" />,
+  Cases: <FolderKanban className="h-[18px] w-[18px]" />,
+};
+
 function Welcome({ onGo }: { onGo?: (i: number) => void }) {
   const [role] = useViewAs();
   const tiles = productTiles(role);
@@ -83,24 +130,29 @@ function Welcome({ onGo }: { onGo?: (i: number) => void }) {
         <span className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold"><span className="h-1.5 w-1.5 rounded-full bg-white" /> Live</span>
       </div>
       <ul className="grid grid-cols-3 gap-px bg-line">
-        {tiles.map((t) => (
+        {tiles.map((t, i) => (
           <li key={t.n} className="min-w-0">
             <button
               type="button"
               onClick={() => onGo?.(t.index)}
-              className="flex h-full min-h-[72px] w-full flex-col items-start justify-center gap-0.5 bg-card px-3 py-3 text-left transition hover:bg-soft"
+              className="prod-tile story-in group flex h-full min-h-[96px] w-full flex-col items-start gap-2 bg-card px-3.5 py-3.5 text-left focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--brand)]"
+              style={{ ...tint(t.index), transitionDelay: `${i * 45}ms` } as React.CSSProperties}
             >
-              <span className="flex items-center gap-1 text-[10px] font-bold tabular-nums text-faint">
-                {String(t.n).padStart(2, "0")}
-                {t.locked && <Lock className="h-2.5 w-2.5" aria-label="Not available to your role" />}
+              <span className="flex w-full items-center gap-2">
+                <span className="prod-ico grid h-8 w-8 shrink-0 place-items-center rounded-xl">{PRODUCT_ICON[t.name]}</span>
+                <span className="text-[10px] font-bold tabular-nums text-faint">{String(t.n).padStart(2, "0")}</span>
+                {t.locked && <Lock className="h-2.5 w-2.5 text-faint" aria-label="Not available to your role" />}
+                <ArrowRight className="prod-go ml-auto h-3.5 w-3.5 shrink-0" aria-hidden />
               </span>
-              <span className="text-[13.5px] font-semibold leading-tight tracking-tight">{t.name}</span>
-              <span className="text-[11.5px] leading-tight text-faint">{t.short}</span>
+              <span className="min-w-0">
+                <span className="prod-name block text-[14px] font-semibold leading-tight tracking-tight">{t.name}</span>
+                <span className="block text-[11.5px] leading-tight text-faint">{t.short}</span>
+              </span>
             </button>
           </li>
         ))}
       </ul>
-      <AiLine>{live} AI features live across all nine — counted from the product&apos;s own registry, never typed.</AiLine>
+      <AiLine>{live} AI features live across all nine — pick any one to see it working.</AiLine>
     </Card>
   );
 }
