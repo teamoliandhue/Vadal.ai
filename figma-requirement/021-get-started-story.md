@@ -192,16 +192,20 @@ is drawn like a button.
 | **Tile** | 3×3, hairlines via `gap-px` on `--line`, tiles `--card`, min-height 96px (114px at 375, three across, no overflow) |
 | **Contents** | icon chip (32px, 12px radius) · `01` · lock glyph when gated · `→` on the right (hidden at rest) — then **Pulse** (14px/600) over *Surveys & sentiment* (11.5px `--faint`) |
 | **Icon** | the section's own nav icon — Gauge, Newspaper, Share2, HeartPulse, Megaphone, GraduationCap, LifeBuoy, UsersRound, FolderKanban — so what you meet here is what you recognise in the sidebar a minute later |
-| **Colour** | each tile carries its scene's hue (`--h = (index × 34 + 250) mod 360`), so the grid is nine distinct things and the colour you meet here is the colour of the room that idea lives in |
-| **Rest** | chip = hue at 15%, icon in the hue; name in `--ink` |
-| **Hover / focus** | tile tints to hue at 8% · chip fills solid, icon flips to `--canvas`, scales 1.08 and tilts −4° · name takes the hue · arrow fades in from the left |
-| **Entrance** | tiles cascade 45ms apart as the scene arrives; motion off under `prefers-reduced-motion` |
+| **Colour** | none at rest. The icons are monochrome and the brand violet is the only colour hover introduces |
+| **Rest** | chip `--soft`, icon `--muted`; name `--ink`, descriptor `--faint` |
+| **Hover / focus** | tile → `--soft` · chip → violet at 10% with a 1px violet ring, icon → `--purple` · arrow fades in from the left. No scale, no tilt |
+| **Entrance** | tiles cascade 45ms apart as the scene arrives |
 
-**Lightness is solved, not picked.** Hue alone is not a colour — cyan and yellow at the lightness
-that suits blue vanish on white. Each tile walks its lightness toward the background until the
-icon clears **3.2:1** against it and stops, keeping as much colour as legibility allows. Measured:
-3.19–4.88 in light, 3.25–13.0 in dark. Figma should take the nine resolved values rather than one
-lightness for all nine.
+**Why monochrome.** An earlier pass gave each tile its own hue — the hue of the scene it leads
+to — and the 3×3 grid read as a rainbow: consumer, not enterprise. It also broke the house colour
+rule, where **violet means action** and the Aurora gradient means intelligence; nine arbitrary
+hues meant neither. The restraint is the professionalism: the grid still has to look like a door,
+it just does it with weight, contrast and one accent rather than nine colours.
+
+The glyphs are unchanged and stay matched to the nav — Gauge · Newspaper · Share2 · HeartPulse ·
+Megaphone · GraduationCap · LifeBuoy · UsersRound · FolderKanban — drawn at the app's own line
+weight (**1.75 at 19px**) rather than the library default, in a 36px chip at 10px radius.
 
 ## 11 · Figma
 
