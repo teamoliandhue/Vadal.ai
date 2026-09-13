@@ -45,9 +45,10 @@ export type TourStep = {
   title: string;
   /** The idea behind it, in one short paragraph. Meaning before mechanism. */
   meaning: string;
-  /** The brief's pillar this scene is: number (none for the layer that runs
-      through them), name, and its one-line tag. */
-  pillar?: { n?: number; name: string; tag: string };
+  /** The product this scene is: number (none for the layer that runs through
+      them all), name, its one-line tag, plus the short forms the opening
+      grid uses — because the first five seconds have to fit nine of them. */
+  pillar?: { n?: number; name: string; tag: string; shortName?: string; short?: string };
   /** The sections of the app that make the pillar up. Gated per role. */
   parts?: TourPart[];
   /** The section this step opens, if any. Gated through access.ts. */
@@ -68,7 +69,7 @@ export const TOUR: TourStep[] = [
   {
     id: "welcome",
     title: "What Vadal is",
-    meaning: "Employees get a daily ritual. Leaders hear what it produces. One product, nine pillars, one assistant.",
+    meaning: "One AI platform, nine HR products, and an assistant running through all of them.",
   },
   {
     id: "ritual",
@@ -82,7 +83,7 @@ export const TOUR: TourStep[] = [
     id: "pulse",
     title: "Hear how people really feel.",
     meaning: "Surveys, check-ins and comments become one health score — with every input shown.",
-    pillar: { n: 1, name: "Pulse", tag: "Listening & Feedback" },
+    pillar: { n: 1, name: "Pulse", tag: "Listening & Feedback" , shortName: "Pulse", short: "Surveys & sentiment" },
     parts: [
       { label: "Pulse", href: "/product" },
       { label: "Surveys", href: "/product/surveys" },
@@ -98,7 +99,7 @@ export const TOUR: TourStep[] = [
     id: "connect",
     title: "A feed where people share wins.",
     meaning: "Post, celebrate, recognise. Tied to your values, visible to everyone.",
-    pillar: { n: 2, name: "Connect", tag: "Social & Showcase Feed" },
+    pillar: { n: 2, name: "Connect", tag: "Social & Showcase Feed" , shortName: "Connect", short: "Feed & recognition" },
     parts: [
       { label: "Feed", href: "/product/feed" },
       { label: "Recognition", href: "/product/recognition" },
@@ -110,7 +111,7 @@ export const TOUR: TourStep[] = [
     id: "amplify",
     title: "Your moments, shared outside.",
     meaning: "Vadal drafts your wins in your voice. You choose what goes out.",
-    pillar: { n: 3, name: "Amplify", tag: "Company Social Media Integration" },
+    pillar: { n: 3, name: "Amplify", tag: "Company Social Media Integration" , shortName: "Amplify", short: "Employee advocacy" },
     parts: [{ label: "Amplify", href: "/product/amplify" }],
     section: "Amplify", href: "/product/amplify",
     completesOn: "open:Amplify", actionLabel: "open Amplify", doneLabel: "opened Amplify",
@@ -119,7 +120,7 @@ export const TOUR: TourStep[] = [
     id: "thrive",
     title: "Health and wealth, side by side.",
     meaning: "A goal that fits your job, and money guidance right next to it.",
-    pillar: { n: 4, name: "Thrive", tag: "Health & Wealth" },
+    pillar: { n: 4, name: "Thrive", tag: "Health & Wealth" , shortName: "Thrive", short: "Health & wealth" },
     parts: [{ label: "Thrive", href: "/product/thrive" }],
     section: "Thrive", href: "/product/thrive",
     completesOn: "open:Thrive", actionLabel: "open Thrive", doneLabel: "opened Thrive",
@@ -128,7 +129,7 @@ export const TOUR: TourStep[] = [
     id: "broadcast",
     title: "One channel everyone trusts.",
     meaning: "Announcements that get acknowledged, campaigns that report reach, and a policy library you can ask.",
-    pillar: { n: 5, name: "Broadcast", tag: "Communication Hub" },
+    pillar: { n: 5, name: "Broadcast", tag: "Communication Hub" , shortName: "Broadcast", short: "Comms & policies" },
     parts: [
       { label: "Campaigns", href: "/product/campaigns" },
       { label: "Knowledge", href: "/product/knowledge" },
@@ -140,7 +141,7 @@ export const TOUR: TourStep[] = [
     id: "grow",
     title: "Learning in five minutes.",
     meaning: "Short lessons, quick quizzes, and reminders for what you keep missing.",
-    pillar: { n: 6, name: "Grow", tag: "Bite-Sized Learning" },
+    pillar: { n: 6, name: "Grow", tag: "Bite-Sized Learning" , shortName: "Grow", short: "Micro-learning" },
     parts: [{ label: "Grow", href: "/product/grow" }],
     section: "Grow", href: "/product/grow",
     completesOn: "open:Grow", actionLabel: "open Grow", doneLabel: "opened Grow",
@@ -149,7 +150,7 @@ export const TOUR: TourStep[] = [
     id: "help",
     title: "A private door to support.",
     meaning: "Talk it through confidentially. A real person is always one tap away.",
-    pillar: { n: 7, name: "One-to-One Help", tag: "AI Companion" },
+    pillar: { n: 7, name: "One-to-One Help", tag: "AI Companion" , shortName: "Help", short: "Private support" },
     parts: [{ label: "One-to-One Help", href: "/product/help" }],
     section: "One-to-One Help", href: "/product/help",
     completesOn: "open:One-to-One Help", actionLabel: "open One-to-One Help", doneLabel: "opened One-to-One Help",
@@ -158,7 +159,7 @@ export const TOUR: TourStep[] = [
     id: "managers",
     title: "Insight managers act on.",
     meaning: "Team health, what is driving it, and the one action to take this week.",
-    pillar: { n: 8, name: "Managers", tag: "Manager Enablement" },
+    pillar: { n: 8, name: "Managers", tag: "Manager Enablement" , shortName: "Managers", short: "Manager tools" },
     parts: [{ label: "Manager hub", href: "/product/managers" }],
     section: "Manager hub", href: "/product/managers",
     lockedNote: "Your manager's view of the team as a whole — never your words with your name on them.",
@@ -168,7 +169,7 @@ export const TOUR: TourStep[] = [
     id: "cases",
     title: "Nothing raised gets lost.",
     meaning: "Concerns become cases — owned, timed, and resolved.",
-    pillar: { n: 9, name: "Cases", tag: "Case Management & Issue Resolution" },
+    pillar: { n: 9, name: "Cases", tag: "Case Management & Issue Resolution" , shortName: "Cases", short: "Issue resolution" },
     parts: [{ label: "Cases", href: "/product/cases" }],
     section: "Cases", href: "/product/cases",
     lockedNote: "The people team's queue. If you raised something, you hear from its owner.",
@@ -184,9 +185,27 @@ export const TOUR: TourStep[] = [
   {
     id: "done",
     title: "You're set",
-    meaning: "Nine pillars, one assistant, all live on your own data.",
+    meaning: "Nine products, one assistant, all live on your own data.",
   },
 ];
+
+/** One of the nine, as the opening grid shows it. */
+export type ProductTile = { n: number; name: string; short: string; index: number; locked: boolean };
+
+/** The nine products. An investor who looks at the first screen for five
+    seconds should be able to say "an HR AI company with nine products" — so
+    the nine are named there, not counted. */
+export function productTiles(role: Role | null): ProductTile[] {
+  return tourFor(role)
+    .filter((s) => s.pillar?.n)
+    .map((s) => ({
+      n: s.pillar!.n!,
+      name: s.pillar!.shortName ?? s.pillar!.name,
+      short: s.pillar!.short ?? s.pillar!.tag,
+      index: s.index,
+      locked: s.locked,
+    }));
+}
 
 export type TourPartView = TourPart & { locked: boolean };
 export type TourStepView = TourStep & { locked: boolean; index: number; partsView: TourPartView[] };

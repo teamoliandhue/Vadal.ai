@@ -9,11 +9,11 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  ArrowRight, BookOpen, Bot, CheckCheck, Clock, FolderKanban, Heart, Layers, Megaphone,
-  Phone, RotateCcw, Search, ShieldCheck, Smile, Sparkles, TrendingDown, TrendingUp, UsersRound, Wallet,
+  ArrowRight, BookOpen, CheckCheck, Clock, FolderKanban, Heart, Megaphone,
+  Lock, Phone, RotateCcw, Search, ShieldCheck, Smile, TrendingDown, TrendingUp, UsersRound, Wallet,
 } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark } from "@vadal/design-system";
-import { NAV } from "../nav-model";
+import { useViewAs } from "../useViewAs";
 import { MoodCheck } from "../home/MoodCheck";
 import { GiveRecognition } from "../recognition/GiveRecognition";
 import { useSession } from "../useSession";
@@ -33,7 +33,7 @@ import { counsellors, eap, WAYS_IN } from "@/lib/help";
 import { growStats, learningDays, retention } from "@/lib/grow";
 import { reviewQueue } from "@/lib/ai/engines/learning";
 import { findAnswer, suggestedQuestions } from "@/lib/knowledge";
-import { didAction, type DemoKey, type TourStepView } from "@/lib/tour";
+import { didAction, productTiles, type DemoKey, type TourStepView } from "@/lib/tour";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 const BRAND = "var(--client-brand, var(--purple))";
@@ -64,37 +64,43 @@ function Stat({ value, label, sub }: { value: React.ReactNode; label: string; su
   );
 }
 
-/* ── 01 · the org, counted ───────────────────────────────────────────────── */
-function Welcome() {
+/* ── 01 · the nine, by name ──────────────────────────────────────────────
+   The opening frame has one job: someone who looks at it for five seconds
+   should be able to say what this company sells. Counting features did not do
+   that — an investor cannot repeat back "52". Nine names can be repeated. */
+function Welcome({ onGo }: { onGo?: (i: number) => void }) {
+  const [role] = useViewAs();
+  const tiles = productTiles(role);
   const live = FEATURES.filter((f) => f.wiredTo && !f.blocked).length;
-  const sections = NAV.reduce((n, g) => n + g.items.length, 0);
   return (
     <Card>
-      <div className="ai-grad relative px-5 py-4 text-white">
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/20 backdrop-blur"><SparkMark size={18} tone="solid" /></span>
-          <div>
-            <p className="text-[15px] font-bold leading-tight tracking-tight">Vadal</p>
-            <p className="text-[12px] leading-tight text-white/80">{org.name} · {org.headcount.toLocaleString()} people</p>
-          </div>
-          <span className="ml-auto flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold"><span className="h-1.5 w-1.5 rounded-full bg-white" /> Live</span>
+      <div className="ai-grad flex items-center gap-2.5 px-5 py-3.5 text-white">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white/20 backdrop-blur"><SparkMark size={16} tone="solid" /></span>
+        <div className="min-w-0 leading-tight">
+          <p className="text-[14.5px] font-bold tracking-tight">Nine products, one platform</p>
+          <p className="text-[11.5px] text-white/80">{org.name} · {org.headcount.toLocaleString()} people</p>
         </div>
+        <span className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold"><span className="h-1.5 w-1.5 rounded-full bg-white" /> Live</span>
       </div>
-      <dl className="grid grid-cols-3 divide-x divide-line">
-        {[
-          { icon: <Layers className="h-4 w-4" />, v: sections, l: "sections", sub: "each role-gated" },
-          { icon: <Sparkles className="h-4 w-4" />, v: live, l: "AI features", sub: "live, not just built" },
-          { icon: <Bot className="h-4 w-4" />, v: 1, l: "assistant", sub: "on every screen" },
-        ].map((s) => (
-          <div key={s.l} className="px-4 py-4">
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-soft text-[var(--client-brand,var(--purple))]">{s.icon}</span>
-            <dd className="mt-2 text-[28px] font-bold leading-none tracking-[-0.02em] tabular-nums">{s.v}</dd>
-            <dt className="mt-1 text-[12.5px] font-semibold">{s.l}</dt>
-            <dd className="text-[11.5px] text-faint">{s.sub}</dd>
-          </div>
+      <ul className="grid grid-cols-3 gap-px bg-line">
+        {tiles.map((t) => (
+          <li key={t.n} className="min-w-0">
+            <button
+              type="button"
+              onClick={() => onGo?.(t.index)}
+              className="flex h-full min-h-[72px] w-full flex-col items-start justify-center gap-0.5 bg-card px-3 py-3 text-left transition hover:bg-soft"
+            >
+              <span className="flex items-center gap-1 text-[10px] font-bold tabular-nums text-faint">
+                {String(t.n).padStart(2, "0")}
+                {t.locked && <Lock className="h-2.5 w-2.5" aria-label="Not available to your role" />}
+              </span>
+              <span className="text-[13.5px] font-semibold leading-tight tracking-tight">{t.name}</span>
+              <span className="text-[11.5px] leading-tight text-faint">{t.short}</span>
+            </button>
+          </li>
         ))}
-      </dl>
-      <AiLine>Counted live from the product&apos;s own registry — never typed.</AiLine>
+      </ul>
+      <AiLine>{live} AI features live across all nine — counted from the product&apos;s own registry, never typed.</AiLine>
     </Card>
   );
 }
@@ -549,9 +555,9 @@ export function Done({ steps, explored, onRestart, onGo }: { steps: TourStepView
   );
 }
 
-export function Demo({ id }: { id: DemoKey }) {
+export function Demo({ id, onGo }: { id: DemoKey; onGo?: (i: number) => void }) {
   switch (id) {
-    case "welcome": return <Welcome />;
+    case "welcome": return <Welcome onGo={onGo} />;
     case "ritual": return <Ritual />;
     case "pulse": return <Pulse />;
     case "connect": return <Connect />;

@@ -11,6 +11,7 @@
    Swapping the demo provider for a live model changes none of this file. */
 import * as React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ArrowUp, Check, FileText, RotateCcw, ThumbsDown, ThumbsUp, X } from "lucide-react";
 import { SparkMark } from "@vadal/design-system";
 import type { ToolCall } from "@/lib/ai/types";
@@ -129,6 +130,11 @@ export function AiDock() {
   const { messages, thinking, step, send, confirmTool, cancelTool, undo } = useAi("dock");
   const me = useMe();
   const [role] = useViewAs();
+  /* Get Started is the product explaining itself to someone who has never seen
+     it. An unprompted nudge about Engineering's sentiment lands on top of that
+     explanation and answers a question nobody has asked yet. The dock stays —
+     "an assistant on every screen" is part of what the tour is showing. */
+  const onTour = usePathname() === "/product/get-started";
   const suggested = role === "employee" ? SUGGESTED_EMPLOYEE : SUGGESTED_MANAGER;
 
   function rate(i: number, dir: "up" | "down") {
@@ -294,7 +300,7 @@ export function AiDock() {
         </div>
       )}
 
-      {nudge && !open && (
+      {nudge && !open && !onTour && (
         <div className="ai-pop ai-glow-border fixed bottom-[92px] right-6 z-30 w-[300px] max-w-[calc(100vw-2rem)] rounded-[20px] p-[1.5px] max-lg:bottom-[168px]">
           <div className="rounded-[18.5px] bg-card p-3">
             <div className="flex items-start gap-2.5">

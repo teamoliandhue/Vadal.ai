@@ -150,7 +150,39 @@ Status rows read *Done when you open Pulse.* / *Done — you opened Pulse.*; the
 window reads *Live from your workspace — the real Pulse, not a picture.*; the locked notes and every
 card's assistant line are one sentence.
 
-## 9 · Figma
+## 9 · Sixth pass — the first five seconds
+
+Investor feedback, verbatim: interest forms in about fifteen seconds; people shown the product
+for thirty seconds could not say what the company does. The target is that an unprompted viewer
+answers **"an HR AI company with nine products."**
+
+Scene 01 was failing that test. *"Keep your company human, every day"* is a brand promise — it
+names no category, no AI, and no count. The card counted **17 sections · 52 AI features · 1
+assistant**, and nobody can repeat "52" back.
+
+| | Before | Now |
+|---|---|---|
+| Headline | Keep your company human, every day. | **One AI platform. Nine HR products.** |
+| Sub | Employees get a daily ritual. Leaders hear what it produces… | Everything a company needs to hear its people — and act on what it hears. Each product shown live, on your own workspace. |
+| Card | three counted stats | **the nine, named** |
+
+**The product grid** is now the hero of scene 01: `ai-grad` band (*Nine products, one platform* ·
+org · people · Live) over a 3×3 grid — hairlines via `gap-px` on `--line`, tiles `--card`, each
+72px min. A tile is `01` / **Pulse** / *Surveys & sentiment*; a lock glyph appears beside the
+number when the role cannot open it, and the tile still jumps to that product's scene. The nine
+descriptors are deliberately plain HR words: Surveys & sentiment · Feed & recognition · Employee
+advocacy · Health & wealth · Comms & policies · Micro-learning · Private support · Manager tools
+· Issue resolution. The footer keeps the proof, now as a sentence: *52 AI features live across
+all nine.*
+
+Every scene eyebrow reads **Product n · Name** (was *Pillar n*) — "pillar" is internal language;
+"nine products" is the sentence the viewer should leave with.
+
+**The proactive nudge is suppressed on this route.** The dock stays — an assistant on every
+screen is part of what the tour is showing — but an unprompted popup about Engineering's
+sentiment landed on top of the product grid and answered a question nobody had asked yet.
+
+## 10 · Figma
 
 Scenes 01, 03 (locked variant for employee), 09 (ask box asked / cited / refused) and 11 at
 1440 × 900 and 375; the spine in three dot states with the hover pill; the mobile hairline.

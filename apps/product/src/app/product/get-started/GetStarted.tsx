@@ -213,7 +213,7 @@ export function GetStarted() {
           {s.id === "done" ? (
             <Done steps={steps} explored={explored} onRestart={restart} onGo={go} />
           ) : (
-            <Demo id={s.id} />
+            <Demo id={s.id} onGo={go} />
           )}
         </Scene>
       ))}
@@ -258,12 +258,12 @@ const Scene = React.forwardRef<
               <span className="ai-grad grid h-6 w-6 place-items-center rounded-full"><SparkMark size={13} tone="solid" /></span> Vadal.ai · Get started
             </p>
             <h1 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-6 text-[clamp(34px,5.2vw,68px)] font-bold leading-[1.0] tracking-[-0.035em]">
-              Keep your company human, every day.
+              One AI platform. Nine HR products.
             </h1>
             <p className="story-in story-in-3 mx-auto mt-6 max-w-[58ch] text-[clamp(16px,1.4vw,20px)] leading-relaxed text-muted">
-              Employees get a daily ritual. Leaders hear what it produces. Nine pillars, one assistant — each shown live on your own workspace.
+              Everything a company needs to hear its people — and act on what it hears. Each product shown live, on your own workspace.
             </p>
-            <div className="story-in story-in-4 mx-auto mt-10 max-w-[640px]">{children}</div>
+            <div className="story-in story-in-4 mx-auto mt-9 max-w-[820px]">{children}</div>
             <div className="story-in story-in-4 mt-10 flex flex-wrap items-center justify-center gap-3">
               <Button variant="brand" className="min-h-[48px] px-6" trailingIcon={<ArrowDown className="h-4 w-4" />} onClick={onNext}>Start the tour</Button>
               <Link href="/product/home" className="flex min-h-[48px] items-center px-3 text-[14px] font-semibold text-muted transition hover:text-ink">Skip for now</Link>
@@ -293,7 +293,7 @@ const Scene = React.forwardRef<
                   <span className="ai-text-grad text-[15px] tabular-nums">{n}</span>
                   {step.pillar ? (
                     <>
-                      <span className="text-ink">{step.pillar.n ? `Pillar ${step.pillar.n} · ` : ""}{step.pillar.name}</span>
+                      <span className="text-ink">{step.pillar.n ? `Product ${step.pillar.n} · ` : ""}{step.pillar.name}</span>
                       <span className="normal-case tracking-normal">{step.pillar.tag}</span>
                     </>
                   ) : (
