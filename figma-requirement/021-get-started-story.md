@@ -221,13 +221,13 @@ story on the left (eyebrow, headline at `clamp(34px, 3.7vw, 56px)`, one-line sub
 CTAs), the chat window on the right, the nine-tile grid full-width beneath. At 1440×900 the last
 tile ends at 807 of 835. The **Present** pill moves to the foot of the spine.
 
-**The chat window, in detail.** 400 × 440, 24px radius, `--card` on a `--line` hairline with a deep
+**The chat window, in detail.** 400 × 400, 24px radius, `--card` on a `--line` hairline with a deep
 soft shadow — no glow border; a chat window is calm. Three parts:
 
 | Part | Spec |
 |---|---|
 | **Header** (52px) | 32px `ai-grad` disc with the SparkMark breathing and a tiny **AI** tag pinned to its corner; *Vadal* 14px/600; right: minimise · expand · close as 32px icon buttons (44px on touch). Minimise and close collapse the window to a launcher pill — *Vadal AI · Open* — that brings it back; expand opens the real assistant |
-| **Body** (flex) | `--ai-surface` wash with the breathing radial glow. Centre: the **mascot** — a 104px `--card`/70 circle holding a 56px Aurora disc with the SparkMark (26px) in its thinking spin and the `ai-aura` pulse, ringed by two hairline orbits (7s clockwise, 11s counter) each carrying a glowing dot. Beneath: the **assistant's bubble** (`--card`, 16px radius with the top-left corner tightened) — eyebrow `VADAL AI IS` + three 4px dots, the capability in `ai-text-grad` at 15px that **turns** (leaving phrase blurs up and out, arriving one blurs in from below), then the result on one line after an accent `→`, typed at 70 cps. Nine **dots** under it: 5px, the current stretched to 28px carrying a 3.4s `ai-grad` timer, passed ones at 40% accent. The bubble and every dot are doors to that product |
+| **Body** (flex) | `--ai-surface` wash with the breathing radial glow; the **assistant's bubble** centred (`--card`, 16px radius with the top-left corner tightened) — eyebrow `VADAL AI IS` + three 4px dots, the capability in `ai-text-grad` at 15px that **turns** (leaving phrase blurs up and out, arriving one blurs in from below), then the result on one line after an accent `→`, typed at 70 cps. Nine **dots** under it: 5px, the current stretched to 28px carrying a 3.4s `ai-grad` timer, passed ones at 40% accent. The bubble and every dot are doors to that product. (An earlier pass put a large orbiting mascot above the bubble; the founders had it removed — the header mark is enough) |
 | **Composer** | *How can I help you today?* as a real 40px input; right: mic (opens the assistant) and a `btn-ai` send. Submitting sends the text to the real assistant, which opens and answers |
 
 Nine beats, in the products' order, each a real record: *reading 8,486 survey responses → Net

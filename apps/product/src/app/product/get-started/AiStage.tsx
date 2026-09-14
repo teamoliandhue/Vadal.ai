@@ -1,8 +1,8 @@
 "use client";
 /* ═══════════════════ the stage: Vadal AI, as a chat window ═══════════════════
    The right half of the opening frame, in the one form everyone already reads
-   as "an AI": a small chat window. Header with the mark, a calm body with the
-   mascot alive in the middle, a composer at the foot that really asks. In the
+   as "an AI": a small chat window. Header with the mark, a calm body, a
+   composer at the foot that really asks. In the
    body the assistant says what it is doing — one capability after another,
    nine for nine products, each with the real result under it — so the viewer
    learns what it can do without reading a list. Hover holds it. The composer
@@ -81,7 +81,7 @@ export function AiStage({ onGo, tiles }: { onGo?: (i: number) => void; tiles: Pr
   return (
     <div className="flex w-full justify-center lg:justify-end">
       <div
-        className={`ai-stage flex h-[440px] w-full max-w-[400px] flex-col overflow-hidden rounded-[24px] border border-line bg-card text-left shadow-[0_1px_2px_rgba(20,20,40,0.05),0_40px_80px_-40px_rgba(20,20,40,0.45)] ${paused ? "is-paused" : ""}`}
+        className={`ai-stage flex h-[400px] w-full max-w-[400px] flex-col overflow-hidden rounded-[24px] border border-line bg-card text-left shadow-[0_1px_2px_rgba(20,20,40,0.05),0_40px_80px_-40px_rgba(20,20,40,0.45)] ${paused ? "is-paused" : ""}`}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
@@ -102,14 +102,6 @@ export function AiStage({ onGo, tiles }: { onGo?: (i: number) => void; tiles: Pr
         {/* ── body: the mark, alive; then what it is doing ── */}
         <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-hidden bg-[var(--ai-surface)] px-5 py-4" aria-live="polite">
           <span aria-hidden className="ai-stage-glow" />
-          <span className="relative grid h-[104px] w-[104px] shrink-0 place-items-center rounded-full bg-card/70">
-            <span className="relative grid h-14 w-14 place-items-center">
-              <span aria-hidden className="ai-orbit" />
-              <span aria-hidden className="ai-orbit ai-orbit-2" />
-              <span className="ai-aura ai-grad grid h-14 w-14 place-items-center rounded-full"><SparkMark size={26} tone="solid" state="thinking" /></span>
-            </span>
-          </span>
-
           <button type="button" onClick={jump} className="relative w-full max-w-[320px] rounded-2xl rounded-tl-md bg-card px-3.5 py-2.5 text-left shadow-sm transition hover:shadow-md">
             <span className="flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-faint">
               Vadal AI is <span className="inline-flex gap-[3px] align-middle"><span className="ai-dot !h-[4px] !w-[4px]" /><span className="ai-dot !h-[4px] !w-[4px] [animation-delay:0.15s]" /><span className="ai-dot !h-[4px] !w-[4px] [animation-delay:0.3s]" /></span>
