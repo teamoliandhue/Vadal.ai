@@ -142,7 +142,7 @@ function Welcome({ onGo }: { onGo?: (i: number) => void }) {
               className="prod-tile prod-card story-in group relative flex min-h-[86px] w-full items-center gap-3 overflow-hidden rounded-2xl border border-line bg-card px-4 py-3 text-left focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--brand)]"
               style={{ transitionDelay: `${i * 45}ms` }}
             >
-              <span aria-hidden className="pointer-events-none absolute -bottom-3 right-3 select-none text-[44px] font-extrabold leading-none tracking-[-0.06em] text-ink opacity-[0.05]">{String(t.n).padStart(2, "0")}</span>
+              <span aria-hidden className="pointer-events-none absolute -bottom-3 right-3 select-none text-[44px] font-extrabold leading-none tracking-[-0.06em] text-ink opacity-[0.025]">{String(t.n).padStart(2, "0")}</span>
               <span className="prod-ico grid h-9 w-9 shrink-0 place-items-center rounded-[11px]">{PRODUCT_ICON[t.name]}</span>
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-1.5">

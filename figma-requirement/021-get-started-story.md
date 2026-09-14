@@ -269,7 +269,7 @@ Monochrome and violet; colour only where it means something.
 
 **Card:** `--card` on `--line`, 16px radius, 86px min, a 1px shadow; left the 36px icon chip,
 name (14.5/600) over descriptor (11.5 `--faint`), the lock glyph beside the name when gated; a ghost
-index — `01` at 44px/800, `--ink` at 5% — sitting in the bottom-right corner behind the fragment.
+index — `01` at 44px/800, `--ink` at 2.5% — sitting in the bottom-right corner behind the fragment.
 **Hover / focus:** the card lifts 2px, its edge goes violet at 40%, a violet-tinted shadow deepens
 beneath it, the chip fills lavender with a violet icon, and the arrow slides in beside the name.
 Below `sm` the cards stack one-up and the fragments hide; they are for a glance, not a thumb.
