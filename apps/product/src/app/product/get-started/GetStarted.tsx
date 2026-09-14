@@ -250,30 +250,27 @@ const Scene = React.forwardRef<
       <span aria-hidden className="story-blob" style={{ width: 620, height: 620, left: step.index % 2 ? "auto" : "-12%", right: step.index % 2 ? "-10%" : "auto", top: "-18%", background: `hsl(${hue} 85% 62% / 0.16)` }} />
       <span aria-hidden className="story-blob" style={{ width: 460, height: 460, left: step.index % 2 ? "-8%" : "auto", right: step.index % 2 ? "auto" : "-6%", bottom: "-22%", background: `hsl(${(hue + 60) % 360} 85% 62% / 0.12)` }} />
 
-      <div className={`relative mx-auto w-full max-w-[1320px] px-6 sm:px-10 lg:px-16 ${first ? "py-8 lg:py-8" : "py-14 lg:py-16"} ${first || last ? "" : "grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-16"}`}>
+      <div className={`relative mx-auto w-full max-w-[1320px] px-6 sm:px-10 lg:px-16 ${first ? "py-5 lg:py-4" : "py-14 lg:py-16"} ${first || last ? "" : "grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-16"}`}>
         {first ? (
           /* ── the opening. One frame, five seconds: category, what we sell,
              the AI visibly doing work, the nine by name, and the way in —
              all above the fold at 1440×900. ── */
           <div className="mx-auto max-w-[900px] text-center">
             <p className="story-in flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[12.5px] font-semibold uppercase tracking-[0.16em] text-faint">
-              <span className="ai-grad grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" /></span>
+              <span className="ai-grad grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" state="idle" /></span>
               <span>Vadal.ai · HR software for the whole workforce</span>
             </p>
-            <h1 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-4 text-[clamp(32px,4.4vw,58px)] font-bold leading-[1.02] tracking-[-0.035em]">
-              Nine HR products.<br />One AI that acts.
+            <h1 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-2 text-[clamp(30px,4vw,52px)] font-bold leading-[1.02] tracking-[-0.035em]">
+              Nine HR products.<br /><span className="ai-text-grad">One AI that acts.</span>
             </h1>
-            <p className="story-in story-in-3 mx-auto mt-4 max-w-[64ch] text-[clamp(16px,1.3vw,19px)] leading-snug text-muted">
+            <p className="story-in story-in-3 mx-auto mt-2 max-w-[64ch] text-[clamp(15px,1.2vw,18px)] leading-snug text-muted">
               Listens to every employee, desk and frontline. Then does the work itself.
             </p>
-            <div className="story-in story-in-4 mx-auto mt-6 max-w-[1040px]">{children}</div>
-            <div className="story-in story-in-4 mt-6 flex flex-wrap items-center justify-center gap-3">
+            <div className="story-in story-in-4 mx-auto mt-4 max-w-[1040px]">{children}</div>
+            <div className="story-in story-in-4 mt-3 flex flex-wrap items-center justify-center gap-3">
               <Button variant="brand" className="min-h-[48px] px-6" trailingIcon={<ArrowDown className="h-4 w-4" />} onClick={onNext}>Start the tour</Button>
               <Link href="/product/home" className="flex min-h-[48px] items-center px-3 text-[14px] font-semibold text-muted transition hover:text-ink">Skip for now</Link>
             </div>
-            <p className="story-in story-in-4 mt-4 hidden items-center justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-faint lg:flex" aria-hidden>
-              Scroll, or use the arrow keys <ArrowDown className="story-cue h-3.5 w-3.5" />
-            </p>
           </div>
         ) : last ? (
           /* ── the close ── */

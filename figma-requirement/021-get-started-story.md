@@ -210,15 +210,24 @@ fold, the headline broke mid-sentence, the dock covered tile 09, and the eyebrow
 | Eyebrow | `VADAL.AI · HR SOFTWARE FOR THE WHOLE WORKFORCE` | the market wedge in plain words, not "AI-native employee experience" |
 | Headline | **Nine HR products.** ⏎ **One AI that acts.** | a deliberate break; `clamp(32px, 4.4vw, 58px)` |
 | Sub | Listens to every employee, desk and frontline. Then does the work itself. | one line at 1440 (`max-w 64ch`, 12 words) |
-| **Done by the AI** | three chips, each a real record with its time: *Opened CASE-118 from a flight-risk signal · 2d ago* · *Drafted a post from your kudos, in your voice · yesterday* · *Proposed Burnout reset — Engineering · +3.4 predicted lift · today* | the claim in the headline, evidenced before anyone scrolls; each chip jumps to that product's scene |
+| **Vadal is working** | the assistant, live: a panel in the Aurora glow border (`ai-glow-border is-busy` while working) with the SparkMark in its *thinking* spin. Three beats, each a real record: it **reads** a signal (typed out, then thinking dots), then **acts** (the result streams in under a `→`), then is marked *done*. *Reading 8,486 survey responses… flight-risk signal on A. Mehta, 92%, no 1:1 in six weeks → Opened CASE-118 · assigned to Neha Rao* · *Neha recognised you… → Drafted a LinkedIn post in your voice · waiting for your tap* · *Engineering sentiment down 6 pts… → Proposed Burnout reset — Engineering · +3.4 predicted lift*. When all three are done the border settles, the header reads *Vadal did this, this week*, and the guardrail fades in: *Nothing reached a person without a tap.* Six seconds later it plays again. Each row is a door to that product's scene | "acts" is not a claim any more; it is watched happening |
 | Card header | `oliandhue · 12,480 people · 52 AI features live` · Live | the proof strip, 40px; the AI line under the grid is gone |
 | Grid | nine tiles at 88px | all above the fold at 1440×900 — last tile ends at 742 of 835 |
 | CTA | **Start the tour ↓** · Skip for now | in frame (bottom at 790) |
 | Dock | collapses to its mark on this route | it sat on tile 09 |
 
-Chips: `--card`/80 on `--line`, 34px at lg (44px on touch, wrapping allowed below `sm`), violet
-icon, `--purple` border on hover. The opening scene uses 32px vertical padding instead of the
-others' 56–64px.
+**The working panel, in detail.** 720px max, `ai-glow-border` (the conic Aurora border already
+in the system) at 1.5px around a `--card` body; `.is-busy` spins it faster while a beat is in
+flight. Header: SparkMark 15px in `ai-grad` — *thinking* (spin) while working, *idle* (breathe)
+when done — the label, and a pulsing `--ai-accent` dot reading *live* that becomes a `--success`
+dot reading *3 actions*. Rows 44px on touch, 34px at lg: a 28px icon chip on `--ai-surface` in
+`--ai-accent` that becomes a `--success` tick when done; the read line 13px `--muted` typed at
+55 cps with the system's `ai-caret`, then three `ai-dot`s; the result line 14px/600 `--ink` after
+an accent `→`, streamed at 45 cps with `ai-stream` on entry; *done* as an 11px `--success` tag.
+Timing: read 2.6s · act 1.7s · hold 6s · loop. Reduced motion: the finished state, still.
+The headline's second line takes `ai-text-grad` — Aurora is the intelligence colour, and this is
+the intelligence claim. The opening scene uses 16–20px vertical padding instead of the others'
+56–64px, tiles are 74px, and the scroll cue is gone (the CTA's own arrow does that job).
 
 ## 10 · The product tiles, in detail
 

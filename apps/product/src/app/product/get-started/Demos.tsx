@@ -9,7 +9,7 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  ArrowRight, BookOpen, CheckCheck, Clock, FolderKanban, Gauge, GraduationCap, Heart, HeartPulse,
+  ArrowRight, BookOpen, Check, CheckCheck, Clock, FolderKanban, Gauge, GraduationCap, Heart, HeartPulse,
   LifeBuoy, Lock, Megaphone, Newspaper, Phone, RotateCcw, Search, Share2, ShieldCheck, Smile,
   TrendingDown, TrendingUp, UsersRound, Wallet,
 } from "lucide-react";
@@ -31,6 +31,7 @@ import { myActivity, atWorkStepsPerDay, weekSteps, weekStepsFrontline, weekDays,
 import { chooseFocus } from "@/lib/ai/engines/wellbeing";
 import { crisisResources } from "@/lib/ai/engines/support";
 import { counsellors, eap, WAYS_IN } from "@/lib/help";
+import { surveys } from "@/lib/listen";
 import { growStats, learningDays, retention } from "@/lib/grow";
 import { reviewQueue } from "@/lib/ai/engines/learning";
 import { findAnswer, suggestedQuestions } from "@/lib/knowledge";
@@ -85,34 +86,95 @@ const PRODUCT_ICON: Record<string, React.ReactNode> = {
   Cases: <FolderKanban className={ICO} strokeWidth={1.75} />,
 };
 
-/* Three things the AI did on this workspace, with the time it did them. The
-   headline says "acts"; this is the evidence, in the first frame, before
-   anyone has scrolled. Every line is a real record from the data the scenes
-   below are built on — and each one is a door to that scene. */
-function ActsNow({ onGo, tiles }: { onGo?: (i: number) => void; tiles: ReturnType<typeof productTiles> }) {
+/* ── the assistant, working, in the first frame ─────────────────────────
+   "One AI that acts" cannot be a claim in a headline and three grey chips
+   underneath. It has to be seen: the assistant reads a signal, decides, does
+   the thing, and stops short of the person — live, in the product's own
+   Aurora language, before anyone has scrolled. Every line is a real record
+   from the data the scenes are built on; the choreography is the only fiction.
+   Reduced motion gets the finished state, still. */
+type Beat = { icon: React.ReactNode; read: string; result: string; go: string };
+
+/** Types `text` out from the moment it mounts; state changes only from the
+    interval, so remounting (a new phase, a new loop) is the reset. */
+function Typed({ text, cps = 55, trail }: { text: string; cps?: number; trail?: React.ReactNode }) {
+  const [n, setN] = React.useState(0);
+  React.useEffect(() => {
+    const t = window.setInterval(() => setN((k) => (k >= text.length ? k : k + 1)), 1000 / cps);
+    return () => window.clearInterval(t);
+  }, [text, cps]);
+  const done = n >= text.length;
+  return <>{text.slice(0, n)}{done ? trail : <span className="ai-caret" />}</>;
+}
+
+function BeatRow({ beat, phase, onGo }: { beat: Beat; phase: "wait" | "read" | "act" | "done"; onGo?: () => void }) {
+  const dim = phase === "wait";
+  const dots = <span className="ml-2 inline-flex gap-1 align-middle"><span className="ai-dot" /><span className="ai-dot [animation-delay:0.15s]" /><span className="ai-dot [animation-delay:0.3s]" /></span>;
+  return (
+    <button
+      type="button"
+      onClick={onGo}
+      className={`flex min-h-[44px] w-full items-start gap-3 rounded-xl px-3 py-1.5 text-left transition lg:min-h-0 ${dim ? "opacity-35" : "opacity-100 hover:bg-[var(--ai-surface)]"}`}
+    >
+      <span className={`mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg ${phase === "done" ? "bg-[color-mix(in_srgb,var(--success)_14%,transparent)] text-[var(--success)]" : "bg-[var(--ai-surface)] text-[var(--ai-accent)]"}`}>
+        {phase === "done" ? <Check className="h-3.5 w-3.5" strokeWidth={2.5} /> : beat.icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[13px] leading-snug text-muted">
+          {phase === "read" ? <Typed text={beat.read} trail={dots} /> : beat.read}
+        </span>
+        {(phase === "act" || phase === "done") && (
+          <span className="ai-stream mt-0.5 block text-[14px] font-semibold leading-snug text-ink">
+            <span className="text-[var(--ai-accent)]">→ </span>{phase === "act" ? <Typed text={beat.result} cps={45} /> : beat.result}
+          </span>
+        )}
+      </span>
+      {phase === "done" && <span className="mt-1 shrink-0 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--success)]">done</span>}
+    </button>
+  );
+}
+
+function AiWorking({ onGo, tiles }: { onGo?: (i: number) => void; tiles: ReturnType<typeof productTiles> }) {
   const at = (name: string) => tiles.find((t) => t.name === name)?.index ?? 0;
   const c = cases[0];
-  const m = myMoments[0];
-  const acts = [
-    { icon: <FolderKanban className="h-3.5 w-3.5" />, text: <>Opened <b className="font-semibold text-ink">{c.id}</b> from a flight-risk signal</>, when: c.timeline[0].when, go: at("Cases") },
-    { icon: <Share2 className="h-3.5 w-3.5" />, text: <>Drafted a post from your kudos, in your voice</>, when: m.when, go: at("Amplify") },
-    { icon: <Megaphone className="h-3.5 w-3.5" />, text: <>Proposed <b className="font-semibold text-ink">{suggestedCampaign.name}</b> · {suggestedCampaign.predictedLift} predicted lift</>, when: "today", go: at("Broadcast") },
-  ];
+  const beats: Beat[] = React.useMemo(() => [
+    { icon: <FolderKanban className="h-3.5 w-3.5" />, read: `Reading ${surveys[0].responses.toLocaleString()} survey responses… flight-risk signal on ${c.subject}, 92%, no 1:1 in six weeks.`, result: `Opened ${c.id} · assigned to ${c.owner.name}`, go: "Cases" },
+    { icon: <Share2 className="h-3.5 w-3.5" />, read: `Neha recognised you for the onboarding flow yesterday — craft, shipped early.`, result: "Drafted a LinkedIn post in your voice · waiting for your tap", go: "Amplify" },
+    { icon: <Megaphone className="h-3.5 w-3.5" />, read: "Engineering sentiment down 6 pts this week, burnout theme rising.", result: `Proposed ${suggestedCampaign.name} · ${suggestedCampaign.predictedLift} predicted lift`, go: "Broadcast" },
+  ], [c]);
+
+  /* the choreography: each beat reads, thinks, acts; then a breath; then again.
+     Starts at 0 on server and client alike; reduced motion jumps to the end
+     from inside the timer, never during render. */
+  const total = beats.length * 2;
+  const [step, setStep] = React.useState(0);
+  React.useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const READ = 2600, ACT = 1700, HOLD = 6000;
+    const t = window.setTimeout(
+      () => setStep((k) => (reduced ? total : k >= total ? 0 : k + 1)),
+      reduced ? 0 : step >= total ? HOLD : step % 2 === 0 ? READ : ACT,
+    );
+    return () => window.clearTimeout(t);
+  }, [step, total]);
+  const phaseOf = (i: number): "wait" | "read" | "act" | "done" => (step >= i * 2 + 2 ? "done" : step === i * 2 ? "read" : step === i * 2 + 1 ? "act" : "wait");
+  const allDone = step >= total;
+
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2">
-      <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-faint"><span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" /> Done by the AI</span>
-      {acts.map((a, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={() => onGo?.(a.go)}
-          className="flex min-h-[44px] max-w-full items-center gap-2 rounded-full border border-line bg-card/80 px-3 py-1.5 text-left text-[12.5px] text-muted backdrop-blur transition hover:border-[var(--purple)] hover:text-ink lg:min-h-[34px] lg:py-0"
-        >
-          <span className="shrink-0 text-[var(--purple)]">{a.icon}</span>
-          <span className="min-w-0 sm:whitespace-nowrap">{a.text}</span>
-          <span className="shrink-0 text-[11px] text-faint">· {a.when}</span>
-        </button>
-      ))}
+    <div className={`ai-glow-border mx-auto w-full max-w-[720px] rounded-[22px] p-[1.5px] ${allDone ? "" : "is-busy"}`}>
+      <div className="rounded-[20.5px] bg-card px-2.5 py-2.5 text-left">
+        <div className="flex items-center gap-2.5 px-3 pb-1.5">
+          <span className="ai-grad grid h-7 w-7 shrink-0 place-items-center rounded-full"><SparkMark size={15} tone="solid" state={allDone ? "idle" : "thinking"} /></span>
+          <span className="text-[13.5px] font-semibold">{allDone ? "Vadal did this, this week" : "Vadal is working"}</span>
+          <span className="ml-auto flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-faint"><span className={`h-1.5 w-1.5 rounded-full ${allDone ? "bg-[var(--success)]" : "bg-[var(--ai-accent)] animate-pulse"}`} /> {allDone ? "3 actions" : "live"}</span>
+        </div>
+        <div className="flex flex-col">
+          {beats.map((b, i) => <BeatRow key={b.go} beat={b} phase={phaseOf(i)} onGo={() => onGo?.(at(b.go))} />)}
+        </div>
+        <p className={`flex items-center gap-2 px-3 pt-1.5 text-[12px] text-faint transition-opacity duration-500 ${allDone ? "opacity-100" : "opacity-0"}`}>
+          <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[var(--success)]" /> Nothing reached a person without a tap. Every action confirms first, and can be undone.
+        </p>
+      </div>
     </div>
   );
 }
@@ -122,11 +184,11 @@ function Welcome({ onGo }: { onGo?: (i: number) => void }) {
   const tiles = productTiles(role);
   const live = FEATURES.filter((f) => f.wiredTo && !f.blocked).length;
   return (
-    <div className="flex flex-col gap-5">
-      <ActsNow onGo={onGo} tiles={tiles} />
+    <div className="flex flex-col gap-3">
+      <AiWorking onGo={onGo} tiles={tiles} />
       <Card className="mx-auto w-full max-w-[860px]">
-        <div className="ai-grad flex items-center gap-2.5 px-4 py-2.5 text-white">
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white/20 backdrop-blur"><SparkMark size={14} tone="solid" /></span>
+        <div className="ai-grad flex items-center gap-2.5 px-4 py-2 text-white">
+          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-white/20 backdrop-blur"><SparkMark size={13} tone="solid" /></span>
           <p className="min-w-0 truncate text-[13px] leading-tight"><span className="font-bold tracking-tight">{org.name}</span><span className="text-white/80"> · {org.headcount.toLocaleString()} people · {live} AI features live</span></p>
           <span className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-semibold"><span className="h-1.5 w-1.5 rounded-full bg-white" /> Live</span>
         </div>
@@ -136,7 +198,7 @@ function Welcome({ onGo }: { onGo?: (i: number) => void }) {
               <button
                 type="button"
                 onClick={() => onGo?.(t.index)}
-                className="prod-tile story-in group flex h-full min-h-[88px] w-full flex-col justify-between gap-2.5 bg-card px-4 py-3.5 text-left focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--brand)]"
+                className="prod-tile story-in group flex h-full min-h-[74px] w-full flex-col justify-between gap-1.5 bg-card px-4 py-2.5 text-left focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--brand)]"
                 style={{ transitionDelay: `${i * 45}ms` }}
               >
                 {/* the top line spans the tile: mark on the left, index on the right */}
