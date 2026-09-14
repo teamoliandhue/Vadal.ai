@@ -198,6 +198,28 @@ Every scene eyebrow reads **Product n · Name** (was *Pillar n*) — "pillar" is
 screen is part of what the tour is showing — but an unprompted popup about Engineering's
 sentiment landed on top of the product grid and answered a question nobody had asked yet.
 
+## 9b · The first frame, as one frame
+
+The test the founders set: an unknown company must explain itself before the visitor scrolls.
+Against that, the previous pass still failed in eight ways — the nine tiles were cut at the fold,
+the sub was a paragraph, "acts" was claimed and not shown, proof was buried, the CTA was below the
+fold, the headline broke mid-sentence, the dock covered tile 09, and the eyebrow was jargon.
+
+| Layer | Now | Why |
+|---|---|---|
+| Eyebrow | `VADAL.AI · HR SOFTWARE FOR THE WHOLE WORKFORCE` | the market wedge in plain words, not "AI-native employee experience" |
+| Headline | **Nine HR products.** ⏎ **One AI that acts.** | a deliberate break; `clamp(32px, 4.4vw, 58px)` |
+| Sub | Listens to every employee, desk and frontline. Then does the work itself. | one line at 1440 (`max-w 64ch`, 12 words) |
+| **Done by the AI** | three chips, each a real record with its time: *Opened CASE-118 from a flight-risk signal · 2d ago* · *Drafted a post from your kudos, in your voice · yesterday* · *Proposed Burnout reset — Engineering · +3.4 predicted lift · today* | the claim in the headline, evidenced before anyone scrolls; each chip jumps to that product's scene |
+| Card header | `oliandhue · 12,480 people · 52 AI features live` · Live | the proof strip, 40px; the AI line under the grid is gone |
+| Grid | nine tiles at 88px | all above the fold at 1440×900 — last tile ends at 742 of 835 |
+| CTA | **Start the tour ↓** · Skip for now | in frame (bottom at 790) |
+| Dock | collapses to its mark on this route | it sat on tile 09 |
+
+Chips: `--card`/80 on `--line`, 34px at lg (44px on touch, wrapping allowed below `sm`), violet
+icon, `--purple` border on hover. The opening scene uses 32px vertical padding instead of the
+others' 56–64px.
+
 ## 10 · The product tiles, in detail
 
 The grid is the one thing on the page that must look like a door, so it is the one thing that

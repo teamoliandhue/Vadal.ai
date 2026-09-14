@@ -315,15 +315,20 @@ export function AiDock() {
         </div>
       )}
 
+      {/* On Get Started the pill collapses to its mark: the page is the product
+          explaining itself, and the full pill sat on top of the ninth tile. */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-5 right-6 z-30 flex items-center gap-2.5 rounded-full border border-line bg-card py-2.5 pl-3 pr-4 shadow-[0_10px_34px_rgba(20,20,25,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_44px_rgba(139,124,248,0.32)] dark:border-white/10 dark:shadow-[0_10px_34px_rgba(0,0,0,0.5)] max-lg:bottom-[76px]"
+        aria-label={onTour ? "Ask Vadal" : undefined}
+        className={`fixed bottom-5 right-6 z-30 flex items-center gap-2.5 rounded-full border border-line bg-card shadow-[0_10px_34px_rgba(20,20,25,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_44px_rgba(139,124,248,0.32)] dark:border-white/10 dark:shadow-[0_10px_34px_rgba(0,0,0,0.5)] max-lg:bottom-[76px] ${onTour ? "p-2" : "py-2.5 pl-3 pr-4"}`}
       >
         <span className="ai-aura ai-grad grid h-8 w-8 place-items-center rounded-full"><SparkMark size={18} tone="solid" state="idle" /></span>
-        <span className="text-left">
-          <span className="flex items-center gap-1 text-[14px] font-semibold">Vadal <span className="rounded-[4px] border border-line px-1 text-[12px] font-bold text-muted dark:border-white/15">AI</span></span>
-          <span className="block text-[14px] text-faint">What are you looking for today?</span>
-        </span>
+        {!onTour && (
+          <span className="text-left">
+            <span className="flex items-center gap-1 text-[14px] font-semibold">Vadal <span className="rounded-[4px] border border-line px-1 text-[12px] font-bold text-muted dark:border-white/15">AI</span></span>
+            <span className="block text-[14px] text-faint">What are you looking for today?</span>
+          </span>
+        )}
       </button>
     </>
   );

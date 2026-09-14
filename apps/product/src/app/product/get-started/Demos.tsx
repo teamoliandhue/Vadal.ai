@@ -22,7 +22,7 @@ import { DayArea, GoalRing, ScoreRing, Sparkline, StreakStrip } from "@/componen
 import { FEATURES } from "@/lib/ai/features";
 import { org, myRecognition, me } from "@/lib/data";
 import { feedItems } from "@/lib/feed";
-import { campaigns } from "@/lib/campaigns";
+import { campaigns, suggested as suggestedCampaign } from "@/lib/campaigns";
 import { team, reports, managerActions } from "@/lib/manager";
 import { cases, caseStats } from "@/lib/cases";
 import { experienceScore } from "@/lib/experience";
@@ -72,7 +72,7 @@ function Stat({ value, label, sub }: { value: React.ReactNode; label: string; su
 /** The nav's own icon for each product — so the thing you meet here is the
     thing you will recognise in the sidebar a minute later. Drawn at the app's
     line weight (1.75 at 19px), not the library default. */
-const ICO = "h-[19px] w-[19px]";
+const ICO = "h-[17px] w-[17px]";
 const PRODUCT_ICON: Record<string, React.ReactNode> = {
   Pulse: <Gauge className={ICO} strokeWidth={1.75} />,
   Connect: <Newspaper className={ICO} strokeWidth={1.75} />,
@@ -85,51 +85,82 @@ const PRODUCT_ICON: Record<string, React.ReactNode> = {
   Cases: <FolderKanban className={ICO} strokeWidth={1.75} />,
 };
 
+/* Three things the AI did on this workspace, with the time it did them. The
+   headline says "acts"; this is the evidence, in the first frame, before
+   anyone has scrolled. Every line is a real record from the data the scenes
+   below are built on — and each one is a door to that scene. */
+function ActsNow({ onGo, tiles }: { onGo?: (i: number) => void; tiles: ReturnType<typeof productTiles> }) {
+  const at = (name: string) => tiles.find((t) => t.name === name)?.index ?? 0;
+  const c = cases[0];
+  const m = myMoments[0];
+  const acts = [
+    { icon: <FolderKanban className="h-3.5 w-3.5" />, text: <>Opened <b className="font-semibold text-ink">{c.id}</b> from a flight-risk signal</>, when: c.timeline[0].when, go: at("Cases") },
+    { icon: <Share2 className="h-3.5 w-3.5" />, text: <>Drafted a post from your kudos, in your voice</>, when: m.when, go: at("Amplify") },
+    { icon: <Megaphone className="h-3.5 w-3.5" />, text: <>Proposed <b className="font-semibold text-ink">{suggestedCampaign.name}</b> · {suggestedCampaign.predictedLift} predicted lift</>, when: "today", go: at("Broadcast") },
+  ];
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2">
+      <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-faint"><span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" /> Done by the AI</span>
+      {acts.map((a, i) => (
+        <button
+          key={i}
+          type="button"
+          onClick={() => onGo?.(a.go)}
+          className="flex min-h-[44px] max-w-full items-center gap-2 rounded-full border border-line bg-card/80 px-3 py-1.5 text-left text-[12.5px] text-muted backdrop-blur transition hover:border-[var(--purple)] hover:text-ink lg:min-h-[34px] lg:py-0"
+        >
+          <span className="shrink-0 text-[var(--purple)]">{a.icon}</span>
+          <span className="min-w-0 sm:whitespace-nowrap">{a.text}</span>
+          <span className="shrink-0 text-[11px] text-faint">· {a.when}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function Welcome({ onGo }: { onGo?: (i: number) => void }) {
   const [role] = useViewAs();
   const tiles = productTiles(role);
   const live = FEATURES.filter((f) => f.wiredTo && !f.blocked).length;
   return (
-    <Card>
-      <div className="ai-grad flex items-center gap-2.5 px-5 py-3.5 text-white">
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white/20 backdrop-blur"><SparkMark size={16} tone="solid" /></span>
-        <div className="min-w-0 leading-tight">
-          <p className="text-[14.5px] font-bold tracking-tight">Your workspace, right now</p>
-          <p className="text-[11.5px] text-white/80">{org.name} · {org.headcount.toLocaleString()} people</p>
+    <div className="flex flex-col gap-5">
+      <ActsNow onGo={onGo} tiles={tiles} />
+      <Card className="mx-auto w-full max-w-[860px]">
+        <div className="ai-grad flex items-center gap-2.5 px-4 py-2.5 text-white">
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white/20 backdrop-blur"><SparkMark size={14} tone="solid" /></span>
+          <p className="min-w-0 truncate text-[13px] leading-tight"><span className="font-bold tracking-tight">{org.name}</span><span className="text-white/80"> · {org.headcount.toLocaleString()} people · {live} AI features live</span></p>
+          <span className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-semibold"><span className="h-1.5 w-1.5 rounded-full bg-white" /> Live</span>
         </div>
-        <span className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold"><span className="h-1.5 w-1.5 rounded-full bg-white" /> Live</span>
-      </div>
-      <ul className="grid grid-cols-3 gap-px bg-line">
-        {tiles.map((t, i) => (
-          <li key={t.n} className="min-w-0">
-            <button
-              type="button"
-              onClick={() => onGo?.(t.index)}
-              className="prod-tile story-in group flex h-full min-h-[104px] w-full flex-col justify-between gap-3 bg-card px-4 py-4 text-left focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--brand)]"
-              style={{ transitionDelay: `${i * 45}ms` }}
-            >
-              {/* the top line spans the tile: mark on the left, index on the right */}
-              <span className="flex w-full items-center justify-between">
-                <span className="prod-ico grid h-9 w-9 shrink-0 place-items-center rounded-[11px]">{PRODUCT_ICON[t.name]}</span>
-                <span className="prod-num flex items-center gap-1 text-[10.5px] font-bold tabular-nums text-faint">
-                  {t.locked && <Lock className="h-2.5 w-2.5" aria-label="Not available to your role" />}
-                  {String(t.n).padStart(2, "0")}
+        <ul className="grid grid-cols-3 gap-px bg-line">
+          {tiles.map((t, i) => (
+            <li key={t.n} className="min-w-0">
+              <button
+                type="button"
+                onClick={() => onGo?.(t.index)}
+                className="prod-tile story-in group flex h-full min-h-[88px] w-full flex-col justify-between gap-2.5 bg-card px-4 py-3.5 text-left focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--brand)]"
+                style={{ transitionDelay: `${i * 45}ms` }}
+              >
+                {/* the top line spans the tile: mark on the left, index on the right */}
+                <span className="flex w-full items-center justify-between">
+                  <span className="prod-ico grid h-8 w-8 shrink-0 place-items-center rounded-[10px]">{PRODUCT_ICON[t.name]}</span>
+                  <span className="prod-num flex items-center gap-1 text-[10.5px] font-bold tabular-nums text-faint">
+                    {t.locked && <Lock className="h-2.5 w-2.5" aria-label="Not available to your role" />}
+                    {String(t.n).padStart(2, "0")}
+                  </span>
                 </span>
-              </span>
-              <span className="min-w-0">
-                <span className="flex items-center gap-1.5">
-                  <span className="text-[15px] font-semibold leading-tight tracking-[-0.01em]">{t.name}</span>
-                  {/* hover-only affordance; on touch it just steals width from the name */}
-                  <ArrowRight className="prod-go hidden h-3.5 w-3.5 shrink-0 sm:block" aria-hidden />
+                <span className="min-w-0">
+                  <span className="flex items-center gap-1.5">
+                    <span className="text-[14.5px] font-semibold leading-tight tracking-[-0.01em]">{t.name}</span>
+                    {/* hover-only affordance; on touch it just steals width from the name */}
+                    <ArrowRight className="prod-go hidden h-3.5 w-3.5 shrink-0 sm:block" aria-hidden />
+                  </span>
+                  <span className="mt-0.5 block text-[11.5px] leading-tight text-faint">{t.short}</span>
                 </span>
-                <span className="mt-0.5 block text-[11.5px] leading-tight text-faint">{t.short}</span>
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
-      <AiLine>{live} AI features live across all nine — pick any one to see it working.</AiLine>
-    </Card>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </Card>
+    </div>
   );
 }
 

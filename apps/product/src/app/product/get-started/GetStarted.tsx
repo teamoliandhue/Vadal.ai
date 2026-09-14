@@ -250,29 +250,29 @@ const Scene = React.forwardRef<
       <span aria-hidden className="story-blob" style={{ width: 620, height: 620, left: step.index % 2 ? "auto" : "-12%", right: step.index % 2 ? "-10%" : "auto", top: "-18%", background: `hsl(${hue} 85% 62% / 0.16)` }} />
       <span aria-hidden className="story-blob" style={{ width: 460, height: 460, left: step.index % 2 ? "-8%" : "auto", right: step.index % 2 ? "auto" : "-6%", bottom: "-22%", background: `hsl(${(hue + 60) % 360} 85% 62% / 0.12)` }} />
 
-      <div className={`relative mx-auto w-full max-w-[1320px] px-6 py-14 sm:px-10 lg:px-16 lg:py-16 ${first || last ? "" : "grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-16"}`}>
+      <div className={`relative mx-auto w-full max-w-[1320px] px-6 sm:px-10 lg:px-16 ${first ? "py-8 lg:py-8" : "py-14 lg:py-16"} ${first || last ? "" : "grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-16"}`}>
         {first ? (
-          /* ── the opening: the idea of the whole product ── */
+          /* ── the opening. One frame, five seconds: category, what we sell,
+             the AI visibly doing work, the nine by name, and the way in —
+             all above the fold at 1440×900. ── */
           <div className="mx-auto max-w-[900px] text-center">
-            {/* three layers, for a reader who gives this five seconds: what
-                category we are, what we sell, and what makes it different */}
             <p className="story-in flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[12.5px] font-semibold uppercase tracking-[0.16em] text-faint">
               <span className="ai-grad grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" /></span>
-              <span>Vadal.ai · AI-native employee experience</span>
+              <span>Vadal.ai · HR software for the whole workforce</span>
             </p>
-            <h1 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-6 text-[clamp(34px,5.2vw,68px)] font-bold leading-[1.0] tracking-[-0.035em]">
-              Nine HR products. One AI that acts.
+            <h1 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-4 text-[clamp(32px,4.4vw,58px)] font-bold leading-[1.02] tracking-[-0.035em]">
+              Nine HR products.<br />One AI that acts.
             </h1>
-            <p className="story-in story-in-3 mx-auto mt-6 max-w-[58ch] text-[clamp(16px,1.4vw,20px)] leading-relaxed text-muted">
-              It listens to every employee — desk and frontline — then acts: launches the pulse, drafts the post, opens the case. One assistant, running through all nine.
+            <p className="story-in story-in-3 mx-auto mt-4 max-w-[64ch] text-[clamp(16px,1.3vw,19px)] leading-snug text-muted">
+              Listens to every employee, desk and frontline. Then does the work itself.
             </p>
-            <div className="story-in story-in-4 mx-auto mt-9 max-w-[820px]">{children}</div>
-            <div className="story-in story-in-4 mt-10 flex flex-wrap items-center justify-center gap-3">
+            <div className="story-in story-in-4 mx-auto mt-6 max-w-[1040px]">{children}</div>
+            <div className="story-in story-in-4 mt-6 flex flex-wrap items-center justify-center gap-3">
               <Button variant="brand" className="min-h-[48px] px-6" trailingIcon={<ArrowDown className="h-4 w-4" />} onClick={onNext}>Start the tour</Button>
               <Link href="/product/home" className="flex min-h-[48px] items-center px-3 text-[14px] font-semibold text-muted transition hover:text-ink">Skip for now</Link>
             </div>
-            <p className="story-in story-in-4 mt-8 hidden flex-col items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-faint lg:flex" aria-hidden>
-              Scroll, or use the arrow keys <ArrowDown className="story-cue mt-1 h-4 w-4" />
+            <p className="story-in story-in-4 mt-4 hidden items-center justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-faint lg:flex" aria-hidden>
+              Scroll, or use the arrow keys <ArrowDown className="story-cue h-3.5 w-3.5" />
             </p>
           </div>
         ) : last ? (
