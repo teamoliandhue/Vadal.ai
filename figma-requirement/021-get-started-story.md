@@ -162,9 +162,25 @@ assistant**, and nobody can repeat "52" back.
 
 | | Before | Now |
 |---|---|---|
-| Headline | Keep your company human, every day. | **One AI platform. Nine HR products.** |
-| Sub | Employees get a daily ritual. Leaders hear what it produces… | Everything a company needs to hear its people — and act on what it hears. Each product shown live, on your own workspace. |
+| Headline | Keep your company human, every day. | **Nine HR products. One AI that acts.** |
+| Sub | Employees get a daily ritual. Leaders hear what it produces… | It listens to every employee — desk and frontline — then acts: launches the pulse, drafts the post, opens the case. One assistant, running through all nine. |
 | Card | three counted stats | **the nine, named** |
+
+**The hero is three layers, for a reader who gives it five seconds.** An earlier draft —
+*"One AI platform. Nine HR products."* over *"Everything a company needs to hear its people"* —
+passed the recall test but read like every HR suite: it named the shape and not the business.
+
+| Layer | Reads | Answers |
+|---|---|---|
+| Eyebrow | `VADAL.AI · AI-NATIVE EMPLOYEE EXPERIENCE` | what category of company this is |
+| Headline | **Nine HR products. One AI that acts.** | what we sell — and the differentiator in four words |
+| Sub | It listens to every employee — desk and frontline — then acts: launches the pulse, drafts the post, opens the case. One assistant, running through all nine. | why it is not a survey tool |
+
+Two deliberate choices. **"Desk and frontline"** carries the wedge from the product brief — the
+frontline are the majority of the workforce and the last to get good software. **Three named
+actions** (launches, drafts, opens) are the agentic claim made concrete; a competitor's hero can
+say "AI-powered insights", it cannot say "opens the case". The card header no longer repeats the
+count — it reads *"Your workspace, right now"*, which is the proof the numbers below are live.
 
 **The product grid** is now the hero of scene 01: `ai-grad` band (*Nine products, one platform* ·
 org · people · Live) over a 3×3 grid — hairlines via `gap-px` on `--line`, tiles `--card`, each

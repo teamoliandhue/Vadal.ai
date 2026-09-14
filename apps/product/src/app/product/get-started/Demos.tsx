@@ -94,7 +94,7 @@ function Welcome({ onGo }: { onGo?: (i: number) => void }) {
       <div className="ai-grad flex items-center gap-2.5 px-5 py-3.5 text-white">
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white/20 backdrop-blur"><SparkMark size={16} tone="solid" /></span>
         <div className="min-w-0 leading-tight">
-          <p className="text-[14.5px] font-bold tracking-tight">Nine products, one platform</p>
+          <p className="text-[14.5px] font-bold tracking-tight">Your workspace, right now</p>
           <p className="text-[11.5px] text-white/80">{org.name} · {org.headcount.toLocaleString()} people</p>
         </div>
         <span className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold"><span className="h-1.5 w-1.5 rounded-full bg-white" /> Live</span>

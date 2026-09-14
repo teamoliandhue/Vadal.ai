@@ -254,14 +254,17 @@ const Scene = React.forwardRef<
         {first ? (
           /* ── the opening: the idea of the whole product ── */
           <div className="mx-auto max-w-[900px] text-center">
-            <p className="story-in flex items-center justify-center gap-2 text-[13px] font-semibold uppercase tracking-[0.18em] text-faint">
-              <span className="ai-grad grid h-6 w-6 place-items-center rounded-full"><SparkMark size={13} tone="solid" /></span> Vadal.ai · Get started
+            {/* three layers, for a reader who gives this five seconds: what
+                category we are, what we sell, and what makes it different */}
+            <p className="story-in flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[12.5px] font-semibold uppercase tracking-[0.16em] text-faint">
+              <span className="ai-grad grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" /></span>
+              <span>Vadal.ai · AI-native employee experience</span>
             </p>
             <h1 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-6 text-[clamp(34px,5.2vw,68px)] font-bold leading-[1.0] tracking-[-0.035em]">
-              One AI platform. Nine HR products.
+              Nine HR products. One AI that acts.
             </h1>
             <p className="story-in story-in-3 mx-auto mt-6 max-w-[58ch] text-[clamp(16px,1.4vw,20px)] leading-relaxed text-muted">
-              Everything a company needs to hear its people — and act on what it hears. Each product shown live, on your own workspace.
+              It listens to every employee — desk and frontline — then acts: launches the pulse, drafts the post, opens the case. One assistant, running through all nine.
             </p>
             <div className="story-in story-in-4 mx-auto mt-9 max-w-[820px]">{children}</div>
             <div className="story-in story-in-4 mt-10 flex flex-wrap items-center justify-center gap-3">
