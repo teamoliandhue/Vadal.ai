@@ -210,28 +210,35 @@ fold, the headline broke mid-sentence, the dock covered tile 09, and the eyebrow
 | Eyebrow | `VADAL.AI · HR SOFTWARE FOR THE WHOLE WORKFORCE` | the market wedge in plain words, not "AI-native employee experience" |
 | Headline | **Nine HR products.** ⏎ **One AI that acts.** | a deliberate break; `clamp(32px, 4.4vw, 58px)` |
 | Sub | Listens to every employee, desk and frontline. Then does the work itself. | one line at 1440 (`max-w 64ch`, 12 words) |
-| **The stage** — *Vadal.ai is …* | the right half of the hero. The assistant does one thing, then the next, until the viewer has watched all nine — **one capability per product**: *reading 8,486 survey responses* (Pulse) · *spotting a flight risk before it becomes a resignation* (Cases) · *drafting a post in your voice* (Amplify) · *launching a three-question pulse to Line 2* (Pulse) · *answering from your policy documents, source attached* (Broadcast) · *opening a case and assigning its owner* (Cases) · *telling a manager the one thing to do this week* (Managers) · *turning a document into an eight-minute course* (Grow) · *handing off to a counsellor, context carried* (Help). Each has its own artifact that builds itself. Hover holds it; any pip, phrase or artifact opens that product | the X, Y, Z of what the AI can do, watched rather than listed |
+| **The chat window** — *Vadal AI* | the right half of the hero, in the one form everyone reads as "an AI" in half a second: a small chat window. In its body the assistant says what it is doing — one capability after another, nine for nine products, each with the real result under it — so the viewer learns what it can do without reading a list. The composer is real | the X, Y, Z of what the AI can do, watched rather than listed |
 | Card header | `oliandhue · 12,480 people · 52 AI features live` · Live | the proof strip, 40px; the AI line under the grid is gone |
 | Grid | nine tiles at 88px | all above the fold at 1440×900 — last tile ends at 742 of 835 |
 | CTA | **Start the tour ↓** · Skip for now | in frame (bottom at 790) |
 | Dock | collapses to its mark on this route | it sat on tile 09 |
 
-**The hero is two columns at `lg`** — `minmax(0,.95fr) minmax(0,1.05fr)`, 48px gap, 1080px max
-so it clears the spine — story on the left (eyebrow, headline at `clamp(34px, 3.7vw, 56px)`,
-one-line sub at 38ch, the CTAs), the stage on the right, the nine-tile grid full-width beneath.
-At 1440×900 the last tile ends at 771 of 835. The **Present** pill moves to the foot of the spine;
-at its head it sat exactly where the vertically-centred stage's corner lands.
+**The hero is two columns at `lg`** — `minmax(0,1fr) minmax(0,420px)`, 48px gap, 1080px max —
+story on the left (eyebrow, headline at `clamp(34px, 3.7vw, 56px)`, one-line sub at 38ch, the
+CTAs), the chat window on the right, the nine-tile grid full-width beneath. At 1440×900 the last
+tile ends at 807 of 835. The **Present** pill moves to the foot of the spine.
 
-**The stage, in detail.** `ai-glow-border is-busy` at 1.5px around a `--card` body, 26px radius;
-a breathing radial wash of `--ai-accent` at 13% behind the head (`ai-stage-glow`).
+**The chat window, in detail.** 400 × 440, 24px radius, `--card` on a `--line` hairline with a deep
+soft shadow — no glow border; a chat window is calm. Three parts:
 
 | Part | Spec |
 |---|---|
-| **The mark** | 48px `ai-grad` disc with the SparkMark (22px) in its *thinking* spin and the `ai-aura` pulse, ringed by two **orbits** — hairlines at 32% and 16% accent, 7px and 14px out, one clockwise at 7s, one counter at 11s, each carrying a glowing 6px/4px accent dot |
-| **The phrase** | eyebrow `VADAL.AI IS` + three `ai-dot`s; the capability in `ai-text-grad` at `clamp(17px, 1.7vw, 24px)`, 60–64px box. It **turns**: the leaving phrase blurs up and out (`ai-phrase-out`, 0.42s — translateY −12px, blur 7px), the arriving one blurs in from below (`ai-phrase-in`, 0.62s). Both render during the turn |
-| **The artifact** | keyed per capability, min-height 124px, enters with `ai-card-in` (0.55s, 10px rise, 0.985 scale). Inside: bars grow from the left (`ai-bar`, staggered 120ms), the risk ring draws to 92% (`ai-ring`, 1.1s), text types at 60–70 cps with the system caret, chips arrive 220–260ms apart. Real data throughout: `sentiment`, `cases[0]`, `myMoments[0]`, `findAnswer`, `managerActions[0]`, `courses[0]`, `counsellors[0]` |
-| **The track** | nine 3px bars; the current one fills left-to-right over the step (`ai-timer`, 3.6s), passed ones sit at 40% accent; a line of the nine verbs beneath at 11px, the current in `--ink` 600. Pips 44px on touch, compact at lg |
-| **Timing** | 3.6s a beat, 32s a lap, loops. **Hover pauses** — the timer and the orbits freeze (`is-paused`), the phrase stays. Reduced motion: no auto-advance, no blur or motion, the ring at its final value |
+| **Header** (52px) | 32px `ai-grad` disc with the SparkMark breathing and a tiny **AI** tag pinned to its corner; *Vadal* 14px/600; right: minimise · expand · close as 32px icon buttons (44px on touch). Minimise and close collapse the window to a launcher pill — *Vadal AI · Open* — that brings it back; expand opens the real assistant |
+| **Body** (flex) | `--ai-surface` wash with the breathing radial glow. Centre: the **mascot** — a 104px `--card`/70 circle holding a 56px Aurora disc with the SparkMark (26px) in its thinking spin and the `ai-aura` pulse, ringed by two hairline orbits (7s clockwise, 11s counter) each carrying a glowing dot. Beneath: the **assistant's bubble** (`--card`, 16px radius with the top-left corner tightened) — eyebrow `VADAL AI IS` + three 4px dots, the capability in `ai-text-grad` at 15px that **turns** (leaving phrase blurs up and out, arriving one blurs in from below), then the result on one line after an accent `→`, typed at 70 cps. Nine **dots** under it: 5px, the current stretched to 28px carrying a 3.4s `ai-grad` timer, passed ones at 40% accent. The bubble and every dot are doors to that product |
+| **Composer** | *How can I help you today?* as a real 40px input; right: mic (opens the assistant) and a `btn-ai` send. Submitting sends the text to the real assistant, which opens and answers |
+
+Nine beats, in the products' order, each a real record: *reading 8,486 survey responses → Net
+sentiment +52 · 4,120 comments read* · *spotting a flight risk before it becomes a resignation →
+A. Mehta · 92% · no 1:1 in six weeks* · *drafting a post in your voice → LinkedIn draft ready ·
+policy check passed* · *launching a three-question pulse to Line 2 → 3 questions · sent by push at
+06:10* · *answering from your policy documents → 18 paid leaves a year · cited: Leave policy* ·
+*opening a case and assigning its owner → CASE-118 · Neha Rao · SLA 1d* · *telling a manager the one
+thing to do this week → Schedule 1:1 with Rohan Mehta · today* · *turning a document into a short
+course → POSH · 4 lessons · 8 min* · *handing off to a counsellor, context carried → Dr. Anjali
+Menon · Today, 6:00 PM*. 3.4s a beat, loops; **hover holds it**; reduced motion shows one beat, still.
 
 ## 10 · The product tiles, in detail
 

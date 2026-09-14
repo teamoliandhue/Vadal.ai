@@ -262,7 +262,7 @@ const Scene = React.forwardRef<
              working on the right, the nine by name underneath — all above
              the fold at 1440×900. ── */
           <div className="mx-auto max-w-[1080px]">
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-12">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)] lg:items-center lg:gap-12">
               <div className="min-w-0 text-left">
                 <p className="story-in flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">
                   <span className="ai-grad grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" state="idle" /></span>
