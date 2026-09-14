@@ -210,7 +210,7 @@ fold, the headline broke mid-sentence, the dock covered tile 09, and the eyebrow
 | Eyebrow | `VADAL.AI · HR SOFTWARE FOR THE WHOLE WORKFORCE` | the market wedge in plain words, not "AI-native employee experience" |
 | Headline | **Nine HR products.** ⏎ **One AI that acts.** | a deliberate break; `clamp(32px, 4.4vw, 58px)` |
 | Sub | Listens to every employee, desk and frontline. Then does the work itself. | one line at 1440 (`max-w 64ch`, 12 words) |
-| **The chat window** — *Vadal AI* | the right half of the hero, in the one form everyone reads as "an AI" in half a second: a small chat window. In its body the assistant says what it is doing — one capability after another, nine for nine products, each with the real result under it — so the viewer learns what it can do without reading a list. The composer is real | the X, Y, Z of what the AI can do, watched rather than listed |
+| **The chat window** — *Vadal AI* | the right half of the hero, in the one form everyone reads as "an AI" in half a second: a small chat window — and in it, **a conversation that plays**. A prompt types itself into the composer and sends; the assistant thinks, then its answer streams in; a beat; the next. Nine exchanges, each a real record and each a door to its product. The composer is real | the X, Y, Z of what the AI can do, watched as a chat rather than read as a list |
 | Card header | `oliandhue · 12,480 people · 52 AI features live` · Live | the proof strip, 40px; the AI line under the grid is gone |
 | Grid | nine tiles at 88px | all above the fold at 1440×900 — last tile ends at 742 of 835 |
 | CTA | **Start the tour ↓** · Skip for now | in frame (bottom at 790) |
@@ -221,24 +221,33 @@ story on the left (eyebrow, headline at `clamp(34px, 3.7vw, 56px)`, one-line sub
 CTAs), the chat window on the right, the nine-tile grid full-width beneath. At 1440×900 the last
 tile ends at 807 of 835. The **Present** pill moves to the foot of the spine.
 
-**The chat window, in detail.** 400 × 400, 24px radius, `--card` on a `--line` hairline with a deep
-soft shadow — no glow border; a chat window is calm. Three parts:
+**The chat window, in detail.** 400 × 300 — no taller than the story beside it (286px) — 22px
+radius, `--card` on a `--line` hairline with a deep soft shadow. Three parts:
 
 | Part | Spec |
 |---|---|
-| **Header** (52px) | 32px `ai-grad` disc with the SparkMark breathing and a tiny **AI** tag pinned to its corner; *Vadal* 14px/600; right: minimise · expand · close as 32px icon buttons (44px on touch). Minimise and close collapse the window to a launcher pill — *Vadal AI · Open* — that brings it back; expand opens the real assistant |
-| **Body** (flex) | `--ai-surface` wash with the breathing radial glow; the **assistant's bubble** centred (`--card`, 16px radius with the top-left corner tightened) — eyebrow `VADAL AI IS` + three 4px dots, the capability in `ai-text-grad` at 15px that **turns** (leaving phrase blurs up and out, arriving one blurs in from below), then the result on one line after an accent `→`, typed at 70 cps. Nine **dots** under it: 5px, the current stretched to 28px carrying a 3.4s `ai-grad` timer, passed ones at 40% accent. The bubble and every dot are doors to that product. (An earlier pass put a large orbiting mascot above the bubble; the founders had it removed — the header mark is enough) |
-| **Composer** | *How can I help you today?* as a real 40px input; right: mic (opens the assistant) and a `btn-ai` send. Submitting sends the text to the real assistant, which opens and answers |
+| **Header** (48px) | 32px `ai-grad` disc with the SparkMark (breathing; spinning while an answer streams) and a tiny **AI** tag on its corner; *Vadal* 14px/600; `● ONLINE` in `--success`; right: minimise · expand · close (32px, 44px on touch). Minimise/close collapse to a launcher pill; expand opens the real assistant |
+| **Body** (flex, bottom-anchored) | `--ai-surface` wash with the breathing radial glow. The **user bubble** on the right: brand violet, white 13px, 16px radius with the bottom-right corner tightened, pops in (`ai-card-in`). The **assistant bubble** on the left with a 24px mark: `--card`, bottom-left tightened; three `ai-dot`s while thinking, then the answer typed at 58 cps with the system caret; when it settles, *Open Pulse →* in `--ai-accent` appears beneath. Nine **dots** at the foot (4px; the current stretched to 16px in accent). The bubble and every dot are doors |
+| **Composer** (56px) | one row: the input, mic, `btn-ai` send. While the script plays, the prompt **types itself here** at 34 cps over the empty input; the send button bursts (`ai-burst`) as it goes. Focus the input and the script yields — it is a real input, and sending opens the real assistant with what you typed |
 
-Nine beats, in the products' order, each a real record: *reading 8,486 survey responses → Net
-sentiment +52 · 4,120 comments read* · *spotting a flight risk before it becomes a resignation →
-A. Mehta · 92% · no 1:1 in six weeks* · *drafting a post in your voice → LinkedIn draft ready ·
-policy check passed* · *launching a three-question pulse to Line 2 → 3 questions · sent by push at
-06:10* · *answering from your policy documents → 18 paid leaves a year · cited: Leave policy* ·
-*opening a case and assigning its owner → CASE-118 · Neha Rao · SLA 1d* · *telling a manager the one
-thing to do this week → Schedule 1:1 with Rohan Mehta · today* · *turning a document into a short
-course → POSH · 4 lessons · 8 min* · *handing off to a counsellor, context carried → Dr. Anjali
-Menon · Today, 6:00 PM*. 3.4s a beat, loops; **hover holds it**; reduced motion shows one beat, still.
+**Timing per exchange:** type (q ÷ 34 cps + 0.45s) → sent 0.42s → thinking 0.8s → answer (a ÷ 58 cps
++ 0.5s) → hold 2.2s → next. About 6s each, ~55s a lap, loops. **Hover holds it**; so does focusing
+the composer. Reduced motion: one exchange, still.
+
+**The nine exchanges** (prompt → answer → product): *How is the team feeling? → I read 8,486
+responses. Net sentiment is +52, up 4 this quarter.* → Pulse · *Who might leave? → A. Mehta — 92%
+flight risk, no 1:1 in six weeks. I opened CASE-118; Neha Rao owns it.* → Cases · *Write up the
+onboarding win for LinkedIn. → Drafted in your voice. Policy check passed — it's your tap to post.*
+→ Amplify · *Ask Line 2 about the new equipment. → Three questions, sent by push at 06:10 — the
+hour they actually answer.* → Pulse · *How many paid leaves do I have? → 18 paid leaves a year —
+cited from your leave policy.* → Broadcast · *What should I do this week? → Schedule 1:1 with Rohan
+Mehta. His sentiment is down 14 pts.* → Managers · *Any burnout signals? → Engineering, down 6 pts.
+I proposed Burnout reset — Engineering — +3.4 predicted lift.* → Broadcast · *Turn the POSH policy
+into a course. → Done — 4 lessons, 8 minutes, built from the document.* → Grow · *I'm not sleeping
+well. → I hear you. Dr. Anjali Menon has today, 6:00 PM — context carried, nothing repeated.* → Help.
+
+On this route the global launcher pill is icon-only at `lg` and hidden below it — the window is
+the launcher there, and the pill sat on its send button.
 
 ## 10 · The product tiles, in detail
 
