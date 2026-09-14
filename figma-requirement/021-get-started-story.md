@@ -249,32 +249,37 @@ well. → I hear you. Dr. Anjali Menon has today, 6:00 PM — context carried, n
 On this route the global launcher pill is icon-only at `lg` and hidden below it — the window is
 the launcher there, and the pill sat on its send button.
 
-## 10 · The product tiles, in detail
+## 10 · The nine as windows
 
-The grid is the one thing on the page that must look like a door, so it is the one thing that
-is drawn like a button.
+The grid is no longer a table under a gradient block. Nine **cards** in a 3×3 with 12px gaps, and
+each carries a **live fragment of its product** at stamp size — the thing you would see inside it.
+Monochrome and violet; colour only where it means something.
 
-| | |
+| Product | The fragment, right-aligned in the card |
 |---|---|
-| **Tile** | 3×3, hairlines via `gap-px` on `--line`, tiles `--card`, min-height 104px (130px at 375, three across, nothing clipped) |
-| **Composition** | two anchored blocks, `justify-between`: a top line that **spans the tile** — 36px icon chip hard left, `01` (10.5px bold tabular `--faint`, lock glyph before it when gated) hard right — and a bottom block of **Pulse** (15px/600, −0.01em) over *Surveys & sentiment* (11.5px `--faint`). The index used to sit beside the icon, which left a dead third of every tile and let the text drift in the middle |
-| **Chip** | `--soft` with a hairline ring and a 1px top highlight (`inset 0 1px 0` at 70% `--card`), so it reads as pressed into the surface rather than a flat grey box |
-| **Icon** | the section's own nav icon — Gauge, Newspaper, Share2, HeartPulse, Megaphone, GraduationCap, LifeBuoy, UsersRound, FolderKanban — so what you meet here is what you recognise in the sidebar a minute later |
-| **Colour** | none at rest. The icons are monochrome and the brand violet is the only colour hover introduces |
-| **Rest** | chip `--soft`, icon `--muted`; name `--ink`, descriptor `--faint` |
-| **Hover / focus** | tile → `--soft` · chip → `--lav` with a 30% violet ring and a soft violet drop-glow, icon → `--purple` · the index lifts `--faint` → `--muted` · an arrow slides in **beside the name** (`Broadcast →`), not in the corner where it would fight the index. No scale, no tilt |
-| **Touch** | the arrow is hidden below `sm` — it can never fire there and it stole width from the longest names |
-| **Entrance** | tiles cascade 45ms apart as the scene arrives |
+| Pulse | engagement sparkline (14 points, brand) · **82** |
+| Connect | three reactor avatars stacked · ♥ **312** |
+| Amplify | reach sparkline in `--success` · **204** |
+| Thrive | six day-bars of the challenge; days that cleared the target in brand, the rest muted |
+| Broadcast | *reach* **91%** over a brand progress bar |
+| Grow | seven minute-bars for the week; quiet days as hairlines |
+| Help | the counsellor's avatar · *6:00 PM · today* |
+| Managers | the at-risk report's sentiment sparkline in `--danger` · **58** |
+| Cases | the SLA ring in `--warning` · **1d** |
 
-**Why monochrome.** An earlier pass gave each tile its own hue — the hue of the scene it leads
-to — and the 3×3 grid read as a rainbow: consumer, not enterprise. It also broke the house colour
-rule, where **violet means action** and the Aurora gradient means intelligence; nine arbitrary
-hues meant neither. The restraint is the professionalism: the grid still has to look like a door,
-it just does it with weight, contrast and one accent rather than nine colours.
+**Card:** `--card` on `--line`, 16px radius, 86px min, a 1px shadow; left the 36px icon chip,
+name (14.5/600) over descriptor (11.5 `--faint`), the lock glyph beside the name when gated; a ghost
+index — `01` at 44px/800, `--ink` at 5% — sitting in the bottom-right corner behind the fragment.
+**Hover / focus:** the card lifts 2px, its edge goes violet at 40%, a violet-tinted shadow deepens
+beneath it, the chip fills lavender with a violet icon, and the arrow slides in beside the name.
+Below `sm` the cards stack one-up and the fragments hide; they are for a glance, not a thumb.
 
-The glyphs are unchanged and stay matched to the nav — Gauge · Newspaper · Share2 · HeartPulse ·
-Megaphone · GraduationCap · LifeBuoy · UsersRound · FolderKanban — drawn at the app's own line
-weight (**1.75 at 19px**) rather than the library default, in a 36px chip at 10px radius.
+**The label strip** replaces the gradient block: a pill on a hairline — a 2px Aurora rule across
+its top — with the mark, *oliandhue · 12,480 people · 52 AI features live*, and `● LIVE` in
+`--success`. The Aurora is a line, and the proof is the words.
+
+**Present** is now a 36px round icon at the spine's foot with a hover label; as a pill it landed on
+the Grow card once the grid grew to full width.
 
 ## 11 · Figma
 

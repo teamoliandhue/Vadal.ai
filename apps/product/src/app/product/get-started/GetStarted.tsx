@@ -182,9 +182,11 @@ export function GetStarted() {
         <button
           onClick={() => { if (!presenting && current >= last) go(0); setPresenting((p) => !p); }}
           aria-pressed={presenting}
-          className={`mt-3 flex h-9 items-center gap-1.5 rounded-full border px-3 text-[12px] font-semibold transition ${presenting ? "border-transparent ai-grad text-white shadow-md" : "border-line bg-card text-muted hover:text-ink"}`}
+          aria-label={presenting ? "Pause presenting" : "Present"}
+          className={`group relative mt-3 grid h-9 w-9 place-items-center rounded-full border transition ${presenting ? "border-transparent ai-grad text-white shadow-md" : "border-line bg-card text-muted hover:text-ink"}`}
         >
-          {presenting ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />} {presenting ? "Pause" : "Present"}
+          {presenting ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+          <span className="pointer-events-none absolute right-full mr-2 whitespace-nowrap rounded-full border border-line bg-card px-2.5 py-1 text-[12px] font-medium text-ink opacity-0 shadow-sm transition group-hover:opacity-100 group-focus-visible:opacity-100">{presenting ? "Pause" : "Present"}</span>
         </button>
         {done > 0 && (
           <button onClick={restart} className="mt-2 mr-1 flex items-center gap-1 text-[11px] text-faint transition hover:text-ink" aria-label="Start the tour over">
