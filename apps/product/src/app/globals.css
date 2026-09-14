@@ -265,3 +265,30 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .lumen .prod-tile .prod-go { transform: none; }
 }
+
+/* ── the stage (Get Started, scene 01): Vadal.ai, working ───────────────── */
+.lumen .ai-stage-glow { position: absolute; left: -10%; right: -10%; top: -45%; height: 80%; background: radial-gradient(closest-side, color-mix(in srgb, var(--ai-accent) 13%, transparent), transparent); pointer-events: none; animation: ai-breathe 7s ease-in-out infinite; }
+.lumen .ai-orbit { position: absolute; inset: -7px; border-radius: 9999px; border: 1px solid color-mix(in srgb, var(--ai-accent) 32%, transparent); animation: ai-orbit 7s linear infinite; }
+.lumen .ai-orbit::after { content: ""; position: absolute; top: -3px; left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 9999px; background: var(--ai-accent); box-shadow: 0 0 10px var(--ai-accent); }
+.lumen .ai-orbit-2 { inset: -14px; animation-duration: 11s; animation-direction: reverse; border-color: color-mix(in srgb, var(--ai-accent) 16%, transparent); }
+.lumen .ai-orbit-2::after { width: 4px; height: 4px; margin-left: -2px; top: -2px; opacity: 0.8; }
+@keyframes ai-orbit { to { transform: rotate(360deg); } }
+.lumen .ai-phrase-in { animation: ai-phrase-in 0.62s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.lumen .ai-phrase-out { animation: ai-phrase-out 0.42s ease both; pointer-events: none; }
+@keyframes ai-phrase-in { from { opacity: 0; transform: translateY(16px); filter: blur(7px); } to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes ai-phrase-out { from { opacity: 1; transform: none; filter: blur(0); } to { opacity: 0; transform: translateY(-12px); filter: blur(7px); } }
+.lumen .ai-card-in { animation: ai-card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes ai-card-in { from { opacity: 0; transform: translateY(10px) scale(0.985); } to { opacity: 1; transform: none; } }
+.lumen .ai-bar { transform-origin: left; animation: ai-bar-grow 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes ai-bar-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.lumen .ai-ring { stroke-dasharray: var(--c); stroke-dashoffset: var(--c); animation: ai-ring-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards; }
+@keyframes ai-ring-in { to { stroke-dashoffset: var(--o); } }
+.lumen .ai-timer { transform-origin: left; animation: ai-timer var(--dur, 3.6s) linear both; }
+@keyframes ai-timer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.lumen .ai-stage.is-paused .ai-timer, .lumen .ai-stage.is-paused .ai-orbit { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .lumen .ai-stage-glow, .lumen .ai-orbit, .lumen .ai-timer { animation: none; }
+  .lumen .ai-phrase-in, .lumen .ai-card-in, .lumen .ai-bar { animation: none; opacity: 1; transform: none; filter: none; }
+  .lumen .ai-phrase-out { display: none; }
+  .lumen .ai-ring { animation: none; stroke-dashoffset: var(--o); }
+}

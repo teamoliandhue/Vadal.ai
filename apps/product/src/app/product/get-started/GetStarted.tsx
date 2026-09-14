@@ -19,7 +19,8 @@ import Link from "next/link";
 import { ArrowDown, ArrowRight, Check, Circle, Lock, Pause, Play, RotateCcw } from "lucide-react";
 import { Button, SparkMark } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
-import { tourFor, TOUR_SEEN_KEY, type TourStepView } from "@/lib/tour";
+import { tourFor, productTiles, TOUR_SEEN_KEY, type TourStepView, type ProductTile } from "@/lib/tour";
+import { AiStage } from "./AiStage";
 import { org } from "@/lib/data";
 import { useViewAs } from "../useViewAs";
 import { useTourProgress } from "../useTourProgress";
@@ -41,6 +42,7 @@ function isTyping(t: EventTarget | null) {
 export function GetStarted() {
   const [role] = useViewAs();
   const steps = React.useMemo(() => tourFor(role), [role]);
+  const tiles = React.useMemo(() => productTiles(role), [role]);
   const { explored, mark, reset } = useTourProgress();
   const [stepIdx, setStepIdx, stepHydrated] = usePersistentState<number>("vadal:tour-step", 0);
   const [current, setCurrent] = React.useState(0);
@@ -151,13 +153,6 @@ export function GetStarted() {
     <div className="relative">
       {/* ── progress: a spine on the right at lg, a hairline under the bar below ── */}
       <nav aria-label="Tour scenes" className="fixed right-5 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-end gap-1 lg:flex">
-        <button
-          onClick={() => { if (!presenting && current >= last) go(0); setPresenting((p) => !p); }}
-          aria-pressed={presenting}
-          className={`mb-3 flex h-9 items-center gap-1.5 rounded-full border px-3 text-[12px] font-semibold transition ${presenting ? "border-transparent ai-grad text-white shadow-md" : "border-line bg-card text-muted hover:text-ink"}`}
-        >
-          {presenting ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />} {presenting ? "Pause" : "Present"}
-        </button>
         <p className="mb-1 mr-1 text-[11px] font-semibold tabular-nums text-faint">{done}/{steps.length}</p>
         {steps.map((s) => {
           const isCurrent = s.index === current;
@@ -184,6 +179,13 @@ export function GetStarted() {
             </button>
           );
         })}
+        <button
+          onClick={() => { if (!presenting && current >= last) go(0); setPresenting((p) => !p); }}
+          aria-pressed={presenting}
+          className={`mt-3 flex h-9 items-center gap-1.5 rounded-full border px-3 text-[12px] font-semibold transition ${presenting ? "border-transparent ai-grad text-white shadow-md" : "border-line bg-card text-muted hover:text-ink"}`}
+        >
+          {presenting ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />} {presenting ? "Pause" : "Present"}
+        </button>
         {done > 0 && (
           <button onClick={restart} className="mt-2 mr-1 flex items-center gap-1 text-[11px] text-faint transition hover:text-ink" aria-label="Start the tour over">
             <RotateCcw className="h-3 w-3" /> Start over
@@ -209,6 +211,8 @@ export function GetStarted() {
           isExplored={explored.includes(s.id)}
           onNext={() => { setPresenting(false); go(s.index + 1); }}
           onOpen={() => mark(s.id)}
+          onGoScene={(i) => { setPresenting(false); go(i); }}
+          tiles={tiles}
         >
           {s.id === "done" ? (
             <Done steps={steps} explored={explored} onRestart={restart} onGo={go} />
@@ -230,9 +234,11 @@ const Scene = React.forwardRef<
     isExplored: boolean;
     onNext: () => void;
     onOpen: () => void;
+    onGoScene: (i: number) => void;
+    tiles: ProductTile[];
     children: React.ReactNode;
   }
->(function Scene({ step, total, isExplored, onNext, onOpen, children }, ref) {
+>(function Scene({ step, total, isExplored, onNext, onOpen, onGoScene, tiles, children }, ref) {
   const first = step.index === 0;
   const last = step.index === total - 1;
   const byDoing = Boolean(step.completesOn) && !step.locked;
@@ -252,25 +258,32 @@ const Scene = React.forwardRef<
 
       <div className={`relative mx-auto w-full max-w-[1320px] px-6 sm:px-10 lg:px-16 ${first ? "py-5 lg:py-4" : "py-14 lg:py-16"} ${first || last ? "" : "grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-16"}`}>
         {first ? (
-          /* ── the opening. One frame, five seconds: category, what we sell,
-             the AI visibly doing work, the nine by name, and the way in —
-             all above the fold at 1440×900. ── */
-          <div className="mx-auto max-w-[900px] text-center">
-            <p className="story-in flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[12.5px] font-semibold uppercase tracking-[0.16em] text-faint">
-              <span className="ai-grad grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" state="idle" /></span>
-              <span>Vadal.ai · HR software for the whole workforce</span>
-            </p>
-            <h1 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-2 text-[clamp(30px,4vw,52px)] font-bold leading-[1.02] tracking-[-0.035em]">
-              Nine HR products.<br /><span className="ai-text-grad">One AI that acts.</span>
-            </h1>
-            <p className="story-in story-in-3 mx-auto mt-2 max-w-[64ch] text-[clamp(15px,1.2vw,18px)] leading-snug text-muted">
-              Listens to every employee, desk and frontline. Then does the work itself.
-            </p>
-            <div className="story-in story-in-4 mx-auto mt-4 max-w-[1040px]">{children}</div>
-            <div className="story-in story-in-4 mt-3 flex flex-wrap items-center justify-center gap-3">
-              <Button variant="brand" className="min-h-[48px] px-6" trailingIcon={<ArrowDown className="h-4 w-4" />} onClick={onNext}>Start the tour</Button>
-              <Link href="/product/home" className="flex min-h-[48px] items-center px-3 text-[14px] font-semibold text-muted transition hover:text-ink">Skip for now</Link>
+          /* ── the opening. One frame: the story on the left, the assistant
+             working on the right, the nine by name underneath — all above
+             the fold at 1440×900. ── */
+          <div className="mx-auto max-w-[1080px]">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-12">
+              <div className="min-w-0 text-left">
+                <p className="story-in flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">
+                  <span className="ai-grad grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={13} tone="solid" state="idle" /></span>
+                  <span>Vadal.ai · HR software for the whole workforce</span>
+                </p>
+                <h1 id={`scene-${step.id}-title`} className="story-in story-in-2 mt-4 text-[clamp(34px,3.7vw,56px)] font-bold leading-[1.02] tracking-[-0.035em]">
+                  Nine HR products.<br /><span className="ai-text-grad">One AI that acts.</span>
+                </h1>
+                <p className="story-in story-in-3 mt-4 max-w-[38ch] text-[clamp(16px,1.25vw,19px)] leading-snug text-muted">
+                  Listens to every employee, desk and frontline. Then does the work itself.
+                </p>
+                <div className="story-in story-in-4 mt-6 flex flex-wrap items-center gap-3">
+                  <Button variant="brand" className="min-h-[48px] px-6" trailingIcon={<ArrowDown className="h-4 w-4" />} onClick={onNext}>Start the tour</Button>
+                  <Link href="/product/home" className="flex min-h-[48px] items-center px-3 text-[14px] font-semibold text-muted transition hover:text-ink">Skip for now</Link>
+                </div>
+              </div>
+              <div className="story-in story-in-3 min-w-0">
+                <AiStage onGo={onGoScene} tiles={tiles} />
+              </div>
             </div>
+            <div className="story-in story-in-4 mt-5">{children}</div>
           </div>
         ) : last ? (
           /* ── the close ── */
