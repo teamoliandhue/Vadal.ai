@@ -19,8 +19,8 @@ import { MoodCheck } from "../home/MoodCheck";
 import { GiveRecognition } from "../recognition/GiveRecognition";
 import { useSession } from "../useSession";
 import { DayArea, GoalRing, ScoreRing, Sparkline, StreakStrip } from "@/components/charts";
-import { FEATURES } from "@/lib/ai/features";
-import { org, myRecognition, me, engagementTrend } from "@/lib/data";
+
+import { myRecognition, me, engagementTrend } from "@/lib/data";
 import { feedItems } from "@/lib/feed";
 import { campaigns } from "@/lib/campaigns";
 import { team, reports, managerActions } from "@/lib/manager";
@@ -131,16 +131,8 @@ function Mini({ name }: { name: string }) {
 function Welcome({ onGo }: { onGo?: (i: number) => void }) {
   const [role] = useViewAs();
   const tiles = productTiles(role);
-  const live = FEATURES.filter((f) => f.wiredTo && !f.blocked).length;
   return (
     <div className="mx-auto w-full">
-      {/* a label strip, not a block: the Aurora is a hairline, the proof is the words */}
-      <div className="relative mb-3 flex items-center gap-2.5 overflow-hidden rounded-full border border-line bg-card/80 px-3 py-1.5 backdrop-blur">
-        <span aria-hidden className="ai-grad absolute inset-x-0 top-0 h-[2px]" />
-        <span className="ai-grad grid h-6 w-6 shrink-0 place-items-center rounded-full"><SparkMark size={12} tone="solid" state="idle" /></span>
-        <p className="min-w-0 truncate text-[12.5px]"><span className="font-semibold">{org.name}</span><span className="text-muted"> · {org.headcount.toLocaleString()} people · {live} AI features live</span></p>
-        <span className="ml-auto flex shrink-0 items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--success)]"><span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" /> Live</span>
-      </div>
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {tiles.map((t, i) => (
           <li key={t.n} className="min-w-0">

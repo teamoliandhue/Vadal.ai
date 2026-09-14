@@ -274,9 +274,9 @@ index — `01` at 44px/800, `--ink` at 5% — sitting in the bottom-right corner
 beneath it, the chip fills lavender with a violet icon, and the arrow slides in beside the name.
 Below `sm` the cards stack one-up and the fragments hide; they are for a glance, not a thumb.
 
-**The label strip** replaces the gradient block: a pill on a hairline — a 2px Aurora rule across
-its top — with the mark, *oliandhue · 12,480 people · 52 AI features live*, and `● LIVE` in
-`--success`. The Aurora is a line, and the proof is the words.
+**No strip above the grid.** The gradient block became a hairline label pill, and then the
+founders had that removed too — the nine cards sit directly under the hero, and the counts they
+carried live in the cards themselves.
 
 **Present** is now a 36px round icon at the spine's foot with a hover label; as a pill it landed on
 the Grow card once the grid grew to full width.
