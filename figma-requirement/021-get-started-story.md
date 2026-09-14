@@ -189,12 +189,14 @@ is drawn like a button.
 
 | | |
 |---|---|
-| **Tile** | 3×3, hairlines via `gap-px` on `--line`, tiles `--card`, min-height 96px (114px at 375, three across, no overflow) |
-| **Contents** | icon chip (32px, 12px radius) · `01` · lock glyph when gated · `→` on the right (hidden at rest) — then **Pulse** (14px/600) over *Surveys & sentiment* (11.5px `--faint`) |
+| **Tile** | 3×3, hairlines via `gap-px` on `--line`, tiles `--card`, min-height 104px (130px at 375, three across, nothing clipped) |
+| **Composition** | two anchored blocks, `justify-between`: a top line that **spans the tile** — 36px icon chip hard left, `01` (10.5px bold tabular `--faint`, lock glyph before it when gated) hard right — and a bottom block of **Pulse** (15px/600, −0.01em) over *Surveys & sentiment* (11.5px `--faint`). The index used to sit beside the icon, which left a dead third of every tile and let the text drift in the middle |
+| **Chip** | `--soft` with a hairline ring and a 1px top highlight (`inset 0 1px 0` at 70% `--card`), so it reads as pressed into the surface rather than a flat grey box |
 | **Icon** | the section's own nav icon — Gauge, Newspaper, Share2, HeartPulse, Megaphone, GraduationCap, LifeBuoy, UsersRound, FolderKanban — so what you meet here is what you recognise in the sidebar a minute later |
 | **Colour** | none at rest. The icons are monochrome and the brand violet is the only colour hover introduces |
 | **Rest** | chip `--soft`, icon `--muted`; name `--ink`, descriptor `--faint` |
-| **Hover / focus** | tile → `--soft` · chip → violet at 10% with a 1px violet ring, icon → `--purple` · arrow fades in from the left. No scale, no tilt |
+| **Hover / focus** | tile → `--soft` · chip → `--lav` with a 30% violet ring and a soft violet drop-glow, icon → `--purple` · the index lifts `--faint` → `--muted` · an arrow slides in **beside the name** (`Broadcast →`), not in the corner where it would fight the index. No scale, no tilt |
+| **Touch** | the arrow is hidden below `sm` — it can never fire there and it stole width from the longest names |
 | **Entrance** | tiles cascade 45ms apart as the scene arrives |
 
 **Why monochrome.** An earlier pass gave each tile its own hue — the hue of the scene it leads

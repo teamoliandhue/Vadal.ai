@@ -105,18 +105,24 @@ function Welcome({ onGo }: { onGo?: (i: number) => void }) {
             <button
               type="button"
               onClick={() => onGo?.(t.index)}
-              className="prod-tile story-in group flex h-full min-h-[96px] w-full flex-col items-start gap-2 bg-card px-3.5 py-3.5 text-left focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--brand)]"
+              className="prod-tile story-in group flex h-full min-h-[104px] w-full flex-col justify-between gap-3 bg-card px-4 py-4 text-left focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--brand)]"
               style={{ transitionDelay: `${i * 45}ms` }}
             >
-              <span className="flex w-full items-center gap-2">
-                <span className="prod-ico grid h-9 w-9 shrink-0 place-items-center rounded-[10px]">{PRODUCT_ICON[t.name]}</span>
-                <span className="text-[10px] font-bold tabular-nums text-faint">{String(t.n).padStart(2, "0")}</span>
-                {t.locked && <Lock className="h-2.5 w-2.5 text-faint" aria-label="Not available to your role" />}
-                <ArrowRight className="prod-go ml-auto h-3.5 w-3.5 shrink-0" aria-hidden />
+              {/* the top line spans the tile: mark on the left, index on the right */}
+              <span className="flex w-full items-center justify-between">
+                <span className="prod-ico grid h-9 w-9 shrink-0 place-items-center rounded-[11px]">{PRODUCT_ICON[t.name]}</span>
+                <span className="prod-num flex items-center gap-1 text-[10.5px] font-bold tabular-nums text-faint">
+                  {t.locked && <Lock className="h-2.5 w-2.5" aria-label="Not available to your role" />}
+                  {String(t.n).padStart(2, "0")}
+                </span>
               </span>
               <span className="min-w-0">
-                <span className="block text-[14px] font-semibold leading-tight tracking-tight">{t.name}</span>
-                <span className="block text-[11.5px] leading-tight text-faint">{t.short}</span>
+                <span className="flex items-center gap-1.5">
+                  <span className="text-[15px] font-semibold leading-tight tracking-[-0.01em]">{t.name}</span>
+                  {/* hover-only affordance; on touch it just steals width from the name */}
+                  <ArrowRight className="prod-go hidden h-3.5 w-3.5 shrink-0 sm:block" aria-hidden />
+                </span>
+                <span className="mt-0.5 block text-[11.5px] leading-tight text-faint">{t.short}</span>
               </span>
             </button>
           </li>
