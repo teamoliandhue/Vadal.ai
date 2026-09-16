@@ -15,25 +15,28 @@ corners. The panel carries almost nothing.
 
 ## 2 · The photos, one after another
 
-The photo block is a **slideshow of the office** — teams, employees at their desks, IT people
-at code — international by design, so *for the whole workforce* is shown rather than claimed.
-Six free-licence Pexels photographs, cropped to 3:4 and shipped as 1050 × 1400 JPEGs in `/auth/`:
+The photo block is a **slideshow of teams celebrating in a dark office** — high-fives, raised
+hands, screens glowing — international by design. The team-celebration shot sets the look; six
+free-licence Pexels photographs were **graded to match it** (shadows crushed toward a cool
+violet-black, faces kept warm, a soft vignette) so the seven read as one world. All 3:4,
+shipped as 1050 × 1400 JPEGs in `/auth/`:
 
 | # | file | scene | Pexels |
 |---|------|-------|--------|
-| 1 | `office-1.jpg` | three colleagues at desks, code on a laptop | 12902874 |
-| 2 | `office-2.jpg` | a team of three at laptops with charts on the table | 7926209 |
-| 3 | `office-3.jpg` | a developer explaining code on a big monitor | 7988749 |
-| 4 | `office-4.jpg` | three professionals reviewing work on a laptop | 7793643 |
-| 5 | `office-5.jpg` | two colleagues at a desk by a city window | 8297574 |
-| 6 | `office-6.jpg` | an employee at her desk, a colleague passing | 7581046 |
+| 1 | `team-celebration.jpg` | the reference — a high-five across desks, code on the monitors | — |
+| 2 | `team-1.jpg` | hands stacked over laptops, a chart on the wall screen | 7988238 |
+| 3 | `team-2.jpg` | colleagues cheering across a desk | 7698801 |
+| 4 | `team-3.jpg` | a team raising fists by a window | 7793999 |
+| 5 | `team-4.jpg` | a three-way high-five, backlit | 9479826 |
+| 6 | `team-5.jpg` | a high-five over a paper-strewn desk | 7794015 |
+| 7 | `team-6.jpg` | hands together in a huddle | 6146814 |
 
 - Every slide is `object-cover` with a per-photo focus point (`50% 40–55%`).
 - **Advance every 6.5s.** The next slide fades in over 1.4s while the one leaving fades out
   underneath; each slide also settles from 1.06 → 1.0 scale over 7.5s (a slow Ken Burns push),
   so nothing is ever still.
 - The wash and the headline (below) sit *over* the slides and never move.
-- **Top-right, over the photo:** the index as six dashes (the current one 18px white, the
+- **Top-right, over the photo:** the index as seven dashes (the current one 18px white, the
   others 6px at 40%) and a round **Pause / Play** control — 44px on touch, 36px at `lg`,
   white on 30% ink with a 25% white ring and a backdrop blur. Paused holds the current slide.
 - `prefers-reduced-motion`: no fade, no push — the current slide is simply shown.
@@ -68,4 +71,4 @@ pulled 32px up over the banner, and rises into place. Nothing on the panel under
 ## 5 · Figma
 
 1440 × 900 and 375 frames, light and dark; the three steps (email · method · code); the pill
-states; the six slides with the index and the Pause / Play control in both states.
+states; the seven slides with the index and the Pause / Play control in both states.
