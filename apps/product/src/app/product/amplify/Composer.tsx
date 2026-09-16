@@ -115,7 +115,7 @@ function ShareActions({
         <span className="text-[14px] font-semibold">Did you post it?</span>
         <div className="ml-auto flex items-center gap-2">
           <Button size="sm" variant="brand" className="min-h-[44px] lg:min-h-0"
-            onClick={() => { setPosted(true); onPosted(); toast("Counted — it'll show in your reach and in Recognition"); }}>
+            onClick={() => { setPosted(true); onPosted(); toast("Counted — it'll show in your reach and in Kudos"); }}>
             Yes
           </Button>
           <Button size="sm" variant="tertiary" className="min-h-[44px] lg:min-h-0"

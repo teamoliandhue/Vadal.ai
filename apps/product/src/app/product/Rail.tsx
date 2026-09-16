@@ -80,7 +80,7 @@ export function Rail({ active }: { active: string }) {
         </div>
       }
       briefing={<AIBriefing title="Today's AI briefing" subtitle="3 new insights" onClick={() => ask("Walk me through today's AI briefing.")} />}
-      health={canAccess(role, "Pulse") ? <Health value={experienceScore().score} label="Health" trend={{ direction: "up", value: String(health.delta) }} href="/product" /> : undefined}
+      health={canAccess(role, "Insight") ? <Health value={experienceScore().score} label="Health" trend={{ direction: "up", value: String(health.delta) }} href="/product" /> : undefined}
       footer={canSettings ? <NavItem icon={<Settings className="size-[18px]" strokeWidth={1.85} />} label="Settings" active={active === "Settings"} href="/product/settings" /> : undefined}
     >
       {groups.map((group) => (

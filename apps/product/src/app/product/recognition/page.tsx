@@ -3,7 +3,7 @@ import { RecognitionHub } from "./RecognitionHub";
 
 export default function RecognitionPage() {
   return (
-    <Shell active="Recognition" breadcrumb="Recognition">
+    <Shell active="Kudos" breadcrumb="Kudos">
       <RecognitionHub />
     </Shell>
   );

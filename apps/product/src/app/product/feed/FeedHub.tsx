@@ -132,11 +132,11 @@ export function FeedHub() {
        bottom of the channel list permanently out of reach. */
     <div className={`${SPLIT} mx-auto max-w-[1100px] justify-center`}>
       {/* the stream */}
-      <div ref={topRef} tabIndex={0} aria-label="Feed" className={`${PANE} w-full max-w-[640px] space-y-4`}>
+      <div ref={topRef} tabIndex={0} aria-label="Social" className={`${PANE} w-full max-w-[640px] space-y-4`}>
         {/* header */}
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-[24px] font-bold tracking-tight text-ink">Feed</h1>
+            <h1 className="text-[24px] font-bold tracking-tight text-ink">Social</h1>
             <p className="text-[14px] text-muted">What&apos;s happening across oliandhue.</p>
           </div>
           <div className="flex items-center gap-2">

@@ -87,7 +87,7 @@ function Briefing({ v, setTab, period, setPeriod }: { v: PulseView; setTab: (t: 
       <div className="relative flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <Eyebrow>{org.name} · {v.isTeam ? v.scope : `${org.headcount.toLocaleString()} people`}</Eyebrow>
-          <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">People intelligence</h1>
+          <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Insight</h1>
           <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px] text-muted">
             <span className="text-[20px] font-bold tracking-tight text-ink">{h.score}</span>
             <Trend direction={h.delta >= 0 ? "up" : "down"} value={String(Math.abs(h.delta))} />
@@ -514,7 +514,7 @@ export function PulseDashboard() {
   // dashboard — Manager: Own team"). The scope control is replaced by a static
   // label rather than a select with one option, and the stored scope is ignored
   // so a value left over from an admin session cannot widen the view.
-  const { scope: dataScope, team: myTeam, ready: scopeReady } = useScope("Pulse");
+  const { scope: dataScope, team: myTeam, ready: scopeReady } = useScope("Insight");
   const [tab, setTab] = React.useState<Tab>("Overview");
   const [storedScope, setScope] = usePersistentState<string>("vadal:pulse-scope", ALL_TEAMS);
   const [period, setPeriod] = usePersistentState<string>("vadal:pulse-period", "30 days");
@@ -531,7 +531,7 @@ export function PulseDashboard() {
 
       {/* tabs + scope */}
       <div className="sticky top-[57px] z-10 -mx-2 flex flex-wrap lg:top-0 items-center justify-between gap-3 border-b border-line bg-canvas/85 px-2 py-2 backdrop-blur-md">
-        <div role="tablist" aria-label="Pulse sections" className="flex flex-wrap gap-1">
+        <div role="tablist" aria-label="Insight sections" className="flex flex-wrap gap-1">
           {TABS.map((t) => (
             <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`rounded-full px-3.5 py-1.5 text-[14px] font-semibold transition ${tab === t ? "bg-ink text-[var(--card)]" : "text-muted hover:bg-soft hover:text-ink"}`}>{t}</button>
           ))}

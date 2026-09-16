@@ -189,7 +189,7 @@ export function ReachCard() {
             is trimmed — including the first — so a space sitting right after an
             expression is eaten and you get "148colleagues". */}
         You&apos;re {myAdvocacy.rank}th of {myAdvocacy.of}{" "}
-        colleagues taking part. Advocacy counts as a contribution — it shows up in Recognition,
+        colleagues taking part. Advocacy counts as a contribution — it shows up in Kudos,
         not just marketing&apos;s dashboard.
       </p>
       <p className="mt-2 text-[12px] leading-snug text-faint">

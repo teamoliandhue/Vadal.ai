@@ -3,7 +3,7 @@ import { SurveysHub } from "./SurveysHub";
 
 export default function SurveysPage() {
   return (
-    <Shell active="Surveys" breadcrumb="Surveys">
+    <Shell active="Pulse" breadcrumb="Pulse">
       <SurveysHub />
     </Shell>
   );

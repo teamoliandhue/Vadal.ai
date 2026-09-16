@@ -235,7 +235,7 @@ export function ThriveHub() {
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[14px] font-semibold">{shiftContent.course.title}</span>
-                    <span className="block text-[12px] text-faint">{shiftContent.course.minutes} min · in Grow</span>
+                    <span className="block text-[12px] text-faint">{shiftContent.course.minutes} min · in iLearn</span>
                   </span>
                   <ArrowRight className="h-4 w-4 shrink-0 text-faint" />
                 </Link>

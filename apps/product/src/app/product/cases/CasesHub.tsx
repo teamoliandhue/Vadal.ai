@@ -89,7 +89,7 @@ export function CasesHub() {
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <Eyebrow>Operations</Eyebrow>
-            <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Cases</h1>
+            <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Flow</h1>
             <p className="mt-2 max-w-xl text-[14px] text-muted">Track and resolve people issues — from flight-risk follow-ups to ER cases. Owner, SLA and status on every one, confidential by design.</p>
           </div>
           <Button variant="brand" leadingIcon={<Plus className="h-4 w-4" />} onClick={() => toast("New case form (demo)", "info")}>New case</Button>

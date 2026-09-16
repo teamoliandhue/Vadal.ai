@@ -3,7 +3,7 @@ import { CasesHub } from "./CasesHub";
 
 export default function CasesPage() {
   return (
-    <Shell active="Cases" breadcrumb="Cases">
+    <Shell active="Flow" breadcrumb="Flow">
       <CasesHub />
     </Shell>
   );

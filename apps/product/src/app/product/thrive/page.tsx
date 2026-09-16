@@ -3,7 +3,7 @@ import { ThriveHub } from "./ThriveHub";
 
 export default function ThrivePage() {
   return (
-    <Shell active="Thrive" breadcrumb="Thrive">
+    <Shell active="iThrive" breadcrumb="iThrive">
       <ThriveHub />
     </Shell>
   );

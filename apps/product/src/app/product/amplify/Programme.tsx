@@ -283,7 +283,7 @@ export function Programme() {
               <Button
                 size="sm" variant="secondary" className="mt-3 min-h-[44px] lg:min-h-0"
                 trailingIcon={<ArrowRight className="h-3.5 w-3.5" />}
-                onClick={() => toast("Kudos drafted for 5 people — review them in Recognition")}
+                onClick={() => toast("Kudos drafted for 5 people — review them in Kudos")}
               >
                 Recognise all five
               </Button>

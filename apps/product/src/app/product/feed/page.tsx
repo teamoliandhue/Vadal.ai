@@ -5,7 +5,7 @@ import { FeedHub } from "./FeedHub";
 
 export default function FeedPage() {
   return (
-    <Shell active="Feed" breadcrumb="Feed" pane="split">
+    <Shell active="Social" breadcrumb="Social" pane="split">
       <FeedHub />
     </Shell>
   );

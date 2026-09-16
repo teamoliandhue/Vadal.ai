@@ -168,7 +168,7 @@ export function AnalyticsExplorer() {
         <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <Link href="/product" className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5"><ArrowLeft className="h-3 w-3" /> Back to Pulse</Link>
+            <Link href="/product" className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5"><ArrowLeft className="h-3 w-3" /> Back to Insight</Link>
             <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Analytics</h1>
             <p className="mt-2 max-w-xl text-[14px] text-muted">Slice any metric across any cut. Pulse tells you what needs attention — Analytics lets you ask why, your way.</p>
           </div>
@@ -278,7 +278,7 @@ export function AnalyticsExplorer() {
             <p className="mt-2 flex items-start gap-2 text-[14px] leading-relaxed text-muted"><SparkMark size={14} className="mt-0.5 shrink-0" /><span>{insight}</span></p>
             <div className="mt-4 flex items-center gap-2.5">
               <Button variant="brand" size="sm" leadingIcon={<SparkMark size={14} tone="solid" />} onClick={() => ask(`In Analytics, explain ${M.label} by ${DIMS[dim].label}.`)}>Ask Vadal</Button>
-              <Link href="/product" className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5">Act in Pulse <ArrowUpRight className="h-3 w-3" /></Link>
+              <Link href="/product" className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5">Act in Insight <ArrowUpRight className="h-3 w-3" /></Link>
             </div>
           </section>
         </div>

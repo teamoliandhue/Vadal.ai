@@ -364,7 +364,7 @@ export const mockProvider: AiProvider = {
       }
 
       case "recognise": {
-        if (!has("give_recognition")) { yield* deny("I can't post recognition from your account. Open Recognition and I'll help you word it there."); return; }
+        if (!has("give_recognition")) { yield* deny("I can't post recognition from your account. Open Kudos and I'll help you word it there."); return; }
         yield* streamText(`I've drafted recognition for **${intent.to}**. Change anything you'd like, then confirm to post it.`);
         yield proposeTool("give_recognition", {
           to: intent.to, value: "Ownership",

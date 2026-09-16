@@ -31,21 +31,21 @@ export const NAV: NavGroupModel[] = [
   {
     label: "My space",
     items: [
-      { label: "Home", icon: House, href: "/product/home" },
-      { label: "Feed", icon: Newspaper, href: "/product/feed" },
+      { label: "Journey", icon: House, href: "/product/home" },
+      { label: "Social", icon: Newspaper, href: "/product/feed" },
     ],
   },
   {
-    label: "Intelligence",
+    label: "Insight",
     items: [
-      { label: "Pulse", icon: Gauge, href: "/product" },
+      { label: "Insight", icon: Gauge, href: "/product" },
       { label: "Analytics", icon: BarChart3, href: "/product/analytics" },
     ],
   },
   {
     label: "Listen",
     items: [
-      { label: "Surveys", icon: ClipboardList, href: "/product/surveys" },
+      { label: "Pulse", icon: ClipboardList, href: "/product/surveys" },
       { label: "Sentiment", icon: Smile, href: "/product/sentiment" },
       { label: "Always-on listening", icon: Radio, href: "/product/listening" },
     ],
@@ -53,7 +53,7 @@ export const NAV: NavGroupModel[] = [
   {
     label: "Engage",
     items: [
-      { label: "Recognition", icon: HeartHandshake, href: "/product/recognition" },
+      { label: "Kudos", icon: HeartHandshake, href: "/product/recognition" },
       { label: "Campaigns", icon: Megaphone, href: "/product/campaigns" },
       { label: "Amplify", icon: Share2, href: "/product/amplify" },
     ],
@@ -61,19 +61,19 @@ export const NAV: NavGroupModel[] = [
   {
     label: "Wellbeing",
     items: [
-      { label: "Thrive", icon: HeartPulse, href: "/product/thrive" },
-      { label: "One-to-One Help", icon: LifeBuoy, href: "/product/help" },
+      { label: "iThrive", icon: HeartPulse, href: "/product/thrive" },
+      { label: "SmartWork", icon: LifeBuoy, href: "/product/help" },
     ],
   },
   {
     label: "Learn",
-    items: [{ label: "Grow", icon: GraduationCap, href: "/product/grow" }],
+    items: [{ label: "iLearn", icon: GraduationCap, href: "/product/grow" }],
   },
   {
     label: "Operations",
     items: [
       { label: "Manager hub", icon: UsersRound, href: "/product/managers" },
-      { label: "Cases", icon: FolderKanban, href: "/product/cases" },
+      { label: "Flow", icon: FolderKanban, href: "/product/cases" },
     ],
   },
   {

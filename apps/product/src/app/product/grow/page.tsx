@@ -3,7 +3,7 @@ import { GrowHub } from "./GrowHub";
 
 export default function GrowPage() {
   return (
-    <Shell active="Grow" breadcrumb="Grow">
+    <Shell active="iLearn" breadcrumb="iLearn">
       <GrowHub />
     </Shell>
   );

@@ -29,17 +29,17 @@ const go = (href: string) => (r: ReturnType<typeof useRouter>) => r.push(href);
 const ask = (q: string) => () => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 
 const NAV: { label: string; icon: LucideIcon; href: string }[] = [
-  { label: "Home", icon: House, href: "/product/home" },
-  { label: "Pulse", icon: Gauge, href: "/product" },
+  { label: "Journey", icon: House, href: "/product/home" },
+  { label: "Insight", icon: Gauge, href: "/product" },
   { label: "Analytics", icon: BarChart3, href: "/product" },
-  { label: "Surveys", icon: ClipboardList, href: "/product" },
+  { label: "Pulse", icon: ClipboardList, href: "/product" },
   { label: "Sentiment", icon: Smile, href: "/product" },
   { label: "Always-on listening", icon: Radio, href: "/product" },
-  { label: "Recognition", icon: HeartHandshake, href: "/product" },
+  { label: "Kudos", icon: HeartHandshake, href: "/product" },
   { label: "Campaigns", icon: Megaphone, href: "/product" },
-  { label: "Feed", icon: Newspaper, href: "/product/feed" },
+  { label: "Social", icon: Newspaper, href: "/product/feed" },
   { label: "Manager hub", icon: UsersRound, href: "/product" },
-  { label: "Cases", icon: FolderKanban, href: "/product" },
+  { label: "Flow", icon: FolderKanban, href: "/product" },
   { label: "Knowledge", icon: BookOpen, href: "/product" },
   { label: "Settings", icon: Settings, href: "#" },
 ];

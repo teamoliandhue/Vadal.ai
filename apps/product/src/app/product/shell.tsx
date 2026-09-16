@@ -22,11 +22,11 @@ import { SectionGuard } from "./SectionGuard";
 
 /* left-hand domain label per section (top-bar breadcrumb root) */
 const DOMAIN: Record<string, string> = {
-  "Get Started": "Vadal.ai", Home: "My space", Feed: "My space", Pulse: "People intelligence", Analytics: "People intelligence",
-  Surveys: "Listening", Sentiment: "Listening", "Always-on listening": "Listening",
-  Recognition: "Engage", Campaigns: "Engage", Amplify: "Engage",
-  Thrive: "Wellbeing", "One-to-One Help": "Wellbeing", Grow: "Learn",
-  "Manager hub": "Operations", Cases: "Operations", Knowledge: "Workspace", Settings: "Account",
+  "Get Started": "Vadal.ai", Journey: "My space", Social: "My space", Insight: "Insight", Analytics: "Insight",
+  Pulse: "Listen", Sentiment: "Listen", "Always-on listening": "Listen",
+  Kudos: "Engage", Campaigns: "Engage", Amplify: "Engage",
+  iThrive: "Wellbeing", SmartWork: "Wellbeing", iLearn: "Learn",
+  "Manager hub": "Operations", Flow: "Operations", Knowledge: "Workspace", Settings: "Account",
 };
 
 export function Shell({

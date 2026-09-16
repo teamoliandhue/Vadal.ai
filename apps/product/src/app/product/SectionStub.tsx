@@ -29,7 +29,7 @@ export function SectionStub({
         </ul>
         <div className="mt-6 flex items-center justify-center gap-3">
           <Button variant="brand" leadingIcon={<Sparkles className="h-4 w-4" />} onClick={() => ask(askQ)}>Ask Vadal</Button>
-          <Link href="/product" className="flex items-center gap-1 text-[14px] font-semibold text-[var(--purple)] transition hover:gap-1.5">Back to Pulse <ArrowRight className="h-3.5 w-3.5" /></Link>
+          <Link href="/product" className="flex items-center gap-1 text-[14px] font-semibold text-[var(--purple)] transition hover:gap-1.5">Back to Insight <ArrowRight className="h-3.5 w-3.5" /></Link>
         </div>
       </section>
     </div>

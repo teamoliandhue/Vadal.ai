@@ -37,15 +37,15 @@ type Exchange = { q: string; a: string; product: string };
 const c0 = cases[0];
 const leave = findAnswer("How many paid leaves do I have?").answer.replace(/\*\*/g, "").split(",")[0];
 const SCRIPT: Exchange[] = [
-  { q: "How is the team feeling?", a: `I read 8,486 responses. Net sentiment is +${sentiment.net}, up ${sentiment.netDelta} this quarter.`, product: "Pulse" },
-  { q: "Who might leave?", a: `${c0.subject} — 92% flight risk, no 1:1 in six weeks. I opened ${c0.id}; ${c0.owner.name} owns it.`, product: "Cases" },
+  { q: "How is the team feeling?", a: `I read 8,486 responses. Net sentiment is +${sentiment.net}, up ${sentiment.netDelta} this quarter.`, product: "Listen" },
+  { q: "Who might leave?", a: `${c0.subject} — 92% flight risk, no 1:1 in six weeks. I opened ${c0.id}; ${c0.owner.name} owns it.`, product: "Flow" },
   { q: "Write up the onboarding win for LinkedIn.", a: "Drafted in your voice. Policy check passed — it's your tap to post.", product: "Amplify" },
-  { q: "Ask Line 2 about the new equipment.", a: "Three questions, sent by push at 06:10 — the hour they actually answer.", product: "Pulse" },
+  { q: "Ask Line 2 about the new equipment.", a: "Three questions, sent by push at 06:10 — the hour they actually answer.", product: "Listen" },
   { q: "How many paid leaves do I have?", a: `${leave} — cited from your leave policy.`, product: "Broadcast" },
   { q: "What should I do this week?", a: `${managerActions[0].title}. His sentiment is down 14 pts.`, product: "Managers" },
   { q: "Any burnout signals?", a: `Engineering, down 6 pts. I proposed ${suggestedCampaign.name} — ${suggestedCampaign.predictedLift} predicted lift.`, product: "Broadcast" },
-  { q: "Turn the POSH policy into a course.", a: `Done — ${courses[0].lessons.length} lessons, ${courses[0].minutes} minutes, built from the document.`, product: "Grow" },
-  { q: "I'm not sleeping well.", a: `I hear you. ${counsellors[0].name} has ${counsellors[0].nextAvailable.toLowerCase()} — context carried, nothing repeated.`, product: "Help" },
+  { q: "Turn the POSH policy into a course.", a: `Done — ${courses[0].lessons.length} lessons, ${courses[0].minutes} minutes, built from the document.`, product: "iLearn" },
+  { q: "I'm not sleeping well.", a: `I hear you. ${counsellors[0].name} has ${counsellors[0].nextAvailable.toLowerCase()} — context carried, nothing repeated.`, product: "SmartWork" },
 ];
 
 type Phase = "typing" | "sent" | "thinking" | "answer" | "hold";
@@ -86,7 +86,7 @@ export function AiStage({ onGo, tiles }: { onGo?: (i: number) => void; tiles: Pr
       <div className="flex w-full justify-center lg:justify-end">
         <button type="button" onClick={() => setOpen(true)} className="ai-card-in flex min-h-[48px] items-center gap-2.5 rounded-full border border-line bg-card py-2 pl-2.5 pr-4 shadow-[0_10px_34px_rgba(20,20,25,0.16)] transition hover:-translate-y-0.5">
           <span className="ai-aura ai-grad grid h-8 w-8 place-items-center rounded-full"><SparkMark size={16} tone="solid" state="idle" /></span>
-          <span className="text-[14px] font-semibold">Vadal <span className="rounded-[4px] border border-line px-1 text-[11px] font-bold text-muted">AI</span></span>
+          <span className="text-[14px] font-semibold">Nudge <span className="rounded-[4px] border border-line px-1 text-[11px] font-bold text-muted">AI</span></span>
           <span className="text-[13px] text-faint">Open</span>
         </button>
       </div>
@@ -106,7 +106,7 @@ export function AiStage({ onGo, tiles }: { onGo?: (i: number) => void; tiles: Pr
             <span className="ai-grad grid h-8 w-8 place-items-center rounded-full"><SparkMark size={15} tone="solid" state={showAssistant && phase !== "hold" ? "thinking" : "idle"} /></span>
             <span className="absolute -bottom-0.5 -right-1 rounded-[4px] border border-line bg-card px-[3px] text-[8px] font-bold leading-[12px] text-muted">AI</span>
           </span>
-          <span className="text-[14px] font-semibold">Vadal</span>
+          <span className="text-[14px] font-semibold">Nudge</span>
           <span className="ml-1.5 flex items-center gap-1 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-faint"><span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" /> online</span>
           <span className="ml-auto flex items-center gap-0.5">
             <button type="button" onClick={() => setOpen(false)} aria-label="Minimise" className="grid h-11 w-11 place-items-center rounded-lg text-muted transition hover:bg-soft hover:text-ink lg:h-8 lg:w-8"><Minus className="h-4 w-4" strokeWidth={1.75} /></button>
@@ -161,7 +161,7 @@ export function AiStage({ onGo, tiles }: { onGo?: (i: number) => void; tiles: Pr
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               placeholder={focused || q ? "How can I help you today?" : ""}
-              aria-label="Ask Vadal AI"
+              aria-label="Ask Nudge"
               className="block h-11 w-full bg-transparent text-[14px] outline-none placeholder:text-faint lg:h-9"
             />
             {!focused && !q && (

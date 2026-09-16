@@ -59,29 +59,29 @@ const ADMIN_UP: Role[] = ["admin", "superadmin"];
  */
 export const SECTION_ACCESS: Record<string, Role[]> = {
   "Get Started": ALL_ROLES,
-  Home: ALL_ROLES,
-  Feed: ALL_ROLES,
-  Recognition: ALL_ROLES,
+  Journey: ALL_ROLES,
+  Social: ALL_ROLES,
+  Kudos: ALL_ROLES,
   Knowledge: ALL_ROLES,
 
   // The four pillars from the brief that had no screens. All are employee-facing
   // by design — Thrive is your own health and money, Grow is your own learning,
   // One-to-One Help must never be gated, and Amplify only works if employees can
   // actually reach it. Authoring inside them is gated separately, in the screen.
-  Thrive: ALL_ROLES,
-  Grow: ALL_ROLES,
+  iThrive: ALL_ROLES,
+  iLearn: ALL_ROLES,
   Amplify: ALL_ROLES,
-  "One-to-One Help": ALL_ROLES,
+  SmartWork: ALL_ROLES,
 
-  Pulse: MANAGER_UP,
+  Insight: MANAGER_UP,
   Sentiment: MANAGER_UP,
   "Manager hub": MANAGER_UP,
   Campaigns: MANAGER_UP, // brief: managers author team-only — scoped by scopeFor
 
   Analytics: ADMIN_UP,
-  Surveys: ADMIN_UP,
+  Pulse: ADMIN_UP,
   "Always-on listening": ADMIN_UP,
-  Cases: ADMIN_UP,
+  Flow: ADMIN_UP,
   Settings: ADMIN_UP,
 };
 
@@ -124,7 +124,7 @@ export type DataScope = "self" | "own-team" | "all";
 export function scopeFor(role: Role | null | undefined, section: string): DataScope {
   if (!role) return "self";
   if (role === "admin" || role === "superadmin") return "all";
-  if (role === "manager") return canAccess("manager", section) && section !== "Home" && section !== "Feed"
+  if (role === "manager") return canAccess("manager", section) && section !== "Journey" && section !== "Social"
     ? "own-team"
     : "self";
   return "self";

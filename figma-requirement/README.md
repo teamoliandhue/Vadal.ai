@@ -37,3 +37,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 019 | [Vadal.ai › Get Started — a tour, one idea at a time](./019-get-started-tour.md) | Layout superseded by 021 |
 | 020 | [Get Started — explored by doing, and how the tour is shown](./020-get-started-by-doing.md) | Built · needs Figma |
 | 021 | [Get Started — a story, one screen per idea](./021-get-started-story.md) | Built · needs Figma |
+| 022 | [Naming — the one-word module names](./022-naming.md) | Applied · needs Figma |

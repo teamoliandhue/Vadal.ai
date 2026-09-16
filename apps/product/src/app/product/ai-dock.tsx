@@ -181,7 +181,7 @@ export function AiDock() {
           <div className="flex items-center gap-2.5 border-b border-line px-4 py-3 dark:border-white/10">
             <span className="ai-grad grid h-8 w-8 place-items-center rounded-full"><SparkMark size={18} tone="solid" state={busy ? "thinking" : "still"} /></span>
             <div className="flex-1">
-              <div className="text-[14px] font-bold tracking-tight">Vadal AI</div>
+              <div className="text-[14px] font-bold tracking-tight">Nudge</div>
               <div className="text-[14px] text-faint">{busy ? "Thinking…" : "Ask HR or Company"}</div>
             </div>
             <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-7 w-7 place-items-center rounded-full text-faint transition hover:bg-soft"><X className="h-4 w-4" /></button>
@@ -321,13 +321,13 @@ export function AiDock() {
           there, and the pill was sitting on its send button. */}
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label={onTour ? "Ask Vadal" : undefined}
+        aria-label={onTour ? "Ask Nudge" : undefined}
         className={`fixed bottom-5 right-6 z-30 flex items-center gap-2.5 rounded-full border border-line bg-card shadow-[0_10px_34px_rgba(20,20,25,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_44px_rgba(139,124,248,0.32)] dark:border-white/10 dark:shadow-[0_10px_34px_rgba(0,0,0,0.5)] max-lg:bottom-[76px] ${onTour ? "p-2 max-lg:hidden" : "py-2.5 pl-3 pr-4"}`}
       >
         <span className="ai-aura ai-grad grid h-8 w-8 place-items-center rounded-full"><SparkMark size={18} tone="solid" state="idle" /></span>
         {!onTour && (
           <span className="text-left">
-            <span className="flex items-center gap-1 text-[14px] font-semibold">Vadal <span className="rounded-[4px] border border-line px-1 text-[12px] font-bold text-muted dark:border-white/15">AI</span></span>
+            <span className="flex items-center gap-1 text-[14px] font-semibold">Nudge <span className="rounded-[4px] border border-line px-1 text-[12px] font-bold text-muted dark:border-white/15">AI</span></span>
             <span className="block text-[14px] text-faint">What are you looking for today?</span>
           </span>
         )}

@@ -149,7 +149,7 @@ export const myMoments: Moment[] = [
     id: "m3", kind: "certification",
     what: "Finished the accessibility certification",
     when: "2 weeks ago",
-    why: "You completed this in Grow. Certifications are the single most-shared moment type on LinkedIn.",
+    why: "You completed this in iLearn. Certifications are the single most-shared moment type on LinkedIn.",
   },
   {
     id: "m4", kind: "milestone",

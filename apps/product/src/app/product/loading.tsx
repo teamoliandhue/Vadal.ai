@@ -7,7 +7,7 @@ function Sk({ className = "" }: { className?: string }) {
 
 export default function Loading() {
   return (
-    <Shell active="Pulse" breadcrumb="Pulse">
+    <Shell active="Insight" breadcrumb="Insight">
       <div className="flex flex-col gap-6">
         <div className="rounded-[28px] border border-line bg-card p-7 sm:p-9">
           <Sk className="h-3 w-40" />

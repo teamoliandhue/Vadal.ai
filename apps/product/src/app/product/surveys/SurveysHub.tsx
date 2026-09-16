@@ -63,7 +63,7 @@ export function SurveysHub() {
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <Eyebrow>Listen</Eyebrow>
-            <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Surveys</h1>
+            <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Pulse</h1>
             <p className="mt-2 max-w-xl text-[14px] text-muted">Ask deliberately — launch, track, and read surveys. The listening that feeds Pulse.</p>
           </div>
           <Button variant="brand" leadingIcon={<Plus className="h-4 w-4" />} onClick={() => setBuilder({ name: "", cadence: "One-time" })}>Launch survey</Button>

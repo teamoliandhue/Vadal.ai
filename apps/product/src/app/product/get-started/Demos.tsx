@@ -74,15 +74,15 @@ function Stat({ value, label, sub }: { value: React.ReactNode; label: string; su
     line weight (1.75 at 19px), not the library default. */
 const ICO = "h-[17px] w-[17px]";
 const PRODUCT_ICON: Record<string, React.ReactNode> = {
-  Pulse: <Gauge className={ICO} strokeWidth={1.75} />,
-  Connect: <Newspaper className={ICO} strokeWidth={1.75} />,
+  Listen: <Gauge className={ICO} strokeWidth={1.75} />,
+  Social: <Newspaper className={ICO} strokeWidth={1.75} />,
   Amplify: <Share2 className={ICO} strokeWidth={1.75} />,
-  Thrive: <HeartPulse className={ICO} strokeWidth={1.75} />,
+  iThrive: <HeartPulse className={ICO} strokeWidth={1.75} />,
   Broadcast: <Megaphone className={ICO} strokeWidth={1.75} />,
-  Grow: <GraduationCap className={ICO} strokeWidth={1.75} />,
-  Help: <LifeBuoy className={ICO} strokeWidth={1.75} />,
+  iLearn: <GraduationCap className={ICO} strokeWidth={1.75} />,
+  SmartWork: <LifeBuoy className={ICO} strokeWidth={1.75} />,
   Managers: <UsersRound className={ICO} strokeWidth={1.75} />,
-  Cases: <FolderKanban className={ICO} strokeWidth={1.75} />,
+  Flow: <FolderKanban className={ICO} strokeWidth={1.75} />,
 };
 
 /* A fragment of each product, live — the thing you would see inside it, at
@@ -91,16 +91,16 @@ const PRODUCT_ICON: Record<string, React.ReactNode> = {
 function Mini({ name }: { name: string }) {
   const V = "var(--client-brand, var(--purple))";
   switch (name) {
-    case "Pulse":
+    case "Listen":
       return <span className="flex items-end gap-2"><span className="w-16"><Sparkline id="mini-pulse" values={engagementTrend.series} color={V} height={26} /></span><span className="text-[13px] font-bold tabular-nums">{engagementTrend.series.at(-1)}</span></span>;
-    case "Connect": {
+    case "Social": {
       const post = feedItems[0];
       const hearts = Object.values(post.reactions).reduce((a, b) => a + (b ?? 0), 0);
       return <span className="flex items-center gap-1.5"><span className="flex -space-x-1.5">{post.reactedBy.slice(0, 3).map((src, i) => <Avatar key={i} src={src} name="" size="xs" />)}</span><span className="text-[12px] font-semibold tabular-nums text-muted">♥ {hearts}</span></span>;
     }
     case "Amplify":
       return <span className="flex items-end gap-2"><span className="w-16"><Sparkline id="mini-reach" values={myReachSeries} color="var(--success)" height={26} /></span><span className="text-[13px] font-bold tabular-nums">{myReachSeries.at(-1)}</span></span>;
-    case "Thrive": {
+    case "iThrive": {
       const d = challengeProgress.days, mx = Math.max(...d);
       return <span className="flex h-7 items-end gap-[3px]">{d.map((v, i) => <span key={i} className="w-[6px] rounded-[2px]" style={{ height: `${Math.max(18, (v / mx) * 100)}%`, background: v >= challengeProgress.target ? V : "color-mix(in srgb, var(--muted) 30%, transparent)" }} />)}</span>;
     }
@@ -108,11 +108,11 @@ function Mini({ name }: { name: string }) {
       const c = campaigns[0];
       return <span className="flex w-24 flex-col gap-1"><span className="flex justify-between text-[10.5px] text-faint"><span>reach</span><span className="font-semibold tabular-nums text-ink">{c.reach}%</span></span><span className="h-1.5 overflow-hidden rounded-full bg-soft"><span className="block h-full rounded-full" style={{ width: `${c.reach}%`, background: V }} /></span></span>;
     }
-    case "Grow": {
+    case "iLearn": {
       const mx = Math.max(...learningDays.map((d) => d.minutes), 1);
       return <span className="flex h-7 items-end gap-[3px]">{learningDays.map((d, i) => <span key={i} className="w-[6px] rounded-[2px]" style={{ height: d.minutes ? `${Math.max(22, (d.minutes / mx) * 100)}%` : "14%", background: d.minutes ? V : "var(--line)" }} />)}</span>;
     }
-    case "Help": {
+    case "SmartWork": {
       const c = counsellors[0];
       return <span className="flex items-center gap-2"><Avatar src={c.img} name={c.name} size="sm" /><span className="text-[11.5px] leading-tight text-muted">{c.nextAvailable.replace("Today, ", "")}<br /><span className="text-faint">today</span></span></span>;
     }
@@ -120,7 +120,7 @@ function Mini({ name }: { name: string }) {
       const r = reports[0];
       return <span className="flex items-end gap-2"><span className="w-16"><Sparkline id="mini-team" values={r.spark} color={r.trend === "down" ? "var(--danger)" : "var(--success)"} height={26} /></span><span className="text-[13px] font-bold tabular-nums">{r.sentiment}</span></span>;
     }
-    case "Cases": {
+    case "Flow": {
       const c = cases[0]; const r = 14, circ = 2 * Math.PI * r, pct = Math.max(0, Math.min(1, c.slaDays / 3));
       return <span className="relative grid h-9 w-9 place-items-center"><svg viewBox="0 0 36 36" className="absolute inset-0 -rotate-90" aria-hidden><circle cx="18" cy="18" r={r} fill="none" stroke="var(--line)" strokeWidth="3.5" /><circle cx="18" cy="18" r={r} fill="none" stroke="var(--warning)" strokeWidth="3.5" strokeLinecap="round" strokeDasharray={`${pct * circ} ${circ}`} /></svg><span className="text-[10.5px] font-bold tabular-nums">{c.slaDays}d</span></span>;
     }
@@ -604,7 +604,7 @@ export function Done({ steps, explored, onRestart, onGo }: { steps: TourStepView
         </ul>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Link href="/product/home"><Button variant="brand" className="min-h-[44px]" trailingIcon={<ArrowRight className="h-3.5 w-3.5" />}>Open Home</Button></Link>
+        <Link href="/product/home"><Button variant="brand" className="min-h-[44px]" trailingIcon={<ArrowRight className="h-3.5 w-3.5" />}>Open Journey</Button></Link>
         <Button variant="tertiary" className="min-h-[44px]" leadingIcon={<RotateCcw className="h-3.5 w-3.5" />} onClick={onRestart}>Start over</Button>
       </div>
     </div>

@@ -61,7 +61,7 @@ export function RecognitionHub() {
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <Eyebrow>Engage</Eyebrow>
-            <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Recognition</h1>
+            <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Kudos</h1>
             <p className="mt-2 max-w-xl text-[14px] text-muted">Make appreciation flow — give kudos, celebrate the wins, and close the cold zones before they cost you people.</p>
           </div>
           <Button variant="brand" leadingIcon={<Plus className="h-4 w-4" />} onClick={() => openFor()}>Give recognition</Button>

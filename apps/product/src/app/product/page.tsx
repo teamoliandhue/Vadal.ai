@@ -10,7 +10,7 @@ import { PulseDashboard } from "./pulse/PulseDashboard";
 
 export default function PulsePage() {
   return (
-    <Shell active="Pulse" breadcrumb="Pulse">
+    <Shell active="Insight" breadcrumb="Insight">
       <PulseDashboard />
     </Shell>
   );

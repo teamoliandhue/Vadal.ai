@@ -1,4 +1,4 @@
 import { PageSkeleton } from "../Skeleton";
 export default function Loading() {
-  return <PageSkeleton active="Cases" breadcrumb="Cases" />;
+  return <PageSkeleton active="Flow" breadcrumb="Flow" />;
 }

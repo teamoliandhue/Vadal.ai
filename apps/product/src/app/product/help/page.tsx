@@ -3,7 +3,7 @@ import { HelpHub } from "./HelpHub";
 
 export default function HelpPage() {
   return (
-    <Shell active="One-to-One Help" breadcrumb="One-to-One Help">
+    <Shell active="SmartWork" breadcrumb="SmartWork">
       <HelpHub />
     </Shell>
   );

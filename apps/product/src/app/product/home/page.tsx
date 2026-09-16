@@ -24,7 +24,7 @@ export default function HomePage() {
   // read would risk a hydration mismatch on the greeting.
   const greeting = greetingFor(new Date().getHours());
   return (
-    <Shell active="Home" breadcrumb="Home">
+    <Shell active="Journey" breadcrumb="Journey">
       {/* useSearchParams needs a Suspense boundary of its own */}
       <Suspense fallback={null}>
         <HomeContent greeting={greeting} />
