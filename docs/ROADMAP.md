@@ -24,7 +24,7 @@ Tags · 🔒 blocked on Pradeep · ❓ needs a decision · S/M/L rough size
 
 Unblocked now (no dependency on the decisions above):
 
-- [ ] **Login page redesign** · S — compact card, minimal copy, rounded; it is the investor's actual first screen.
+- [x] **Login page redesign** · S — photo + rounded panel (Swiftt pattern); spec 024
 - [ ] **Groups & Communities** under Social · M — a group object (channels exist, groups don't); project communities (create, publish, join) and interest communities; group feed; join/leave. Not a Jira.
 - [ ] **Feed** · M — full-view post state; AI writing assist in the composer; inline translate on a post (UI now, provider later).
 - [ ] **Moderation + posting rights** · M — AI pre-publish check for images and language with a soft rejection; per-tenant config for who may post and share (everyone / leadership only).

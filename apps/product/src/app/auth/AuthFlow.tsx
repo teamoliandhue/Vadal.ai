@@ -5,8 +5,12 @@
    Step 2: the domain routes to the workspace → continue with its SSO, or a
    6-digit email code (demo shows the code inline). New users then go through
    role-based onboarding; returning users land on Home.
-   Layout: Fireflies-pattern split screen — form column left, dark Showcase
-   panel (real product-UI moments + testimonial) right. */
+   Layout: a photo fills the screen — a frontline worker, lit in the brand's
+   own periwinkle, because "the whole workforce" should be the first thing
+   seen — with the positioning line low on it; the form lives on a white
+   panel that rides over the photo's right edge with 40px rounded corners
+   (the Swiftt pattern). The panel carries almost nothing: wordmark, a
+   welcome, one field, one button, the demo roles under a hairline. */
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Building2, KeyRound, Lock, Mail } from "lucide-react";
@@ -14,10 +18,8 @@ import { Button, SparkMark } from "@vadal/design-system";
 import {
   checkEmail, demoOtp, DEMO_PERSONAS, sessionFor, setSession, type Tenant,
 } from "@/lib/auth";
-import { Showcase, type ShowcaseVariant } from "./Showcase";
 
 type Step = "email" | "method" | "otp";
-const STEP_SHOWCASE: Record<Step, ShowcaseVariant> = { email: "pulse", method: "ai", otp: "privacy" };
 
 export function AuthFlow() {
   const router = useRouter();
@@ -75,12 +77,24 @@ export function AuthFlow() {
   }
 
   return (
-    <div className="lumen grid min-h-screen bg-canvas text-ink lg:grid-cols-2" data-ds>
-      {/* ── LEFT · the form column ── */}
-      <div className="relative flex min-h-screen flex-col overflow-hidden px-6 py-8 sm:px-12">
-        <div className="pointer-events-none absolute -left-40 -top-40 h-[420px] w-[420px] rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
+    <div className="lumen relative min-h-screen bg-[#0a0a0c] text-ink" data-ds>
+      {/* ── the photo: full-bleed, the panel rides over its right edge ── */}
+      <div className="af-photo relative h-[46vh] min-h-[320px] w-full overflow-hidden lg:absolute lg:inset-y-0 lg:left-0 lg:h-auto lg:w-[60%]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/auth/nightshift-worker.jpg" alt="" className="af-photo-img h-full w-full object-cover object-[50%_40%]" />
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,12,0.15)_0%,rgba(10,10,12,0)_35%,rgba(10,10,12,0.72)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 px-6 pb-8 sm:px-10 lg:px-14 lg:pb-14">
+          <h2 className="af-line max-w-[15ch] text-[clamp(26px,3.4vw,44px)] font-bold leading-[1.04] tracking-[-0.03em] text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.35)]">
+            Nine HR products.<br />One AI that acts.
+          </h2>
+          <p className="af-line mt-3 max-w-[40ch] text-[clamp(14px,1.1vw,16px)] leading-snug text-white/75 [animation-delay:120ms]">For the whole workforce — desk and frontline.</p>
+          <span aria-hidden className="af-line mt-6 block h-px w-full max-w-[560px] bg-white/25 [animation-delay:240ms]" />
+        </div>
+      </div>
 
-        {/* brand — top-left, Fireflies-style */}
+      {/* ── the panel ── */}
+      <div className="af-panel relative -mt-8 flex min-h-[54vh] flex-col rounded-t-[32px] bg-card px-6 py-8 sm:px-12 lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:min-h-0 lg:w-[42%] lg:rounded-none lg:rounded-l-[40px] lg:px-14 lg:py-10 xl:px-20">
+        {/* brand — top-left of the panel */}
         <div className="relative flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/signal-mark.svg" alt="Vadal" className="h-7 w-auto" />
@@ -91,12 +105,12 @@ export function AuthFlow() {
         <div key={step} className="af-step">
           {step === "email" && (
             <>
-              <h1 className="text-[28px] font-bold leading-[1.1] tracking-[-0.02em]">The pulse of your company, daily.</h1>
-              <p className="mt-2.5 text-[14px] leading-relaxed text-muted">Sign in with your <b className="font-semibold text-ink">company email</b> — it routes you to the right workspace.</p>
+              <h1 className="text-[30px] font-bold leading-[1.08] tracking-[-0.025em]">Welcome back</h1>
+              <p className="mt-2 text-[14px] leading-relaxed text-muted">Sign in with your company email — it routes you to your workspace.</p>
               <form className="mt-5" onSubmit={(e) => { e.preventDefault(); submitEmail(email); }}>
                 <label className="block">
                   <span className="text-[12px] font-semibold text-faint">Work email</span>
-                  <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-line bg-card px-3.5 focus-within:border-[var(--purple)]">
+                  <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-line bg-card px-3.5 transition focus-within:border-[var(--purple)] focus-within:ring-4 focus-within:ring-[color-mix(in_srgb,var(--purple)_12%,transparent)]">
                     <Mail className="h-4 w-4 shrink-0 text-faint" />
                     <input
                       autoFocus type="email" value={email} onChange={(e) => setEmail(e.target.value)}
@@ -106,17 +120,16 @@ export function AuthFlow() {
                   </div>
                 </label>
                 {error && <p className="mt-2.5 rounded-xl bg-[color-mix(in_srgb,var(--danger)_10%,transparent)] px-3.5 py-2.5 text-[13px] leading-relaxed text-ink">{error}</p>}
-                <Button type="submit" variant="brand" className="mt-4 w-full" trailingIcon={<ArrowRight className="h-4 w-4" />}>Continue</Button>
+                <Button type="submit" variant="brand" className="mt-4 min-h-[44px] w-full" trailingIcon={<ArrowRight className="h-4 w-4" />}>Continue</Button>
               </form>
 
               {/* demo personas — one tap per actor */}
-              <div className="mt-6 border-t border-line pt-4">
-                <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">Demo · sign in as</p>
-                <div className="mt-2 grid grid-cols-2 gap-2">
+              <div className="mt-7 border-t border-line pt-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-faint">Demo · sign in as</p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
                   {DEMO_PERSONAS.map((p) => (
-                    <button key={p.email} onClick={() => submitEmail(p.email)} className="rounded-xl border border-line px-3 py-2 text-left transition hover:border-[var(--purple)] hover:bg-soft">
-                      <span className="block text-[13px] font-semibold">{p.label}</span>
-                      <span className="block truncate text-[11px] text-faint">{p.email}</span>
+                    <button key={p.email} onClick={() => submitEmail(p.email)} title={p.email} className="min-h-[44px] rounded-full border border-line px-3 text-[12.5px] font-medium text-muted transition hover:border-[var(--purple)] hover:text-ink lg:min-h-[34px]">
+                      {p.label}
                     </button>
                   ))}
                 </div>
@@ -134,12 +147,12 @@ export function AuthFlow() {
               </div>
               <div className="mt-5 flex flex-col gap-2.5">
                 {tenant.sso && (
-                  <Button variant="brand" className="w-full" loading={busy} leadingIcon={<Lock className="h-4 w-4" />} onClick={() => finish("sso")}>
+                  <Button variant="brand" className="min-h-[44px] w-full" loading={busy} leadingIcon={<Lock className="h-4 w-4" />} onClick={() => finish("sso")}>
                     Continue with {tenant.sso.provider} SSO
                   </Button>
                 )}
                 {tenant.otp && (
-                  <Button variant={tenant.sso ? "secondary" : "brand"} className="w-full" leadingIcon={<KeyRound className="h-4 w-4" />} onClick={() => { setStep("otp"); setError(null); setCode(Array(6).fill("")); }}>
+                  <Button variant={tenant.sso ? "secondary" : "brand"} className="min-h-[44px] w-full" leadingIcon={<KeyRound className="h-4 w-4" />} onClick={() => { setStep("otp"); setError(null); setCode(Array(6).fill("")); }}>
                     Email me a sign-in code
                   </Button>
                 )}
@@ -174,14 +187,14 @@ export function AuthFlow() {
               <div className="mt-3 flex items-center gap-2 rounded-xl bg-soft px-3.5 py-2.5 text-[13px] text-muted">
                 <Mail className="h-3.5 w-3.5 shrink-0" /> Demo inbox: your code is <b className="font-bold tracking-widest text-ink">{demoOtp(email)}</b>
               </div>
-              <Button variant="brand" className="mt-4 w-full" loading={busy} disabled={code.join("").length < 6} onClick={submitOtp}>Verify &amp; sign in</Button>
-              <button onClick={() => setCode(Array(6).fill(""))} className="mt-3 w-full text-center text-[13px] font-semibold text-[var(--purple)] hover:underline">Resend code</button>
+              <Button variant="brand" className="mt-4 min-h-[44px] w-full" loading={busy} disabled={code.join("").length < 6} onClick={submitOtp}>Verify &amp; sign in</Button>
+              <button onClick={() => setCode(Array(6).fill(""))} className="mt-3 min-h-[44px] w-full text-center text-[13px] font-semibold text-[var(--purple)] hover:underline">Resend code</button>
             </>
           )}
         </div>
         </div>
 
-        {/* trust footer — bottom of the form column */}
+        {/* trust footer — bottom of the panel */}
         <div className="relative">
           <p className="flex items-center gap-1.5 text-[12px] text-faint">
             <Building2 className="h-3.5 w-3.5" /> Company workspaces only · SOC 2 · Data stays in your region
@@ -192,15 +205,18 @@ export function AuthFlow() {
         </div>
       </div>
 
-      {/* ── RIGHT · the product showcase ── */}
-      <Showcase variant={STEP_SHOWCASE[step]} />
-
       <style>{`
         .af-step { animation: afStepIn .42s cubic-bezier(.22,.9,.3,1) both; }
+        .af-photo-img { animation: afPhoto 1.6s cubic-bezier(.22,1,.36,1) both; }
+        .af-line { animation: afStepIn .7s cubic-bezier(.22,1,.36,1) both; animation-delay: .25s; }
+        .af-panel { box-shadow: -24px 0 60px -30px rgba(0,0,0,.5); animation: afPanel .7s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes afPhoto { from { transform: scale(1.06); } to { transform: scale(1); } }
+        @keyframes afPanel { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
         .af-otp-filled { border-color: var(--purple); animation: afOtpPop .22s cubic-bezier(.34,1.56,.64,1); }
         @keyframes afStepIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes afOtpPop { 0% { transform: scale(1); } 55% { transform: scale(1.09); } 100% { transform: scale(1); } }
-        @media (prefers-reduced-motion: reduce) { .af-step, .af-otp-filled { animation: none !important; } }
+        @media (max-width: 1023px) { .af-panel { animation-name: afStepIn; } }
+        @media (prefers-reduced-motion: reduce) { .af-step, .af-otp-filled, .af-photo-img, .af-line, .af-panel { animation: none !important; } }
       `}</style>
     </div>
   );
