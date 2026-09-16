@@ -20,8 +20,8 @@ const PHOTO: Record<ShowcaseVariant, { src: string; alt: string }> = {
   ai: { src: "/auth/team-celebration.jpg", alt: "" },
   recognition: { src: "/auth/team-celebration.jpg", alt: "" },
   branding: { src: "/auth/team-celebration.jpg", alt: "" },
-  manager: { src: "/auth/nightshift-worker.jpg", alt: "" },
-  privacy: { src: "/auth/nightshift-worker.jpg", alt: "" },
+  manager: { src: "/auth/team-celebration.jpg", alt: "" },
+  privacy: { src: "/auth/team-celebration.jpg", alt: "" },
 };
 
 /* tiny sparkline (same construction as ManagerHub's) */

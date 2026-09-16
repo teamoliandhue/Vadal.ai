@@ -5,21 +5,73 @@
    Step 2: the domain routes to the workspace → continue with its SSO, or a
    6-digit email code (demo shows the code inline). New users then go through
    role-based onboarding; returning users land on Home.
-   Layout: a photo fills the screen — a frontline worker, lit in the brand's
-   own periwinkle, because "the whole workforce" should be the first thing
-   seen — with the positioning line low on it; the form lives on a white
+   Layout: photos fill the screen, one after another — the whole workforce,
+   one person at a time, each lit in the brand's own periwinkle — with the
+   positioning line low on them; the form lives on a white
    panel that rides over the photo's right edge with 40px rounded corners
    (the Swiftt pattern). The panel carries almost nothing: wordmark, a
    welcome, one field, one button, the demo roles under a hairline. */
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Building2, KeyRound, Lock, Mail } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2, KeyRound, Lock, Mail, Pause, Play } from "lucide-react";
 import { Button, SparkMark } from "@vadal/design-system";
 import {
   checkEmail, demoOtp, DEMO_PERSONAS, sessionFor, setSession, type Tenant,
 } from "@/lib/auth";
 
 type Step = "email" | "method" | "otp";
+
+/* The photos behind the panel — the whole workforce, one person at a time:
+   different countries, different work, the same dark room and the same
+   periwinkle light. They cross-fade every few seconds with a slow settle;
+   a pause control holds the frame; reduced motion shows the first, still. */
+const SLIDES: { src: string; alt: string; focus: string }[] = [
+  { src: "/auth/slide-1.jpg", alt: "", focus: "50% 35%" },
+  { src: "/auth/slide-2.jpg", alt: "", focus: "50% 35%" },
+  { src: "/auth/team-celebration.jpg", alt: "", focus: "50% 45%" },
+];
+const SLIDE_MS = 6500;
+
+function Slides() {
+  const [i, setI] = React.useState(0);
+  const [paused, setPaused] = React.useState(false);
+  React.useEffect(() => {
+    if (paused || SLIDES.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = window.setTimeout(() => setI((k) => (k + 1) % SLIDES.length), SLIDE_MS);
+    return () => window.clearTimeout(t);
+  }, [i, paused]);
+  return (
+    <>
+      {SLIDES.map((sl, k) => (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          key={sl.src}
+          src={sl.src}
+          alt={sl.alt}
+          aria-hidden={k !== i}
+          className={`af-slide absolute inset-0 h-full w-full object-cover ${k === i ? "is-on" : ""}`}
+          style={{ objectPosition: sl.focus }}
+        />
+      ))}
+      <div className="absolute right-4 top-4 z-10 flex items-center gap-2 lg:right-6 lg:top-6">
+        <span className="flex items-center gap-1" aria-hidden>
+          {SLIDES.map((sl, k) => (
+            <span key={sl.src} className={`h-1 rounded-full bg-white transition-all duration-500 ${k === i ? "w-5 opacity-90" : "w-1.5 opacity-40"}`} />
+          ))}
+        </span>
+        <button
+          type="button"
+          onClick={() => setPaused((p) => !p)}
+          aria-pressed={paused}
+          aria-label={paused ? "Play" : "Pause"}
+          className="grid min-h-[44px] min-w-[44px] place-items-center rounded-full border border-white/25 bg-black/30 text-white backdrop-blur transition hover:bg-black/45 lg:min-h-9 lg:min-w-9"
+        >
+          {paused ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+        </button>
+      </div>
+    </>
+  );
+}
 
 export function AuthFlow() {
   const router = useRouter();
@@ -80,8 +132,7 @@ export function AuthFlow() {
     <div className="lumen relative min-h-screen bg-[#0a0a0c] text-ink" data-ds>
       {/* ── the photo: full-bleed, the panel rides over its right edge ── */}
       <div className="af-photo relative h-[46vh] min-h-[320px] w-full overflow-hidden lg:absolute lg:inset-y-0 lg:left-0 lg:h-auto lg:w-[60%]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/auth/nightshift-worker.jpg" alt="" className="af-photo-img h-full w-full object-cover object-[50%_40%]" />
+        <Slides />
         <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,12,0.15)_0%,rgba(10,10,12,0)_35%,rgba(10,10,12,0.72)_100%)]" />
         <div className="absolute inset-x-0 bottom-0 px-6 pb-8 sm:px-10 lg:px-14 lg:pb-14">
           <h2 className="af-line max-w-[15ch] text-[clamp(26px,3.4vw,44px)] font-bold leading-[1.04] tracking-[-0.03em] text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.35)]">
@@ -207,16 +258,16 @@ export function AuthFlow() {
 
       <style>{`
         .af-step { animation: afStepIn .42s cubic-bezier(.22,.9,.3,1) both; }
-        .af-photo-img { animation: afPhoto 1.6s cubic-bezier(.22,1,.36,1) both; }
+        .af-slide { opacity: 0; transform: scale(1.06); transition: opacity 1.4s ease, transform 7.5s linear; will-change: opacity, transform; }
+        .af-slide.is-on { opacity: 1; transform: scale(1); }
         .af-line { animation: afStepIn .7s cubic-bezier(.22,1,.36,1) both; animation-delay: .25s; }
         .af-panel { box-shadow: -24px 0 60px -30px rgba(0,0,0,.5); animation: afPanel .7s cubic-bezier(.22,1,.36,1) both; }
-        @keyframes afPhoto { from { transform: scale(1.06); } to { transform: scale(1); } }
         @keyframes afPanel { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
         .af-otp-filled { border-color: var(--purple); animation: afOtpPop .22s cubic-bezier(.34,1.56,.64,1); }
         @keyframes afStepIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes afOtpPop { 0% { transform: scale(1); } 55% { transform: scale(1.09); } 100% { transform: scale(1); } }
         @media (max-width: 1023px) { .af-panel { animation-name: afStepIn; } }
-        @media (prefers-reduced-motion: reduce) { .af-step, .af-otp-filled, .af-photo-img, .af-line, .af-panel { animation: none !important; } }
+        @media (prefers-reduced-motion: reduce) { .af-step, .af-otp-filled, .af-line, .af-panel { animation: none !important; } .af-slide { transition: none; transform: none; } }
       `}</style>
     </div>
   );

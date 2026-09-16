@@ -1,4 +1,4 @@
-# 024 · Sign in — the photo and the panel
+# 024 · Sign in — the photos and the panel
 
 **Status:** built in code · `/auth` · reference: the Swiftt sign-in shown in the 16 Sep meeting
 
@@ -13,13 +13,34 @@ with a product card, an insight card and a testimonial. The meeting asked for th
 Now a **photo fills the screen** and a **white panel rides over its right edge** with 40px rounded
 corners. The panel carries almost nothing.
 
-## 2 · The photo
+## 2 · The photos, one after another
 
-`/auth/nightshift-worker.jpg` — a frontline worker on a night shift, lit in the brand's own
-periwinkle. Chosen over the office celebration shot on purpose: *for the whole workforce — desk
-and frontline* is the wedge, and it should be the first thing an investor sees, before a word.
+The single night-shift photo is gone. The photo block is now a **slideshow of the workforce** —
+one person, one job, one part of the world per slide, so *for the whole workforce* is shown
+rather than claimed. All are Soul Cinema portraits lit in the brand's own periwinkle on
+near-black, 3:4, shipped as 1050 × 1400 JPEGs in `/auth/`:
 
-- `object-cover`, focus `50% 40%`; a 1.6s settle from 1.06 → 1.0 scale on load.
+| # | file | who |
+|---|------|-----|
+| 1 | `slide-1.jpg` | a warehouse worker, scanner in hand — West African man |
+| 2 | `slide-2.jpg` | a nurse on a ward, tablet in hand — East Asian woman |
+| 3 | `team-celebration.jpg` | the office team, together |
+
+Three more are queued for the same set — a Latin American factory technician, a Middle Eastern
+desk worker, a South Asian retail associate — and drop into the same list.
+
+- Every slide is `object-cover`, focus `50% 35%` (people) / `50% 45%` (the team).
+- **Advance every 6.5s.** The next slide fades in over 1.4s while the one leaving fades out
+  underneath; each slide also settles from 1.06 → 1.0 scale over 7.5s (a slow Ken Burns push),
+  so nothing is ever still.
+- The wash and the headline (§below) sit *over* the slides and never move.
+- **Top-right, over the photo:** the index as three dashes (the current one 18px white, the
+  others 6px at 40%) and a round **Pause / Play** control — 44px on touch, 36px at `lg`,
+  white on 30% ink with a 25% white ring and a backdrop blur. Paused holds the current slide.
+- `prefers-reduced-motion`: no fade, no push — the current slide is simply shown.
+
+The wash, the headline and the hairline are unchanged from the first cut:
+
 - A vertical wash: 15% ink at the top, clear through the middle, 72% ink at the foot, so the
   headline reads on any crop.
 - **Low-left, on the photo:** *Nine HR products.* ⏎ *One AI that acts.* — white,
@@ -48,4 +69,4 @@ pulled 32px up over the banner, and rises into place. Nothing on the panel under
 ## 5 · Figma
 
 1440 × 900 and 375 frames, light and dark; the three steps (email · method · code); the pill
-states.
+states; the three slides with the index and the Pause / Play control in both states.
