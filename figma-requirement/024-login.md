@@ -15,26 +15,25 @@ corners. The panel carries almost nothing.
 
 ## 2 · The photos, one after another
 
-The single night-shift photo is gone. The photo block is now a **slideshow of the workforce** —
-one person, one job, one part of the world per slide, so *for the whole workforce* is shown
-rather than claimed. All are Soul Cinema portraits lit in the brand's own periwinkle on
-near-black, 3:4, shipped as 1050 × 1400 JPEGs in `/auth/`:
+The photo block is a **slideshow of the office** — teams, employees at their desks, IT people
+at code — international by design, so *for the whole workforce* is shown rather than claimed.
+Six free-licence Pexels photographs, cropped to 3:4 and shipped as 1050 × 1400 JPEGs in `/auth/`:
 
-| # | file | who |
-|---|------|-----|
-| 1 | `slide-1.jpg` | a warehouse worker, scanner in hand — West African man |
-| 2 | `slide-2.jpg` | a nurse on a ward, tablet in hand — East Asian woman |
-| 3 | `team-celebration.jpg` | the office team, together |
+| # | file | scene | Pexels |
+|---|------|-------|--------|
+| 1 | `office-1.jpg` | three colleagues at desks, code on a laptop | 12902874 |
+| 2 | `office-2.jpg` | a team of three at laptops with charts on the table | 7926209 |
+| 3 | `office-3.jpg` | a developer explaining code on a big monitor | 7988749 |
+| 4 | `office-4.jpg` | three professionals reviewing work on a laptop | 7793643 |
+| 5 | `office-5.jpg` | two colleagues at a desk by a city window | 8297574 |
+| 6 | `office-6.jpg` | an employee at her desk, a colleague passing | 7581046 |
 
-Three more are queued for the same set — a Latin American factory technician, a Middle Eastern
-desk worker, a South Asian retail associate — and drop into the same list.
-
-- Every slide is `object-cover`, focus `50% 35%` (people) / `50% 45%` (the team).
+- Every slide is `object-cover` with a per-photo focus point (`50% 40–55%`).
 - **Advance every 6.5s.** The next slide fades in over 1.4s while the one leaving fades out
   underneath; each slide also settles from 1.06 → 1.0 scale over 7.5s (a slow Ken Burns push),
   so nothing is ever still.
-- The wash and the headline (§below) sit *over* the slides and never move.
-- **Top-right, over the photo:** the index as three dashes (the current one 18px white, the
+- The wash and the headline (below) sit *over* the slides and never move.
+- **Top-right, over the photo:** the index as six dashes (the current one 18px white, the
   others 6px at 40%) and a round **Pause / Play** control — 44px on touch, 36px at `lg`,
   white on 30% ink with a 25% white ring and a backdrop blur. Paused holds the current slide.
 - `prefers-reduced-motion`: no fade, no push — the current slide is simply shown.
@@ -69,4 +68,4 @@ pulled 32px up over the banner, and rises into place. Nothing on the panel under
 ## 5 · Figma
 
 1440 × 900 and 375 frames, light and dark; the three steps (email · method · code); the pill
-states; the three slides with the index and the Pause / Play control in both states.
+states; the six slides with the index and the Pause / Play control in both states.

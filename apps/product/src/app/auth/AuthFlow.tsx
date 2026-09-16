@@ -23,12 +23,15 @@ type Step = "email" | "method" | "otp";
 
 /* The photos behind the panel — the whole workforce, one person at a time:
    different countries, different work, the same dark room and the same
-   periwinkle light. They cross-fade every few seconds with a slow settle;
+   office. They cross-fade every few seconds with a slow settle;
    a pause control holds the frame; reduced motion shows the first, still. */
 const SLIDES: { src: string; alt: string; focus: string }[] = [
-  { src: "/auth/slide-1.jpg", alt: "", focus: "50% 35%" },
-  { src: "/auth/slide-2.jpg", alt: "", focus: "50% 35%" },
-  { src: "/auth/team-celebration.jpg", alt: "", focus: "50% 45%" },
+  { src: "/auth/office-1.jpg", alt: "", focus: "50% 40%" },
+  { src: "/auth/office-2.jpg", alt: "", focus: "50% 55%" },
+  { src: "/auth/office-3.jpg", alt: "", focus: "50% 40%" },
+  { src: "/auth/office-4.jpg", alt: "", focus: "50% 45%" },
+  { src: "/auth/office-5.jpg", alt: "", focus: "50% 45%" },
+  { src: "/auth/office-6.jpg", alt: "", focus: "50% 50%" },
 ];
 const SLIDE_MS = 6500;
 
