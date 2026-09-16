@@ -75,8 +75,8 @@ export const TOUR: TourStep[] = [
     id: "ritual",
     title: "Your daily ritual",
     meaning: "Five seconds a day: how are you feeling? Private to you. Everything else starts here.",
-    section: "Journey", href: "/product/home",
-    parts: [{ label: "Journey", href: "/product/home" }],
+    section: "Home", href: "/product/home",
+    parts: [{ label: "Home", href: "/product/home" }],
     completesOn: "checkin", actionLabel: "log today's check-in", doneLabel: "logged today's check-in",
   },
   {
@@ -190,7 +190,7 @@ export const TOUR: TourStep[] = [
 ];
 
 /** One of the nine, as the opening grid shows it. */
-export type ProductTile = { n: number; name: string; short: string; index: number; locked: boolean };
+export type ProductTile = { n: number; name: string; short: string; index: number; locked: boolean; href: string };
 
 /** The nine products. An investor who looks at the first screen for five
     seconds should be able to say "an HR AI company with nine products" — so
@@ -204,6 +204,7 @@ export function productTiles(role: Role | null): ProductTile[] {
       short: s.pillar!.short ?? s.pillar!.tag,
       index: s.index,
       locked: s.locked,
+      href: s.href ?? "/product/home",
     }));
 }
 

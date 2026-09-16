@@ -31,7 +31,7 @@ export const NAV: NavGroupModel[] = [
   {
     label: "My space",
     items: [
-      { label: "Journey", icon: House, href: "/product/home" },
+      { label: "Home", icon: House, href: "/product/home" },
       { label: "Social", icon: Newspaper, href: "/product/feed" },
     ],
   },

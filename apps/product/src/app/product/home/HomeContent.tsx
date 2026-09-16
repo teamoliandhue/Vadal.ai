@@ -19,6 +19,7 @@ import { org, me, myRecognition, communities, myDay, engagementTrend, myCalendar
 import { MoodCheck } from "./MoodCheck";
 import { MyDay } from "./MyDay";
 import { TourResume } from "../get-started/TourResume";
+import { ProductGrid } from "../ProductGrid";
 import { QuickPoll } from "./QuickPoll";
 import { Feed } from "./Feed";
 import { AskAi } from "./AskAi";
@@ -38,6 +39,11 @@ export function HomeContent({ greeting }: { greeting: string }) {
   return (
     <>
       <RitualHero firstTime={firstTime} greeting={greeting} />
+      {/* the nine, straight after the greeting — every product one tap away,
+          each showing a live fragment of itself */}
+      <section aria-label="Products" className="mt-6">
+        <ProductGrid mode="nav" idPrefix="home" />
+      </section>
       <TourResume />
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
         {/* LEFT (wider, action-first) — what you need to do, then who you are */}

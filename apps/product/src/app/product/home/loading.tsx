@@ -10,7 +10,7 @@ const CARD = "rounded-[26px] border border-line bg-card p-6 sm:p-7";
 
 export default function Loading() {
   return (
-    <Shell active="Journey" breadcrumb="Journey">
+    <Shell active="Home" breadcrumb="Home">
       <div className="rounded-[28px] border border-line bg-card p-7 sm:p-9">
         <Sk className="h-3 w-28" />
         <Sk className="mt-4 h-9 w-[22rem] max-w-full" />

@@ -49,7 +49,7 @@ export function SectionGuard({ section, children }: { section: string; children:
         )}
       </p>
       <Link href="/product/home" className="mt-6">
-        <Button variant="brand">Back to Journey</Button>
+        <Button variant="brand">Back to Home</Button>
       </Link>
     </div>
   );

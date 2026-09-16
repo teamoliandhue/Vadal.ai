@@ -38,3 +38,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 020 | [Get Started — explored by doing, and how the tour is shown](./020-get-started-by-doing.md) | Built · needs Figma |
 | 021 | [Get Started — a story, one screen per idea](./021-get-started-story.md) | Built · needs Figma |
 | 022 | [Naming — the one-word module names](./022-naming.md) | Applied · needs Figma |
+| 023 | [Home — the nine, under the greeting](./023-home-the-nine.md) | Built · needs Figma |

@@ -29,7 +29,7 @@ const go = (href: string) => (r: ReturnType<typeof useRouter>) => r.push(href);
 const ask = (q: string) => () => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 
 const NAV: { label: string; icon: LucideIcon; href: string }[] = [
-  { label: "Journey", icon: House, href: "/product/home" },
+  { label: "Home", icon: House, href: "/product/home" },
   { label: "Insight", icon: Gauge, href: "/product" },
   { label: "Analytics", icon: BarChart3, href: "/product" },
   { label: "Pulse", icon: ClipboardList, href: "/product" },

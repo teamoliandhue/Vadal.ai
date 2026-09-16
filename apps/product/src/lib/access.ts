@@ -59,7 +59,7 @@ const ADMIN_UP: Role[] = ["admin", "superadmin"];
  */
 export const SECTION_ACCESS: Record<string, Role[]> = {
   "Get Started": ALL_ROLES,
-  Journey: ALL_ROLES,
+  Home: ALL_ROLES,
   Social: ALL_ROLES,
   Kudos: ALL_ROLES,
   Knowledge: ALL_ROLES,
@@ -124,7 +124,7 @@ export type DataScope = "self" | "own-team" | "all";
 export function scopeFor(role: Role | null | undefined, section: string): DataScope {
   if (!role) return "self";
   if (role === "admin" || role === "superadmin") return "all";
-  if (role === "manager") return canAccess("manager", section) && section !== "Journey" && section !== "Social"
+  if (role === "manager") return canAccess("manager", section) && section !== "Home" && section !== "Social"
     ? "own-team"
     : "self";
   return "self";

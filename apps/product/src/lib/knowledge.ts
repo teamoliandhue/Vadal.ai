@@ -36,7 +36,7 @@ export const articles: Article[] = [
     updated: "Updated 3 weeks ago", updatedMonthsAgo: 1, readMins: 3, views: 4120,
     sections: [
       { text: "Every full-time employee gets 18 paid leaves a year, accruing at 1.5 days per month. Sick leave (12/year) and casual leave are tracked separately." },
-      { heading: "Applying", text: "Apply from Journey → Apply for leave, or just ask Vadal. Requests route to your manager for approval and reflect in your balance instantly." },
+      { heading: "Applying", text: "Apply from Home → Apply for leave, or just ask Vadal. Requests route to your manager for approval and reflect in your balance instantly." },
       { heading: "Carry-forward", bullets: ["Up to 6 unused paid leaves carry to the next year.", "Anything above 6 lapses on 31 December.", "Sick leave does not carry forward."] },
     ],
   },
@@ -123,7 +123,7 @@ export const articles: Article[] = [
 export type Answer = { keywords: string[]; answer: string; sources: string[] };
 export const answers: Answer[] = [
   { keywords: ["leave", "paid leave", "how many days", "holiday", "vacation", "pto", "time off"], sources: ["leave-policy"],
-    answer: "You get **18 paid leaves a year**, accruing 1.5 days a month, plus 12 sick days tracked separately. Apply from Journey → Apply for leave (or just ask me) and it routes to your manager. Up to 6 unused paid leaves carry into next year — the rest lapse on 31 December." },
+    answer: "You get **18 paid leaves a year**, accruing 1.5 days a month, plus 12 sick days tracked separately. Apply from Home → Apply for leave (or just ask me) and it routes to your manager. Up to 6 unused paid leaves carry into next year — the rest lapse on 31 December." },
   { keywords: ["reimburse", "expense", "claim expense", "spend"], sources: ["reimburse"],
     answer: "Submit expenses **within 30 days** with a receipt. Anything under ₹5,000 is auto-approved; above that needs manager sign-off. Approved claims are paid with the next payroll run, usually in 7–10 working days." },
   { keywords: ["wfh", "work from home", "remote", "hybrid", "office days"], sources: ["wfh"],

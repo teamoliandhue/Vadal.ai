@@ -13,7 +13,7 @@ collided with an existing one, the dashboard moved rather than the survey produc
 
 | Section (old) | **Section (new)** | Route (unchanged) | From the table |
 |---|---|---|---|
-| Home | **Journey** | `/product/home` | Employee Experience |
+| Home | **Home** (Journey was applied, then reverted on the founders' call — the home screen is the shell, not a product) | `/product/home` | Employee Experience |
 | Feed | **Social** | `/product/feed` | Employee Communication |
 | Pulse — the health-score dashboard | **Insight** | `/product` | Decision Intelligence Copilot |
 | Surveys | **Pulse** | `/product/surveys` | Engagement Surveys |
@@ -37,7 +37,7 @@ Compliance), Launch (Implementation). Listed here so the names are reserved, not
 Nav rail and mobile sheet · command palette · access keys (`SECTION_ACCESS`, `scopeFor`) · every
 page's `active` and breadcrumb · the top-bar domain roots (*People intelligence* → *Insight*,
 *Listening* → *Listen*) · hub headings (Flow, Social, Pulse, Kudos, Insight) · in-product copy that
-names a section (*Back to Insight*, *review them in Kudos*, *in iLearn*, *Apply from Journey*) ·
+names a section (*Back to Insight*, *review them in Kudos*, *in iLearn*, *Apply from Home*) ·
 the Get Started tour — pillar names, section chips, "Done when you open …" rows, the nine tiles and
 the stage's replies · the assistant's own name in the dock and the chat window.
 

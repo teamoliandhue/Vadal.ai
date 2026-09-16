@@ -24,7 +24,7 @@ export default function ProductError({ error, reset }: { error: Error & { digest
           <button onClick={reset} className="flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-[14px] font-semibold text-[var(--card)] transition hover:opacity-90">
             <RotateCw className="h-4 w-4" /> Try again
           </button>
-          <a href="/product/home" className="rounded-full px-4 py-2 text-[14px] font-semibold text-muted ring-1 ring-line transition hover:bg-soft">Go to Journey</a>
+          <a href="/product/home" className="rounded-full px-4 py-2 text-[14px] font-semibold text-muted ring-1 ring-line transition hover:bg-soft">Go to Home</a>
         </div>
       </div>
     </div>
