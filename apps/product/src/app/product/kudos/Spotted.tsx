@@ -18,6 +18,7 @@ import { tagPost } from "@/lib/ai/engines/text";
 import { feedItems } from "@/lib/feed";
 import { recognitionHistory, type Person } from "@/lib/recognize";
 import { useViewAs } from "../useViewAs";
+import { useMe } from "../useSession";
 import { toast } from "../Toaster";
 
 const SEVERITY = { urgent: "var(--danger)", concern: "var(--warning)", watch: "var(--muted)" } as const;
@@ -25,6 +26,7 @@ const SEVERITY = { urgent: "var(--danger)", concern: "var(--warning)", watch: "v
 export function Spotted({ onRecognise }: { onRecognise: (p: Person) => void }) {
   const [role] = useViewAs();
   const isManager = canAccess(role, "Manager hub");
+  const me = useMe();
 
   const moments = React.useMemo(() => feedItems
     /* anniversaries and birthdays are celebrations, handled below the wall — this is for work */
@@ -32,7 +34,9 @@ export function Spotted({ onRecognise }: { onRecognise: (p: Person) => void }) {
     .map((p) => ({ p, topics: tagPost(p.text).topics }))
     .filter(({ p, topics }) => topics.includes("milestone") || /\b(shipped|days|over target|faster)\b/i.test(p.text))
     .filter(({ p }) => !/^(Vadal|People Team)$/.test(p.author.name) && p.author.role !== "CEO")
-    .slice(0, 3), []);
+    /* never suggest thanking yourself — seeds use short names ("Aarav S."), sessions full ones */
+    .filter(({ p }) => { const [f, l] = me.fullName.split(" "); return !(p.author.name === me.fullName || (l && p.author.name === `${f} ${l[0]}.`)); })
+    .slice(0, 3), [me.fullName]);
 
   const dips = React.useMemo(() => scanAnomalies(recognitionHistory()).slice(0, 3), []);
 

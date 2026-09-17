@@ -29,10 +29,28 @@ export const recognizeStats = {
 
 export type Person = { name: string; team: string; img: string };
 
+/* The look of a kudos card (Kudos v2, spec 045). */
+export type CardStyle = "thanks" | "beyond" | "teamwin" | "welcome";
+export const CARD_STYLES: { id: CardStyle; label: string; emoji: string; tint: string }[] = [
+  { id: "thanks", label: "Thank you", emoji: "🙏", tint: "var(--purple)" },
+  { id: "beyond", label: "Above and beyond", emoji: "🚀", tint: "var(--info)" },
+  { id: "teamwin", label: "Team win", emoji: "🏆", tint: "var(--warning)" },
+  { id: "welcome", label: "Welcome aboard", emoji: "👋", tint: "var(--success)" },
+];
+
+/** A short line someone adds to another person's kudos — "me too". */
+export type Boost = { from: Person; text: string };
+
 export type Kudos = {
   id: string;
   from: Person;
   to: Person;
+  /** More people recognised in the same kudos — a team shout-out. */
+  also?: Person[];
+  style?: CardStyle;
+  boosts?: Boost[];
+  /** The recipient's reply. */
+  thanks?: string;
   value: string; // value name
   message: string;
   time: string;
@@ -47,7 +65,11 @@ export const wall: Kudos[] = [
     id: "k1",
     from: { name: "Anita Desai", team: "Design", img: "/avatars/user-5.svg" },
     to: { name: "Priya Sharma", team: "Design", img: "/avatars/user-8.svg" },
-    value: "Ownership", manager: true,
+    value: "Ownership", manager: true, style: "beyond",
+    boosts: [
+      { from: { name: "Neha Rao", team: "Design", img: "/avatars/user-5.svg" }, text: "The empty states alone 🤌" },
+      { from: { name: "Dev Patel", team: "Design", img: "/avatars/user-3.svg" }, text: "Learned a lot pairing on this" },
+    ],
     message: "Brilliant work on the onboarding flow — clean, considered, and shipped a day early. Textbook ownership.",
     time: "1h", reactions: 24, points: 25,
   },
@@ -55,7 +77,8 @@ export const wall: Kudos[] = [
     id: "k2",
     from: { name: "Rahul Verma", team: "Sales · West", img: "/avatars/user-1.svg" },
     to: { name: "Aarav Sharma", team: "Engineering", img: "/avatars/user-2.svg" },
-    value: "Collaboration",
+    value: "Collaboration", style: "thanks",
+    boosts: [{ from: { name: "Sara Mehta", team: "Support", img: "/avatars/user-7.svg" }, text: "Customers noticed within the hour 🙌" }],
     message: "Jumped on the pricing-page bug at 9pm before the West demo. Saved the quarter-close. 🙏",
     time: "3h", reactions: 31, points: 25,
   },
@@ -71,7 +94,7 @@ export const wall: Kudos[] = [
     id: "k4",
     from: { name: "Neha Rao", team: "Design", img: "/avatars/user-5.svg" },
     to: { name: "Dev Patel", team: "Design", img: "/avatars/user-3.svg" },
-    value: "Innovation",
+    value: "Innovation", style: "welcome",
     message: "The auto-layout token idea shaved hours off the handoff. Welcome-week Dev is already shipping. 💡",
     time: "8h", reactions: 15, points: 25,
   },
@@ -79,7 +102,14 @@ export const wall: Kudos[] = [
     id: "k5",
     from: { name: "Imran Shaikh", team: "Engineering", img: "/avatars/user-2.svg" },
     to: { name: "Aarav Sharma", team: "Engineering", img: "/avatars/user-2.svg" },
-    value: "Ownership", manager: true,
+    value: "Ownership", manager: true, style: "teamwin",
+    also: [{ name: "Karan Joshi", team: "Plant Ops", img: "/avatars/user-4.svg" }],
+    boosts: [
+      { from: { name: "Rahul Verma", team: "Sales · West", img: "/avatars/user-1.svg" }, text: "Demo-day saviours" },
+      { from: { name: "Meera Pillai", team: "Support", img: "/avatars/user-7.svg" }, text: "Tickets about search: zero 👏" },
+      { from: { name: "Neha Rao", team: "Design", img: "/avatars/user-5.svg" }, text: "So fast it feels broken (it isn't)" },
+    ],
+    thanks: "Thank you — Karan's load testing is the reason it held.",
     message: "Owned the search rewrite from spec to rollout — 40% faster and zero incidents. Proud of you.",
     time: "1d", reactions: 42, points: 25,
   },
@@ -90,6 +120,44 @@ export const wall: Kudos[] = [
     value: "Collaboration",
     message: "Thanks for the research readout — reshaped how we're framing the whole feature. 🤝",
     time: "1d", reactions: 12, points: 25,
+  },
+];
+
+/* Group cards — one card everyone signs, delivered on the day (Kudos v2). */
+export type GroupCard = {
+  id: string;
+  for: Person;
+  occasion: string;
+  emoji: string;
+  headline: string;
+  delivers: string;
+  signatures: { from: Person; text: string }[];
+};
+
+export const groupCards: GroupCard[] = [
+  {
+    id: "card-arjun", for: { name: "Arjun Rao", team: "Engineering", img: "/avatars/user-2.svg" },
+    occasion: "Work anniversary", emoji: "🎉", headline: "Three years, Arjun", delivers: "Today at 5:00 pm",
+    signatures: [
+      { from: { name: "Karan Joshi", team: "Plant Ops", img: "/avatars/user-4.svg" }, text: "Best mentor I've had outside my own team. Here's to many more." },
+      { from: { name: "Imran Shaikh", team: "Engineering", img: "/avatars/user-2.svg" }, text: "Calmer releases since you arrived. Thank you." },
+      { from: { name: "Neha Rao", team: "Design", img: "/avatars/user-5.svg" }, text: "The kindest code reviews in the building." },
+    ],
+  },
+  {
+    id: "card-sara", for: { name: "Sara Mehta", team: "Support", img: "/avatars/user-7.svg" },
+    occasion: "Birthday", emoji: "🎂", headline: "Happy birthday, Sara", delivers: "Today at 5:00 pm",
+    signatures: [
+      { from: { name: "Meera Pillai", team: "Support", img: "/avatars/user-7.svg" }, text: "Cake is in the pantry at 4. Don't be late 🎂" },
+    ],
+  },
+  {
+    id: "card-dev", for: { name: "Dev Patel", team: "Design", img: "/avatars/user-3.svg" },
+    occasion: "New joiner", emoji: "👋", headline: "Welcome to the team, Dev", delivers: "Friday, end of week one",
+    signatures: [
+      { from: { name: "Anita Desai", team: "Design", img: "/avatars/user-5.svg" }, text: "So glad you're here. Ask me anything, any time." },
+      { from: { name: "Neha Rao", team: "Design", img: "/avatars/user-5.svg" }, text: "Coffee on me all of week one ☕" },
+    ],
   },
 ];
 
