@@ -4,6 +4,9 @@
 import * as React from "react";
 import Image from "next/image";
 import { ChevronDown, Keyboard, LifeBuoy, LogOut, Repeat, Settings, Trophy, UserPlus, UserRound, Building2 } from "lucide-react";
+import { BADGES } from "@/lib/points";
+import { useWallet } from "../kudos/useWallet";
+import { usePoints } from "../usePointsMode";
 import { useRouter } from "next/navigation";
 import { MenuItem } from "@vadal/design-system";
 import { setSession } from "@/lib/auth";
@@ -15,7 +18,7 @@ import { canAccess } from "@/lib/access";
 
 const ACCOUNT = [
   { icon: UserRound, label: "View profile", href: "/product/home" },
-  { icon: Trophy, label: "Points & badges", href: "/product/home" },
+  { icon: Trophy, label: "Points & badges", href: "/product/kudos/wallet" },
   { icon: Settings, label: "Settings", href: "/product/settings" },
   { icon: LifeBuoy, label: "Help & support", href: "#" },
   { icon: Keyboard, label: "Keyboard shortcuts", href: "#" },
@@ -26,6 +29,8 @@ export function ProfileMenu() {
   const { open, setOpen, ref } = useMenu();
   const [role] = useViewAs();
   const me = useMe();
+  const points = usePoints();
+  const { balance } = useWallet();
   const canAdmin = canAccess(role, "Settings"); // workspace controls are admin-only
 
   function signOut() {
@@ -63,14 +68,15 @@ export function ProfileMenu() {
           {/* points & badges pill */}
           <div className="mx-1 mb-1 flex items-center gap-2 rounded-xl bg-soft px-2.5 py-2 text-[12px]">
             <Trophy className="h-3.5 w-3.5 text-[var(--purple)]" />
-            <span className="font-semibold">{me.points.toLocaleString()} pts</span>
-            <span className="text-faint">· #{me.rank} on your team · {me.streak}-day streak 🔥</span>
+            {points
+              ? <><span className="font-semibold">{balance.toLocaleString()} pts</span><span className="text-faint">· {me.streak}-day streak 🔥</span></>
+              : <><span className="font-semibold">{BADGES.filter((b) => b.earned).length} badges</span><span className="text-faint">· {me.streak}-day streak 🔥</span></>}
           </div>
 
           <div className="my-1 h-px bg-line" />
 
           {ACCOUNT.map((l) => (
-            <MenuItem key={l.label} href={l.href} icon={<l.icon className="h-[18px] w-[18px]" strokeWidth={1.85} />} label={l.label} />
+            <MenuItem key={l.label} href={l.href} icon={<l.icon className="h-[18px] w-[18px]" strokeWidth={1.85} />} label={!points && l.label === "Points & badges" ? "Badges" : l.label} />
           ))}
 
           {/* workspace — manager/admin only */}

@@ -49,7 +49,7 @@ export const wall: Kudos[] = [
     to: { name: "Priya Sharma", team: "Design", img: "/avatars/user-8.svg" },
     value: "Ownership", manager: true,
     message: "Brilliant work on the onboarding flow — clean, considered, and shipped a day early. Textbook ownership.",
-    time: "1h", reactions: 24, points: 50,
+    time: "1h", reactions: 24, points: 25,
   },
   {
     id: "k2",
@@ -57,7 +57,7 @@ export const wall: Kudos[] = [
     to: { name: "Aarav Sharma", team: "Engineering", img: "/avatars/user-2.svg" },
     value: "Collaboration",
     message: "Jumped on the pricing-page bug at 9pm before the West demo. Saved the quarter-close. 🙏",
-    time: "3h", reactions: 31, points: 40,
+    time: "3h", reactions: 31, points: 25,
   },
   {
     id: "k3",
@@ -65,7 +65,7 @@ export const wall: Kudos[] = [
     to: { name: "Sara Mehta", team: "Support", img: "/avatars/user-7.svg" },
     value: "Customer focus",
     message: "Turned an angry escalation into a five-star review. That's the whole job, done beautifully.",
-    time: "5h", reactions: 18, points: 40,
+    time: "5h", reactions: 18, points: 25,
   },
   {
     id: "k4",
@@ -73,7 +73,7 @@ export const wall: Kudos[] = [
     to: { name: "Dev Patel", team: "Design", img: "/avatars/user-3.svg" },
     value: "Innovation",
     message: "The auto-layout token idea shaved hours off the handoff. Welcome-week Dev is already shipping. 💡",
-    time: "8h", reactions: 15, points: 40,
+    time: "8h", reactions: 15, points: 25,
   },
   {
     id: "k5",
@@ -81,7 +81,7 @@ export const wall: Kudos[] = [
     to: { name: "Aarav Sharma", team: "Engineering", img: "/avatars/user-2.svg" },
     value: "Ownership", manager: true,
     message: "Owned the search rewrite from spec to rollout — 40% faster and zero incidents. Proud of you.",
-    time: "1d", reactions: 42, points: 50,
+    time: "1d", reactions: 42, points: 25,
   },
   {
     id: "k6",
@@ -89,7 +89,7 @@ export const wall: Kudos[] = [
     to: { name: "Meera Pillai", team: "Support", img: "/avatars/user-7.svg" },
     value: "Collaboration",
     message: "Thanks for the research readout — reshaped how we're framing the whole feature. 🤝",
-    time: "1d", reactions: 12, points: 40,
+    time: "1d", reactions: 12, points: 25,
   },
 ];
 

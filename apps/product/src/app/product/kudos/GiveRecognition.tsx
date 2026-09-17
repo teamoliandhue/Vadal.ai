@@ -5,13 +5,17 @@
 import * as React from "react";
 import { Search, Sparkles } from "lucide-react";
 import { Avatar, Button, SparkMark, Switch } from "@vadal/design-system";
+import { EARN_RULES } from "@/lib/points";
+import { usePoints } from "../usePointsMode";
 import { Drawer } from "../Drawer";
 import { toast } from "../Toaster";
 import { useMe } from "../useSession";
 import { values, teammates, draftLines, type Kudos, type Person } from "@/lib/recognize";
 import { didAction } from "@/lib/tour";
 
-const POINTS: Record<string, number> = { Ownership: 50, Collaboration: 40, Innovation: 40, "Customer focus": 40 };
+/* Fixed and published (lib/points): the same for every value — a value is not worth more than another. */
+const GIVE = EARN_RULES.find((r) => r.source === "kudos-given")!.points;
+const GET = EARN_RULES.find((r) => r.source === "kudos-received")!.points;
 let kid = 100;
 
 export function GiveRecognition({
@@ -25,6 +29,7 @@ export function GiveRecognition({
   onClose: () => void;
   onGive: (k: Kudos) => void;
 }) {
+  const points = usePoints();
   const me = useMe();
   const [to, setTo] = React.useState<Person | null>(null);
   const [query, setQuery] = React.useState("");
@@ -71,7 +76,7 @@ export function GiveRecognition({
       message: message.trim(),
       time: "Just now",
       reactions: 0,
-      points: POINTS[value] ?? 40,
+      points: GET,
     };
     onGive(k);
     didAction("kudos");
@@ -170,7 +175,7 @@ export function GiveRecognition({
       </div>
 
       <div className="sticky bottom-0 -mx-7 -mb-7 mt-6 flex items-center justify-between gap-2 border-t border-line bg-card px-7 py-4">
-        <span className="text-[12px] text-faint">Worth <span className="font-semibold text-muted">+{POINTS[value] ?? 40} pts</span></span>
+        <span className="text-[12px] text-faint">{points ? <>You get <span className="font-semibold text-muted">+{GIVE}</span> · {to ? to.name.split(" ")[0] : "they"} get <span className="font-semibold text-muted">+{GET}</span></> : "Counts toward their Top recogniser badge"}</span>
         <div className="flex items-center gap-2">
           <Button variant="tertiary" size="sm" onClick={onClose}>Cancel</Button>
           <Button variant="brand" size="sm" disabled={!valid} leadingIcon={<SparkMark size={14} tone="solid" />} onClick={send}>Send recognition</Button>

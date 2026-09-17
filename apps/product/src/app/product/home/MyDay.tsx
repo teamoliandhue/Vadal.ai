@@ -5,6 +5,7 @@ import * as React from "react";
 import { Check, PartyPopper } from "lucide-react";
 import { Button } from "@vadal/design-system";
 import { myDay } from "@/lib/data";
+import { usePoints } from "../usePointsMode";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { toast } from "../Toaster";
 
@@ -16,6 +17,7 @@ const DOT: Record<string, string> = {
 };
 
 export function MyDay({ className = "", empty = false }: { className?: string; empty?: boolean }) {
+  const points = usePoints();
   // Track completion by stable task title (not array index) so the list and the
   // progress/empty state can never disagree.
   const [doneIds, setDoneIds] = usePersistentState<string[]>("vadal:myday-done2", []);
@@ -68,7 +70,7 @@ export function MyDay({ className = "", empty = false }: { className?: string; e
                     <span className="size-1.5 shrink-0 rounded-full" style={{ background: DOT[t.tag] ?? "var(--faint)" }} />
                     <span className="truncate text-[14px] font-semibold">{t.title}</span>
                   </div>
-                  <div className="mt-0.5 pl-3.5 text-[12px] text-faint">{t.meta} · {t.tag}</div>
+                  <div className="mt-0.5 pl-3.5 text-[12px] text-faint">{t.meta}{points && "points" in t ? ` · +${t.points} pts` : ""} · {t.tag}</div>
                 </div>
                 <Button variant="tertiary" size="sm" onClick={() => complete(t.title)}>{t.action}</Button>
               </li>

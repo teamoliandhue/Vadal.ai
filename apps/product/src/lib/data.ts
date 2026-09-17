@@ -520,7 +520,7 @@ export const myDay = [
   { title: "Pulse survey · 6 quick questions", meta: "Closes Friday · 2 min", tag: "Survey", accent: "#8b7cf8", action: "Start" },
   { title: "1:1 with Anita", meta: "Today · 3:00 PM", tag: "Meeting", accent: "#33b28a", action: "Prep" },
   { title: "Recognise a teammate", meta: "You haven’t this week", tag: "Recognition", accent: "#f2884d", action: "Give" },
-  { title: "Micro-learning · Giving feedback", meta: "5 min · earns 50 pts", tag: "Learning", accent: "#e0a3c8", action: "Resume" },
+  { title: "Micro-learning · Giving feedback", meta: "5 min", points: 20, tag: "Learning", accent: "#e0a3c8", action: "Resume" },
 ] as const;
 
 export const myRecognition = [
@@ -557,8 +557,8 @@ export const myCalendar = [
 /* Daily-adoption hooks (Home §6) — optional widgets that give people a reason to
    open the app every day. `connected` seeds which are already on. */
 export const homeHooks = [
-  { key: "health", label: "Health & steps", emoji: "⌚", desc: "Sync Fitbit — earn streak points for staying active.", connected: true, stat: "8,240 steps · 6-day streak" },
-  { key: "learning", label: "Daily learning", emoji: "📚", desc: "A 5-minute micro-lesson, earns 50 points.", connected: true, stat: "Giving feedback · 2 min left" },
+  { key: "health", label: "Health & steps", emoji: "⌚", desc: "Sync Fitbit — keep a streak for staying active.", connected: true, stat: "8,240 steps · 6-day streak" },
+  { key: "learning", label: "Daily learning", emoji: "📚", desc: "A 5-minute micro-lesson, once a day.", connected: true, stat: "Giving feedback · 2 min left" },
   { key: "visitor", label: "Visitor pass", emoji: "🚪", desc: "Pre-register guests and skip the front desk.", connected: false, stat: "" },
   { key: "commute", label: "Commute & parking", emoji: "🅿️", desc: "Reserve a desk or parking spot for office days.", connected: false, stat: "" },
 ] as const;

@@ -46,3 +46,5 @@ here for the product designer, so Figma stays in sync with the built product.
 | 028 | [Amplify — Results](./028-amplify-results.md) | Built · needs Figma |
 | 029 | [Insight — adoption, counted without points](./029-insight-adoption.md) | Built · needs Figma |
 | 030 | [Navigation, Nudge group and For you](./030-nav-and-for-you.md) | Built · needs Figma |
+| 031 | [Points mode, the ledger and Wallet](./031-points-mode-and-wallet.md) | Built · needs Figma |
+| 032 | [Rewards — the catalogue](./032-rewards.md) | Built · needs Figma |

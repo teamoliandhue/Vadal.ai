@@ -16,6 +16,9 @@ import { ArrowRight, Award, Clock, Gift, Heart, Trophy } from "lucide-react";
 import { Avatar, Badge, Button, Trend } from "@vadal/design-system";
 import { Sparkline } from "@/components/charts";
 import { org, me, myRecognition, communities, myDay, engagementTrend, myCalendar } from "@/lib/data";
+import { BADGES, MY_RECOGNITION } from "@/lib/points";
+import { useWallet } from "../kudos/useWallet";
+import { usePoints } from "../usePointsMode";
 import { MoodCheck } from "./MoodCheck";
 import { MyDay } from "./MyDay";
 import { TourResume } from "../get-started/TourResume";
@@ -128,9 +131,14 @@ function YouCard({ className = "", firstTime = false }: { className?: string; fi
   const es = engagementTrend.series;
   const engScore = es[es.length - 1];
   const engDelta = engScore - es[es.length - 4];
+  /* With points off there is no balance or rank to show — recognition and badges carry it. */
+  const points = usePoints();
+  const { balance } = useWallet();
   const stats: [React.ReactNode, string][] = firstTime
-    ? [["0", "Points"], ["0", "Day streak"], ["—", "Team rank"]]
-    : [[me.points.toLocaleString(), "Points"], [me.streak, "Day streak"], [`#${me.rank}`, "Team rank"]];
+    ? [["0", points ? "Points" : "Kudos"], ["0", "Day streak"], ["0", "Badges"]]
+    : points
+      ? [[balance.toLocaleString(), "Points"], [me.streak, "Day streak"], [BADGES.filter((b) => b.earned).length, "Badges"]]
+      : [[MY_RECOGNITION.received30d, "Kudos · 30d"], [me.streak, "Day streak"], [BADGES.filter((b) => b.earned).length, "Badges"]];
   return (
     <section className={`card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>
       <MyIdentityHeader />
@@ -169,16 +177,16 @@ function YouCard({ className = "", firstTime = false }: { className?: string; fi
 
       <div className="mt-4 rounded-2xl bg-soft p-4">
         <div className="flex items-center gap-2 text-[14px] font-semibold">
-          <Award className="h-4 w-4 text-[var(--purple)]" /> {firstTime ? "Earn points to unlock badges" : `${me.nextBadge.left} more to “${me.nextBadge.name}”`}
+          <Award className="h-4 w-4 text-[var(--purple)]" /> {firstTime ? "Check in and recognise teammates to earn badges" : `${me.nextBadge.left} more to “${me.nextBadge.name}”`}
         </div>
         <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-line">
           <span className="block h-full rounded-full bg-[var(--purple)]" style={{ width: firstTime ? "4%" : "66%" }} />
         </div>
       </div>
 
-      <Link href="/product/kudos" className="mt-auto block">
-        <Button variant="tertiary" leadingIcon={<Trophy className="h-4 w-4 text-[var(--purple)]" />} className="w-full">
-          View leaderboard
+      <Link href="/product/kudos/wallet" className="mt-auto block">
+        <Button variant="tertiary" leadingIcon={<Trophy className="h-4 w-4 text-[var(--purple)]" />} className="min-h-[44px] w-full lg:min-h-0">
+          {points ? "Your wallet" : "Your badges"}
         </Button>
       </Link>
     </section>

@@ -13,6 +13,8 @@ import {
   celebrations, zoneOf, type Kudos, type Person,
 } from "@/lib/recognize";
 import { GiveRecognition } from "./GiveRecognition";
+import { usePoints } from "../usePointsMode";
+import { KudosTabs } from "./KudosTabs";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 const colorOf = (name: string) => values.find((v) => v.name === name)?.color ?? "var(--purple)";
@@ -36,6 +38,7 @@ function ValueChip({ name }: { name: string }) {
 }
 
 export function RecognitionHub() {
+  const points = usePoints();
   const [given, setGiven] = usePersistentState<Kudos[]>("vadal:recognition-given", []);
   const [reacted, setReacted] = usePersistentState<string[]>("vadal:recognition-reacted", []);
   const [composer, setComposer] = React.useState(false);
@@ -55,16 +58,17 @@ export function RecognitionHub() {
 
   return (
     <div className="flex flex-col gap-6">
+      <KudosTabs active="kudos" />
       {/* header */}
       <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card p-7 shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)] sm:p-9">
         <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <Eyebrow>Engage</Eyebrow>
+            <Eyebrow>My space</Eyebrow>
             <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Kudos</h1>
             <p className="mt-2 max-w-xl text-[14px] text-muted">Make appreciation flow — give kudos, celebrate the wins, and close the cold zones before they cost you people.</p>
           </div>
-          <Button variant="brand" leadingIcon={<Plus className="h-4 w-4" />} onClick={() => openFor()}>Give recognition</Button>
+          <Button variant="brand" className="min-h-[44px] lg:min-h-0" leadingIcon={<Plus className="h-4 w-4" />} onClick={() => openFor()}>Give recognition</Button>
         </div>
         <div className="relative mt-6 grid grid-cols-2 gap-4 border-t border-line pt-5 lg:grid-cols-4">
           {kpis.map(([label, val, delta]) => (
@@ -81,7 +85,7 @@ export function RecognitionHub() {
         <div className="flex flex-col gap-4 xl:col-span-7">
           <div className="flex items-center justify-between">
             <div><Eyebrow>The wall</Eyebrow><h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Recent recognition</h2></div>
-            <Button variant="secondary" size="sm" leadingIcon={<HeartHandshake className="h-4 w-4" />} onClick={() => openFor()}>Give kudos</Button>
+            <Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" leadingIcon={<HeartHandshake className="h-4 w-4" />} onClick={() => openFor()}>Give kudos</Button>
           </div>
           {stream.map((k) => {
             const on = reacted.includes(k.id);
@@ -103,11 +107,10 @@ export function RecognitionHub() {
                     <div className="mt-1.5"><ValueChip name={k.value} /></div>
                     <p className="mt-2 text-[14px] leading-relaxed text-muted">{k.message}</p>
                     <div className="mt-3 flex items-center gap-4 text-[12px] text-faint">
-                      <button onClick={() => react(k.id)} className={`flex items-center gap-1.5 font-semibold transition hover:text-ink ${on ? "text-[var(--danger)]" : ""}`}>
+                      <button onClick={() => react(k.id)} aria-pressed={on} aria-label={`${on ? "Unlike" : "Like"} · ${count}`} className={`flex min-h-[44px] items-center gap-1.5 px-1 font-semibold transition hover:text-ink lg:min-h-0 ${on ? "text-[var(--danger)]" : ""}`}>
                         <span aria-hidden>{on ? "❤️" : "🤍"}</span> {count}
                       </button>
-                      <span>·</span>
-                      <span>+{k.points} pts</span>
+                      {points && <><span>·</span><span>+{k.points} pts</span></>}
                       <span className="ml-auto">{k.time}</span>
                     </div>
                   </div>
@@ -173,7 +176,7 @@ export function RecognitionHub() {
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div><Eyebrow>Coverage · by team</Eyebrow><h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Who's getting seen — and who isn't</h2></div>
-          <Button variant="secondary" size="sm" leadingIcon={<SparkMark size={14} tone="solid" />} onClick={() => ask("Which teams have recognition cold zones, and how do I fix them?")}>Ask Vadal</Button>
+          <Button className="min-h-[44px] lg:min-h-0" variant="secondary" size="sm" leadingIcon={<SparkMark size={14} tone="solid" />} onClick={() => ask("Which teams have recognition cold zones, and how do I fix them?")}>Ask Vadal</Button>
         </div>
         <div className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           {coverage.map((c) => {
@@ -193,8 +196,8 @@ export function RecognitionHub() {
           <div className="min-w-0">
             <p className="text-[14px] leading-relaxed text-muted">{coldInsight}</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <Button variant="brand" size="sm" onClick={() => toast("Nudge sent to 3 managers — Night shift, Plant Ops, Logistics 📣")}>Nudge their managers</Button>
-              <Button variant="tertiary" size="sm" onClick={() => ask("Draft a recognition prompt for Night-shift managers.")}>Draft a prompt</Button>
+              <Button className="min-h-[44px] lg:min-h-0" variant="brand" size="sm" onClick={() => toast("Nudge sent to 3 managers — Night shift, Plant Ops, Logistics 📣")}>Nudge their managers</Button>
+              <Button className="min-h-[44px] lg:min-h-0" variant="tertiary" size="sm" onClick={() => ask("Draft a recognition prompt for Night-shift managers.")}>Draft a prompt</Button>
             </div>
           </div>
         </div>
@@ -219,7 +222,7 @@ export function RecognitionHub() {
               </div>
               <div className="mt-3 text-[14px] font-semibold">{c.name}</div>
               <div className="text-[12px] text-faint">{c.type} · {c.detail}</div>
-              <Button variant="secondary" size="sm" className="mt-3 self-stretch" onClick={() => openFor({ name: c.name, team: c.team, img: c.img })}>Send a note</Button>
+              <Button variant="secondary" size="sm" className="mt-3 self-stretch min-h-[44px] lg:min-h-0" onClick={() => openFor({ name: c.name, team: c.team, img: c.img })}>Send a note</Button>
             </div>
           ))}
         </div>

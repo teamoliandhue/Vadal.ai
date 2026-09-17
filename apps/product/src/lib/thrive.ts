@@ -101,7 +101,7 @@ export const moneyConfig = {
   festival: { name: "Diwali", opensInDays: 38 },
 };
 
-export const points = { balance: 4180, thisMonth: 340, rank: 7, of: 240 };
+/* Points live in lib/points (one ledger, shared with Kudos). */
 
 /** Consent for the wellbeing check — off until the person turns it on. */
 export const wellbeingConsentDefault = false;

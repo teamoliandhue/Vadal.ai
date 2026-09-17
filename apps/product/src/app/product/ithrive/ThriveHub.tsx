@@ -28,9 +28,12 @@ import { Button, SparkMark, Switch } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { activityNudges, buildCohorts, chooseFocus, contentFor, financialTips, moneyMoment, unusedBenefits, wellbeingCheck } from "@/lib/ai/engines/wellbeing";
 import {
-  myActivity, devices, challenges, participants, benefits, wealthArticles, points, mySignals,
+  myActivity, devices, challenges, participants, benefits, wealthArticles, mySignals,
   atWorkStepsPerDay, weekSteps, weekStepsFrontline, weekSleep, weekDays, moneyConfig,
 } from "@/lib/thrive";
+import { BADGES } from "@/lib/points";
+import { useWallet } from "../kudos/useWallet";
+import { usePoints } from "../usePointsMode";
 import { GoalRing, DayArea } from "@/components/charts";
 import { Card, Eyebrow, HalfHeader } from "./parts";
 import { Challenges } from "./Challenges";
@@ -40,6 +43,8 @@ import { toast } from "../Toaster";
 
 export function ThriveHub() {
   const { session } = useSession();
+  const pointsOn = usePoints();
+  const { balance } = useWallet();
   const surface = session?.profile === "frontline" ? "frontline" : "desk";
 
   /* `=== true` is deliberate — see the same guard in amplify/AmplifyHub. This
@@ -126,7 +131,7 @@ export function ThriveHub() {
               {isRecovery && (
                 <span className="flex items-center gap-1.5"><Activity className="h-3.5 w-3.5 text-faint" />{atWorkStepsPerDay.toLocaleString()} on shift</span>
               )}
-              <span className="flex items-center gap-1.5"><Trophy className="h-3.5 w-3.5 text-faint" />{points.balance.toLocaleString()} pts · #{points.rank}</span>
+              <span className="flex items-center gap-1.5"><Trophy className="h-3.5 w-3.5 text-faint" />{pointsOn ? `${balance.toLocaleString()} pts` : `${BADGES.filter((b) => b.earned).length} badges`}</span>
             </div>
           </div>
 
@@ -395,8 +400,8 @@ export function ThriveHub() {
             </button>
           </div>
 
-          <Link href="/product/kudos" className="flex min-h-[44px] items-center gap-2 px-1 text-[14px] font-semibold text-[var(--purple)] transition hover:gap-2.5">
-            Your {points.balance.toLocaleString()} points, shared with Recognition <ArrowRight className="h-3.5 w-3.5" />
+          <Link href="/product/kudos/wallet" className="flex min-h-[44px] items-center gap-2 px-1 text-[14px] font-semibold text-[var(--purple)] transition hover:gap-2.5">
+            {pointsOn ? `Your ${balance.toLocaleString()} points, in your wallet` : "Your badges"} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </div>
