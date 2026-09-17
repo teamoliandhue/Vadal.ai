@@ -1,6 +1,8 @@
 "use client";
-/* Reusable right-side drawer — backdrop + slide-in panel, Escape/backdrop to
-   close. Accessible modal: focus moves into the panel on open, Tab is trapped
+/* Reusable drawer — backdrop + slide-in panel, Escape/backdrop to close.
+   On a phone it is a bottom sheet (mobile pass, spec 043): it rises from the
+   bottom where a thumb already is, has a grab bar you can pull down to close,
+   and a 44px close button. From md up it is the right-side panel. Accessible modal: focus moves into the panel on open, Tab is trapped
    inside, body scroll is locked, and focus returns to the trigger on close.
    Used for drill-downs across the product (Listen sections, Pulse, Feed). */
 import * as React from "react";
@@ -23,6 +25,7 @@ export function Drawer({
   const [show, setShow] = React.useState(false);
   const panelRef = React.useRef<HTMLDivElement>(null);
   const restoreRef = React.useRef<HTMLElement | null>(null);
+  const pull = React.useRef<number | null>(null);
 
   React.useEffect(() => {
     if (!open) { setShow(false); return; }
@@ -65,9 +68,23 @@ export function Drawer({
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={title}>
       <div onClick={onClose} className={`absolute inset-0 bg-black/35 backdrop-blur-[2px] transition-opacity duration-300 ${show ? "opacity-100" : "opacity-0"}`} aria-hidden />
-      <div ref={panelRef} tabIndex={-1} className={`absolute right-0 top-0 flex h-full w-full max-w-[440px] flex-col border-l border-line bg-card shadow-[0_0_60px_-12px_rgba(20,20,40,0.4)] outline-none transition-transform duration-300 ${show ? "translate-x-0" : "translate-x-full"}`}>
-        <button onClick={onClose} aria-label="Close" className="absolute right-4 top-4 z-10 grid h-8 w-8 place-items-center rounded-full text-faint transition hover:bg-soft hover:text-ink"><X className="h-4 w-4" /></button>
-        <div className="flex-1 overflow-y-auto p-7">{children}</div>
+      <div
+        ref={panelRef} tabIndex={-1}
+        className={`absolute inset-x-0 bottom-0 flex max-h-[92dvh] flex-col rounded-t-[28px] border-t border-line bg-card shadow-[0_0_60px_-12px_rgba(20,20,40,0.4)] outline-none transition-transform duration-300 md:inset-x-auto md:bottom-auto md:right-0 md:top-0 md:h-full md:max-h-none md:w-full md:max-w-[440px] md:rounded-none md:border-l md:border-t-0 ${
+          show ? "translate-y-0 md:translate-x-0" : "translate-y-full md:translate-x-full md:translate-y-0"
+        }`}
+      >
+        {/* Grab bar — pull it down to close. Phone only. */}
+        <div
+          className="flex h-6 shrink-0 touch-none items-center justify-center md:hidden"
+          onPointerDown={(e) => { pull.current = e.clientY; }}
+          onPointerUp={(e) => { if (pull.current !== null && e.clientY - pull.current > 60) onClose(); pull.current = null; }}
+          aria-hidden
+        >
+          <span className="h-1.5 w-10 rounded-full bg-[var(--line)]" />
+        </div>
+        <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 z-10 grid h-11 w-11 place-items-center rounded-full text-faint transition hover:bg-soft hover:text-ink md:right-4 md:top-4 md:h-8 md:w-8"><X className="h-4 w-4" /></button>
+        <div className="flex-1 overflow-y-auto px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-2 md:p-7">{children}</div>
       </div>
     </div>
   );

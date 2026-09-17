@@ -73,7 +73,7 @@ function widgetsFor(firstTime: boolean): Record<string, WidgetDef> {
     whatsnew: { title: "What's new", emoji: "✨", desc: "Policies, campaigns, new communities and what's new in Vadal.", render: () => <WhatsNewWidget /> },
     manager: { title: "Team snapshot", emoji: "👥", desc: "Your team's health and who needs you this week.", roles: MGR, render: () => <ManagerSnapshot /> },
     myday: { title: "My day", emoji: "✅", desc: "Today's to-dos, which you can tick off here.", render: () => <MyDay empty={firstTime} /> },
-    calendar: { title: "Today's calendar", emoji: "📅", desc: "Your meetings today, from Google Calendar.", render: () => <CalendarCard /> },
+    calendar: { title: "Today's calendar", emoji: "📅", desc: "Your meetings today, from your calendar.", render: () => <CalendarCard /> },
     you: { title: "You", emoji: "🏅", desc: "Your streak, badges and engagement trend.", render: () => <YouCard firstTime={firstTime} /> },
     hooks: { title: "Daily hooks", emoji: "⌚", desc: "Steps, daily learning and visitor passes.", render: () => <HooksCard /> },
     poll: { title: "Quick poll", emoji: "🗳️", desc: "The one-question poll of the day.", render: () => <QuickPoll className="card-lift" firstTime={firstTime} /> },

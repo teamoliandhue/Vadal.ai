@@ -58,3 +58,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 040 | [Amplify — captions that sound like a person](./040-amplify-caption-copy.md) | Built · needs Figma |
 | 041 | [Translation — the paid add-on](./041-translation-add-on.md) | Built · needs Figma |
 | 042 | [Link · Trust · Launch — the platform surfaces](./042-link-trust-launch.md) | Built · needs Figma |
+| 043 | [Mobile pass — Home a phone arranges, and bottom sheets](./043-mobile-pass.md) | Built · needs Figma |

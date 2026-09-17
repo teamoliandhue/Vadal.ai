@@ -8,8 +8,8 @@
      · the ↑ ↓ buttons, and ← → between columns (touch and keyboard)
      · remove it and add it back from the library
    The layout is the person's own and is remembered; Reset brings back the
-   default. On a phone the two columns stack, left first — same order, same
-   controls. */
+   default. A phone gets its own board (PhoneBoard, spec 043) with its own
+   saved arrangement — not these columns stacked. */
 import * as React from "react";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, GripVertical, LayoutGrid, Plus, RotateCcw, X } from "lucide-react";
 import { Button } from "@vadal/design-system";
@@ -18,6 +18,14 @@ import { usePersistentState } from "@/lib/usePersistentState";
 import { Drawer } from "../Drawer";
 import { toast } from "../Toaster";
 import { useViewAs } from "../useViewAs";
+import { PhoneBoard } from "./PhoneBoard";
+
+/* Phone = below md. null until mounted, so the server render never guesses. */
+const PHONE = "(max-width: 767px)";
+const subscribePhone = (f: () => void) => { const m = window.matchMedia(PHONE); m.addEventListener("change", f); return () => m.removeEventListener("change", f); };
+function useIsPhone(): boolean | null {
+  return React.useSyncExternalStore(subscribePhone, () => window.matchMedia(PHONE).matches, () => null);
+}
 
 export type WidgetDef = { title: string; desc: string; emoji: string; roles?: Role[]; render: () => React.ReactNode };
 type Col = "left" | "right";
@@ -31,6 +39,7 @@ export function WidgetBoard({ widgets, defaults }: { widgets: Record<string, Wid
   const [drag, setDrag] = React.useState<string | null>(null);
   const [over, setOver] = React.useState<{ col: Col; index: number } | null>(null);
   const liveRef = React.useRef<HTMLParagraphElement>(null);
+  const phone = useIsPhone();
 
   const allowed = (id: string) => Boolean(widgets[id]) && (!widgets[id].roles || widgets[id].roles!.includes(role));
   const base = stored ?? defaults;
@@ -67,6 +76,9 @@ export function WidgetBoard({ widgets, defaults }: { widgets: Record<string, Wid
     commit({ ...layout, [col]: [...layout[col], id] });
     toast(`Added ${widgets[id].title}`);
   }
+
+  if (phone === null) return <section aria-label="Your Home" className="mt-6 min-h-[240px]" aria-busy="true" />;
+  if (phone) return <PhoneBoard widgets={widgets} allowed={allowed} defaults={[...defaults.left, ...defaults.right].filter(allowed)} />;
 
   const iconBtn = "grid h-11 w-11 place-items-center rounded-full text-muted transition hover:bg-soft hover:text-ink disabled:opacity-30 lg:h-8 lg:w-8";
 
