@@ -213,6 +213,20 @@ export function readability(text: string): Readability {
 }
 
 const PLAIN: [RegExp, string][] = [
+  [/\bcommencing\b/gi, "starting"],
+  [/\bcommences\b/gi, "starts"],
+  [/\bcommenced\b/gi, "started"],
+  [/\bare required to\b/gi, "must"],
+  [/\bis required to\b/gi, "has to"],
+  [/\bis required\b/gi, "is needed"],
+  [/\bplease consider whether\b/gi, "check if"],
+  [/\bin advance\b/gi, "ahead of time"],
+  [/\bsubsequent to\b/gi, "after"],
+  [/\bunderstand what\b/gi, "find out what"],
+  [/\bthe organisation\b|\bthe organization\b/gi, "the company"],
+  [/\bensure\b/gi, "make sure"],
+  [/\bassistance\b/gi, "help"],
+  [/\bregarding\b/gi, "about"],
   [/\butilise|utilize\b/gi, "use"],
   [/\bcommence\b/gi, "start"],
   [/\bterminate\b/gi, "end"],
@@ -239,15 +253,18 @@ const PLAIN: [RegExp, string][] = [
  */
 export function simplify(text: string, target: "simple" | "standard" = "simple"): string {
   let out = text;
-  for (const [re, plain] of PLAIN) out = out.replace(re, plain);
+  /* keep the capital when a replacement lands at the start of a sentence —
+     "Prior to scheduling" must become "Before scheduling", not "before" */
+  for (const [re, plain] of PLAIN) out = out.replace(re, (m) => (m[0] === m[0].toUpperCase() && m[0] !== m[0].toLowerCase() ? plain[0].toUpperCase() + plain.slice(1) : plain));
   if (target !== "simple") return out;
   // Split long sentences at conjunctions — the single biggest readability win.
   return out
     .split(/(?<=[.!?])\s+/)
-    .flatMap((s) => (s.split(/\s+/).length > 22 ? s.split(/,\s+(?:and|but|which|while)\s+/i) : [s]))
-    .map((s) => s.trim())
+    .flatMap((sentence) => (sentence.split(/\s+/).length > 16 ? sentence.split(/,\s+(?:and|but|so|which|while)\s+|\s+(?:and|but)\s+(?=(?:managers?|we|you|they|it|this|everyone|people|your)\b)|;\s+/i) : [sentence]))
+    .map((x) => x.trim().replace(/[,;]$/, ""))
     .filter(Boolean)
-    .map((s) => (/[.!?]$/.test(s) ? s : `${s}.`))
+    .map((x) => x[0].toUpperCase() + x.slice(1))
+    .map((x) => (/[.!?]$/.test(x) ? x : `${x}.`))
     .join(" ");
 }
 

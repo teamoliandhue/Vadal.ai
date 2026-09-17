@@ -149,3 +149,39 @@ export const audiences = [
   "All org", "Engineering", "Sales", "Sales · West", "Support", "Design", "People managers",
   "New joiners", "Plant Ops", "Night shift", "Logistics", "Night shift · Plant Ops · Logistics",
 ] as const;
+
+/* ── delivery previews (Broadcast) ─────────────────────────────────
+   Who a send reaches, as recipients the timing engine can plan for. Seeded
+   deterministically from the audience: frontline audiences are mostly shift
+   workers on WhatsApp/SMS, desk teams are in the app and Teams. */
+import type { Recipient, ShiftPattern, Channel } from "./ai/engines/timing";
+
+const FRONT = /Plant Ops|Night shift|Logistics/;
+
+export function recipientsFor(audience: string, count = 24): Recipient[] {
+  let h = 7;
+  for (const ch of audience) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const rnd = () => { h = (h * 1103515245 + 12345) >>> 0; return (h >>> 16) / 65536; };
+  const frontline = FRONT.test(audience);
+  const mixed = audience === "All org";
+  return Array.from({ length: count }, (_, i) => {
+    const r = rnd();
+    const shift: ShiftPattern = frontline
+      ? (/Night shift/.test(audience) && r < 0.6 ? "night" : r < 0.7 ? "day" : "evening")
+      : mixed ? (r < 0.5 ? "desk" : r < 0.75 ? "day" : r < 0.9 ? "evening" : "night")
+      : "desk";
+    const channels: Channel[] = shift === "desk" ? (rnd() < 0.5 ? ["teams", "app"] : ["app", "email"]) : (rnd() < 0.7 ? ["whatsapp", "sms"] : ["sms"]);
+    const history = rnd() < 0.55;
+    const respondsAt = !history ? [] : shift === "desk" ? [10, 11, 10] : shift === "day" ? [12, 13] : shift === "evening" ? [16] : [22, 23];
+    return { email: `${audience}-${i}`, team: audience, shift, respondsAt, reachableOn: channels, recentSends: rnd() < 0.12 ? 3 : Math.floor(rnd() * 2) };
+  });
+}
+
+/** A first message per objective, written the way first drafts usually are. */
+export const DRAFT_MESSAGE: Record<string, string> = {
+  engagement: "Commencing Monday, Wednesdays will be meeting-free across the organisation in order to facilitate focused work. Prior to scheduling a meeting on a Wednesday, please consider whether it can be moved to Tuesday or Thursday, and managers will check in with their teams subsequent to the first week to understand what additional support is required.",
+  wellbeing: "In order to support your wellbeing, we are introducing additional mental-health days this quarter. Employees are required to book them in advance via the leave system, and managers will facilitate cover so that nobody is required to work while they are away.",
+  recognition: "This month we are asking every manager to recognise at least one person on their team. Recognition that is specific and timely is the most effective, so please utilise the kudos feature subsequent to any piece of work that went well.",
+  retention: "We would like to understand what keeps you here. Over the next two weeks, managers will commence short stay conversations with each member of their team, and any additional feedback can be shared anonymously via the pulse.",
+  onboarding: "Welcome to your first week. Prior to your first day, please complete your profile and payroll details, and your buddy will facilitate introductions to the team.",
+};

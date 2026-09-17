@@ -53,3 +53,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 035 | [AI you can reach — feed ranking, topics, kudos-spotting, Home order](./035-ai-wiring-social-kudos-home.md) | Built · needs Figma |
 | 036 | [Knowledge — the loop closed](./036-knowledge-loop.md) | Built · needs Figma |
 | 037 | [Pulse programmes, smart send, and answering a pulse](./037-pulse-programmes-and-responding.md) | Built · needs Figma |
+| 038 | [Campaigns — delivery preview](./038-campaign-delivery-preview.md) | Built · needs Figma |

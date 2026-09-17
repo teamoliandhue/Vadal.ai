@@ -51,7 +51,7 @@ Unblocked by the decisions:
 - [ ] **Onboard** and **Alumni** screens · M each
 - [x] **Pulse programmes** · M (spec 037) — onboarding (day 7/30/90), stay interview, manager effectiveness, exit
 - [x] Wired (spec 035): `tagPost` → Social topics, `rankFeed` → For you, `scanAnomalies` → Kudos spotted, PersonProfile → Home order.
-- [ ] Carry-over from earlier: delivery previews in the Campaign builder.
+- [x] Carry-over: delivery previews in the Campaign builder (spec 038).
 - [x] Survey-respondent view, adaptive, with smart send-time (spec 037).
 - [x] Knowledge: role-gating, thumbs-down → correction, unanswered → gap, staleness warnings (spec 036).
 

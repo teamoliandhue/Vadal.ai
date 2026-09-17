@@ -8,7 +8,8 @@ import { Bell, ClipboardList, Mail, Newspaper, Plus, Sparkles, X, type LucideIco
 import { Button, SparkMark } from "@vadal/design-system";
 import { Drawer } from "../Drawer";
 import { toast } from "../Toaster";
-import { objectives, channels, audiences, starterSteps, type Campaign, type Step } from "@/lib/campaigns";
+import { objectives, channels, audiences, starterSteps, DRAFT_MESSAGE, type Campaign, type Step } from "@/lib/campaigns";
+import { DeliveryPreview } from "./DeliveryPreview";
 import { useScope } from "../useViewAs";
 
 export type CampaignSeed =
@@ -38,6 +39,7 @@ export function CampaignBuilder({ seed, onClose, onLaunch }: { seed: CampaignSee
   const [chans, setChans] = React.useState<string[]>(["feed"]);
   const [steps, setSteps] = React.useState<(Step & { id: string })[]>([]);
   const [thinking, setThinking] = React.useState(false);
+  const [message, setMessage] = React.useState("");
 
   React.useEffect(() => {
     if (!seed) return;
@@ -50,6 +52,7 @@ export function CampaignBuilder({ seed, onClose, onLaunch }: { seed: CampaignSee
     setChans(["feed"]);
     const s = seed.steps ?? starterSteps[seed.objective] ?? [];
     setSteps(s.length ? s.map((l) => newStep(l)) : [newStep()]);
+    setMessage(DRAFT_MESSAGE[seed.objective] ?? DRAFT_MESSAGE.engagement);
   }, [seed]);
 
   const toggleChan = (k: string) => setChans((c) => (c.includes(k) ? c.filter((x) => x !== k) : [...c, k]));
@@ -158,6 +161,17 @@ export function CampaignBuilder({ seed, onClose, onLaunch }: { seed: CampaignSee
           })}
         </div>
       </div>
+
+      {/* message + delivery preview */}
+      <label className="mt-5 block">
+        <span className="flex items-center justify-between text-[12px] font-semibold text-faint">
+          First message
+          <button type="button" onClick={() => setMessage(DRAFT_MESSAGE[objective] ?? DRAFT_MESSAGE.engagement)} className="min-h-[44px] text-[12px] font-semibold text-[var(--ai-accent)] hover:opacity-80 lg:min-h-0">Draft for this objective</button>
+        </span>
+        <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={4}
+          className="mt-1.5 w-full resize-none rounded-xl border border-line bg-card px-3.5 py-2.5 text-[16px] leading-relaxed outline-none transition focus:border-[var(--purple)] lg:text-[14px]" />
+      </label>
+      {message.trim() && <DeliveryPreview message={message} audience={audience} />}
 
       {/* steps */}
       <div className="mt-5 flex items-center justify-between">

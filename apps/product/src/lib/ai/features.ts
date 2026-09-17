@@ -43,7 +43,7 @@ export const FEATURES: FeatureStatus[] = [
   /* ── Onboarding (§2) ─────────────────────────────────────── */
   { id: "onb-assistant", pillar: "Onboarding", brief: "Conversational onboarding assistant replaces static forms", module: "engines/onboarding", entry: "openingTurn", agentic: false, surface: "copilot", wiredTo: null },
   { id: "onb-progressive", pillar: "Onboarding", brief: "Progressive profiling — 2–3 light questions per session over the first two weeks", module: "engines/onboarding", entry: "nextTurn", agentic: false, surface: "copilot", wiredTo: null },
-  { id: "onb-locale", pillar: "Onboarding", brief: "Automatic locale and reading-level adaptation", module: "engines/text", entry: "localise", agentic: false, surface: "engine-only", wiredTo: null },
+  { id: "onb-locale", pillar: "Onboarding", brief: "Automatic locale and reading-level adaptation", module: "engines/text", entry: "localise", agentic: false, surface: "engine-only", wiredTo: "app/product/campaigns/DeliveryPreview.tsx" },
 
   /* ── Pillar 1 · Pulse ────────────────────────────────────── */
   { id: "pulse-checkin", pillar: "Pulse", brief: "Conversational check-ins converted into a structured Pulse entry to confirm", module: "engines/survey", entry: "draftCheckIn", agentic: false, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
@@ -96,9 +96,9 @@ export const FEATURES: FeatureStatus[] = [
 
   /* ── Pillar 5 · Broadcast ────────────────────────────────── */
   { id: "bc-draft", pillar: "Broadcast", brief: "AI drafting assistant — bullet points into a clear announcement in company tone", module: "engines/text", entry: "composePost", agentic: false, surface: "copilot", wiredTo: "app/product/social/WriteAssist.tsx" },
-  { id: "bc-translate", pillar: "Broadcast", brief: "Automatic translation and reading-level simplification per recipient", module: "engines/text", entry: "localise", agentic: false, surface: "engine-only", wiredTo: null },
+  { id: "bc-translate", pillar: "Broadcast", brief: "Automatic translation and reading-level simplification per recipient", module: "engines/text", entry: "localise", agentic: false, surface: "engine-only", wiredTo: "app/product/campaigns/DeliveryPreview.tsx" },
   { id: "bc-qa", pillar: "Broadcast", brief: "AI Q&A over the policy library — a sourced answer, not a PDF search", module: "retrieve", entry: "retrieve", agentic: false, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
-  { id: "bc-delivery", pillar: "Broadcast", brief: "Delivery-optimisation — best channel/time per segment", module: "engines/timing", entry: "planSegment", agentic: false, surface: "engine-only", wiredTo: null },
+  { id: "bc-delivery", pillar: "Broadcast", brief: "Delivery-optimisation — best channel/time per segment", module: "engines/timing", entry: "planSegment", agentic: false, surface: "engine-only", wiredTo: "app/product/campaigns/DeliveryPreview.tsx" },
   { id: "bc-digest", pillar: "Broadcast", brief: "AI-generated weekly digest for anyone on leave or off-shift", module: "engines/text", entry: "weeklyDigest", agentic: false, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
   { id: "bc-draft-agentic", pillar: "Broadcast", brief: "AGENTIC — 'draft the PPE update for Plant 3', queued for human approval", module: "tools", entry: "draft_announcement", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
   { id: "bc-chase", pillar: "Broadcast", brief: "AGENTIC — auto-chase acknowledgement, reminding only non-confirmers", module: "tools", entry: "chase_acknowledgement", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
