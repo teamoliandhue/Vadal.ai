@@ -35,7 +35,7 @@ Unblocked now (no dependency on the decisions above):
 Unblocked by the decisions:
 
 - [x] **Nav restructure** (spec 030) into the agreed domains and order; surface Kudos properly.
-- [ ] **Home as digest** · M — *last week · yesterday · my actions next week · what's new*, built as widgets with a fixed default layout (drag-and-drop is v2). Check-in stays. The nine cards stay under the greeting.
+- [x] **Home as digest** · M (spec 034) — *last week · yesterday · my actions next week · what's new*, built as widgets with a fixed default layout (drag-and-drop is v2). Check-in stays. The nine cards stay under the greeting.
 - [x] **Get Started after first visit** (spec 030) · S — moves under Nudge (or Help); rail group renamed.
 - [x] **Points ledger + plan toggle** (spec 031) · L — sources: kudos given/received, posts, survey participation (small, flat), learning/assessment completion, health activity (opt-in), manager actions (completing 1:1s, never ratings). Wallet view separate from the feed: balance, badges, value redeemed. No-points mode across Kudos, leaderboards, cards.
 - [x] **Naming leftovers** — decided: no further renames.
@@ -46,7 +46,7 @@ Unblocked by the decisions:
 
 - [x] **Marketplace + redemption catalogue** (spec 032) · L — partner integration (Advantage Club–type) bridged by API, not in-house fulfilment; tiered ladder (100 → mug … 50,000 → ₹10k voucher); client-branded merch; configurable non-marketplace options (offsites, lunches, travel; appraisal/bonus only with HR sign-off). Managers earn too.
 - [x] **Health leaderboards** · M (spec 033; ranked by activity, never points) — walking/running/swimming points; opt-in via the existing consent pattern; role-aware so the frontline isn't scored on its job.
-- [ ] **Widget library + drag-and-drop Home** · L — 10–15 widgets, user-arranged.
+- [x] **Widget library + drag-and-drop Home** · L (spec 034) — 10–15 widgets, user-arranged.
 - [ ] **Amplify AI copy** improvements · S
 - [ ] **Onboard** and **Alumni** screens · M each
 - [ ] **Pulse programmes** · M — onboarding (day 7/30/90), stay interview, manager effectiveness, exit
@@ -66,7 +66,7 @@ Unblocked by the decisions:
 
 - [x] `/product/<unknown>` now returns 404 (`dynamicParams = false` on the catch-all).
 - [x] Stale Vercel links — root (`vadal`) and `apps/hub` point at live projects and stay; `apps/deck` pointed at a team this account can't reach and was removed (local, gitignored).
-- [ ] Home tap targets — folded into the Home digest rebuild (the hero they belonged to is replaced).
+- [x] Home tap targets — check-in links and Up next fixed (spec 034).
 - [x] Route slugs renamed to match product names, old paths redirect (spec 030).
 
 ---

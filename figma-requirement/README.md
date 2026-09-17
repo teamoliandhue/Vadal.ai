@@ -49,3 +49,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 031 | [Points mode, the ledger and Wallet](./031-points-mode-and-wallet.md) | Built · needs Figma |
 | 032 | [Rewards — the catalogue](./032-rewards.md) | Built · needs Figma |
 | 033 | [Health leaderboards](./033-health-leaderboards.md) | Built · needs Figma |
+| 034 | [Home — the digest, and widgets you arrange](./034-home-digest-and-widgets.md) | Built · needs Figma |

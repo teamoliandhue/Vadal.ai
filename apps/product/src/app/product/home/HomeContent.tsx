@@ -31,6 +31,34 @@ import { CalendarCard } from "./CalendarCard";
 import { HooksCard } from "./HooksCard";
 import { ViewAsSwitch, ManagerSnapshot } from "./HomeRole";
 import { MyFirstName, MyIdentityHeader } from "./Identity";
+import { WidgetBoard, type WidgetDef } from "./WidgetBoard";
+import { LastWeekWidget, WeekAheadWidget, WhatsNewWidget, YesterdayWidget } from "./Digest";
+import type { Role } from "@/lib/auth";
+
+const MGR: Role[] = ["manager", "admin", "superadmin"];
+
+/* Home opens on the digest (read-only except the check-in above). Everything
+   else is in the library, one tap from "Customise". */
+const DEFAULT_LAYOUT = { left: ["manager", "yesterday", "ahead"], right: ["lastweek", "whatsnew"] };
+
+function widgetsFor(firstTime: boolean): Record<string, WidgetDef> {
+  return {
+    yesterday: { title: "Yesterday", emoji: "🌙", desc: "What happened while you were away — kudos, your communities, milestones.", render: () => <YesterdayWidget /> },
+    ahead: { title: "Your week ahead", emoji: "🗓️", desc: "Meetings, deadlines and events for the next seven days.", render: () => <WeekAheadWidget /> },
+    lastweek: { title: "Last week", emoji: "📈", desc: "Your week in short: check-ins, kudos, learning, your team's pulse.", render: () => <LastWeekWidget /> },
+    whatsnew: { title: "What's new", emoji: "✨", desc: "Policies, campaigns, new communities and what's new in Vadal.", render: () => <WhatsNewWidget /> },
+    manager: { title: "Team snapshot", emoji: "👥", desc: "Your team's health and who needs you this week.", roles: MGR, render: () => <ManagerSnapshot /> },
+    myday: { title: "My day", emoji: "✅", desc: "Today's to-dos, which you can tick off here.", render: () => <MyDay empty={firstTime} /> },
+    calendar: { title: "Today's calendar", emoji: "📅", desc: "Your meetings today, from Google Calendar.", render: () => <CalendarCard /> },
+    you: { title: "You", emoji: "🏅", desc: "Your streak, badges and engagement trend.", render: () => <YouCard firstTime={firstTime} /> },
+    hooks: { title: "Daily hooks", emoji: "⌚", desc: "Steps, daily learning and visitor passes.", render: () => <HooksCard /> },
+    poll: { title: "Quick poll", emoji: "🗳️", desc: "The one-question poll of the day.", render: () => <QuickPoll className="card-lift" firstTime={firstTime} /> },
+    kudos: { title: "Kudos", emoji: "💜", desc: "Recognition you received, and a way to give some.", render: () => <RecognitionCard firstTime={firstTime} /> },
+    communities: { title: "Communities", emoji: "🏃", desc: "The rooms you're in and what's active.", render: () => <CommunitiesCard /> },
+    ask: { title: "Ask Nudge", emoji: "💬", desc: "Ask anything about work, policy or your team.", render: () => <AskAi /> },
+    feed: { title: "Social feed", emoji: "📰", desc: "The latest from the company feed.", render: () => <Feed empty={firstTime} showMore /> },
+  };
+}
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
@@ -48,24 +76,7 @@ export function HomeContent({ greeting }: { greeting: string }) {
         <ProductGrid mode="nav" idPrefix="home" />
       </section>
       <TourResume />
-      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
-        {/* LEFT (wider, action-first) — what you need to do, then who you are */}
-        <div className="flex flex-col gap-6 xl:col-span-7">
-          <ManagerSnapshot />
-          <MyDay empty={firstTime} />
-          <CalendarCard />
-          <YouCard firstTime={firstTime} />
-          <HooksCard />
-          <QuickPoll className="card-lift" firstTime={firstTime} />
-          <RecognitionCard firstTime={firstTime} />
-          <CommunitiesCard />
-        </div>
-        {/* RIGHT (narrower) — AI on top, then the feed (natural height) */}
-        <div className="flex flex-col gap-6 xl:col-span-5">
-          <AskAi />
-          <Feed empty={firstTime} showMore />
-        </div>
-      </div>
+      <WidgetBoard widgets={widgetsFor(firstTime)} defaults={DEFAULT_LAYOUT} />
     </>
   );
 }
@@ -119,7 +130,7 @@ function RitualHero({ firstTime, greeting }: { firstTime: boolean; greeting: str
               </p>
             </div>
           </div>
-          <Button variant="brand" size="sm">{upNext.now ? "Join" : upNext.prep ? "Prep" : "View"}</Button>
+          <Button variant="brand" size="sm" className="min-h-[44px] lg:min-h-0">{upNext.now ? "Join" : upNext.prep ? "Prep" : "View"}</Button>
         </div>
       )}
     </header>

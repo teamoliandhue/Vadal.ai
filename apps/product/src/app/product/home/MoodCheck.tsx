@@ -50,11 +50,11 @@ export function MoodCheck({ firstTime = false }: { firstTime?: boolean }) {
             </p>
             <p className="mt-0.5 text-[14px] text-faint">
               Private to you · {me.streak + 1}-day streak ·{" "}
-              <button onClick={() => { setLogged(null); setSelected(null); setNote(""); }} className="font-semibold text-[var(--purple)] hover:underline">
+              <button onClick={() => { setLogged(null); setSelected(null); setNote(""); }} className="relative font-semibold text-[var(--purple)] after:absolute after:-inset-x-2 after:-inset-y-3 after:content-[''] hover:underline lg:after:hidden">
                 Change
               </button>
             </p>
-            <button onClick={() => talkItThrough(logged.mood)} className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--ai-accent)] transition hover:gap-2">
+            <button onClick={() => talkItThrough(logged.mood)} className="mt-1 inline-flex min-h-[44px] items-center gap-1.5 text-[13px] font-semibold text-[var(--ai-accent)] transition hover:gap-2 lg:mt-2 lg:min-h-0">
               <Sparkles className="h-3.5 w-3.5" /> Want to talk about it? →
             </button>
           </div>
