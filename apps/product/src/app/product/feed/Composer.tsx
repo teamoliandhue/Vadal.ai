@@ -6,7 +6,7 @@ import * as React from "react";
 import { BarChart3, ChevronDown, Award, ImageIcon, Sparkles, X } from "lucide-react";
 import { Avatar, Badge, Button } from "@vadal/design-system";
 import { useMe } from "../useSession";
-import { channels, type FeedItem, type Person } from "@/lib/feed";
+import { channels, type FeedItem, type GroupRef, type Person } from "@/lib/feed";
 import { toast } from "../Toaster";
 
 type Mode = "text" | "photo" | "poll" | "kudos";
@@ -27,7 +27,9 @@ const AI_DRAFTS = [
   "Grateful for this team this week — calm under pressure, generous with help. Tag someone who made your week easier. 🙌",
 ];
 
-export function Composer({ onPost }: { onPost: (item: FeedItem) => void }) {
+/* `group` fixes where the post goes: inside a community there is no channel to
+   pick, and the post carries the room it was made in. */
+export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; group?: GroupRef }) {
   const me = useMe();
   const [open, setOpen] = React.useState(false);
   const [mode, setMode] = React.useState<Mode>("text");
@@ -68,7 +70,8 @@ export function Composer({ onPost }: { onPost: (item: FeedItem) => void }) {
       id: `me-${Date.now()}`,
       type: mode === "poll" ? "poll" : mode === "kudos" ? "kudos" : "post",
       author: { name: me.fullName, role: `${me.title} · You`, img: me.img },
-      channel,
+      channel: group ? "" : channel,
+      ...(group ? { group } : {}),
       time: "now",
       text: text.trim(),
       reactions: {},
@@ -82,7 +85,7 @@ export function Composer({ onPost }: { onPost: (item: FeedItem) => void }) {
     }
     if (mode === "kudos") base.kudos = { to: recips, values: values.length ? values : ["Ownership"] };
     onPost(base);
-    toast(mode === "kudos" ? "Kudos sent 🏆" : "Posted to the feed 🎉");
+    toast(mode === "kudos" ? "Kudos sent 🏆" : group ? `Posted to ${group.name} ${group.emoji}` : "Posted to the feed 🎉");
     reset();
   }
 
@@ -99,10 +102,14 @@ export function Composer({ onPost }: { onPost: (item: FeedItem) => void }) {
         {!open ? (
           <button
             onClick={() => setOpen(true)}
-            className="flex-1 rounded-full bg-soft px-4 py-2.5 text-left text-[14px] text-faint transition hover:bg-[var(--lav)]"
+            className="min-w-0 flex-1 truncate rounded-full bg-soft px-4 py-2.5 text-left text-[14px] text-faint transition hover:bg-[var(--lav)]"
           >
-            Share something with the company…
+            {group ? `Post to ${group.name}…` : "Share something with the company…"}
           </button>
+        ) : group ? (
+          <span className="flex items-center gap-1.5 rounded-full bg-[var(--lav)] px-3 py-1.5 text-[13px] font-semibold text-[var(--purple)]">
+            <span aria-hidden>{group.emoji}</span> {group.name}
+          </span>
         ) : (
           <ChannelPicker ch={ch} open={chOpen} setOpen={setChOpen} onSelect={(id) => { setChannel(id); setChOpen(false); }} />
         )}

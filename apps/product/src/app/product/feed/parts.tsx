@@ -3,6 +3,7 @@
    (kudos / poll / event / milestone), the multi-emoji reaction picker, and the
    engagement bar. Composed by both the stream PostCard and the post-detail Drawer. */
 import * as React from "react";
+import Link from "next/link";
 import { Bookmark, MessageCircle, Pin, Share2, Smile } from "lucide-react";
 import { Avatar, Badge } from "@vadal/design-system";
 import {
@@ -43,6 +44,19 @@ function ChannelChip({ channel }: { channel?: Channel }) {
   );
 }
 
+/* A post made inside a community says so, and the chip is the way in. */
+function GroupChip({ group }: { group: NonNullable<FeedItem["group"]> }) {
+  return (
+    <Link
+      href={`/product/feed/groups/${group.id}`}
+      onClick={(e) => e.stopPropagation()}
+      className="inline-flex items-center gap-1 rounded-full bg-[var(--lav)] px-2 py-0.5 text-[12px] font-semibold text-[var(--purple)] transition hover:opacity-80"
+    >
+      <span aria-hidden>{group.emoji}</span> {group.name}
+    </Link>
+  );
+}
+
 export function PostHeader({ item, trailing }: { item: DisplayItem; trailing?: React.ReactNode }) {
   const channel = channelMap[item.channel];
   return (
@@ -56,7 +70,7 @@ export function PostHeader({ item, trailing }: { item: DisplayItem; trailing?: R
         <div className="mt-0.5 flex items-center gap-2 text-[12px] text-faint">
           <span>{item.time === "now" ? "just now" : `${item.time} ago`}</span>
           <span aria-hidden>·</span>
-          <ChannelChip channel={channel} />
+          {item.group ? <GroupChip group={item.group} /> : <ChannelChip channel={channel} />}
         </div>
       </div>
       {trailing}

@@ -40,3 +40,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 022 | [Naming — the one-word module names](./022-naming.md) | Applied · needs Figma |
 | 023 | [Home — the nine, under the greeting](./023-home-the-nine.md) | Built · needs Figma |
 | 024 | [Sign in — the photos and the panel](./024-login.md) | Built · needs Figma |
+| 025 | [Communities — groups under Social](./025-communities.md) | Built · needs Figma |

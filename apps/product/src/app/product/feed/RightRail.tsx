@@ -8,10 +8,12 @@
    be reached at all. A pane scrolls to its own end and stays where you left
    it while the stream moves. */
 import * as React from "react";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Avatar, SparkMark } from "@vadal/design-system";
 import { celebrations } from "@/lib/data";
 import { channels, feedDigest, trendingTopics, whosNew } from "@/lib/feed";
+import type { Group } from "@/lib/groups";
 import { renderRich } from "./parts";
 import { toast } from "../Toaster";
 import { PANE } from "../panes";
@@ -19,8 +21,8 @@ import { PANE } from "../panes";
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 
 export function RightRail({
-  activeChannel, onPickChannel,
-}: { activeChannel: string | null; onPickChannel: (id: string | null) => void }) {
+  activeChannel, onPickChannel, myGroups,
+}: { activeChannel: string | null; onPickChannel: (id: string | null) => void; myGroups: Group[] }) {
   return (
     <aside tabIndex={0} aria-label="Feed context" className={`hidden w-[320px] shrink-0 xl:block ${PANE}`}>
       <div className="space-y-4">
@@ -46,6 +48,27 @@ export function RightRail({
           >
             <SparkMark size={14} tone="gradient" /> Ask Vadal for the full digest
           </button>
+        </section>
+
+        {/* My communities */}
+        <section className="rounded-[22px] border border-line bg-card p-5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">Your communities</h3>
+            <Link href="/product/feed/groups" className="text-[13px] font-semibold text-[var(--purple)] hover:underline">Browse all</Link>
+          </div>
+          {myGroups.length === 0 ? (
+            <p className="mt-2.5 text-[13px] text-muted">You are not in any yet. Project rooms and interest circles live here.</p>
+          ) : (
+            <div className="mt-2.5 space-y-0.5">
+              {myGroups.slice(0, 5).map((g) => (
+                <Link key={g.id} href={`/product/feed/groups/${g.id}`} className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 transition hover:bg-soft">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[var(--lav)] text-[15px]" aria-hidden>{g.emoji}</span>
+                  <span className="min-w-0 flex-1 truncate text-[14px] font-semibold text-ink">{g.name}</span>
+                  <span className="text-[12px] text-faint">{g.status === "draft" ? "Draft" : `${g.postsThisWeek} new`}</span>
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Channels */}

@@ -6,34 +6,20 @@
 import * as React from "react";
 import { ArrowUp, Sparkles } from "lucide-react";
 import { SparkMark } from "@vadal/design-system";
-import { usePersistentState } from "@/lib/usePersistentState";
-import {
-  feedItems, type Comment, type FeedItem, type ReactionEmoji,
-} from "@/lib/feed";
-import { useMe } from "../useSession";
+import { feedItems, type FeedItem } from "@/lib/feed";
+import { groupPosts } from "@/lib/groups";
 import { Composer } from "./Composer";
 import { PostCard } from "./PostCard";
 import { PostDrawer } from "./PostDrawer";
 import { RightRail } from "./RightRail";
-import { type DisplayItem } from "./parts";
+import { SocialTabs } from "./SocialTabs";
+import { score, timeMins, useFeedState } from "./useFeedState";
+import { useGroups } from "./groups/useGroups";
 import { PANE, SPLIT } from "../panes";
-import { toast } from "../Toaster";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 type Sort = "trending" | "recent";
 
-function score(it: FeedItem) {
-  const reacts = Object.values(it.reactions).reduce((s, n) => s + (n ?? 0), 0);
-  return reacts + it.comments.length * 3 + it.views / 200;
-}
-/* relative "2h"/"1d"/"28m"/"now" → minutes ago, for the Recent sort */
-function timeMins(t: string): number {
-  if (t === "now") return 0;
-  const m = /^(\d+)\s*([mhd])$/.exec(t);
-  if (!m) return 1e9;
-  const n = +m[1];
-  return m[2] === "m" ? n : m[2] === "h" ? n * 60 : n * 1440;
-}
 /* fresh posts the "new posts" pill actually delivers (not a fake scroll) */
 const FRESH: FeedItem[] = [
   { id: "fresh-1", type: "kudos", author: { name: "Anita Desai", role: "Engineering", img: "/avatars/user-5.svg" }, channel: "wins", time: "now", text: "Just shipped the billing fix with **Aarav** — clean rollback plan, zero downtime. 👏", kudos: { to: [{ name: "Aarav S.", role: "Engineering", img: "/avatars/user-2.svg" }], values: ["Ownership"] }, reactions: { "👏": 3 }, reactedBy: ["/avatars/user-2.svg"], comments: [], views: 12 },
@@ -41,14 +27,9 @@ const FRESH: FeedItem[] = [
 ];
 
 export function FeedHub() {
-  const me = useMe();
-  const [mine, setMine] = usePersistentState<FeedItem[]>("vadal:feed2-mine", []);
-  const [reacts, setReacts] = usePersistentState<Record<string, ReactionEmoji>>("vadal:feed2-reacts", {});
-  const [votes, setVotes] = usePersistentState<Record<string, string>>("vadal:feed2-votes", {});
-  const [bookmarks, setBookmarks] = usePersistentState<string[]>("vadal:feed2-bookmarks", []);
-  const [myComments, setMyComments] = usePersistentState<Record<string, Comment[]>>("vadal:feed2-comments", {});
-  const [going, setGoing] = usePersistentState<string[]>("vadal:feed2-going", []);
-  const [likedC, setLikedC] = usePersistentState<string[]>("vadal:feed2-likedc", []);
+  const { mine, toDisplay, react, bookmark, vote, rsvp, likeComment, addComment, addMine, share, menu } = useFeedState();
+  const { mineList } = useGroups();
+  const myRooms = React.useMemo(() => new Set(mineList.map((g) => g.id)), [mineList]);
 
   const [channel, setChannel] = React.useState<string | null>(null);
   const [sort, setSort] = React.useState<Sort>("trending");
@@ -63,53 +44,25 @@ export function FeedHub() {
     return () => window.clearTimeout(t);
   }, []);
 
-  const toDisplay = React.useCallback((it: FeedItem): DisplayItem => {
-    const myReaction = reacts[it.id];
-    const reactions = { ...it.reactions };
-    if (myReaction) reactions[myReaction] = (reactions[myReaction] ?? 0) + 1;
-    const comments = [...it.comments, ...(myComments[it.id] ?? [])].map((cm) => ({
-      ...cm, likes: cm.likes + (likedC.includes(cm.id) ? 1 : 0),
-    }));
-    return {
-      ...it, reactions, myReaction,
-      myVote: votes[it.id],
-      bookmarked: bookmarks.includes(it.id),
-      going: going.includes(it.id),
-      comments,
-      commentCount: comments.length,
-    };
-  }, [reacts, votes, bookmarks, myComments, going, likedC]);
-
-  const all = React.useMemo(() => [...extra, ...mine, ...feedItems].map(toDisplay), [extra, mine, toDisplay]);
+  /* The company stream, plus what was said in the rooms you are in. A post
+     from a community you have not joined stays in that community. */
+  const all = React.useMemo(() => {
+    const inMyRooms = (it: FeedItem) => !it.group || myRooms.has(it.group.id);
+    return [...extra, ...mine, ...feedItems, ...groupPosts].filter(inMyRooms).map(toDisplay);
+  }, [extra, mine, toDisplay, myRooms]);
 
   const stream = React.useMemo(() => {
     const filtered = channel ? all.filter((it) => it.channel === channel) : all;
-    const pinned = filtered.filter((it) => it.pinned);
-    const rest = filtered.filter((it) => !it.pinned);
+    /* a pin inside a community is that room's pin, not the company's */
+    const pinned = filtered.filter((it) => it.pinned && !it.group);
+    const rest = filtered.filter((it) => !it.pinned || it.group).map((it) => (it.group ? { ...it, pinned: false } : it));
     rest.sort((a, b) => (sort === "trending" ? score(b) - score(a) : timeMins(a.time) - timeMins(b.time)));
     return [...pinned, ...rest];
   }, [all, channel, sort]);
 
   const openItem = openId ? all.find((it) => it.id === openId) ?? null : null;
 
-  /* ── handlers ─────────────────────────────────────────────────── */
-  const react = (id: string, e: ReactionEmoji) =>
-    setReacts((p) => { const n = { ...p }; if (n[id] === e) delete n[id]; else n[id] = e; return n; });
-  const bookmark = (id: string) =>
-    setBookmarks((p) => { const on = p.includes(id); if (!on) toast("Saved to bookmarks 🔖"); return on ? p.filter((x) => x !== id) : [...p, id]; });
-  const vote = (id: string, optionId: string) =>
-    setVotes((p) => (p[id] ? p : { ...p, [id]: optionId }));
-  const rsvp = (id: string) =>
-    setGoing((p) => { const on = p.includes(id); if (!on) toast("You're going 🎉"); return on ? p.filter((x) => x !== id) : [...p, id]; });
-  const likeComment = (cid: string) =>
-    setLikedC((p) => (p.includes(cid) ? p.filter((x) => x !== cid) : [...p, cid]));
-  const addComment = (id: string, text: string) => {
-    const cm: Comment = { id: `c-${Date.now()}`, author: { name: me.fullName, role: "You", img: me.img }, text, time: "now", likes: 0 };
-    setMyComments((p) => ({ ...p, [id]: [...(p[id] ?? []), cm] }));
-  };
-  const share = () => toast("Post link copied ✓");
-  const menu = (label: string) => toast(label === "Report" ? "Reported — thank you" : `${label} ✓`);
-  const addPost = (item: FeedItem) => { setMine((m) => [item, ...m]); setChannel(null); setSort("recent"); };
+  const addPost = (item: FeedItem) => { addMine(item); setChannel(null); setSort("recent"); };
 
   const refresh = () => {
     setExtra(FRESH); setShowNew(false); setSort("recent");
@@ -133,6 +86,8 @@ export function FeedHub() {
     <div className={`${SPLIT} mx-auto max-w-[1100px] justify-center`}>
       {/* the stream */}
       <div ref={topRef} tabIndex={0} aria-label="Social" className={`${PANE} w-full max-w-[640px] space-y-4`}>
+        <SocialTabs active="feed" count={mineList.length} />
+
         {/* header */}
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -205,7 +160,7 @@ export function FeedHub() {
         )}
       </div>
 
-      <RightRail activeChannel={channel} onPickChannel={setChannel} />
+      <RightRail activeChannel={channel} onPickChannel={setChannel} myGroups={mineList} />
 
       <PostDrawer
         item={openItem}

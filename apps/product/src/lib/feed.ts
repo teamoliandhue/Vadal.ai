@@ -26,11 +26,17 @@ export type PollOption = { id: string; label: string; votes: number };
 
 export type FeedType = "announcement" | "post" | "kudos" | "poll" | "event" | "milestone";
 
+/** A post made inside a community carries where it was made, so the company
+ *  stream can say so without looking the group up (groups people create live
+ *  in their own browser; the seed list does not know them). */
+export type GroupRef = { id: string; name: string; emoji: string };
+
 export type FeedItem = {
   id: string;
   type: FeedType;
   author: Person;
-  channel: string; // Channel.id
+  channel: string; // Channel.id — "" for a post made inside a community
+  group?: GroupRef;
   time: string;
   text: string;
   pinned?: boolean;

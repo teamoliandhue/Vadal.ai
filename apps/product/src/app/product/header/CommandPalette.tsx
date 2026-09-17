@@ -38,6 +38,7 @@ const NAV: { label: string; icon: LucideIcon; href: string }[] = [
   { label: "Kudos", icon: HeartHandshake, href: "/product" },
   { label: "Campaigns", icon: Megaphone, href: "/product" },
   { label: "Social", icon: Newspaper, href: "/product/feed" },
+  { label: "Communities", icon: UsersRound, href: "/product/feed/groups" },
   { label: "Manager hub", icon: UsersRound, href: "/product" },
   { label: "Flow", icon: FolderKanban, href: "/product" },
   { label: "Knowledge", icon: BookOpen, href: "/product" },

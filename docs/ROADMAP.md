@@ -25,12 +25,12 @@ Tags · 🔒 blocked on Pradeep · ❓ needs a decision · S/M/L rough size
 Unblocked now (no dependency on the decisions above):
 
 - [x] **Login page redesign** · S — photo + rounded panel (Swiftt pattern); spec 024
-- [ ] **Groups & Communities** under Social · M — a group object (channels exist, groups don't); project communities (create, publish, join) and interest communities; group feed; join/leave. Not a Jira.
+- [x] **Groups & Communities** under Social · M (spec 025) — a group object (channels exist, groups don't); project communities (create, publish, join) and interest communities; group feed; join/leave. Not a Jira.
 - [ ] **Feed** · M — full-view post state; AI writing assist in the composer; inline translate on a post (UI now, provider later).
 - [ ] **Moderation + posting rights** · M — AI pre-publish check for images and language with a soft rejection; per-tenant config for who may post and share (everyone / leadership only).
 - [ ] **Amplify analytics screen** · S — posts out, by platform, who approved, reach. Data mostly exists.
 - [ ] **Insight: points-independent adoption** · S — DAU/WAU and check-in rate as first-class metrics.
-- [ ] Broadcast card on Home → open Campaigns rather than Knowledge · XS
+- [x] Broadcast card on Home → opens Campaigns for roles that can (managers and up); Knowledge for everyone else · XS
 
 Waiting on a decision:
 
@@ -72,6 +72,9 @@ Waiting on a decision:
 
 ## Done this cycle
 
+- [x] Communities — hub, create/draft/publish, join / ask to join / leave, community page, community posts in the company feed
+- [x] Mobile bottom bar labels repaired after the renaming (it had fallen back to the first four nav items)
+- [x] Sign-in slideshow — seven graded team photographs
 - [x] Get Started — the tour: Nudge chat window, the nine as live cards, first-visit landing, resume row, explored-by-doing, Present mode
 - [x] Naming — Journey/Social/Insight/Pulse/Kudos/iThrive/SmartWork/iLearn/Flow/Nudge applied (Journey reverted to Home)
 - [x] The nine cards on Home under the greeting
