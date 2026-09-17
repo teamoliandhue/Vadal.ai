@@ -143,3 +143,38 @@ export const CHALLENGE_TONE: Record<Challenge["kind"], { hue: string; label: str
   "active-minutes": { hue: "#17a35e", label: "Active minutes" },
   distance:         { hue: "#E0803A", label: "Distance" },
 };
+
+/* ── health leaderboards (roadmap v2) ──────────────────────────────
+   Ranked by the activity itself — never by points (17 Sep decision §5).
+   Walking uses the fair cohorts above, so a picker's on-shift steps are never
+   compared with a designer's evening walk. Running and swimming are not part of
+   anyone's job, so one board each.
+
+   Nobody appears by name unless they opted in. Everyone else is "a colleague
+   in <team>" — the board stays meaningful without exposing anyone. */
+export type BoardEntry = { email: string; name: string; team: string; value: number; optedIn: boolean };
+
+export const leaderboardOptIn: Record<string, boolean> = {
+  "ravi@oliandhue.com": true, "sunita@oliandhue.com": false, "kiran@oliandhue.com": true,
+  "anita@oliandhue.com": true, "aarav@oliandhue.com": false, "meera@oliandhue.com": true, "vikram@oliandhue.com": true,
+};
+
+export const runningBoard: BoardEntry[] = [
+  { email: "rahul@oliandhue.com", name: "Rahul Verma", team: "Sales", value: 38.5, optedIn: true },
+  { email: "anita@oliandhue.com", name: "Anita Desai", team: "Design", value: 31.2, optedIn: true },
+  { email: "kiran@oliandhue.com", name: "Kiran M.", team: "Plant Ops", value: 26.8, optedIn: true },
+  { email: "dev@oliandhue.com", name: "Dev Patel", team: "Design", value: 22.4, optedIn: false },
+  { email: "priya@oliandhue.com", name: "Priya Sharma", team: "People", value: 18.0, optedIn: false },
+  { email: "meera@oliandhue.com", name: "Meera Pillai", team: "Support", value: 12.6, optedIn: true },
+  { email: "sunita@oliandhue.com", name: "Sunita Rao", team: "Night shift", value: 9.4, optedIn: false },
+  { email: "aarav@oliandhue.com", name: "Aarav Sharma", team: "Engineering", value: 6.1, optedIn: false },
+];
+
+export const swimmingBoard: BoardEntry[] = [
+  { email: "ishaan@oliandhue.com", name: "Ishaan B.", team: "Finance", value: 4800, optedIn: true },
+  { email: "sara@oliandhue.com", name: "Sara Mehta", team: "Support", value: 3600, optedIn: true },
+  { email: "priya@oliandhue.com", name: "Priya Sharma", team: "People", value: 2400, optedIn: false },
+  { email: "vikram@oliandhue.com", name: "Vikram S.", team: "Logistics", value: 2000, optedIn: true },
+  { email: "neha@oliandhue.com", name: "Neha R.", team: "Design", value: 1500, optedIn: false },
+  { email: "arjun@oliandhue.com", name: "Arjun K.", team: "Operations", value: 900, optedIn: true },
+];

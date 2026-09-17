@@ -21,16 +21,25 @@ import { Card, Eyebrow } from "./parts";
 
 const nameOf = (email: string) => email.split("@")[0].replace(/\b\w/g, (c) => c.toUpperCase());
 
-export function Cohorts({ cohorts, myCohort, myEmail }: { cohorts: Cohort[]; myCohort?: Cohort; myEmail?: string }) {
+export function Cohorts({ cohorts, myCohort, myEmail, isVisible = () => true, bare = false }: {
+  cohorts: Cohort[]; myCohort?: Cohort; myEmail?: string;
+  /** Opted in to leaderboards. Everyone else is shown as "a colleague". */
+  isVisible?: (email: string) => boolean;
+  /** Inside another card — no card chrome of its own. */
+  bare?: boolean;
+}) {
   /* One scale for everyone. This is the whole argument. */
   const globalMax = Math.max(...cohorts.flatMap((c) => c.members.map((m) => m.avgDailySteps)));
 
+  const Wrap = bare ? React.Fragment : Card;
   return (
-    <Card>
+    <Wrap>
+      {!bare && (
       <div className="flex items-center gap-2">
         <span className="ai-grad grid h-7 w-7 place-items-center rounded-full"><SparkMark size={15} tone="solid" /></span>
         <Eyebrow>Your leaderboard group</Eyebrow>
       </div>
+      )}
       <p className="mt-2 text-[14px] leading-relaxed text-muted">{(myCohort ?? cohorts[0])?.basis}</p>
 
       <div className="mt-5 flex flex-col gap-5">
@@ -55,7 +64,7 @@ export function Cohorts({ cohorts, myCohort, myEmail }: { cohorts: Cohort[]; myC
                         <span className="w-3 shrink-0 text-[12px] font-semibold tabular-nums text-faint">{i + 1}</span>
 
                         <span className="w-[104px] shrink-0 truncate text-[13px]">
-                          <span className={isMe ? "font-semibold" : ""}>{isMe ? "You" : nameOf(m.email)}</span>
+                          <span className={isMe ? "font-semibold" : ""}>{isMe ? "You" : isVisible(m.email) ? nameOf(m.email) : "A colleague"}</span>
                           <span className="block truncate text-[11px] leading-tight text-faint">{m.role}</span>
                         </span>
 
@@ -89,6 +98,6 @@ export function Cohorts({ cohorts, myCohort, myEmail }: { cohorts: Cohort[]; myC
         ranking them together would make effort invisible. A picker walks 18,000 steps doing their
         job. A designer walking 8,000 has tried much harder.
       </p>
-    </Card>
+    </Wrap>
   );
 }

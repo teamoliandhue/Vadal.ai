@@ -37,7 +37,7 @@ import { usePoints } from "../usePointsMode";
 import { GoalRing, DayArea } from "@/components/charts";
 import { Card, Eyebrow, HalfHeader } from "./parts";
 import { Challenges } from "./Challenges";
-import { Cohorts } from "./Cohorts";
+import { Leaderboards } from "./Leaderboards";
 import { useSession } from "../useSession";
 import { toast } from "../Toaster";
 
@@ -250,7 +250,7 @@ export function ThriveHub() {
 
           <Challenges joined={joined} setJoined={setJoined} />
 
-          <Cohorts cohorts={cohorts} myCohort={myCohort} myEmail={session?.email} />
+          <Leaderboards cohorts={cohorts} myCohort={myCohort} myEmail={session?.email} />
         </div>
 
         {/* ── money — equal billing, per the brief ── */}

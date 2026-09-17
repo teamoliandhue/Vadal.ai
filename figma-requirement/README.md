@@ -48,3 +48,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 030 | [Navigation, Nudge group and For you](./030-nav-and-for-you.md) | Built · needs Figma |
 | 031 | [Points mode, the ledger and Wallet](./031-points-mode-and-wallet.md) | Built · needs Figma |
 | 032 | [Rewards — the catalogue](./032-rewards.md) | Built · needs Figma |
+| 033 | [Health leaderboards](./033-health-leaderboards.md) | Built · needs Figma |
