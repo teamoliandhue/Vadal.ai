@@ -88,6 +88,10 @@ export const SECTION_ACCESS: Record<string, Role[]> = {
   Flow: ADMIN_UP,
   // Individual exit reasons are People-only.
   Alumni: ADMIN_UP,
+  // Platform: integrations, security and the rollout are workspace-admin work.
+  Link: ADMIN_UP,
+  Trust: ADMIN_UP,
+  Launch: ADMIN_UP,
   Settings: ADMIN_UP,
 };
 

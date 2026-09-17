@@ -30,6 +30,7 @@ const DOMAIN: Record<string, string> = {
   Insight: "Insight", Analytics: "Insight",
   iThrive: "Wellbeing", SmartWork: "Wellbeing",
   "Manager hub": "Operations", Onboard: "Operations", Alumni: "Operations", Flow: "Operations",
+  Link: "Platform", Trust: "Platform", Launch: "Platform",
   Settings: "Account",
 };
 

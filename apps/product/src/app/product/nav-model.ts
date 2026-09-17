@@ -9,8 +9,8 @@
    routing and permissions in agreement. */
 import {
   BarChart3, BookOpen, ClipboardList, Compass, FolderKanban, Gauge, GraduationCap,
-  Handshake, HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio,
-  Share2, Smile, Sparkles, Sprout, UsersRound, type LucideIcon,
+  Cable, Handshake, HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio, Rocket,
+  Share2, ShieldCheck, Smile, Sparkles, Sprout, UsersRound, type LucideIcon,
 } from "lucide-react";
 import type { Role } from "@/lib/auth";
 import { canAccess } from "@/lib/access";
@@ -88,6 +88,16 @@ export const NAV: NavGroupModel[] = [
       { label: "Onboard", icon: Sprout, href: "/product/onboard" },
       { label: "Alumni", icon: Handshake, href: "/product/alumni" },
       { label: "Flow", icon: FolderKanban, href: "/product/flow" },
+    ],
+  },
+  /* The platform itself (roadmap v3): integrations, security and compliance,
+     and the rollout. Admin work, so it sits last. */
+  {
+    label: "Platform",
+    items: [
+      { label: "Link", icon: Cable, href: "/product/link" },
+      { label: "Trust", icon: ShieldCheck, href: "/product/trust" },
+      { label: "Launch", icon: Rocket, href: "/product/launch" },
     ],
   },
 ];

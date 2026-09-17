@@ -5,6 +5,7 @@
    privacy, and AI & guardrails. Same Lumen shell as the rest of the product.
    Seeded data (lib/settings). */
 import * as React from "react";
+import NextLink from "next/link";
 import {
   Award, Bell, Building2, Check, Languages, Lock, MessageSquareWarning, Palette, Plug, ShieldCheck, Sparkles, UserPlus, Users, type LucideIcon,
 } from "lucide-react";
@@ -12,8 +13,8 @@ import { Avatar, Badge, Button, Switch, type BadgeTone } from "@vadal/design-sys
 import { toast } from "../Toaster";
 import { usePersistentState } from "@/lib/usePersistentState";
 import {
-  workspace, roles, capabilities, members, integrations, notifCategories, aiDefaults, privacyDefaults,
-  type IntegrationMode, type Role,
+  workspace, roles, capabilities, members, notifCategories, aiDefaults, privacyDefaults,
+  type Role,
 } from "@/lib/settings";
 import { BrandingPanel } from "./BrandingPanel";
 import { PostingPanel } from "./PostingPanel";
@@ -160,36 +161,15 @@ function MembersPanel() {
   );
 }
 
-const MODES: IntegrationMode[] = ["Full", "Selective", "Off"];
+/* Integrations grew into their own surface — Link — with what each one reads,
+   sends and never touches. The tab stays so an admin who looks here finds it. */
 function IntegrationsPanel() {
-  const [state, setState] = usePersistentState<Record<string, IntegrationMode>>("vadal:integration-modes", Object.fromEntries(integrations.map((i) => [i.key, i.mode ?? "Off"])));
-  const cats = [...new Set(integrations.map((i) => i.category))];
   return (
     <div className="flex flex-col gap-6">
-      <PanelHead title="Integrations" desc="Connect the tools you already use. Choose how much each one shares: full sync, selective (labelled), or off." />
-      {cats.map((cat) => (
-        <div key={cat} className="flex flex-col gap-3">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">{cat}</p>
-          {integrations.filter((i) => i.category === cat).map((i) => {
-            const mode = state[i.key] ?? "Off";
-            return (
-              <div key={i.key} className="flex flex-wrap items-center gap-3 rounded-2xl border border-line p-4">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-soft text-[20px]" aria-hidden>{i.emoji}</span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 text-[14px] font-semibold">{i.name}{i.connected && <span className="flex items-center gap-1 text-[11px] font-semibold text-[var(--success)]"><span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" /> Connected</span>}</div>
-                  <div className="text-[13px] text-muted">{i.desc}</div>
-                </div>
-                <div className="flex items-center gap-1 rounded-full border border-line bg-soft p-1">
-                  {MODES.map((mo) => (
-                    <button key={mo} onClick={() => { setState((s) => ({ ...s, [i.key]: mo })); }} className={`rounded-full px-2.5 py-1 text-[12px] font-semibold transition ${mode === mo ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}>{mo}</button>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      ))}
-      <p className="text-[13px] text-muted">Selective sharing pulls only the data you approve, with the source labelled. Anything set to Off stays disconnected.</p>
+      <PanelHead title="Integrations" desc="Integrations now live in Link, under Platform — with what each one reads, sends and never touches." />
+      <NextLink href="/product/link" className="inline-flex min-h-[44px] items-center gap-2 self-start rounded-full bg-[var(--purple)] px-4 text-[14px] font-semibold text-white hover:opacity-90">
+        <Plug className="h-4 w-4" /> Open Link
+      </NextLink>
     </div>
   );
 }

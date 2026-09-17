@@ -57,3 +57,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 039 | [Onboard and Alumni](./039-onboard-and-alumni.md) | Built · needs Figma |
 | 040 | [Amplify — captions that sound like a person](./040-amplify-caption-copy.md) | Built · needs Figma |
 | 041 | [Translation — the paid add-on](./041-translation-add-on.md) | Built · needs Figma |
+| 042 | [Link · Trust · Launch — the platform surfaces](./042-link-trust-launch.md) | Built · needs Figma |
