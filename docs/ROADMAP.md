@@ -64,9 +64,9 @@ Unblocked by the decisions:
 
 ## Housekeeping
 
-- [ ] `/product/<unknown>` returns 200 (Suspense streaming before `notFound()`).
-- [ ] Stale `.vercel/project.json` files in `vadal`, `apps/hub`, `apps/deck`.
-- [ ] Re-apply the two Home hero tap-target fixes lost in the My-day revert.
+- [x] `/product/<unknown>` now returns 404 (`dynamicParams = false` on the catch-all).
+- [x] Stale Vercel links — root (`vadal`) and `apps/hub` point at live projects and stay; `apps/deck` pointed at a team this account can't reach and was removed (local, gitignored).
+- [ ] Home tap targets — folded into the Home digest rebuild (the hero they belonged to is replaced).
 - [ ] Route slugs still carry old names (`/product/recognition` = Kudos) — rename with redirects once names settle.
 
 ---

@@ -99,12 +99,12 @@ function Briefing({ v, setTab, period, setPeriod }: { v: PulseView; setTab: (t: 
         <div className="flex flex-col items-end gap-2.5">
           <div className="flex items-center gap-1 rounded-full border border-line bg-soft p-1">
             {PERIODS.map((p) => (
-              <button key={p} onClick={() => setPeriod(p)} className={`rounded-full px-3 py-1.5 text-[14px] font-semibold transition ${period === p ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}>{p}</button>
+              <button key={p} onClick={() => setPeriod(p)} aria-pressed={period === p} className={`min-h-[44px] rounded-full px-3 py-1.5 text-[14px] font-semibold transition lg:min-h-0 ${period === p ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}>{p}</button>
             ))}
           </div>
           <div className="flex items-center gap-2.5">
             <span className="text-[12px] text-faint">Synced 9:12 AM</span>
-            <Button variant="brand" size="sm" leadingIcon={<Sparkles className="h-4 w-4" />} onClick={() => ask(`Give me today's people-intelligence report for ${v.scope}`)}>AI report</Button>
+            <Button variant="brand" size="sm" className="min-h-[44px] lg:min-h-0" leadingIcon={<Sparkles className="h-4 w-4" />} onClick={() => ask(`Give me today's people-intelligence report for ${v.scope}`)}>AI report</Button>
           </div>
         </div>
       </div>
@@ -122,8 +122,8 @@ function Briefing({ v, setTab, period, setPeriod }: { v: PulseView; setTab: (t: 
                 <div className="min-w-0 flex-1"><div className="text-[14px] font-semibold leading-snug">{b.text}</div><div className="mt-0.5 text-[12px] text-faint">{b.sub}</div></div>
               </div>
               <div className="mt-3 flex items-center gap-2">
-                <Button variant="secondary" size="sm" onClick={() => setTab(b.to)}>{b.label}</Button>
-                <button onClick={() => ask(b.text)} className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] hover:underline"><Sparkles className="h-3 w-3" /> Why</button>
+                <Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" onClick={() => setTab(b.to)}>{b.label}</Button>
+                <button onClick={() => ask(b.text)} className="flex min-h-[44px] items-center gap-1 px-1 text-[12px] font-semibold text-[var(--purple)] hover:underline lg:min-h-0"><Sparkles className="h-3 w-3" /> Why</button>
               </div>
             </div>
           ))}
@@ -671,7 +671,7 @@ export function PulseDashboard() {
       <div className="sticky top-[57px] z-10 -mx-2 flex flex-wrap lg:top-0 items-center justify-between gap-3 border-b border-line bg-canvas/85 px-2 py-2 backdrop-blur-md">
         <div role="tablist" aria-label="Insight sections" className="flex flex-wrap gap-1">
           {TABS.map((t) => (
-            <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`rounded-full px-3.5 py-1.5 text-[14px] font-semibold transition ${tab === t ? "bg-ink text-[var(--card)]" : "text-muted hover:bg-soft hover:text-ink"}`}>{t}</button>
+            <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`min-h-[44px] rounded-full px-3.5 py-1.5 text-[14px] font-semibold transition lg:min-h-0 ${tab === t ? "bg-ink text-[var(--card)]" : "text-muted hover:bg-soft hover:text-ink"}`}>{t}</button>
           ))}
         </div>
         <div className="flex items-center gap-3">
