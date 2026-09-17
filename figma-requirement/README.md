@@ -51,3 +51,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 033 | [Health leaderboards](./033-health-leaderboards.md) | Built · needs Figma |
 | 034 | [Home — the digest, and widgets you arrange](./034-home-digest-and-widgets.md) | Built · needs Figma |
 | 035 | [AI you can reach — feed ranking, topics, kudos-spotting, Home order](./035-ai-wiring-social-kudos-home.md) | Built · needs Figma |
+| 036 | [Knowledge — the loop closed](./036-knowledge-loop.md) | Built · needs Figma |

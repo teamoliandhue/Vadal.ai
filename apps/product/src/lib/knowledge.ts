@@ -27,6 +27,8 @@ export type Article = {
   readMins: number;
   views: number;
   sections: Section[];
+  /** Who can read it. Missing = everyone. Answers that cite it follow the same rule. */
+  audience?: ("manager" | "admin" | "superadmin")[];
 };
 
 export const articles: Article[] = [
@@ -117,6 +119,24 @@ export const articles: Article[] = [
       { heading: "Notice", text: "Give at least six weeks' notice of the move date so the allowance can be arranged with payroll." },
     ],
   },
+  {
+    id: "manager-appraisals", title: "Running appraisal conversations", collection: "policies",
+    excerpt: "For managers: preparing, calibrating and holding the December review.",
+    updated: "Updated 4 months ago", updatedMonthsAgo: 4, readMins: 5, views: 640, audience: ["manager", "admin", "superadmin"],
+    sections: [
+      { text: "Ratings are proposed by you, calibrated with your peer managers, and only then shared. Never share a proposed rating before calibration." },
+      { heading: "Before the conversation", bullets: ["Read their self-review and peer feedback.", "Write down two specific examples for each point you'll make.", "Book 45 minutes, not 30."] },
+    ],
+  },
+  {
+    id: "payroll-offcycle", title: "Off-cycle payments and corrections", collection: "pay",
+    excerpt: "For People and payroll admins: arrears, corrections and one-off payments.",
+    updated: "Updated 14 months ago", updatedMonthsAgo: 14, readMins: 3, views: 120, audience: ["admin", "superadmin"],
+    sections: [
+      { text: "Off-cycle payments need a second approver in payroll and are paid within five working days." },
+      { heading: "Corrections", text: "Corrections to a closed payroll run are processed as arrears in the next run, with a note on the payslip." },
+    ],
+  },
 ];
 
 /** Canned AI answers keyed by trigger words; sources are article ids. */
@@ -128,6 +148,10 @@ export const answers: Answer[] = [
     answer: "Submit expenses **within 30 days** with a receipt. Anything under ₹5,000 is auto-approved; above that needs manager sign-off. Approved claims are paid with the next payroll run, usually in 7–10 working days." },
   { keywords: ["wfh", "work from home", "remote", "hybrid", "office days"], sources: ["wfh"],
     answer: "We're **hybrid** — 3 days in-office (Tue–Thu) and 2 flexible, with **no-meeting Wednesdays**. Full-remote for a set period is approved case-by-case through your manager." },
+  { keywords: ["run an appraisal", "appraisal conversation", "calibrat", "rate my team"], sources: ["manager-appraisals"],
+    answer: "Propose ratings, **calibrate with your peer managers**, and only then share them. Before each conversation read the self-review and peer feedback, bring two specific examples per point, and book 45 minutes." },
+  { keywords: ["off-cycle", "arrears", "payroll correction", "one-off payment"], sources: ["payroll-offcycle"],
+    answer: "Off-cycle payments need **a second approver in payroll** and are paid within five working days. Corrections to a closed run go through as **arrears in the next run**, noted on the payslip." },
   { keywords: ["appraisal", "review", "promotion", "rating", "performance"], sources: ["appraisal"],
     answer: "Appraisals run **twice a year** — a light mid-year check-in in June and a full cycle in December covering ratings, feedback and compensation. Come with a short self-review, 3–5 peer-feedback nominations, and your growth asks." },
   { keywords: ["insurance", "health", "medical", "hospital", "mediclaim"], sources: ["insurance"],
@@ -199,20 +223,35 @@ export type CorrectionReason = (typeof CORRECTION_REASONS)[number]["key"];
  */
 export const whoToAsk = [
   { label: "Your manager", detail: "Anything about your own role, workload or team", href: "/product/home" },
-  { label: "The People team", detail: "Pay, leave, policy and anything contractual", href: "/product/flow" },
+  { label: "The People team", detail: "Pay, leave, policy and anything contractual · people@oliandhue.com", href: "mailto:people@oliandhue.com" },
   { label: "One-to-One Help", detail: "If it is personal, and you would rather it stayed private", href: "/product/smartwork" },
 ];
 
 export const usage = { questions: "6,240", resolved: 78, views: "18.4K", searchSuccess: 84 };
 
+export type Reader = "employee" | "manager" | "admin" | "superadmin";
+
+/** Can this reader open the article? Gated articles never leak through an answer either. */
+export const canRead = (a: Pick<Article, "audience">, role: Reader) => !a.audience || a.audience.includes(role as never);
+
 /** Simple matcher for the ask box — returns a canned answer or a fallback. */
-export function findAnswer(query: string): { answer: string; sources: string[]; matched: boolean } {
+export function findAnswer(query: string, role: Reader = "employee"): { answer: string; sources: string[]; matched: boolean } {
   const q = query.toLowerCase();
-  const hit = answers.find((a) => a.keywords.some((k) => q.includes(k)));
+  const visible = (id: string) => { const a = articles.find((x) => x.id === id); return Boolean(a && canRead(a, role)); };
+  const hit = answers.find((a) => a.keywords.some((k) => q.includes(k)) && a.sources.every(visible));
   if (hit) return { answer: hit.answer, sources: hit.sources, matched: true };
   // fallback: pick articles whose title/excerpt shares a word with the query
-  const words = q.split(/\s+/).filter((w) => w.length > 3);
-  const related = articles.filter((a) => words.some((w) => (a.title + " " + a.excerpt).toLowerCase().includes(w))).slice(0, 2);
+  /* Rank by meaningful words, title matches first — "what is the relocation
+     policy" must find Relocation, not every article with "what" in it. */
+  const STOP = new Set(["what", "when", "where", "which", "does", "have", "with", "about", "policy", "there", "this", "that", "your", "from", "much", "many"]);
+  const words = q.split(/[^a-z0-9]+/).filter((w) => w.length > 3 && !STOP.has(w));
+  const related = articles
+    .filter((a) => canRead(a, role))
+    .map((a) => ({ a, score: words.reduce((n, w) => n + (a.title.toLowerCase().includes(w) ? 3 : 0) + (a.excerpt.toLowerCase().includes(w) ? 1 : 0), 0) }))
+    .filter((x) => x.score > 0)
+    .sort((x, y) => y.score - x.score)
+    .slice(0, 2)
+    .map((x) => x.a);
   if (related.length) return { answer: "I couldn't find a single exact answer, but these articles look closest. Open one, or rephrase and I'll try again.", sources: related.map((a) => a.id), matched: false };
-  return { answer: "I don't have a confident answer for that yet — it may be a gap in the knowledge base. I've logged the question so the People team can add it.", sources: [], matched: false };
+  return { answer: "I don't have a confident answer for that yet. I've added your question to the gaps the People team works through — and here's who can answer it now.", sources: [], matched: false };
 }
