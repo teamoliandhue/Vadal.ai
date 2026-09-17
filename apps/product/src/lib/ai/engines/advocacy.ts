@@ -411,6 +411,12 @@ export type ReachForecast = {
   caveat: string;
 };
 
+/** Modelled reach of posts already shared — the same organic-reach model the
+ *  forecast uses, applied after the fact. Still modelled, and labelled so. */
+export function modelledReach(shares: number, avgFollowers: number, platform: Platform): number {
+  return Math.round(shares * avgFollowers * ORGANIC_REACH[platform]);
+}
+
 export function forecastReach(
   participants: number,
   avgFollowers: number,

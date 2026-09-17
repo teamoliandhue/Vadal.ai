@@ -28,7 +28,7 @@ Unblocked now (no dependency on the decisions above):
 - [x] **Groups & Communities** under Social · M (spec 025) — a group object (channels exist, groups don't); project communities (create, publish, join) and interest communities; group feed; join/leave. Not a Jira.
 - [x] **Feed** · M (spec 026) — full-view post state; AI writing assist in the composer; inline translate on a post (UI now, provider later).
 - [x] **Moderation + posting rights** · M (spec 027) — AI pre-publish check for images and language with a soft rejection; per-tenant config for who may post and share (everyone / leadership only).
-- [ ] **Amplify analytics screen** · S — posts out, by platform, who approved, reach. Data mostly exists.
+- [x] **Amplify analytics screen** · S (spec 028) — posts out, by platform, who approved, reach. Data mostly exists.
 - [ ] **Insight: points-independent adoption** · S — DAU/WAU and check-in rate as first-class metrics.
 - [x] Broadcast card on Home → opens Campaigns for roles that can (managers and up); Knowledge for everyone else · XS
 

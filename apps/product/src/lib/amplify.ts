@@ -332,3 +332,65 @@ export type AdvocacyScope = "both" | "mine" | "company";
 export const DEFAULT_PREFS: { scope: AdvocacyScope; voice: Voice; platform: Platform } = {
   scope: "both", voice: "warm", platform: "LinkedIn",
 };
+
+/* ════════════════════════════════════════════════════════════════════
+   RESULTS — what went out, who let it, and what came back (admin).
+
+   Three kinds of number, kept apart on screen because they are not equally
+   true:
+     · decided  — who approved a post and when. A record.
+     · reported — shares, which people confirm with "Did you post it?". We have
+                  no platform APIs, so this is a self-report, and says so.
+     · modelled — reach, from follower counts and typical organic reach.
+   Referral clicks are counted by our own redirect and only exist on hiring posts.
+   ════════════════════════════════════════════════════════════════════ */
+
+export type PublishedPost = {
+  id: string;
+  platform: Platform;
+  text: string;
+  image?: string;
+  approvedBy: { name: string; img: string };
+  /** ISO date the post entered the advocacy queue. */
+  approvedOn: string;
+  /** Opted-in people it was put in front of. */
+  asked: number;
+  shared: number;
+  passed: number;
+  /** Average followers of the people who shared it — feeds modelled reach. */
+  avgFollowers: number;
+  referralClicks?: number;
+};
+
+const PRIYA = { name: "Priya Sharma", img: "/avatars/user-8.svg" };
+const PRADEEP = { name: "Pradeep Kumar", img: "/avatars/user-6.svg" };
+const NEHA = { name: "Neha R.", img: "/avatars/user-5.svg" };
+
+/** Newest first. Consistent with companyPosts' sharedBy / passedBy for p1–p4. */
+export const publishedPosts: PublishedPost[] = [
+  { id: "p1", platform: "LinkedIn", text: companyPosts[0].text, image: companyPosts[0].image, approvedBy: PRIYA, approvedOn: "2026-09-14", asked: 131, shared: 23, passed: 4, avgFollowers: 1650 },
+  { id: "camp-1", platform: "LinkedIn", text: "Sixteen people started on our floor in March who had never worked in manufacturing. We have forty more places for October.", image: "/feed/plant.jpg", approvedBy: PRADEEP, approvedOn: "2026-09-12", asked: 148, shared: 47, passed: 6, avgFollowers: 1120, referralClicks: 433 },
+  { id: "p2", platform: "LinkedIn", text: companyPosts[1].text, image: companyPosts[1].image, approvedBy: PRADEEP, approvedOn: "2026-09-11", asked: 126, shared: 41, passed: 2, avgFollowers: 2240 },
+  { id: "p3", platform: "Instagram", text: companyPosts[2].text, image: companyPosts[2].image, approvedBy: NEHA, approvedOn: "2026-09-09", asked: 88, shared: 8, passed: 11, avgFollowers: 980 },
+  { id: "p4", platform: "X", text: companyPosts[3].text, approvedBy: PRIYA, approvedOn: "2026-09-09", asked: 104, shared: 3, passed: 19, avgFollowers: 610, referralClicks: 34 },
+  { id: "old-1", platform: "LinkedIn", text: "Our People team rebuilt parental leave around what parents actually asked for. Twenty-six weeks, for everyone.", approvedBy: PRADEEP, approvedOn: "2026-08-27", asked: 120, shared: 38, passed: 3, avgFollowers: 1870 },
+  { id: "old-2", platform: "Instagram", text: "Night shift, Plant Ops, 3am. The canteen team kept the chai coming through the monsoon power cuts.", image: "/feed/coldbrew.jpg", approvedBy: NEHA, approvedOn: "2026-08-21", asked: 96, shared: 19, passed: 5, avgFollowers: 1040 },
+  { id: "old-3", platform: "X", text: "We open-sourced the scheduling tool our logistics team built for shift swaps.", approvedBy: PRIYA, approvedOn: "2026-08-14", asked: 72, shared: 12, passed: 8, avgFollowers: 890 },
+  { id: "old-4", platform: "Facebook", text: "Family day at the Pune plant — 1,200 people, one very tired bouncy castle.", image: "/feed/milestone.jpg", approvedBy: NEHA, approvedOn: "2026-08-02", asked: 64, shared: 14, passed: 2, avgFollowers: 540 },
+  { id: "old-5", platform: "LinkedIn", text: "Four of our apprentices from last year are now leading shifts.", approvedBy: PRADEEP, approvedOn: "2026-07-24", asked: 110, shared: 29, passed: 4, avgFollowers: 1410 },
+];
+
+/** Shares people reported, per week and platform — oldest first. The last four
+ *  weeks sum to advocacyStats.resharesThisMonth (312). */
+export const shareWeeks = {
+  labels: ["21 Jul", "28 Jul", "4 Aug", "11 Aug", "18 Aug", "25 Aug", "1 Sep", "8 Sep"],
+  byPlatform: {
+    LinkedIn: [30, 34, 33, 40, 38, 47, 44, 53],
+    X: [9, 12, 8, 14, 11, 13, 15, 18],
+    Instagram: [6, 9, 11, 8, 12, 15, 14, 17],
+    Facebook: [2, 3, 2, 4, 3, 3, 5, 4],
+  } as Record<Platform, number[]>,
+};
+
+/** People who approved things into the queue, by name — "who approved". */
+export const approvers = [PRIYA, PRADEEP, NEHA];

@@ -27,12 +27,19 @@ import {
 } from "@/lib/amplify";
 import { GoalRing } from "@/components/charts";
 import { toast } from "../Toaster";
+import { usePersistentState } from "@/lib/usePersistentState";
+import { useMe } from "../useSession";
+import type { Approval } from "./Results";
 import { Card, Eyebrow, PlatformLine } from "./parts";
 
 const inr = (n: number) => `₹${(n / 100000).toFixed(1)}L`;
 
 export function Programme() {
-  const [decided, setDecided] = React.useState<Record<string, "in" | "out">>({});
+  /* Decisions persist, and an approval carries a name and a date — Results
+     lists who let each post out, so the record has to exist. */
+  const [decided, setDecided] = usePersistentState<Record<string, "in" | "out">>("vadal:advocacy-decided", {});
+  const [, setApprovals] = usePersistentState<Record<string, Approval>>("vadal:advocacy-approvals", {});
+  const me = useMe();
   const impact = scoreAdvocacy(shares, companyPostReach);
   const verdict = declineInsight(declineSignal, advocacyStats.resharesThisMonth);
   const pending = queueCandidates.filter((q) => !decided[q.id]);
@@ -165,7 +172,11 @@ export function Programme() {
                           <div className="mt-4 flex flex-wrap items-center gap-2">
                             <Button size="sm" variant="brand" className="min-h-[44px] lg:min-h-0"
                               leadingIcon={<Check className="h-3.5 w-3.5" />}
-                              onClick={() => { setDecided((d) => ({ ...d, [q.id]: "in" })); toast(`Queued to ${q.audience.join(", ")}`); }}>
+                              onClick={() => {
+                                setDecided((d) => ({ ...d, [q.id]: "in" }));
+                                setApprovals((a) => ({ ...a, [q.id]: { by: me.fullName, img: me.img, on: "2026-09-17" } }));
+                                toast(`Queued to ${q.audience.join(", ")} — it's in Results with your name on it`);
+                              }}>
                               Queue it
                             </Button>
                             <Button size="sm" variant="tertiary" className="min-h-[44px] lg:min-h-0"

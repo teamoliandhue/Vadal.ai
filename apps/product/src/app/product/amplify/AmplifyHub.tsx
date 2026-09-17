@@ -45,11 +45,12 @@ import { AmplifyRail, type Prefs } from "./Rail";
 import { Composer } from "./Composer";
 import { MomentHero, MomentStrip } from "./Moments";
 import { Programme } from "./Programme";
+import { Results } from "./Results";
 
 export function AmplifyHub() {
   const [role] = useViewAs();
   const isAdmin = canAccess(role, "Campaigns");
-  const [tab, setTab] = React.useState<"share" | "programme">("share");
+  const [tab, setTab] = React.useState<AmplifyTab>("share");
 
   /* `=== true` is deliberate. A consent flag whose stored value is anything
      other than a literal true must read as OFF — never on. Demo sessions from
@@ -93,11 +94,11 @@ export function AmplifyHub() {
     toast(reason === "never" ? "Noted — we'll stop putting these in front of you" : "Passed. We'll show you something else.");
   }
 
-  if (isAdmin && tab === "programme") {
+  if (isAdmin && tab !== "share") {
     return (
       <div className="flex flex-col gap-6">
         <Tabs tab={tab} setTab={setTab} />
-        <Programme />
+        {tab === "programme" ? <Programme /> : <Results />}
       </div>
     );
   }
@@ -221,10 +222,11 @@ export function AmplifyHub() {
 }
 
 /* ── the two jobs, kept apart ─────────────────────────────────────── */
-function Tabs({ tab, setTab }: { tab: "share" | "programme"; setTab: (t: "share" | "programme") => void }) {
+type AmplifyTab = "share" | "programme" | "results";
+function Tabs({ tab, setTab }: { tab: AmplifyTab; setTab: (t: AmplifyTab) => void }) {
   return (
     <div className="flex w-fit rounded-full bg-soft p-1 text-[14px] font-semibold">
-      {([["share", "Share"], ["programme", "Programme"]] as const).map(([k, label]) => (
+      {([["share", "Share"], ["programme", "Programme"], ["results", "Results"]] as const).map(([k, label]) => (
         <button
           key={k}
           onClick={() => setTab(k)}
