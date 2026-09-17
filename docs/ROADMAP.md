@@ -7,16 +7,16 @@ Tags · 🔒 blocked on Pradeep · ❓ needs a decision · S/M/L rough size
 
 ---
 
-## 0 · Decisions to get first (each one gates work below)
+## 0 · Decisions — answered 17 Sep (see `DECISIONS.md`)
 
-- [ ] ❓ **Nav taxonomy** — six domains from the naming doc, or the meeting's *Engage · Listen · Learning · Intelligence · Health*? Recommendation: six domains, meeting's order. 🔒 Pradeep sends the final sequence.
-- [ ] ❓ **Health** — confirm: iThrive stays the module, "Health" stays the rail badge (not a nav section).
-- [ ] ❓ **Home** — digest is read-only *except* the daily check-in. Confirm the check-in stays on Home.
-- [ ] ❓ **Get Started after first visit** — into Help in the top bar, or under the assistant's group (Vadal.ai → **Nudge**)? Recommendation: Nudge group; it keeps the investor landing and the tailored-sections idea.
-- [ ] ❓ **Points mode** — "points off" is a product mode, not a flag. Every points surface needs a no-points variant; adoption needs a points-independent metric. Decide before any redemption screen is designed.
-- [ ] ❓ **Naming leftovers** — Pradeep's reply on: drop the "i" (Thrive, Learn), SmartWork → **Ask** and point it at Knowledge, Amplify = outward voice, Social = inside.
-- [ ] ❓ **Missing P1s** — Onboard / lifecycle surveys / stay interviews / manager-effectiveness survey: deprioritised, or just not discussed?
-- [ ] ❓ **Redemption beyond the marketplace** — appraisal marks and bonus as catalogue items need HR sign-off before they are demoed.
+- [x] **Nav taxonomy** — Nudge · My space (Home, Social, Kudos) · Engage · Listen · Learn · Insight · Wellbeing · Operations
+- [x] **Health** — iThrive is the module; Health stays the rail badge
+- [x] **Home** — digest, read-only except the daily check-in, which stays
+- [x] **Get Started** — rail group renamed Nudge; becomes *Product tour* once done
+- [x] **Points** — a workspace mode, on by default, with a designed "off" state; fixed earning rules, never for performance
+- [x] **Naming leftovers** — keep the client's names; no further renames
+- [x] **Missing P1s** — Pulse programmes (onboarding, stay interview, manager effectiveness, exit) + Onboard and Alumni screens
+- [x] **Redemption** — experiences yes; appraisal marks and bonus never
 
 ---
 
@@ -32,13 +32,13 @@ Unblocked now (no dependency on the decisions above):
 - [x] **Insight: points-independent adoption** · S (spec 029) — DAU/WAU and check-in rate as first-class metrics.
 - [x] Broadcast card on Home → opens Campaigns for roles that can (managers and up); Knowledge for everyone else · XS
 
-Waiting on a decision:
+Unblocked by the decisions:
 
-- [ ] 🔒 **Nav restructure** into the agreed domains and order; surface Kudos properly.
-- [ ] 🔒 **Home as digest** · M — *last week · yesterday · my actions next week · what's new*, built as widgets with a fixed default layout (drag-and-drop is v2). Check-in stays. The nine cards stay under the greeting.
-- [ ] 🔒 **Get Started after first visit** · S — moves under Nudge (or Help); rail group renamed.
-- [ ] 🔒 **Points ledger + plan toggle** · L — sources: kudos given/received, posts, survey participation (small, flat), learning/assessment completion, health activity (opt-in), manager actions (completing 1:1s, never ratings). Wallet view separate from the feed: balance, badges, value redeemed. No-points mode across Kudos, leaderboards, cards.
-- [ ] 🔒 **Naming leftovers** once Pradeep replies.
+- [ ] **Nav restructure** into the agreed domains and order; surface Kudos properly.
+- [ ] **Home as digest** · M — *last week · yesterday · my actions next week · what's new*, built as widgets with a fixed default layout (drag-and-drop is v2). Check-in stays. The nine cards stay under the greeting.
+- [ ] **Get Started after first visit** · S — moves under Nudge (or Help); rail group renamed.
+- [ ] **Points ledger + plan toggle** · L — sources: kudos given/received, posts, survey participation (small, flat), learning/assessment completion, health activity (opt-in), manager actions (completing 1:1s, never ratings). Wallet view separate from the feed: balance, badges, value redeemed. No-points mode across Kudos, leaderboards, cards.
+- [x] **Naming leftovers** — decided: no further renames.
 
 ---
 
@@ -49,6 +49,7 @@ Waiting on a decision:
 - [ ] **Widget library + drag-and-drop Home** · L — 10–15 widgets, user-arranged.
 - [ ] **Amplify AI copy** improvements · S
 - [ ] **Onboard** and **Alumni** screens · M each
+- [ ] **Pulse programmes** · M — onboarding (day 7/30/90), stay interview, manager effectiveness, exit
 - [ ] Carry-over from earlier: wire `tagPost` → Social, `scanAnomalies` → Kudos; PersonProfile batch (`emptyProfile` / `inferFromContext` / `orderHome` / `rankFeed`); delivery previews in the Campaign builder; survey-respondent view; Knowledge screen role-gating, thumbs-down → correction, unanswered → gap, staleness warnings.
 
 ---
