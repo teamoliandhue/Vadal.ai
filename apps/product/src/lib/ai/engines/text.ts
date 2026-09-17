@@ -126,6 +126,12 @@ export function extractThemes(texts: string[], minN = 1): Theme[] {
 
 export type PostTags = { topics: string[]; sentiment: Sentiment["label"]; team?: string };
 
+/** Human labels for every topic tagPost can return. */
+export const TOPIC_LABEL: Record<string, string> = {
+  ...Object.fromEntries(THEMES.map((t) => [t.key, t.label])),
+  milestone: "Milestones", joiner: "New joiners", celebration: "Celebrations",
+};
+
 export function tagPost(text: string, team?: string): PostTags {
   const low = text.toLowerCase();
   const topics = THEMES.filter((t) => t.stems.some((s) => low.includes(s))).map((t) => t.key);

@@ -50,7 +50,8 @@ Unblocked by the decisions:
 - [ ] **Amplify AI copy** improvements · S
 - [ ] **Onboard** and **Alumni** screens · M each
 - [ ] **Pulse programmes** · M — onboarding (day 7/30/90), stay interview, manager effectiveness, exit
-- [ ] Carry-over from earlier: wire `tagPost` → Social, `scanAnomalies` → Kudos; PersonProfile batch (`emptyProfile` / `inferFromContext` / `orderHome` / `rankFeed`); delivery previews in the Campaign builder; survey-respondent view; Knowledge screen role-gating, thumbs-down → correction, unanswered → gap, staleness warnings.
+- [x] Wired (spec 035): `tagPost` → Social topics, `rankFeed` → For you, `scanAnomalies` → Kudos spotted, PersonProfile → Home order.
+- [ ] Carry-over from earlier: delivery previews in the Campaign builder; survey-respondent view; Knowledge screen role-gating, thumbs-down → correction, unanswered → gap, staleness warnings.
 
 ---
 

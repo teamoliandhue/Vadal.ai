@@ -59,10 +59,10 @@ export const FEATURES: FeatureStatus[] = [
 
   /* ── Pillar 2 · Connect ──────────────────────────────────── */
   { id: "connect-compose", pillar: "Connect", brief: "AI-assisted post creation from a rough voice note or a couple of phrases", module: "engines/text", entry: "composePost", agentic: false, surface: "copilot", wiredTo: "app/product/social/WriteAssist.tsx" },
-  { id: "connect-tagging", pillar: "Connect", brief: "Auto-tagging of posts by team, topic and sentiment", module: "engines/text", entry: "tagPost", agentic: false, surface: "engine-only", wiredTo: null },
+  { id: "connect-tagging", pillar: "Connect", brief: "Auto-tagging of posts by team, topic and sentiment", module: "engines/text", entry: "tagPost", agentic: false, surface: "engine-only", wiredTo: "app/product/kudos/Spotted.tsx" },
   { id: "connect-moderation", pillar: "Connect", brief: "Toxicity/harassment detection routed to the moderation queue before publish", module: "engines/moderation", entry: "checkPost", agentic: false, surface: "screen", wiredTo: "app/product/settings/PostingPanel.tsx" },
-  { id: "connect-ranking", pillar: "Connect", brief: "Personalised feed ranking balancing relevance with company-wide culture moments", module: "engines/personalize", entry: "rankFeed", agentic: false, surface: "engine-only", wiredTo: null },
-  { id: "connect-kudos-spot", pillar: "Connect", brief: "AI kudos-spotting — surfaces moments worth recognising and prompts the manager", module: "engines/signals", entry: "scanAnomalies", agentic: false, surface: "copilot", wiredTo: null },
+  { id: "connect-ranking", pillar: "Connect", brief: "Personalised feed ranking balancing relevance with company-wide culture moments", module: "engines/personalize", entry: "rankFeed", agentic: false, surface: "engine-only", wiredTo: "app/product/social/FeedHub.tsx" },
+  { id: "connect-kudos-spot", pillar: "Connect", brief: "AI kudos-spotting — surfaces moments worth recognising and prompts the manager", module: "engines/signals", entry: "scanAnomalies", agentic: false, surface: "copilot", wiredTo: "app/product/kudos/Spotted.tsx" },
   { id: "connect-writeup", pillar: "Connect", brief: "AGENTIC — 'write up the Line 2 safety streak as a post'", module: "tools", entry: "write_post", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
   { id: "connect-milestone", pillar: "Connect", brief: "AGENTIC — auto-schedule a recognition post for a detected milestone", module: "tools", entry: "schedule_milestone_post", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
   { id: "connect-kudos", pillar: "Connect", brief: "Peer-to-peer recognition, drafted by the Copilot", module: "tools", entry: "give_recognition", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
@@ -131,8 +131,8 @@ export const FEATURES: FeatureStatus[] = [
   { id: "help-crisis-tests", pillar: "One-to-One Help", brief: "Executable crisis-phrasing cases — 15 that must trip the crisis path, 10 ordinary phrases that must not", module: "engines/support", entry: "checkTriage", agentic: false, surface: "engine-only", wiredTo: "app/api/ai/features/route.ts" },
 
   /* ── §8 Cross-cutting AI layer ───────────────────────────── */
-  { id: "x-personalize", pillar: "Cross-cutting", brief: "Personalization engine — one profile ranking feed, home order and Grow recommendations", module: "engines/personalize", entry: "orderHome", agentic: false, surface: "engine-only", wiredTo: null },
-  { id: "x-signal", pillar: "Cross-cutting", brief: "Sentiment & signal engine feeding one employee-experience score", module: "engines/signals", entry: "employeeExperienceScore", agentic: false, surface: "engine-only", wiredTo: null },
+  { id: "x-personalize", pillar: "Cross-cutting", brief: "Personalization engine — one profile ranking feed, home order and Grow recommendations", module: "engines/personalize", entry: "orderHome", agentic: false, surface: "engine-only", wiredTo: "app/product/home/HomeContent.tsx" },
+  { id: "x-signal", pillar: "Cross-cutting", brief: "Sentiment & signal engine feeding one employee-experience score", module: "engines/signals", entry: "employeeExperienceScore", agentic: false, surface: "engine-only", wiredTo: "lib/experience.ts (via a screen)" },
   { id: "x-copilot", pillar: "Cross-cutting", brief: "A persistent Copilot on every pillar that answers, drafts and surfaces insight", module: "mock", entry: "mockProvider", agentic: false, surface: "copilot", wiredTo: "lib/ai/index.ts" },
   { id: "x-guardrails", pillar: "Cross-cutting", brief: "Every AI output labelled AI-assisted; safety-critical content requires human review", module: "tools", entry: "assertRegistryIsSafe", agentic: false, surface: "copilot", wiredTo: "lib/ai/tools.ts (runs at import)" },
 ];

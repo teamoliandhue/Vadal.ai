@@ -15,6 +15,7 @@ import {
 import { GiveRecognition } from "./GiveRecognition";
 import { usePoints } from "../usePointsMode";
 import { KudosTabs } from "./KudosTabs";
+import { Spotted } from "./Spotted";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 const colorOf = (name: string) => values.find((v) => v.name === name)?.color ?? "var(--purple)";
@@ -79,6 +80,8 @@ export function RecognitionHub() {
           ))}
         </div>
       </header>
+
+      <Spotted onRecognise={(p) => openFor(p)} />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
         {/* wall */}

@@ -34,12 +34,31 @@ import { MyFirstName, MyIdentityHeader } from "./Identity";
 import { WidgetBoard, type WidgetDef } from "./WidgetBoard";
 import { LastWeekWidget, WeekAheadWidget, WhatsNewWidget, YesterdayWidget } from "./Digest";
 import type { Role } from "@/lib/auth";
+import { orderHome, type HomeSection } from "@/lib/ai/engines/personalize";
+import { useProfile } from "../useProfile";
 
 const MGR: Role[] = ["manager", "admin", "superadmin"];
 
 /* Home opens on the digest (read-only except the check-in above). Everything
-   else is in the library, one tap from "Customise". */
-const DEFAULT_LAYOUT = { left: ["manager", "yesterday", "ahead"], right: ["lastweek", "whatsnew"] };
+   else is in the library, one tap from "Customise".
+
+   The default ORDER is the person's, from orderHome() over their profile: a
+   line operator on a shared phone gets announcements (What's new) first, a
+   manager gets their team first, someone who checked in "Struggling" is not
+   greeted with a numbers tile. The person's own arrangement, once they make
+   one, always wins. */
+const SECTION_TO_WIDGET: Partial<Record<HomeSection, string>> = {
+  team: "manager", announcements: "whatsnew", myday: "ahead", calendar: "ahead", feed: "yesterday", recognition: "lastweek",
+};
+function defaultLayoutFor(sections: HomeSection[]) {
+  const order = [...new Set(sections.map((s) => SECTION_TO_WIDGET[s]).filter((x): x is string => Boolean(x)))];
+  for (const id of ["yesterday", "ahead", "lastweek", "whatsnew"]) if (!order.includes(id)) order.push(id);
+  /* The first widget leads the left column (it is also first on a phone);
+     the numbers and news widgets otherwise sit on the right. */
+  const [lead, ...rest] = order;
+  const sideways = (id: string) => id === "lastweek" || id === "whatsnew";
+  return { left: [lead, ...rest.filter((id) => !sideways(id))], right: rest.filter(sideways) };
+}
 
 function widgetsFor(firstTime: boolean): Record<string, WidgetDef> {
   return {
@@ -67,6 +86,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 export function HomeContent({ greeting }: { greeting: string }) {
   // Home §1–7: client-brand band, conversational mood, calendar, hooks, view-as role.
   const firstTime = useSearchParams().get("view") === "new";
+  const profile = useProfile();
   return (
     <>
       <RitualHero firstTime={firstTime} greeting={greeting} />
@@ -76,7 +96,7 @@ export function HomeContent({ greeting }: { greeting: string }) {
         <ProductGrid mode="nav" idPrefix="home" />
       </section>
       <TourResume />
-      <WidgetBoard widgets={widgetsFor(firstTime)} defaults={DEFAULT_LAYOUT} />
+      <WidgetBoard widgets={widgetsFor(firstTime)} defaults={defaultLayoutFor(orderHome(profile))} />
     </>
   );
 }

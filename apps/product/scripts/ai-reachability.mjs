@@ -64,6 +64,15 @@ const results = entries.map(({ id, module, entry }) => {
   if (new RegExp(`^${entry}\\(\\);`, "m").test(own)) {
     return { id, wiredTo: `lib/ai/${module}.ts (runs at import)` };
   }
+  // One hop: a lib module a screen imports counts as a call site when it calls
+  // the entry. lib/experience computes the Health score every screen shows by
+  // calling employeeExperienceScore() — reachable, just not from a screen file.
+  for (const lib of walk(join(SRC, "lib")).filter((p) => !/lib\/ai\/(features|verify|tools|mock)\.ts$/.test(p) && !p.endsWith(`${module}.ts`))) {
+    const libSrc = readFileSync(lib, "utf8");
+    if (!re.test(libSrc)) continue;
+    const spec = lib.replace(/^src\//, "@/").replace(/\.tsx?$/, "");
+    if (callers.some(({ src }) => src.includes(`"${spec}"`))) return { id, wiredTo: `${lib.replace(/^src\//, "")} (via a screen)` };
+  }
   return { id, wiredTo: null };
 });
 

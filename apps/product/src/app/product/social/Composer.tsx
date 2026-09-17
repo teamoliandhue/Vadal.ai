@@ -13,7 +13,7 @@ import { usePostingPolicy } from "../usePostingPolicy";
 import { useViewAs } from "../useViewAs";
 import { AUDIENCE_PHRASE, allowed } from "@/lib/posting";
 import { checkPost, PHOTO_LABELS, type PostCheck } from "@/lib/ai/engines/moderation";
-import { readability } from "@/lib/ai/engines/text";
+import { TOPIC_LABEL, readability, tagPost } from "@/lib/ai/engines/text";
 import { moderation } from "./useModeration";
 import { CheckPanel } from "./PrePublish";
 import { AssistMenu, AssistSuggestion, UndoAssist, suggest, type Suggestion } from "./WriteAssist";
@@ -113,7 +113,8 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
 
   function publish(item: FeedItem) {
     onPost(item);
-    toast(item.type === "kudos" ? "Kudos sent 🏆" : group ? `Posted to ${group.name} ${group.emoji}` : "Posted to the feed 🎉");
+    const tags = tagPost(item.text).topics.map((t) => TOPIC_LABEL[t] ?? t);
+    toast(`${item.type === "kudos" ? "Kudos sent 🏆" : group ? `Posted to ${group.name} ${group.emoji}` : "Posted to the feed 🎉"}${tags.length ? ` · Nudge tagged it ${tags.slice(0, 2).join(", ")}` : ""}`);
     reset();
   }
 

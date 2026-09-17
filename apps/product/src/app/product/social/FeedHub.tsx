@@ -13,6 +13,9 @@ import { PostCard } from "./PostCard";
 import { PostDrawer } from "./PostDrawer";
 import { RightRail } from "./RightRail";
 import { SocialTabs } from "./SocialTabs";
+import { rankFeed } from "@/lib/ai/engines/personalize";
+import { TOPIC_LABEL, tagPost } from "@/lib/ai/engines/text";
+import { useProfile } from "../useProfile";
 import { score, timeMins, useFeedState } from "./useFeedState";
 import { useGroups } from "./groups/useGroups";
 import { useModeration } from "./useModeration";
@@ -22,7 +25,8 @@ import { PANE, SPLIT } from "../panes";
 import { toast } from "../Toaster";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
-type Sort = "trending" | "recent";
+type Sort = "foryou" | "trending" | "recent";
+const SORT_LABEL: Record<Sort, string> = { foryou: "For you", trending: "Trending", recent: "Recent" };
 
 const FRESH = freshItems;
 
@@ -34,7 +38,9 @@ export function FeedHub() {
   const myRooms = React.useMemo(() => new Set(mineList.map((g) => g.id)), [mineList]);
 
   const [channel, setChannel] = React.useState<string | null>(null);
-  const [sort, setSort] = React.useState<Sort>("trending");
+  const [sort, setSort] = React.useState<Sort>("foryou");
+  const [topic, setTopic] = React.useState<string | null>(null);
+  const profile = useProfile();
   const [openId, setOpenId] = React.useState<string | null>(null);
   const [showNew, setShowNew] = React.useState(false);
   const [extra, setExtra] = React.useState<FeedItem[]>([]); // posts the "new posts" pill delivers
@@ -57,14 +63,39 @@ export function FeedHub() {
   }, [extra, mine, toDisplay, myRooms, mod.approved, mod.removed]);
   const myQueue = mod.items.filter((q) => q.kind === "held" && !q.post.group && q.post.author.name === me.fullName && (q.status === "pending" || q.status === "returned"));
 
+  /* Nudge tags every post (topic + sentiment) as it is read — the tags drive the
+     topic filter and the For you ranking, and are never typed by anyone. */
+  const tagged = React.useMemo(() => all.map((it) => ({ it, topics: tagPost(it.text ?? "").topics })), [all]);
+  const topics = React.useMemo(() => {
+    const n = new Map<string, number>();
+    for (const t of tagged) for (const k of t.topics) n.set(k, (n.get(k) ?? 0) + 1);
+    return [...n.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k]) => k);
+  }, [tagged]);
+
   const stream = React.useMemo(() => {
-    const filtered = channel ? all.filter((it) => it.channel === channel) : all;
+    const byTopic = topic ? tagged.filter((t) => t.topics.includes(topic)).map((t) => t.it) : all;
+    const filtered = channel ? byTopic.filter((it) => it.channel === channel) : byTopic;
     /* a pin inside a community is that room's pin, not the company's */
     const pinned = filtered.filter((it) => it.pinned && !it.group);
     const rest = filtered.filter((it) => !it.pinned || it.group).map((it) => (it.group ? { ...it, pinned: false } : it));
+    if (sort === "foryou") {
+      const topicsOf = new Map(tagged.map((t) => [t.it.id, t.topics]));
+      const ranked = rankFeed(
+        rest.map((it) => ({
+          ...it,
+          topics: topicsOf.get(it.id) ?? [],
+          team: it.group ? undefined : it.author.role.split("·").pop()?.trim(),
+          ageHours: timeMins(it.time) / 60,
+          companyWide: it.channel === "company" || it.type === "announcement",
+          engagement: score(it),
+        })),
+        profile,
+      );
+      return [...pinned, ...ranked.map((r) => rest.find((x) => x.id === r.id)!)];
+    }
     rest.sort((a, b) => (sort === "trending" ? score(b) - score(a) : timeMins(a.time) - timeMins(b.time)));
     return [...pinned, ...rest];
-  }, [all, channel, sort]);
+  }, [all, channel, sort, topic, tagged, profile]);
 
   const openItem = openId ? all.find((it) => it.id === openId) ?? null : null;
 
@@ -110,18 +141,37 @@ export function FeedHub() {
               <Sparkles className="h-4 w-4" /> Catch me up
             </button>
             <div className="flex rounded-full bg-soft p-0.5 text-[13px] font-semibold">
-              {(["trending", "recent"] as Sort[]).map((s) => (
+              {(["foryou", "trending", "recent"] as Sort[]).map((s) => (
                 <button
                   key={s}
                   onClick={() => setSort(s)}
-                  className={`rounded-full px-3 py-1.5 capitalize transition ${sort === s ? "bg-card text-ink shadow-sm" : "text-muted hover:text-ink"}`}
+                  aria-pressed={sort === s}
+                  className={`min-h-[44px] rounded-full px-3 py-1.5 transition lg:min-h-0 ${sort === s ? "bg-card text-ink shadow-sm" : "text-muted hover:text-ink"}`}
                 >
-                  {s}
+                  {SORT_LABEL[s]}
                 </button>
               ))}
             </div>
           </div>
         </header>
+
+        {/* topics Nudge found in the posts */}
+        <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Topics">
+          <span className="mr-1 flex items-center gap-1 text-[12px] text-faint"><SparkMark size={12} tone="gradient" /> Topics</span>
+          {[null, ...topics].map((k) => (
+            <button
+              key={k ?? "all"}
+              onClick={() => setTopic(k)}
+              aria-pressed={topic === k}
+              className={`min-h-[44px] rounded-full px-3 text-[13px] font-semibold transition lg:min-h-[30px] ${topic === k ? "bg-[var(--lav)] text-[var(--purple)]" : "bg-soft text-muted hover:text-ink"}`}
+            >
+              {k ? TOPIC_LABEL[k] ?? k : "All"}
+            </button>
+          ))}
+        </div>
+        {sort === "foryou" && !topic && !channel && (
+          <p className="-mt-2 text-[12px] text-faint">Ranked for you — your team, what you react to and the rooms you&apos;re in. Company-wide moments always stay in.</p>
+        )}
 
         <Composer onPost={addPost} />
         <PendingPosts items={myQueue} />

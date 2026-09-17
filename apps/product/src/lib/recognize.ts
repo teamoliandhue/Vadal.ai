@@ -171,3 +171,23 @@ export const draftLines: Record<string, string[]> = {
     "went out of their way on {x} to make the customer experience feel effortless.",
   ],
 };
+
+/* ── kudos-spotting (AI · Connect) ─────────────────────────────────
+   Ten weeks of recognition coverage per team, ending at this week's figure
+   above. Cold zones have fallen from where they were; healthy teams wobble
+   around their own level. scanAnomalies() compares each team with ITSELF, so a
+   team that is always lower is not flagged — only a team that dropped. */
+export function recognitionHistory(): { team: string; metric: "recognition"; series: { at: string; value: number }[] }[] {
+  return coverage.map((c) => {
+    let h = 7;
+    for (const ch of c.team) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    const cold = c.pct < 50;
+    const usual = cold ? c.pct + 16 : c.pct + 1;
+    const series = Array.from({ length: 9 }, (_, i) => {
+      h = (h * 1103515245 + 12345) >>> 0;
+      return { at: `w${10 - i}`, value: Math.round((usual + (((h >>> 16) % 500) / 100 - 2.5)) * 10) / 10 };
+    });
+    series.push({ at: "w1", value: c.pct });
+    return { team: c.team, metric: "recognition" as const, series };
+  });
+}
