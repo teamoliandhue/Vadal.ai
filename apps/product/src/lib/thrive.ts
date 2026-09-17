@@ -1,5 +1,5 @@
 /**
- * Thrive — Pillar 4 (route /product/thrive).
+ * Thrive — Pillar 4 (route /product/ithrive).
  *
  * "One wellness pillar: physical health and financial health, side by side."
  * Wearable-fed activity, fair-cohort leaderboards, challenges, and a wealth hub.

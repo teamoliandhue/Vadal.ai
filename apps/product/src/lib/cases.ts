@@ -1,5 +1,5 @@
 /**
- * Cases module data (route /product/cases · "Operations" group).
+ * Cases module data (route /product/flow · "Operations" group).
  * A confidential tracker for people issues — flight-risk follow-ups, burnout,
  * grievances, pay & growth, and ER cases. Each case has an owner, an SLA, a
  * source (often a Pulse risk), a status pipeline and an activity timeline.

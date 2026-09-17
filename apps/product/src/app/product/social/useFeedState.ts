@@ -57,7 +57,7 @@ export function useFeedState() {
   const addMine = (item: FeedItem) => setMine((m) => [item, ...m]);
   /* the link is real now that a post has a page of its own */
   const share = (id: string) => {
-    const url = `${window.location.origin}/product/feed/post/${id}`;
+    const url = `${window.location.origin}/product/social/post/${id}`;
     navigator.clipboard?.writeText(url).then(() => toast("Post link copied ✓"), () => toast("Could not copy — the link is in the address bar of the full view"));
     if (!navigator.clipboard) toast("Open the full view to copy its link");
   };

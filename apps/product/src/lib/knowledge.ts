@@ -199,8 +199,8 @@ export type CorrectionReason = (typeof CORRECTION_REASONS)[number]["key"];
  */
 export const whoToAsk = [
   { label: "Your manager", detail: "Anything about your own role, workload or team", href: "/product/home" },
-  { label: "The People team", detail: "Pay, leave, policy and anything contractual", href: "/product/cases" },
-  { label: "One-to-One Help", detail: "If it is personal, and you would rather it stayed private", href: "/product/help" },
+  { label: "The People team", detail: "Pay, leave, policy and anything contractual", href: "/product/flow" },
+  { label: "One-to-One Help", detail: "If it is personal, and you would rather it stayed private", href: "/product/smartwork" },
 ];
 
 export const usage = { questions: "6,240", resolved: 78, views: "18.4K", searchSuccess: 84 };

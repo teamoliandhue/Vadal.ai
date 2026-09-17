@@ -45,3 +45,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 027 | [Moderation & posting rights](./027-moderation-posting-rights.md) | Built · needs Figma |
 | 028 | [Amplify — Results](./028-amplify-results.md) | Built · needs Figma |
 | 029 | [Insight — adoption, counted without points](./029-insight-adoption.md) | Built · needs Figma |
+| 030 | [Navigation, Nudge group and For you](./030-nav-and-for-you.md) | Built · needs Figma |

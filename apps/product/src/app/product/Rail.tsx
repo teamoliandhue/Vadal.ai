@@ -20,7 +20,8 @@ import { canAccess } from "@/lib/access";
 import { navFor } from "./nav-model";
 import { useViewAs } from "./useViewAs";
 import { useTourProgress } from "./useTourProgress";
-import { tourFor } from "@/lib/tour";
+import { tourFor, TOUR_DISMISSED_KEY } from "@/lib/tour";
+import { usePersistentState } from "@/lib/usePersistentState";
 import { toast } from "./Toaster";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
@@ -32,6 +33,8 @@ export function Rail({ active }: { active: string }) {
      user has a nudge and a returning one does not. Gone once it is done. */
   const { explored } = useTourProgress(active);
   const tourLeft = tourFor(role).filter((s) => !explored.includes(s.id)).length;
+  const [tourDismissed] = usePersistentState<boolean>(TOUR_DISMISSED_KEY, false);
+  const tourDone = tourLeft === 0 || tourDismissed === true;
   const wsRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -44,7 +47,7 @@ export function Rail({ active }: { active: string }) {
   }, [wsOpen]);
 
   const wsMeta = `${org.headcount.toLocaleString()} people`;
-  const groups = navFor(role);
+  const groups = navFor(role, { tourDone });
   const canSettings = canAccess(role, "Settings");
   // eslint-disable-next-line @next/next/no-img-element
   const wsLogo = <img src={org.logo} alt={org.name} className="h-full w-full object-cover" />;
@@ -90,8 +93,8 @@ export function Rail({ active }: { active: string }) {
               key={it.label}
               href={it.href}
               active={it.label === active}
-              label={it.label}
-              count={it.label === "Get Started" && tourLeft > 0 ? tourLeft : undefined}
+              label={it.display ?? it.label}
+              count={it.label === "Get Started" && !tourDone ? tourLeft : undefined}
               tag={it.soon ? "Soon" : undefined}
               icon={<it.icon className="size-[18px]" strokeWidth={it.label === active ? 2.1 : 1.85} />}
             />

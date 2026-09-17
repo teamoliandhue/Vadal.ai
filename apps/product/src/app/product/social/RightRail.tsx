@@ -54,14 +54,14 @@ export function RightRail({
         <section className="rounded-[22px] border border-line bg-card p-5">
           <div className="flex items-center justify-between">
             <h3 className="text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">Your communities</h3>
-            <Link href="/product/feed/groups" className="text-[13px] font-semibold text-[var(--purple)] hover:underline">Browse all</Link>
+            <Link href="/product/social/groups" className="text-[13px] font-semibold text-[var(--purple)] hover:underline">Browse all</Link>
           </div>
           {myGroups.length === 0 ? (
             <p className="mt-2.5 text-[13px] text-muted">You are not in any yet. Project rooms and interest circles live here.</p>
           ) : (
             <div className="mt-2.5 space-y-0.5">
               {myGroups.slice(0, 5).map((g) => (
-                <Link key={g.id} href={`/product/feed/groups/${g.id}`} className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 transition hover:bg-soft">
+                <Link key={g.id} href={`/product/social/groups/${g.id}`} className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 transition hover:bg-soft">
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[var(--lav)] text-[15px]" aria-hidden>{g.emoji}</span>
                   <span className="min-w-0 flex-1 truncate text-[14px] font-semibold text-ink">{g.name}</span>
                   <span className="text-[12px] text-faint">{g.status === "draft" ? "Draft" : `${g.postsThisWeek} new`}</span>

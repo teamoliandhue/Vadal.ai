@@ -63,7 +63,7 @@ export function GroupCard({
       </div>
       <div className="flex flex-1 flex-col px-5 pb-5 pt-8">
         <h3 className="flex items-center gap-1.5 text-[16px] font-bold tracking-tight text-ink">
-          <Link href={`/product/feed/groups/${group.id}`} className="truncate outline-none after:absolute after:inset-0 after:content-['']">{group.name}</Link>
+          <Link href={`/product/social/groups/${group.id}`} className="truncate outline-none after:absolute after:inset-0 after:content-['']">{group.name}</Link>
           {group.privacy === "request" && <Lock className="h-3.5 w-3.5 shrink-0 text-faint" aria-label="Ask to join" />}
         </h3>
         <p className="mt-1 line-clamp-2 min-h-[40px] text-[14px] leading-snug text-muted">{group.desc}</p>

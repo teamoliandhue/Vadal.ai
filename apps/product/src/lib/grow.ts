@@ -1,5 +1,5 @@
 /**
- * Grow — Pillar 6 (route /product/grow).
+ * Grow — Pillar 6 (route /product/ilearn).
  *
  * "Learning that fits into a five-minute break, not a training day."
  * Micro-courses grouped into paths, compliance tracking with due dates, quizzes

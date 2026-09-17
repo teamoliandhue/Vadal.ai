@@ -1,5 +1,5 @@
 /**
- * Recognition module data (route /product/recognition · "Engage" group).
+ * Recognition module data (route /product/kudos · "Engage" group).
  * Peer & manager appreciation: a values-tagged kudos wall, giver/receiver
  * leaderboards, a company-values breakdown, coverage + cold-zone insights,
  * and celebrations. Figures are kept consistent with the org-level recognition

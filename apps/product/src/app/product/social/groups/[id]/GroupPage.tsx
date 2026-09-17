@@ -83,7 +83,7 @@ export function GroupPage({ id }: { id: string }) {
         <SparkMark size={28} tone="gradient" state="idle" />
         <h1 className="text-[18px] font-bold text-ink">This community is not here</h1>
         <p className="text-[14px] text-muted">It may have been a draft on another device, or it has been closed.</p>
-        <Link href="/product/feed/groups" className="mt-3 text-[14px] font-semibold text-[var(--purple)] hover:underline">Browse communities</Link>
+        <Link href="/product/social/groups" className="mt-3 text-[14px] font-semibold text-[var(--purple)] hover:underline">Browse communities</Link>
       </div>
     );
   }
@@ -143,7 +143,7 @@ export function GroupPage({ id }: { id: string }) {
   return (
     <div className={`${SPLIT} mx-auto max-w-[1100px] justify-center`}>
       <div tabIndex={0} aria-label={group.name} className={`${PANE} w-full max-w-[680px] space-y-4`}>
-        <Link href="/product/feed/groups" className="inline-flex min-h-[44px] items-center gap-1.5 text-[13px] font-semibold text-muted transition hover:text-ink lg:min-h-0">
+        <Link href="/product/social/groups" className="inline-flex min-h-[44px] items-center gap-1.5 text-[13px] font-semibold text-muted transition hover:text-ink lg:min-h-0">
           <ArrowLeft className="h-4 w-4" /> Communities
         </Link>
 

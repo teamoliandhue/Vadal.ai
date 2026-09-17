@@ -10,29 +10,59 @@
 import {
   BarChart3, BookOpen, ClipboardList, Compass, FolderKanban, Gauge, GraduationCap,
   HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio,
-  Share2, Smile, UsersRound, type LucideIcon,
+  Share2, Smile, Sparkles, UsersRound, type LucideIcon,
 } from "lucide-react";
 import type { Role } from "@/lib/auth";
 import { canAccess } from "@/lib/access";
 
-export type NavLeaf = { label: string; icon: LucideIcon; href: string; soon?: boolean };
+/** `label` is the access/active key; `display` is what the person reads when it differs. */
+export type NavLeaf = { label: string; icon: LucideIcon; href: string; soon?: boolean; display?: string };
 export type NavGroupModel = { label: string; items: NavLeaf[] };
 
 export const NAV: NavGroupModel[] = [
-  /* The assistant's own group. It sits above the person's space because it is
-     where Vadal.ai surfaces what it has tailored for them — and, later, the
-     temporary sections it builds from what the workspace is telling it. Get
-     Started is the first of those and the only permanent one: a walkthrough of
-     the product for anyone seeing it cold, whether a new joiner or an investor. */
+  /* Nudge — the assistant's own group (17 Sep decision). It sits above the
+     person's space because it is where Nudge surfaces what it has tailored for
+     them. Get Started is the investor/new-joiner walkthrough; once it is done
+     the Rail relabels it "Product tour" and puts it below For you. */
   {
-    label: "Vadal.ai",
-    items: [{ label: "Get Started", icon: Compass, href: "/product/get-started" }],
+    label: "Nudge",
+    items: [
+      { label: "Get Started", icon: Compass, href: "/product/get-started" },
+      { label: "For you", icon: Sparkles, href: "/product/for-you" },
+    ],
   },
+  /* Kudos sits in My space: it is the one engagement action every employee
+     takes, and it was buried under Engage beside two admin tools. */
   {
     label: "My space",
     items: [
       { label: "Home", icon: House, href: "/product/home" },
-      { label: "Social", icon: Newspaper, href: "/product/feed" },
+      { label: "Social", icon: Newspaper, href: "/product/social" },
+      { label: "Kudos", icon: HeartHandshake, href: "/product/kudos" },
+    ],
+  },
+  /* Then the meeting's order: Engage · Listen · Learn · Insight · Wellbeing, and
+     Operations last because it is manager and HR work. */
+  {
+    label: "Engage",
+    items: [
+      { label: "Campaigns", icon: Megaphone, href: "/product/campaigns" },
+      { label: "Amplify", icon: Share2, href: "/product/amplify" },
+    ],
+  },
+  {
+    label: "Listen",
+    items: [
+      { label: "Pulse", icon: ClipboardList, href: "/product/pulse" },
+      { label: "Sentiment", icon: Smile, href: "/product/sentiment" },
+      { label: "Always-on listening", icon: Radio, href: "/product/listening" },
+    ],
+  },
+  {
+    label: "Learn",
+    items: [
+      { label: "iLearn", icon: GraduationCap, href: "/product/ilearn" },
+      { label: "Knowledge", icon: BookOpen, href: "/product/knowledge" },
     ],
   },
   {
@@ -43,51 +73,33 @@ export const NAV: NavGroupModel[] = [
     ],
   },
   {
-    label: "Listen",
-    items: [
-      { label: "Pulse", icon: ClipboardList, href: "/product/surveys" },
-      { label: "Sentiment", icon: Smile, href: "/product/sentiment" },
-      { label: "Always-on listening", icon: Radio, href: "/product/listening" },
-    ],
-  },
-  {
-    label: "Engage",
-    items: [
-      { label: "Kudos", icon: HeartHandshake, href: "/product/recognition" },
-      { label: "Campaigns", icon: Megaphone, href: "/product/campaigns" },
-      { label: "Amplify", icon: Share2, href: "/product/amplify" },
-    ],
-  },
-  {
     label: "Wellbeing",
     items: [
-      { label: "iThrive", icon: HeartPulse, href: "/product/thrive" },
-      { label: "SmartWork", icon: LifeBuoy, href: "/product/help" },
+      { label: "iThrive", icon: HeartPulse, href: "/product/ithrive" },
+      { label: "SmartWork", icon: LifeBuoy, href: "/product/smartwork" },
     ],
-  },
-  {
-    label: "Learn",
-    items: [{ label: "iLearn", icon: GraduationCap, href: "/product/grow" }],
   },
   {
     label: "Operations",
     items: [
       { label: "Manager hub", icon: UsersRound, href: "/product/managers" },
-      { label: "Flow", icon: FolderKanban, href: "/product/cases" },
+      { label: "Flow", icon: FolderKanban, href: "/product/flow" },
     ],
-  },
-  {
-    label: "Knowledge",
-    items: [{ label: "Knowledge", icon: BookOpen, href: "/product/knowledge" }],
   },
 ];
 
-/** The nav this role can actually use — groups that empty out are dropped. */
-export function navFor(role: Role | null): NavGroupModel[] {
+/** The nav this role can actually use — groups that empty out are dropped.
+ *  Once the tour is finished or dismissed, Get Started reads "Product tour" and
+ *  moves below For you: it has stopped being the first thing to do. */
+export function navFor(role: Role | null, opts: { tourDone?: boolean } = {}): NavGroupModel[] {
   if (!role) return [];
-  return NAV.map((g) => ({ ...g, items: g.items.filter((i) => canAccess(role, i.label)) })).filter(
-    (g) => g.items.length > 0,
-  );
+  return NAV.map((g) => {
+    let items = g.items.filter((i) => canAccess(role, i.label));
+    if (g.label === "Nudge" && opts.tourDone) {
+      items = [...items.filter((i) => i.label !== "Get Started"), ...items.filter((i) => i.label === "Get Started").map((i) => ({ ...i, display: "Product tour" }))];
+    }
+    return { ...g, items };
+  }).filter((g) => g.items.length > 0);
 }
 
 /**

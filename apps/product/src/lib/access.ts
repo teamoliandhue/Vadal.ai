@@ -59,6 +59,7 @@ const ADMIN_UP: Role[] = ["admin", "superadmin"];
  */
 export const SECTION_ACCESS: Record<string, Role[]> = {
   "Get Started": ALL_ROLES,
+  "For you": ALL_ROLES,
   Home: ALL_ROLES,
   Social: ALL_ROLES,
   Kudos: ALL_ROLES,

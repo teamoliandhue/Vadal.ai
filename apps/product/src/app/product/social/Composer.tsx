@@ -138,7 +138,7 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
           <p className="text-[14px] font-semibold text-ink">Posting to the company feed is open to {AUDIENCE_PHRASE[policy.feed]} here</p>
           <p className="mt-0.5 text-[13px] leading-snug text-muted">
             You can still react and comment, and post in your{" "}
-            <Link href="/product/feed/groups" className="font-semibold text-[var(--purple)] hover:underline">communities</Link>.
+            <Link href="/product/social/groups" className="font-semibold text-[var(--purple)] hover:underline">communities</Link>.
           </p>
         </div>
       </section>

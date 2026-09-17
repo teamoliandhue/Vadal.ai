@@ -23,6 +23,9 @@ import { canAccess } from "@/lib/access";
 import { org } from "@/lib/data";
 import { navFor, mobilePrimary } from "./nav-model";
 import { useViewAs } from "./useViewAs";
+import { useTourProgress } from "./useTourProgress";
+import { tourFor, TOUR_DISMISSED_KEY } from "@/lib/tour";
+import { usePersistentState } from "@/lib/usePersistentState";
 import { useMe } from "./useSession";
 import { toast } from "./Toaster";
 
@@ -32,6 +35,9 @@ export function MobileNav({ active }: { active: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const me = useMe();
+  const { explored } = useTourProgress();
+  const [tourDismissed] = usePersistentState<boolean>(TOUR_DISMISSED_KEY, false);
+  const tourDone = tourFor(role).every((st) => explored.includes(st.id)) || tourDismissed === true;
 
   // Close the sheet whenever navigation actually happens.
   React.useEffect(() => setOpen(false), [pathname]);
@@ -52,7 +58,7 @@ export function MobileNav({ active }: { active: string }) {
   if (!meta.ready) return null;
 
   const primary = mobilePrimary(role);
-  const groups = navFor(role);
+  const groups = navFor(role, { tourDone });
   const canSettings = canAccess(role, "Settings");
 
   function signOut() {
@@ -149,7 +155,7 @@ export function MobileNav({ active }: { active: string }) {
                             style={on ? { color: "var(--client-brand, var(--purple))" } : undefined}
                           >
                             <item.icon className="size-[20px] shrink-0" strokeWidth={on ? 2.1 : 1.8} />
-                            {item.label}
+                            {item.display ?? item.label}
                           </Link>
                         </li>
                       );

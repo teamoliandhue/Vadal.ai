@@ -6,7 +6,7 @@
    floor, DS components, and the hand-rolled chart primitives.
    ════════════════════════════════════════════════════════════════════ */
 import { Shell } from "./shell";
-import { PulseDashboard } from "./pulse/PulseDashboard";
+import { PulseDashboard } from "./_insight/PulseDashboard";
 
 export default function PulsePage() {
   return (

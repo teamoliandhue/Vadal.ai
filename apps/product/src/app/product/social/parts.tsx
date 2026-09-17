@@ -48,7 +48,7 @@ function ChannelChip({ channel }: { channel?: Channel }) {
 function GroupChip({ group }: { group: NonNullable<FeedItem["group"]> }) {
   return (
     <Link
-      href={`/product/feed/groups/${group.id}`}
+      href={`/product/social/groups/${group.id}`}
       onClick={(e) => e.stopPropagation()}
       className="inline-flex items-center gap-1 rounded-full bg-[var(--lav)] px-2 py-0.5 text-[12px] font-semibold text-[var(--purple)] transition hover:opacity-80"
     >
@@ -68,7 +68,7 @@ export function PostHeader({ item, trailing }: { item: DisplayItem; trailing?: R
           <span className="text-[12px] text-faint">{item.author.role}</span>
         </div>
         <div className="mt-0.5 flex items-center gap-2 text-[12px] text-faint">
-          <Link href={`/product/feed/post/${item.id}`} onClick={(e) => e.stopPropagation()} className="relative transition after:absolute after:-inset-x-1 after:-inset-y-3.5 after:content-[''] hover:text-ink hover:underline" title="Open full view">
+          <Link href={`/product/social/post/${item.id}`} onClick={(e) => e.stopPropagation()} className="relative transition after:absolute after:-inset-x-1 after:-inset-y-3.5 after:content-[''] hover:text-ink hover:underline" title="Open full view">
             {item.time === "now" ? "just now" : `${item.time} ago`}
           </Link>
           <span aria-hidden>·</span>

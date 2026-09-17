@@ -7,9 +7,9 @@ import { useViewAs } from "../useViewAs";
 import { useModeration } from "./useModeration";
 
 const TABS = [
-  { id: "feed", label: "Feed", href: "/product/feed" },
-  { id: "groups", label: "Communities", href: "/product/feed/groups" },
-  { id: "review", label: "Review", href: "/product/feed/review" },
+  { id: "feed", label: "Feed", href: "/product/social" },
+  { id: "groups", label: "Communities", href: "/product/social/groups" },
+  { id: "review", label: "Review", href: "/product/social/review" },
 ] as const;
 
 /* Review is the moderator's tab — admins only, per lib/access. */

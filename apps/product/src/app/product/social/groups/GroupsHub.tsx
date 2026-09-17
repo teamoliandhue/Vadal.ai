@@ -70,7 +70,7 @@ export function GroupsHub() {
               <div key={group.id} className="relative flex min-w-0 items-center gap-3 rounded-2xl bg-card p-3 ring-1 ring-[var(--ai-border)] transition focus-within:ring-2 focus-within:ring-[var(--purple)] hover:shadow-sm">
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[var(--ai-surface)] text-[22px]" aria-hidden>{group.emoji}</span>
                 <span className="min-w-0 flex-1">
-                  <Link href={`/product/feed/groups/${group.id}`} className="block truncate text-[14px] font-semibold text-ink outline-none after:absolute after:inset-0 after:content-['']">{group.name}</Link>
+                  <Link href={`/product/social/groups/${group.id}`} className="block truncate text-[14px] font-semibold text-ink outline-none after:absolute after:inset-0 after:content-['']">{group.name}</Link>
                   <span className="block truncate text-[12px] text-muted">{why}</span>
                 </span>
                 <span className="relative z-10 shrink-0"><JoinButton group={group} member={false} asked={g.hasAsked(group.id)} onJoin={() => g.join(group)} onWithdraw={() => g.withdraw(group)} /></span>

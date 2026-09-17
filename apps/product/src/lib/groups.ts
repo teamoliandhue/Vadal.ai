@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════
-   COMMUNITIES — the group object under Social (route /product/feed/groups).
+   COMMUNITIES — the group object under Social (route /product/social/groups).
 
    Channels are topics the company defines; a community is a room people
    choose to be in. Two kinds:

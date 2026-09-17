@@ -34,9 +34,9 @@ Unblocked now (no dependency on the decisions above):
 
 Unblocked by the decisions:
 
-- [ ] **Nav restructure** into the agreed domains and order; surface Kudos properly.
+- [x] **Nav restructure** (spec 030) into the agreed domains and order; surface Kudos properly.
 - [ ] **Home as digest** · M — *last week · yesterday · my actions next week · what's new*, built as widgets with a fixed default layout (drag-and-drop is v2). Check-in stays. The nine cards stay under the greeting.
-- [ ] **Get Started after first visit** · S — moves under Nudge (or Help); rail group renamed.
+- [x] **Get Started after first visit** (spec 030) · S — moves under Nudge (or Help); rail group renamed.
 - [ ] **Points ledger + plan toggle** · L — sources: kudos given/received, posts, survey participation (small, flat), learning/assessment completion, health activity (opt-in), manager actions (completing 1:1s, never ratings). Wallet view separate from the feed: balance, badges, value redeemed. No-points mode across Kudos, leaderboards, cards.
 - [x] **Naming leftovers** — decided: no further renames.
 
@@ -67,7 +67,7 @@ Unblocked by the decisions:
 - [x] `/product/<unknown>` now returns 404 (`dynamicParams = false` on the catch-all).
 - [x] Stale Vercel links — root (`vadal`) and `apps/hub` point at live projects and stay; `apps/deck` pointed at a team this account can't reach and was removed (local, gitignored).
 - [ ] Home tap targets — folded into the Home digest rebuild (the hero they belonged to is replaced).
-- [ ] Route slugs still carry old names (`/product/recognition` = Kudos) — rename with redirects once names settle.
+- [x] Route slugs renamed to match product names, old paths redirect (spec 030).
 
 ---
 

@@ -132,7 +132,7 @@ export function PostingPanel() {
       </section>
 
       <p className="text-[13px] text-muted">
-        Held and reported posts wait in <Link href="/product/feed/review" className="font-semibold text-[var(--purple)] hover:underline">Social › Review</Link>.
+        Held and reported posts wait in <Link href="/product/social/review" className="font-semibold text-[var(--purple)] hover:underline">Social › Review</Link>.
       </p>
     </div>
   );

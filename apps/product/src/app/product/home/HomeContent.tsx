@@ -176,7 +176,7 @@ function YouCard({ className = "", firstTime = false }: { className?: string; fi
         </div>
       </div>
 
-      <Link href="/product/recognition" className="mt-auto block">
+      <Link href="/product/kudos" className="mt-auto block">
         <Button variant="tertiary" leadingIcon={<Trophy className="h-4 w-4 text-[var(--purple)]" />} className="w-full">
           View leaderboard
         </Button>
@@ -217,7 +217,7 @@ function RecognitionCard({ className = "", firstTime = false }: { className?: st
           ))}
         </ul>
       )}
-      <Link href="/product/recognition" className="mt-auto block">
+      <Link href="/product/kudos" className="mt-auto block">
         <Button variant="tertiary" leadingIcon={<Gift className="h-4 w-4 text-[var(--purple)]" />} className="w-full">
           Recognise a teammate
         </Button>

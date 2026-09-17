@@ -6,12 +6,14 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import {
-  BarChart3, BookOpen, Building2, ClipboardList, CornerDownLeft, FolderKanban, Gauge,
-  HeartHandshake, House, Megaphone, Newspaper, Radio, Search, Settings, Smile, Sparkles,
-  UsersRound, type LucideIcon,
+  Building2, CornerDownLeft, Search, Settings, ShieldCheck, Sparkles, UsersRound, type LucideIcon,
 } from "lucide-react";
 import { SparkMark } from "@vadal/design-system";
 import { people, departments, aiBriefing, quickActions } from "@/lib/data";
+import type { Role } from "@/lib/auth";
+import { canAccess } from "@/lib/access";
+import { NAV as RAIL } from "../nav-model";
+import { useViewAs } from "../useViewAs";
 
 type Item = {
   id: string;
@@ -28,25 +30,20 @@ type Item = {
 const go = (href: string) => (r: ReturnType<typeof useRouter>) => r.push(href);
 const ask = (q: string) => () => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 
-const NAV: { label: string; icon: LucideIcon; href: string }[] = [
-  { label: "Home", icon: House, href: "/product/home" },
-  { label: "Insight", icon: Gauge, href: "/product" },
-  { label: "Analytics", icon: BarChart3, href: "/product" },
-  { label: "Pulse", icon: ClipboardList, href: "/product" },
-  { label: "Sentiment", icon: Smile, href: "/product" },
-  { label: "Always-on listening", icon: Radio, href: "/product" },
-  { label: "Kudos", icon: HeartHandshake, href: "/product" },
-  { label: "Campaigns", icon: Megaphone, href: "/product" },
-  { label: "Social", icon: Newspaper, href: "/product/feed" },
-  { label: "Communities", icon: UsersRound, href: "/product/feed/groups" },
-  { label: "Manager hub", icon: UsersRound, href: "/product" },
-  { label: "Flow", icon: FolderKanban, href: "/product" },
-  { label: "Knowledge", icon: BookOpen, href: "/product" },
-  { label: "Settings", icon: Settings, href: "#" },
+/* Jump-to comes from the rail's own model, filtered by what this person can
+   open. A hand-kept list here had drifted until most entries went to /product. */
+const EXTRA: { label: string; icon: LucideIcon; href: string; section: string }[] = [
+  { label: "Communities", icon: UsersRound, href: "/product/social/groups", section: "Social" },
+  { label: "Review", icon: ShieldCheck, href: "/product/social/review", section: "Settings" },
+  { label: "Settings", icon: Settings, href: "/product/settings", section: "Settings" },
 ];
 
-function buildIndex(): Item[] {
-  const nav: Item[] = NAV.map((n) => ({
+function buildIndex(role: Role | null): Item[] {
+  const destinations = [
+    ...RAIL.flatMap((g) => g.items).map((i) => ({ label: i.label, icon: i.icon, href: i.href, section: i.label })),
+    ...EXTRA,
+  ].filter((d) => canAccess(role, d.section));
+  const nav: Item[] = destinations.map((n) => ({
     id: `nav-${n.label}`, group: "Jump to", label: n.label, icon: n.icon,
     keywords: `${n.label} page nav go`.toLowerCase(), run: go(n.href),
   }));
@@ -79,7 +76,8 @@ export function CommandPalette() {
   const [active, setActive] = React.useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
-  const index = React.useMemo(buildIndex, []);
+  const [role] = useViewAs();
+  const index = React.useMemo(() => buildIndex(role), [role]);
 
   // open via ⌘K / Ctrl-K, or the search-field event
   React.useEffect(() => {

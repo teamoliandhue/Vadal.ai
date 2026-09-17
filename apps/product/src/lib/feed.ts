@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════
-   FEED — the company feed content layer (route /product/feed).
+   FEED — the company feed content layer (route /product/social).
    A richer model than the Home feed widget: post types (announcement,
    kudos, poll, event, milestone, plain post), multi-emoji reactions,
    threaded comments, channels, and an AI "Catch me up" digest.

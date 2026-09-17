@@ -53,13 +53,13 @@ export function PostView({ id }: { id: string }) {
         <SparkMark size={28} tone="gradient" state="idle" />
         <h1 className="text-[18px] font-bold text-ink">This post is not here</h1>
         <p className="text-[14px] text-muted">It may have been removed, or written on another device.</p>
-        <Link href="/product/feed" className="mt-3 text-[14px] font-semibold text-[var(--purple)] hover:underline">Back to the feed</Link>
+        <Link href="/product/social" className="mt-3 text-[14px] font-semibold text-[var(--purple)] hover:underline">Back to the feed</Link>
       </div>
     );
   }
 
   const room = item.group ? g.byId[item.group.id] : undefined;
-  const back = item.group ? { href: `/product/feed/groups/${item.group.id}`, label: item.group.name } : { href: "/product/feed", label: "Feed" };
+  const back = item.group ? { href: `/product/social/groups/${item.group.id}`, label: item.group.name } : { href: "/product/social", label: "Feed" };
 
   /* a closed community's post stays closed, link or no link */
   if (room && room.privacy === "request" && !g.isMember(room.id)) {
@@ -168,7 +168,7 @@ export function PostView({ id }: { id: string }) {
               <h3 className="text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">More from {place}</h3>
               <div className="mt-2 space-y-0.5">
                 {more.map((p) => (
-                  <Link key={p.id} href={`/product/feed/post/${p.id}`} className="-mx-2 flex items-start gap-2.5 rounded-xl px-2 py-2 transition hover:bg-soft">
+                  <Link key={p.id} href={`/product/social/post/${p.id}`} className="-mx-2 flex items-start gap-2.5 rounded-xl px-2 py-2 transition hover:bg-soft">
                     <Avatar src={p.author.img} name={p.author.name} size="sm" />
                     <span className="min-w-0">
                       <span className="block truncate text-[13px] font-semibold text-ink">{p.author.name} <span className="font-normal text-faint">· {p.time}</span></span>

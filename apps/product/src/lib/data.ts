@@ -585,7 +585,7 @@ export type Notif = {
 
 export const notifications: Notif[] = [
   { id: "n1", kind: "recognition", actor: "Anita Desai", body: "recognised you for Ownership — “clean and shipped on time.”", time: "8m", read: false, img: "/avatars/user-5.svg", href: "/product/home" },
-  { id: "n2", kind: "mention", actor: "Rahul Verma", body: "mentioned you in a comment on the Sales dashboard review.", time: "40m", read: false, img: "/avatars/user-1.svg", href: "/product/feed" },
+  { id: "n2", kind: "mention", actor: "Rahul Verma", body: "mentioned you in a comment on the Sales dashboard review.", time: "40m", read: false, img: "/avatars/user-1.svg", href: "/product/social" },
   { id: "n3", kind: "manager", actor: "1:1 with Anita", body: "starts in 2 hours — your prep doc is pinned to Your day.", time: "1h", read: false, img: "/avatars/user-5.svg", href: "/product/home" },
   { id: "n4", kind: "survey", actor: "Pulse survey", body: "6 quick questions close Friday — 2 minutes left to add your voice.", time: "3h", read: true, href: "/product/home" },
   { id: "n5", kind: "celebration", actor: "Sara Mehta", body: "has a birthday today 🎂 — send a quick note.", time: "5h", read: true, img: "/avatars/user-7.svg", href: "/product/home" },

@@ -172,7 +172,7 @@ export function Feed({ className = "", empty = false, showMore = false }: { clas
       )}
 
       {showMore && (
-        <Link href="/product/feed" className="mt-auto block pt-5">
+        <Link href="/product/social" className="mt-auto block pt-5">
           <span className="flex items-center justify-center gap-1.5 rounded-full border border-line py-2.5 text-[14px] font-semibold transition hover:border-faint/40 hover:bg-soft">
             View all updates <ArrowRight className="h-3.5 w-3.5" />
           </span>

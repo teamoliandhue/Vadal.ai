@@ -46,7 +46,7 @@ export function CheckPanel({
       {check.safety && (
         <p className="mt-2.5 rounded-xl bg-card px-3 py-2 text-[13px] leading-snug text-ink ring-1 ring-[var(--ai-border)]">
           If this is about a hazard, you can also{" "}
-          <Link href="/product/cases" className="font-semibold text-[var(--purple)] hover:underline">raise it privately in Flow</Link>
+          <Link href="/product/flow" className="font-semibold text-[var(--purple)] hover:underline">raise it privately in Flow</Link>
           {" "}— it goes straight to the people who can fix it.
         </p>
       )}

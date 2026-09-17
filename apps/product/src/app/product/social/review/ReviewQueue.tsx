@@ -150,7 +150,7 @@ function ItemCard({ q, by }: { q: QueueItem; by: string }) {
             </>
           )}
           {q.safety && (
-            <Link href="/product/cases" onClick={() => toast("Opening Flow — the post stays here until you decide")} className={`ml-auto inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--purple)] hover:underline ${btn}`}>
+            <Link href="/product/flow" onClick={() => toast("Opening Flow — the post stays here until you decide")} className={`ml-auto inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--purple)] hover:underline ${btn}`}>
               <FolderKanban className="h-4 w-4" /> Raise as a safety case
             </Link>
           )}
@@ -173,7 +173,7 @@ export function ReviewQueue() {
         <Lock className="h-6 w-6 text-faint" />
         <h1 className="text-[18px] font-bold text-ink">Review is for moderators</h1>
         <p className="text-[14px] text-muted">The People team looks at held and reported posts here.</p>
-        <Link href="/product/feed" className="mt-3 text-[14px] font-semibold text-[var(--purple)] hover:underline">Back to the feed</Link>
+        <Link href="/product/social" className="mt-3 text-[14px] font-semibold text-[var(--purple)] hover:underline">Back to the feed</Link>
       </div>
     );
   }

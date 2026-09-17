@@ -192,7 +192,7 @@ export function ThriveHub() {
           <p className="mt-2 max-w-xl text-[16px] leading-relaxed">{check.message}</p>
           <p className="mt-2 text-[12px] text-faint">Noticed: {check.reason}. Not shared with anyone.</p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Link href="/product/help"><Button variant="brand" className="min-h-[44px]">Talk to someone, privately</Button></Link>
+            <Link href="/product/smartwork"><Button variant="brand" className="min-h-[44px]">Talk to someone, privately</Button></Link>
             <Switch checked={consent} onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setConsent(e.target.checked); toast(e.target.checked ? "Wellbeing checks on" : "Wellbeing checks off"); }} label="Keep checks on" />
           </div>
         </Card>
@@ -229,7 +229,7 @@ export function ThriveHub() {
               <h2 className="mt-2 text-[18px] font-bold leading-snug tracking-[-0.015em]">{shiftContent.headline}</h2>
               <p className="mt-2 text-[16px] leading-relaxed text-muted">{shiftContent.body}</p>
               {shiftContent.course && (
-                <Link href="/product/grow" className="mt-4 flex min-h-[44px] items-center gap-3 rounded-2xl border border-line p-4 transition hover:bg-soft">
+                <Link href="/product/ilearn" className="mt-4 flex min-h-[44px] items-center gap-3 rounded-2xl border border-line p-4 transition hover:bg-soft">
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-soft text-[var(--purple)]">
                     <GraduationCap className="h-[18px] w-[18px]" strokeWidth={1.85} />
                   </span>
@@ -395,7 +395,7 @@ export function ThriveHub() {
             </button>
           </div>
 
-          <Link href="/product/recognition" className="flex min-h-[44px] items-center gap-2 px-1 text-[14px] font-semibold text-[var(--purple)] transition hover:gap-2.5">
+          <Link href="/product/kudos" className="flex min-h-[44px] items-center gap-2 px-1 text-[14px] font-semibold text-[var(--purple)] transition hover:gap-2.5">
             Your {points.balance.toLocaleString()} points, shared with Recognition <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>

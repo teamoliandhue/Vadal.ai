@@ -31,7 +31,7 @@ export function PostDrawer({
       {item && (
         <div className="space-y-1">
           <Link
-            href={`/product/feed/post/${item.id}`}
+            href={`/product/social/post/${item.id}`}
             className="mb-3 inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-soft px-3 text-[13px] font-semibold text-muted transition hover:text-ink lg:min-h-[32px]"
           >
             <Maximize2 className="h-3.5 w-3.5" /> Open full view

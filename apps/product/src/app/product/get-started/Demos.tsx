@@ -15,7 +15,7 @@ import {
 import { Avatar, Badge, Button, SparkMark } from "@vadal/design-system";
 import { ProductGrid } from "../ProductGrid";
 import { MoodCheck } from "../home/MoodCheck";
-import { GiveRecognition } from "../recognition/GiveRecognition";
+import { GiveRecognition } from "../kudos/GiveRecognition";
 import { useSession } from "../useSession";
 import { DayArea, GoalRing, ScoreRing, Sparkline, StreakStrip } from "@/components/charts";
 
@@ -351,7 +351,7 @@ function Help() {
           <p className="truncate text-[13.5px] font-semibold">{c.name}</p>
           <p className="truncate text-[11.5px] text-faint">{c.credentials} · next {c.nextAvailable}</p>
         </div>
-        <Link href="/product/help" className="flex min-h-[44px] items-center gap-1 rounded-full px-3 text-[13px] font-semibold text-[var(--client-brand,var(--purple))] lg:min-h-[36px]">Talk to a person <ArrowRight className="h-3.5 w-3.5" /></Link>
+        <Link href="/product/smartwork" className="flex min-h-[44px] items-center gap-1 rounded-full px-3 text-[13px] font-semibold text-[var(--client-brand,var(--purple))] lg:min-h-[36px]">Talk to a person <ArrowRight className="h-3.5 w-3.5" /></Link>
       </div>
       <div className="flex flex-wrap gap-1.5 border-t border-line px-4 py-3">
         {WAYS_IN.slice(0, 3).map((w) => <span key={w} className="rounded-full bg-soft px-2.5 py-1 text-[12px] text-muted">“{w}”</span>)}
@@ -466,7 +466,7 @@ export function Done({ steps, explored, onRestart, onGo }: { steps: TourStepView
   const left = steps.filter((s) => s.id !== "done" && !explored.includes(s.id) && !s.locked);
   const NEXT: { icon: React.ReactNode; label: string; sub: string; href?: string; onClick?: () => void }[] = [
     { icon: <Smile className="h-4 w-4" />, label: "Log today's check-in", sub: "Five seconds, private to you", href: "/product/home" },
-    { icon: <Heart className="h-4 w-4" />, label: "Recognise someone", sub: "It reaches them today", href: "/product/recognition" },
+    { icon: <Heart className="h-4 w-4" />, label: "Recognise someone", sub: "It reaches them today", href: "/product/kudos" },
     { icon: <SparkMark size={14} tone="solid" />, label: "Ask Vadal", sub: "“What should I look at first?”", onClick: () => ask("What should I look at first?") },
   ];
   return (
