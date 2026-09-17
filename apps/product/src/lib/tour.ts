@@ -54,6 +54,8 @@ export type TourStep = {
   /** The section this step opens, if any. Gated through access.ts. */
   section?: string;
   href?: string;
+  /** Where the product card goes when it should differ from the tour step. */
+  tile?: { section: string; href: string };
   /** Shown instead of the open button when the role cannot open the section. */
   lockedNote?: string;
   /** The action that explores this step, and how to name it. Steps without one
@@ -135,6 +137,7 @@ export const TOUR: TourStep[] = [
       { label: "Knowledge", href: "/product/knowledge" },
     ],
     section: "Knowledge", href: "/product/knowledge",
+    tile: { section: "Campaigns", href: "/product/campaigns" },
     completesOn: "answer", actionLabel: "ask it something", doneLabel: "asked it something",
   },
   {
@@ -204,7 +207,9 @@ export function productTiles(role: Role | null): ProductTile[] {
       short: s.pillar!.short ?? s.pillar!.tag,
       index: s.index,
       locked: s.locked,
-      href: s.href ?? "/product/home",
+      /* A tile may prefer a different door from the tour step — Broadcast's
+         card opens Campaigns — but only for a role that can walk through it. */
+      href: (s.tile && canAccess(role, s.tile.section) ? s.tile.href : s.href) ?? "/product/home",
     }));
 }
 

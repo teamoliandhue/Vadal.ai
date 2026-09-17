@@ -98,13 +98,15 @@ export function navFor(role: Role | null): NavGroupModel[] {
  * we are most at risk of failing. Everything else lives one tap away under More.
  */
 const MOBILE_PRIORITY: Record<Role, string[]> = {
-  // Grow over Knowledge for the employee: a five-minute course on a break is the
+  // iLearn over Knowledge for the employee: a five-minute course on a break is the
   // thing this product is asking a frontline worker to do, and Knowledge is
-  // reachable from the Copilot on any screen.
-  employee: ["Home", "Feed", "Grow", "Thrive"],
-  manager: ["Home", "Pulse", "Manager hub", "Feed"],
-  admin: ["Home", "Pulse", "Cases", "Feed"],
-  superadmin: ["Home", "Pulse", "Cases", "Feed"],
+  // reachable from Nudge on any screen.
+  // These are nav labels and must match NAV exactly — after the renaming they
+  // did not, and the bar quietly fell back to "first four in the sidebar".
+  employee: ["Home", "Social", "iLearn", "iThrive"],
+  manager: ["Home", "Insight", "Manager hub", "Social"],
+  admin: ["Home", "Insight", "Flow", "Social"],
+  superadmin: ["Home", "Insight", "Flow", "Social"],
 };
 
 const FLAT = NAV.flatMap((g) => g.items);
