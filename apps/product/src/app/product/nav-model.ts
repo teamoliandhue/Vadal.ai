@@ -9,8 +9,8 @@
    routing and permissions in agreement. */
 import {
   BarChart3, BookOpen, ClipboardList, Compass, FolderKanban, Gauge, GraduationCap,
-  HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio,
-  Share2, Smile, Sparkles, UsersRound, type LucideIcon,
+  Handshake, HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio,
+  Share2, Smile, Sparkles, Sprout, UsersRound, type LucideIcon,
 } from "lucide-react";
 import type { Role } from "@/lib/auth";
 import { canAccess } from "@/lib/access";
@@ -83,6 +83,10 @@ export const NAV: NavGroupModel[] = [
     label: "Operations",
     items: [
       { label: "Manager hub", icon: UsersRound, href: "/product/managers" },
+      // The two ends of the lifecycle (17 Sep decision §7): joiners' first 90
+      // days for managers and People, and the alumni network for People.
+      { label: "Onboard", icon: Sprout, href: "/product/onboard" },
+      { label: "Alumni", icon: Handshake, href: "/product/alumni" },
       { label: "Flow", icon: FolderKanban, href: "/product/flow" },
     ],
   },

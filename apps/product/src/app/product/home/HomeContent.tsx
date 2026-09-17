@@ -51,7 +51,12 @@ const SECTION_TO_WIDGET: Partial<Record<HomeSection, string>> = {
   team: "manager", announcements: "whatsnew", myday: "ahead", calendar: "ahead", feed: "yesterday", recognition: "lastweek",
 };
 function defaultLayoutFor(sections: HomeSection[]) {
-  const order = [...new Set(sections.map((s) => SECTION_TO_WIDGET[s]).filter((x): x is string => Boolean(x)))];
+  /* Learning has no widget of its own — Daily hooks carries today's lesson. It
+     joins the default board only when the profile puts learning in its first
+     three (a joiner told the setup assistant they want it), so nobody else's
+     Home changes. */
+  const learningFirst = sections.slice(0, 3).includes("learning");
+  const order = [...new Set(sections.map((s) => (s === "learning" && learningFirst ? "hooks" : SECTION_TO_WIDGET[s])).filter((x): x is string => Boolean(x)))];
   for (const id of ["yesterday", "ahead", "lastweek", "whatsnew"]) if (!order.includes(id)) order.push(id);
   /* The first widget leads the left column (it is also first on a phone);
      the numbers and news widgets otherwise sit on the right. */

@@ -43,7 +43,8 @@ const TOTAL_SIGNALS = 6;
  * "first proof point" the brief is describing.
  */
 export function openingTurn(p: PersonProfile): OnboardingStep {
-  const known = `You're ${p.title} on ${p.team}${p.surface === "frontline" ? ", mostly out on site" : ""}.`;
+  const article = /^[aeiou]/i.test(p.title) ? "an" : "a";
+  const known = `You're ${article} ${p.title} on ${p.team}${p.surface === "frontline" ? ", mostly out on site" : ""}.`;
   const inferred = inferFromContext(p);
   const literacy = inferred.literacy ?? p.literacy;
 
@@ -92,7 +93,9 @@ export function applyAnswer(p: PersonProfile, key: string, value: string): Perso
     case "device":
       break;
     case "wellbeing":
-      next.known = [...new Set([...next.known, "wellbeing-consent"])];
+      // Consent is only ever a clear yes. "Not now" records that we asked —
+      // so we stop asking — and nothing else.
+      if (/^yes/i.test(value.trim())) next.known = [...new Set([...next.known, "wellbeing-consent"])];
       break;
   }
   return { ...next, ...inferFromContext(next) };
@@ -106,6 +109,12 @@ export type OnboardingOutcome = {
   summary: string;
 };
 
+/** How a home section reads to a person — the summary must not show ids. */
+export const HOME_SECTION_LABEL: Record<HomeSection, string> = {
+  checkin: "your check-in", myday: "your day", calendar: "your calendar", recognition: "kudos", feed: "the feed",
+  learning: "learning", wellbeing: "wellbeing", team: "your team", announcements: "announcements",
+};
+
 export function completeOnboarding(p: PersonProfile): OnboardingOutcome {
   const homeOrder = orderHome(p);
   return {
@@ -113,9 +122,13 @@ export function completeOnboarding(p: PersonProfile): OnboardingOutcome {
     language: p.language,
     literacy: p.literacy,
     summary: simplify(
-      `Set up: your home starts with ${homeOrder.slice(0, 3).join(", ")}. Everything is in ${p.language}${
+      `Set up: your home starts with ${homeOrder.slice(0, 2).map((h) => HOME_SECTION_LABEL[h]).join(", ")} and ${HOME_SECTION_LABEL[homeOrder[2]]}. Everything is in ${p.language}${
         p.literacy === "simple" ? ", written plainly" : ""
-      }. You can change any of this later, and I'll ask the odd question over the next couple of weeks rather than all at once.`,
+      }. You can change any of this later${
+        nextProfileQuestions(p, 1).length
+          ? ", and I'll ask the odd question over the next couple of weeks rather than all at once."
+          : ". That's everything — I won't ask again."
+      }`,
       p.literacy === "simple" ? "simple" : "standard",
     ),
   };

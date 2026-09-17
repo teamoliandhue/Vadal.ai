@@ -6,7 +6,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import {
-  Building2, CornerDownLeft, Search, Settings, ShieldCheck, Sparkles, UsersRound, type LucideIcon,
+  Building2, Compass, CornerDownLeft, Search, Settings, ShieldCheck, Sparkles, UsersRound, type LucideIcon,
 } from "lucide-react";
 import { SparkMark } from "@vadal/design-system";
 import { people, departments, aiBriefing, quickActions } from "@/lib/data";
@@ -34,6 +34,7 @@ const ask = (q: string) => () => window.dispatchEvent(new CustomEvent("vadal:ask
    open. A hand-kept list here had drifted until most entries went to /product. */
 const EXTRA: { label: string; icon: LucideIcon; href: string; section: string }[] = [
   { label: "Communities", icon: UsersRound, href: "/product/social/groups", section: "Social" },
+  { label: "Your first 90 days", icon: Compass, href: "/product/onboard/me", section: "For you" },
   { label: "Review", icon: ShieldCheck, href: "/product/social/review", section: "Settings" },
   { label: "Settings", icon: Settings, href: "/product/settings", section: "Settings" },
 ];

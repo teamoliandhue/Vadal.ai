@@ -48,7 +48,7 @@ Unblocked by the decisions:
 - [x] **Health leaderboards** · M (spec 033; ranked by activity, never points) — walking/running/swimming points; opt-in via the existing consent pattern; role-aware so the frontline isn't scored on its job.
 - [x] **Widget library + drag-and-drop Home** · L (spec 034) — 10–15 widgets, user-arranged.
 - [ ] **Amplify AI copy** improvements · S
-- [ ] **Onboard** and **Alumni** screens · M each
+- [x] **Onboard** and **Alumni** screens · M each (spec 039) — joiner journey + setup assistant, joiner cohort, alumni network
 - [x] **Pulse programmes** · M (spec 037) — onboarding (day 7/30/90), stay interview, manager effectiveness, exit
 - [x] Wired (spec 035): `tagPost` → Social topics, `rankFeed` → For you, `scanAnomalies` → Kudos spotted, PersonProfile → Home order.
 - [x] Carry-over: delivery previews in the Campaign builder (spec 038).

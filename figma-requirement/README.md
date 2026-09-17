@@ -54,3 +54,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 036 | [Knowledge — the loop closed](./036-knowledge-loop.md) | Built · needs Figma |
 | 037 | [Pulse programmes, smart send, and answering a pulse](./037-pulse-programmes-and-responding.md) | Built · needs Figma |
 | 038 | [Campaigns — delivery preview](./038-campaign-delivery-preview.md) | Built · needs Figma |
+| 039 | [Onboard and Alumni](./039-onboard-and-alumni.md) | Built · needs Figma |

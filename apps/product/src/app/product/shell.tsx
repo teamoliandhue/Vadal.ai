@@ -29,7 +29,7 @@ const DOMAIN: Record<string, string> = {
   iLearn: "Learn", Knowledge: "Learn",
   Insight: "Insight", Analytics: "Insight",
   iThrive: "Wellbeing", SmartWork: "Wellbeing",
-  "Manager hub": "Operations", Flow: "Operations",
+  "Manager hub": "Operations", Onboard: "Operations", Alumni: "Operations", Flow: "Operations",
   Settings: "Account",
 };
 

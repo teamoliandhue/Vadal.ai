@@ -77,12 +77,17 @@ export const SECTION_ACCESS: Record<string, Role[]> = {
   Insight: MANAGER_UP,
   Sentiment: MANAGER_UP,
   "Manager hub": MANAGER_UP,
+  // A manager sees their own team's joiners (scopeFor → own-team). A joiner's
+  // own journey lives at /product/onboard/me under For you, open to everyone.
+  Onboard: MANAGER_UP,
   Campaigns: MANAGER_UP, // brief: managers author team-only — scoped by scopeFor
 
   Analytics: ADMIN_UP,
   Pulse: ADMIN_UP,
   "Always-on listening": ADMIN_UP,
   Flow: ADMIN_UP,
+  // Individual exit reasons are People-only.
+  Alumni: ADMIN_UP,
   Settings: ADMIN_UP,
 };
 

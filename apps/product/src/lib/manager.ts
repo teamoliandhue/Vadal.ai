@@ -68,13 +68,13 @@ export const reports: Report[] = [
     ],
   },
   {
-    id: "r3", name: "Dev Patel", role: "Junior Designer", img: "/avatars/user-3.svg", tenure: "3 weeks",
+    id: "r3", name: "Dev Patel", role: "Junior Designer", img: "/avatars/user-3.svg", tenure: "4 days",
     sentiment: 76, spark: [68, 70, 72, 74, 75, 76], trend: "up", risk: "Low",
-    lastOneOnOne: "3 days ago", nextOneOnOne: "Mon", recognition30d: 2,
-    note: "New joiner — week 3, onboarding on track.",
+    lastOneOnOne: "2 days ago", nextOneOnOne: "Mon", recognition30d: 2,
+    note: "New joiner — day 4, onboarding on track.",
     aiPrep: [
       "Check buddy-matching is working — it's the strongest onboarding driver.",
-      "Confirm he has a clear first project and knows who to ask for help.",
+      "Confirm they have a clear first project and know who to ask for help.",
     ],
   },
   {

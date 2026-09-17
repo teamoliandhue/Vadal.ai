@@ -11,11 +11,12 @@ import * as React from "react";
 import Link from "next/link";
 import {
   ArrowRight, BookOpenCheck, ClipboardList, Compass, HeartHandshake, HeartPulse, Share2, ShieldCheck,
-  Smile, UsersRound, type LucideIcon,
+  Smile, Sprout, UsersRound, type LucideIcon,
 } from "lucide-react";
 import { SparkMark } from "@vadal/design-system";
 import { canAccess } from "@/lib/access";
 import type { Role } from "@/lib/auth";
+import { JOINED } from "@/lib/lifecycle";
 import { TOUR_DISMISSED_KEY, tourFor } from "@/lib/tour";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { useTourProgress } from "../useTourProgress";
@@ -39,9 +40,14 @@ type Suggestion = {
 const today = () => new Date().toISOString().slice(0, 10);
 
 function build(role: Role, state: {
-  checkedIn: boolean; pulseDone: boolean; tourLeft: number; tourDismissed: boolean; learningDone: boolean; pendingReview: number; pendingSafety: boolean; managerDone: number;
+  joinerDay: number | null; checkedIn: boolean; pulseDone: boolean; tourLeft: number; tourDismissed: boolean; learningDone: boolean; pendingReview: number; pendingSafety: boolean; managerDone: number;
 }): Suggestion[] {
   const out: Suggestion[] = [];
+  if (state.joinerDay !== null) out.push({
+    id: "first-90", section: "For you", icon: Sprout, title: `Day ${state.joinerDay} of your first 90`, minutes: 1,
+    why: "Two quick questions set Vadal up around you, and your journey shows what's due this week — and whose job each part is.",
+    cta: "Open your journey", href: "/product/onboard/me",
+  });
   if (!state.pulseDone) out.push({
     id: "answer-pulse", section: "Home", icon: ClipboardList, title: "Answer the September pulse", minutes: 2,
     why: "It adapts to you — a good week is two questions. It closes Friday and it's anonymous.",
@@ -74,17 +80,24 @@ function build(role: Role, state: {
     why: "She shipped it early and three people on your team mentioned it this week. Nobody has said thanks yet.",
     cta: "Give kudos", href: "/product/kudos",
   });
-  if (!state.learningDone) out.push({
+  if (state.joinerDay !== null) out.push({
+    id: "welcome-course", section: "iLearn", icon: BookOpenCheck, title: "Start “Welcome to Oli&Hue”", minutes: 6,
+    why: "Four short parts on how the company works. Everyone does it in their first three weeks, a part at a time.",
+    cta: "Start part one", href: "/product/ilearn",
+  });
+  // A joiner has no streak to keep, no win to share and no challenge underway.
+  const joiner = state.joinerDay !== null;
+  if (!joiner && !state.learningDone) out.push({
     id: "learning", section: "iLearn", icon: BookOpenCheck, title: "Finish “Giving feedback” — two minutes left", minutes: 2,
     why: "You stopped at the last quiz. Finishing today keeps your five-day streak.",
     cta: "Continue", href: "/product/ilearn",
   });
-  out.push({
+  if (!joiner) out.push({
     id: "amplify", section: "Amplify", icon: Share2, title: "Your onboarding win is worth sharing",
     why: "Cutting onboarding from nine days to four is the kind of post people outside the company read. Nudge has drafted it in your voice.",
     cta: "See the draft", href: "/product/amplify",
   });
-  out.push({
+  if (!joiner) out.push({
     id: "challenge", section: "iThrive", icon: HeartPulse, title: "Day 4 of the Monsoon 10K",
     why: "You're 1,200 steps short of today's goal — about a twelve-minute walk.",
     cta: "Open iThrive", href: "/product/ithrive",
@@ -117,6 +130,7 @@ export function ForYou() {
   if (!meta.ready || !hydrated) return <div className="mx-auto w-full max-w-[760px] py-10" aria-busy="true" />;
 
   const all = build(role, {
+    joinerDay: me.email && JOINED[me.email] ? JOINED[me.email].day : null,
     checkedIn: Boolean(mood),
     pulseDone: surveysDone.includes("september-pulse"),
     tourLeft: tourFor(role).filter((s) => !explored.includes(s.id)).length,

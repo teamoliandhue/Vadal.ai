@@ -100,6 +100,15 @@ export function orderHome(profile: PersonProfile): HomeSection[] {
       : ["checkin", "myday", "calendar", "feed", "recognition", "learning", "announcements", "wellbeing"];
 
   if (profile.role !== "employee") base.splice(1, 0, "team");
+  // Something the person TOLD the assistant they care about (0.9) comes up to
+  // just after their day. Inferred interests (≤0.8) don't move anything — a
+  // guess shouldn't rearrange someone's Home.
+  const TOLD: [string, HomeSection][] = [["learning", "learning"], ["wellbeing", "wellbeing"], ["team news", "announcements"], ["safety", "announcements"]];
+  for (const [topic, section] of TOLD) {
+    if ((profile.interests[topic] ?? 0) < 0.85) continue;
+    const i = base.indexOf(section), at = base.indexOf("myday") + 1;
+    if (i > at) { base.splice(i, 1); base.splice(at, 0, section); }
+  }
   // Someone having a hard week gets wellbeing earlier — gently, not as an alarm.
   if (profile.mood < -0.3) {
     const i = base.indexOf("wellbeing");

@@ -77,6 +77,8 @@ export const DIRECTORY: Record<string, { name: string; role: Role; img: string; 
   // The brief's fourth role: same permissions as a desk employee, different
   // presentation. Seeded so the frontline experience is testable from day one
   // rather than designed for an abstraction.
+  // A new joiner on day 4 — the Onboard journey and the setup assistant are theirs.
+  "dev@oliandhue.com": { name: "Dev Patel", role: "employee", img: "/avatars/user-3.svg", team: "Design", title: "Junior Designer", profile: "desk" },
   "ravi@oliandhue.com": { name: "Ravi Prasad", role: "employee", img: "/avatars/user-4.svg", team: "Plant Ops", title: "Line Operator", profile: "frontline" },
   "sunita@oliandhue.com": { name: "Sunita Rao", role: "manager", img: "/avatars/user-7.svg", team: "Night shift", title: "Shift Supervisor", profile: "frontline" },
   "ops@vadal.ai": { name: "Vadal Ops", role: "superadmin", img: "/avatars/user-3.svg", team: "Vadal", title: "Platform Operations", profile: "desk" },
@@ -86,6 +88,7 @@ export const DIRECTORY: Record<string, { name: string; role: Role; img: string; 
 export const DEMO_PERSONAS: { email: string; label: string }[] = [
   { email: "aarav@oliandhue.com", label: "Employee" },
   { email: "ravi@oliandhue.com", label: "Frontline employee" },
+  { email: "dev@oliandhue.com", label: "New joiner" },
   { email: "anita@oliandhue.com", label: "Manager" },
   { email: "sunita@oliandhue.com", label: "Frontline manager" },
   { email: "priya@oliandhue.com", label: "HR admin" },

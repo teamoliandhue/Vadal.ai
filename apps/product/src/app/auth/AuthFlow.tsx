@@ -18,6 +18,7 @@ import { Button, SparkMark } from "@vadal/design-system";
 import {
   checkEmail, demoOtp, DEMO_PERSONAS, sessionFor, setSession, type Tenant,
 } from "@/lib/auth";
+import { JOINED } from "@/lib/lifecycle";
 
 type Step = "email" | "method" | "otp";
 
@@ -109,7 +110,9 @@ export function AuthFlow() {
     const s = sessionFor(email, tenant, method);
     window.setTimeout(() => {
       setSession(s);
-      router.push(s.onboarded ? "/product/home" : "/auth/onboarding");
+      // A joiner inside their first 90 days skips the static form: the setup
+      // assistant on their journey asks two light questions instead.
+      router.push(s.onboarded ? "/product/home" : JOINED[s.email] ? "/product/onboard/me" : "/auth/onboarding");
     }, 650);
   }
 

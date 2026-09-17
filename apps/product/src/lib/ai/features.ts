@@ -41,8 +41,8 @@ export type FeatureStatus = {
 
 export const FEATURES: FeatureStatus[] = [
   /* ── Onboarding (§2) ─────────────────────────────────────── */
-  { id: "onb-assistant", pillar: "Onboarding", brief: "Conversational onboarding assistant replaces static forms", module: "engines/onboarding", entry: "openingTurn", agentic: false, surface: "copilot", wiredTo: null },
-  { id: "onb-progressive", pillar: "Onboarding", brief: "Progressive profiling — 2–3 light questions per session over the first two weeks", module: "engines/onboarding", entry: "nextTurn", agentic: false, surface: "copilot", wiredTo: null },
+  { id: "onb-assistant", pillar: "Onboarding", brief: "Conversational onboarding assistant replaces static forms", module: "engines/onboarding", entry: "openingTurn", agentic: false, surface: "copilot", wiredTo: "app/product/onboard/me/Journey.tsx" },
+  { id: "onb-progressive", pillar: "Onboarding", brief: "Progressive profiling — 2–3 light questions per session over the first two weeks", module: "engines/onboarding", entry: "nextTurn", agentic: false, surface: "copilot", wiredTo: "app/product/onboard/me/Journey.tsx" },
   { id: "onb-locale", pillar: "Onboarding", brief: "Automatic locale and reading-level adaptation", module: "engines/text", entry: "localise", agentic: false, surface: "engine-only", wiredTo: "app/product/campaigns/DeliveryPreview.tsx" },
 
   /* ── Pillar 1 · Pulse ────────────────────────────────────── */
