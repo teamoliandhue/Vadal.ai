@@ -11,6 +11,7 @@ import { Drawer } from "../Drawer";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { surveyStats, surveys, surveyTemplates, surveyResult, type Survey, type SurveyStatus } from "@/lib/listen";
 import { SurveyBuilder, type BuilderSeed } from "./SurveyBuilder";
+import { Programmes } from "./Programmes";
 
 const TONE = { good: "var(--success)", bad: "var(--danger)", warn: "var(--warning)", purple: "var(--purple)" } as const;
 const soft = (c: string, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
@@ -115,6 +116,8 @@ export function SurveysHub() {
           </table>
         </div>
       </Card>
+
+      <Programmes />
 
       {/* templates */}
       <div className="flex flex-col gap-3">

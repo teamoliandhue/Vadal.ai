@@ -42,7 +42,7 @@ export const WEEK_AHEAD: AheadItem[] = [
   { day: "Tue", date: "22 Sep", title: "Plan two 1:1s you owe", meta: "Rohan and Ishaan · suggested times ready", href: "/product/managers", section: "Manager hub", roles: MGR },
   { day: "Wed", date: "23 Sep", title: "No-meeting Wednesday", meta: "All day · Wellbeing campaign", href: "/product/social/post/f1", section: "Social" },
   { day: "Thu", date: "24 Sep", title: "Search revamp demo", meta: "4:00 PM · in the community", href: "/product/social/groups/search-revamp", section: "Social" },
-  { day: "Fri", date: "25 Sep", title: "September pulse closes", meta: "6 questions · about 2 minutes", href: "/product/for-you", section: "For you" },
+  { day: "Fri", date: "25 Sep", title: "September pulse closes", meta: "About 2 minutes · only the questions that matter to you", href: "/product/survey/september-pulse", section: "Home" },
   { day: "Fri", date: "25 Sep", title: "Compliance refresher due", meta: "12 minutes left in iLearn", href: "/product/ilearn", section: "iLearn" },
   { day: "Fri", date: "25 Sep", title: "Pulse wave closes — 71% have answered", meta: "Night shift is at 48%", href: "/product/pulse", section: "Pulse", roles: ADM },
   { day: "Sat", date: "26 Sep", title: "Runners club · lake run", meta: "6:00 AM · Ulsoor Lake gate", href: "/product/social/groups/runners", section: "Social" },

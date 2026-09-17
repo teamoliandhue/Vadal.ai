@@ -43,7 +43,10 @@ export const QUESTION_BANK: Question[] = [
   {
     id: "blocker", text: "What got in your way most?", kind: "choice",
     choices: ["Workload", "Equipment or tools", "Unclear priorities", "Support from my manager", "Something else"],
-    when: (a) => num(a.mood) <= 3 || num(a.workload) <= 2,
+    // `low()`, not `num() <= 2`: an unanswered workload question is not a low
+    // workload score. Reading it as 0 asked a "Great week" respondent what got
+    // in their way — the exact 20-question form the adaptive bank exists to avoid.
+    when: (a) => low(a.mood, 3) || low(a.workload, 2),
   },
   {
     id: "detail", text: "Anything you'd want changed about that?", kind: "text",
@@ -60,6 +63,8 @@ export const QUESTION_BANK: Question[] = [
 ];
 
 const num = (v: number | string | undefined): number => (typeof v === "number" ? v : 0);
+/** Answered, and at or below the threshold. Unanswered is never "low". */
+export const low = (v: number | string | undefined, max: number): boolean => typeof v === "number" && v <= max;
 
 /** The next question, or null when we have enough. */
 export function nextQuestion(answers: Answers, bank: Question[] = QUESTION_BANK): Question | null {

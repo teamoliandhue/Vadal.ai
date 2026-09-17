@@ -82,7 +82,7 @@ export function planSend(r: Recipient, quiet: QuietHours = DEFAULT_QUIET, priori
   return {
     hour,
     channel,
-    reason: reasonFor(r, hour, channel),
+    reason: reasonFor(r, hour, channel, r.respondsAt.some((h) => h === hour && !inQuietHours(h, quiet))),
     allowed: true,
   };
 }
@@ -97,17 +97,21 @@ function bestHour(r: Recipient, quiet: QuietHours): number {
   }
   // Otherwise fall back to the shift — the start of a break, not mid-task.
   switch (r.shift) {
-    case "night": return 5;      // end of shift, before they sleep
+    // End of shift, before they sleep — at the first hour quiet hours allow.
+    // This was 5, which sits inside the default 21:00–07:00 quiet window, so a
+    // night-shift worker with no response history could never be reached at all.
+    case "night": return quiet.from > quiet.to ? quiet.to : 7;
     case "evening": return 16;   // before they clock on
     case "day": return 12;       // lunch break
     default: return 10;
   }
 }
 
-function reasonFor(r: Recipient, hour: number, channel: Channel): string {
+function reasonFor(r: Recipient, hour: number, channel: Channel, fromHistory: boolean): string {
   const time = `${String(hour).padStart(2, "0")}:00`;
-  const via = channel === "sms" || channel === "whatsapp" ? `on ${channel.toUpperCase()}` : `in ${channel}`;
-  if (r.respondsAt.length) return `They usually respond around ${time} — sending ${via}.`;
+  const via = channel === "sms" || channel === "whatsapp" ? `on ${channel === "sms" ? "SMS" : "WhatsApp"}` : channel === "app" ? "in the app" : `in ${channel[0].toUpperCase()}${channel.slice(1)}`;
+  if (fromHistory) return `They usually respond around ${time} — sending ${via}.`;
+  if (r.respondsAt.length) return `They usually answer late at night, inside quiet hours — so ${time} ${via} instead, on their ${r.shift === "desk" ? "working day" : "shift break"}.`;
   return `${r.shift === "night" ? "Night shift" : r.shift === "evening" ? "Evening shift" : "Day shift"}, so ${time} ${via} lands on a break rather than mid-task.`;
 }
 

@@ -39,9 +39,14 @@ type Suggestion = {
 const today = () => new Date().toISOString().slice(0, 10);
 
 function build(role: Role, state: {
-  checkedIn: boolean; tourLeft: number; tourDismissed: boolean; learningDone: boolean; pendingReview: number; pendingSafety: boolean; managerDone: number;
+  checkedIn: boolean; pulseDone: boolean; tourLeft: number; tourDismissed: boolean; learningDone: boolean; pendingReview: number; pendingSafety: boolean; managerDone: number;
 }): Suggestion[] {
   const out: Suggestion[] = [];
+  if (!state.pulseDone) out.push({
+    id: "answer-pulse", section: "Home", icon: ClipboardList, title: "Answer the September pulse", minutes: 2,
+    why: "It adapts to you — a good week is two questions. It closes Friday and it's anonymous.",
+    cta: "Answer it", href: "/product/survey/september-pulse",
+  });
   if (!state.checkedIn) out.push({
     id: "checkin", section: "Home", icon: Smile, title: "Check in for today", minutes: 1,
     why: "It's the one thing that tells your manager how the week is really going — and it takes twenty seconds.",
@@ -105,6 +110,7 @@ export function ForYou() {
   const [tourDismissed] = usePersistentState<boolean>(TOUR_DISMISSED_KEY, false);
   const [growDone] = usePersistentState<string[]>("vadal:grow-done", []);
   const [mgrDone] = usePersistentState<string[]>("vadal:mgr-actions-done", []);
+  const [surveysDone] = usePersistentState<string[]>("vadal:surveys-done", []);
   const [hidden, setHidden] = usePersistentState<Record<string, string>>("vadal:for-you-hidden", {});
   const { pending } = useModeration();
 
@@ -112,6 +118,7 @@ export function ForYou() {
 
   const all = build(role, {
     checkedIn: Boolean(mood),
+    pulseDone: surveysDone.includes("september-pulse"),
     tourLeft: tourFor(role).filter((s) => !explored.includes(s.id)).length,
     tourDismissed: tourDismissed === true,
     learningDone: growDone.length >= 3,
