@@ -6,7 +6,7 @@
    Seeded data (lib/settings). */
 import * as React from "react";
 import {
-  Bell, Building2, Check, Lock, Palette, Plug, ShieldCheck, Sparkles, UserPlus, Users, type LucideIcon,
+  Bell, Building2, Check, Lock, MessageSquareWarning, Palette, Plug, ShieldCheck, Sparkles, UserPlus, Users, type LucideIcon,
 } from "lucide-react";
 import { Avatar, Badge, Button, Switch, type BadgeTone } from "@vadal/design-system";
 import { toast } from "../Toaster";
@@ -16,6 +16,7 @@ import {
   type IntegrationMode, type Role,
 } from "@/lib/settings";
 import { BrandingPanel } from "./BrandingPanel";
+import { PostingPanel } from "./PostingPanel";
 
 const soft = (c: string, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
 
@@ -25,6 +26,7 @@ const TABS: Tab[] = [
   { key: "branding", label: "Branding", icon: Palette },
   { key: "roles", label: "Roles & permissions", icon: ShieldCheck },
   { key: "members", label: "Members", icon: Users },
+  { key: "posting", label: "Posting & moderation", icon: MessageSquareWarning },
   { key: "integrations", label: "Integrations", icon: Plug },
   { key: "notifications", label: "Notifications", icon: Bell },
   { key: "privacy", label: "Data & privacy", icon: Lock },
@@ -275,6 +277,7 @@ const PANELS: Record<string, React.ReactNode> = {
   branding: <BrandingPanel />,
   roles: <RolesPanel />,
   members: <MembersPanel />,
+  posting: <PostingPanel />,
   integrations: <IntegrationsPanel />,
   notifications: <NotificationsPanel />,
   privacy: <PrivacyPanel />,

@@ -15,7 +15,11 @@ import { RightRail } from "./RightRail";
 import { SocialTabs } from "./SocialTabs";
 import { score, timeMins, useFeedState } from "./useFeedState";
 import { useGroups } from "./groups/useGroups";
+import { useModeration } from "./useModeration";
+import { PendingPosts } from "./PendingPosts";
+import { useMe } from "../useSession";
 import { PANE, SPLIT } from "../panes";
+import { toast } from "../Toaster";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 type Sort = "trending" | "recent";
@@ -25,6 +29,8 @@ const FRESH = freshItems;
 export function FeedHub() {
   const { mine, toDisplay, react, bookmark, vote, rsvp, likeComment, addComment, addMine, share, menu } = useFeedState();
   const { mineList } = useGroups();
+  const me = useMe();
+  const mod = useModeration();
   const myRooms = React.useMemo(() => new Set(mineList.map((g) => g.id)), [mineList]);
 
   const [channel, setChannel] = React.useState<string | null>(null);
@@ -44,8 +50,12 @@ export function FeedHub() {
      from a community you have not joined stays in that community. */
   const all = React.useMemo(() => {
     const inMyRooms = (it: FeedItem) => !it.group || myRooms.has(it.group.id);
-    return [...extra, ...mine, ...feedItems, ...groupPosts].filter(inMyRooms).map(toDisplay);
-  }, [extra, mine, toDisplay, myRooms]);
+    /* held posts join the stream once approved; reported posts leave it once removed */
+    return [...extra, ...mine, ...mod.approved, ...feedItems, ...groupPosts]
+      .filter((it) => inMyRooms(it) && !mod.removed.has(it.id))
+      .map(toDisplay);
+  }, [extra, mine, toDisplay, myRooms, mod.approved, mod.removed]);
+  const myQueue = mod.items.filter((q) => q.kind === "held" && !q.post.group && q.post.author.name === me.fullName && (q.status === "pending" || q.status === "returned"));
 
   const stream = React.useMemo(() => {
     const filtered = channel ? all.filter((it) => it.channel === channel) : all;
@@ -58,6 +68,8 @@ export function FeedHub() {
 
   const openItem = openId ? all.find((it) => it.id === openId) ?? null : null;
 
+  const report = (it: FeedItem) =>
+    toast(mod.report(it, me.fullName) ? "Reported — a moderator will look. It stays up until they decide." : "You've already reported this one");
   const addPost = (item: FeedItem) => { addMine(item); setChannel(null); setSort("recent"); };
 
   const refresh = () => {
@@ -112,6 +124,7 @@ export function FeedHub() {
         </header>
 
         <Composer onPost={addPost} />
+        <PendingPosts items={myQueue} />
 
         {/* new posts pill */}
         {showNew && (
@@ -149,7 +162,7 @@ export function FeedHub() {
                 onGoing={() => rsvp(it.id)}
                 onOpen={() => setOpenId(it.id)}
                 onShare={() => share(it.id)}
-                onMenu={menu}
+                onMenu={(l) => (l === "Report" ? report(it) : menu(l))}
               />
             ))}
           </div>

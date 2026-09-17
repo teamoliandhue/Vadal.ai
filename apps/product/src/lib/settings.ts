@@ -38,6 +38,7 @@ export const capabilities: { label: string; group: string; roles: Role[] }[] = [
   { label: "See org-wide analytics", group: "Admin", roles: ["Admin", "Super admin"] },
   { label: "Manage members & roles", group: "Admin", roles: ["Admin", "Super admin"] },
   { label: "Configure branding & features", group: "Admin", roles: ["Admin", "Super admin"] },
+  { label: "Moderate posts & set posting rights", group: "Admin", roles: ["Admin", "Super admin"] },
   { label: "Manage integrations", group: "Admin", roles: ["Admin", "Super admin"] },
   { label: "Billing & data controls", group: "Super admin", roles: ["Super admin"] },
   { label: "Create client workspaces", group: "Super admin", roles: ["Super admin"] },

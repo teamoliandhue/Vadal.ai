@@ -42,3 +42,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 024 | [Sign in — the photos and the panel](./024-login.md) | Built · needs Figma |
 | 025 | [Communities — groups under Social](./025-communities.md) | Built · needs Figma |
 | 026 | [Feed — full view, Write with Nudge, translate in place](./026-feed-full-view-assist-translate.md) | Built · needs Figma |
+| 027 | [Moderation & posting rights](./027-moderation-posting-rights.md) | Built · needs Figma |

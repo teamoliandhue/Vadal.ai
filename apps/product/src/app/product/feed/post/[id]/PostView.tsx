@@ -18,6 +18,7 @@ import { CommentBox, CommentList } from "../../Thread";
 import { PostText } from "../../Translate";
 import { useFeedState } from "../../useFeedState";
 import { useGroups } from "../../groups/useGroups";
+import { useModeration } from "../../useModeration";
 import { PANE, SPLIT } from "../../../panes";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
@@ -36,10 +37,11 @@ function readThread(item: DisplayItem) {
 export function PostView({ id }: { id: string }) {
   const feed = useFeedState();
   const g = useGroups();
+  const mod = useModeration();
 
   const source: FeedItem | undefined = React.useMemo(
-    () => [...feed.mine, ...freshItems, ...feedItems, ...groupPosts].find((p) => p.id === id),
-    [feed.mine, id],
+    () => (mod.removed.has(id) ? undefined : [...feed.mine, ...mod.approved, ...freshItems, ...feedItems, ...groupPosts].find((p) => p.id === id)),
+    [feed.mine, id, mod.approved, mod.removed],
   );
   const item = source ? feed.toDisplay(source) : null;
 

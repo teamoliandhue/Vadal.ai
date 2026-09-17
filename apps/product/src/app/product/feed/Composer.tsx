@@ -3,17 +3,25 @@
    full editor with a channel picker, four modes (Text / Photo / Poll / Kudos),
    and a "Draft with Vadal" AI assist. Emits a fully-formed FeedItem to the hub. */
 import * as React from "react";
-import { BarChart3, ChevronDown, Award, ImageIcon, X } from "lucide-react";
+import Link from "next/link";
+import { BarChart3, ChevronDown, Award, ImageIcon, Lock, X } from "lucide-react";
 import { Avatar, Badge, Button } from "@vadal/design-system";
 import { useMe } from "../useSession";
 import { channels, type FeedItem, type GroupRef, type Person } from "@/lib/feed";
 import { toast } from "../Toaster";
+import { usePostingPolicy } from "../usePostingPolicy";
+import { useViewAs } from "../useViewAs";
+import { AUDIENCE_PHRASE, allowed } from "@/lib/posting";
+import { checkPost, PHOTO_LABELS, type PostCheck } from "@/lib/ai/engines/moderation";
+import { readability } from "@/lib/ai/engines/text";
+import { moderation } from "./useModeration";
+import { CheckPanel } from "./PrePublish";
 import { AssistMenu, AssistSuggestion, UndoAssist, suggest, type Suggestion } from "./WriteAssist";
 
 type Mode = "text" | "photo" | "poll" | "kudos";
 
 /* Attachable images offered in the composer — real photography, same set the feed uses. */
-const ART = ["/feed/wellbeing.jpg", "/feed/ship.jpg", "/feed/plant.jpg", "/feed/milestone.jpg", "/feed/coldbrew.jpg"];
+const ART = ["/feed/wellbeing.jpg", "/feed/ship.jpg", "/feed/plant.jpg", "/feed/milestone.jpg", "/feed/coldbrew.jpg", "/feed/screen.jpg"];
 const ROSTER: Person[] = [
   { name: "Aarav S.", role: "Engineering", img: "/avatars/user-2.svg" },
   { name: "Neha R.", role: "Design", img: "/avatars/user-5.svg" },
@@ -37,11 +45,34 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
   const [values, setValues] = React.useState<string[]>([]);
   const [sugg, setSugg] = React.useState<Suggestion | null>(null);
   const [before, setBefore] = React.useState<string | null>(null); // the draft as it was, for Undo
-  const ch = channels.find((c) => c.id === channel)!;
+  const [check, setCheck] = React.useState<{ c: PostCheck; item: FeedItem } | null>(null);
+  const textRef = React.useRef<HTMLTextAreaElement>(null);
+  const [policy] = usePostingPolicy();
+  const [role] = useViewAs();
+
+  /* Posting rights. Inside a community, membership is the right; in the company
+     feed the workspace's rules decide, and #company has its own. */
+  const canFeed = allowed(policy.feed, role);
+  const canChannel = (id: string) => canFeed && (id !== "company" || allowed(policy.announcements, role));
+  const firstOpen = channels.find((c) => canChannel(c.id))?.id ?? channels[0].id;
+  const effective = canChannel(channel) ? channel : firstOpen;
+  const ch = channels.find((c) => c.id === effective)!;
+
+  /* "Edit and post again" from a held or returned post lands here */
+  React.useEffect(() => {
+    const onCompose = (e: Event) => {
+      const d = (e as CustomEvent<{ text: string; channel: string; groupId: string | null }>).detail;
+      if ((d.groupId ?? null) !== (group?.id ?? null)) return;
+      setOpen(true); setMode("text"); setText(d.text); if (d.channel) setChannel(d.channel);
+      window.setTimeout(() => textRef.current?.focus(), 50);
+    };
+    window.addEventListener("vadal:compose", onCompose);
+    return () => window.removeEventListener("vadal:compose", onCompose);
+  }, [group?.id]);
 
   function reset() {
     setOpen(false); setMode("text"); setText(""); setChannel(channels[0].id);
-    setPollOpts(["", ""]); setRecips([]); setValues([]); setArt(0); setSugg(null); setBefore(null);
+    setPollOpts(["", ""]); setRecips([]); setValues([]); setArt(0); setSugg(null); setBefore(null); setCheck(null);
   }
 
   const validPoll = mode === "poll" && pollOpts.filter((o) => o.trim()).length >= 2;
@@ -59,7 +90,7 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
       id: `me-${Date.now()}`,
       type: mode === "poll" ? "poll" : mode === "kudos" ? "kudos" : "post",
       author: { name: me.fullName, role: `${me.title} · You`, img: me.img },
-      channel: group ? "" : channel,
+      channel: group ? "" : effective,
       ...(group ? { group } : {}),
       time: "now",
       text: text.trim(),
@@ -73,8 +104,23 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
       base.poll = { closesIn: "3 days", options: pollOpts.filter((o) => o.trim()).map((label, i) => ({ id: `o${i}`, label: label.trim(), votes: 0 })) };
     }
     if (mode === "kudos") base.kudos = { to: recips, values: values.length ? values : ["Ownership"] };
-    onPost(base);
-    toast(mode === "kudos" ? "Kudos sent 🏆" : group ? `Posted to ${group.name} ${group.emoji}` : "Posted to the feed 🎉");
+
+    /* the pre-publish check — most posts pass straight through */
+    const c = checkPost({ text: base.text, media: base.media }, policy);
+    if (c.verdict === "publish") publish(base);
+    else setCheck({ c, item: base });
+  }
+
+  function publish(item: FeedItem) {
+    onPost(item);
+    toast(item.type === "kudos" ? "Kudos sent 🏆" : group ? `Posted to ${group.name} ${group.emoji}` : "Posted to the feed 🎉");
+    reset();
+  }
+
+  function sendForReview() {
+    if (!check) return;
+    moderation.hold(check.item, check.c.findings, check.c.safety);
+    toast("Sent for review — it waits at the top of your feed until someone decides");
     reset();
   }
 
@@ -83,6 +129,21 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
     { id: "poll", label: "Poll", icon: BarChart3 },
     { id: "kudos", label: "Kudos", icon: Award },
   ];
+
+  if (!group && !canFeed) {
+    return (
+      <section className="flex items-start gap-3 rounded-[22px] border border-dashed border-line bg-card p-4 sm:p-5">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-soft text-muted"><Lock className="h-4 w-4" /></span>
+        <div>
+          <p className="text-[14px] font-semibold text-ink">Posting to the company feed is open to {AUDIENCE_PHRASE[policy.feed]} here</p>
+          <p className="mt-0.5 text-[13px] leading-snug text-muted">
+            You can still react and comment, and post in your{" "}
+            <Link href="/product/feed/groups" className="font-semibold text-[var(--purple)] hover:underline">communities</Link>.
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="rounded-[22px] border border-line bg-card p-4 transition focus-within:border-[var(--purple)]/40 sm:p-5">
@@ -100,7 +161,7 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
             <span aria-hidden>{group.emoji}</span> {group.name}
           </span>
         ) : (
-          <ChannelPicker ch={ch} open={chOpen} setOpen={setChOpen} onSelect={(id) => { setChannel(id); setChOpen(false); }} />
+          <ChannelPicker ch={ch} open={chOpen} setOpen={setChOpen} can={canChannel} lockedTo={AUDIENCE_PHRASE[policy.announcements]} onSelect={(id) => { setChannel(id); setChOpen(false); setCheck(null); }} />
         )}
         {!open && (
           <div className="flex items-center gap-1 text-faint">
@@ -118,7 +179,8 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
           <textarea
             autoFocus
             value={text}
-            onChange={(e) => { setText(e.target.value); setBefore(null); }}
+            ref={textRef}
+            onChange={(e) => { setText(e.target.value); setBefore(null); setCheck(null); }}
             rows={3}
             placeholder={mode === "kudos" ? "Say what they did well…" : "What's on your mind?"}
             /* Negative margin + equal padding: the text still lines up optically
@@ -138,13 +200,27 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
               onRetone={(m) => setSugg(suggest(text, m))}
             />
           )}
+          {check && (
+            <CheckPanel
+              check={check.c}
+              onEdit={() => { setCheck(null); textRef.current?.focus(); }}
+              onPostAnyway={() => publish(check.item)}
+              onSendForReview={sendForReview}
+              onRemoveDetails={() => { if (check.c.redacted) { setBefore(text); setText(check.c.redacted); } setCheck(null); }}
+              onCalmer={() => {
+                if (check.c.calmer) setSugg({ label: "A calmer version", text: check.c.calmer, note: "The same point, without the harsh words.", grade: readability(check.c.calmer).grade, changed: true });
+                setCheck(null);
+              }}
+              onOtherPhoto={() => { setArt(Math.max(0, ART.findIndex((src) => !PHOTO_LABELS[src]?.risk))); setCheck(null); }}
+            />
+          )}
           {!sugg && before !== null && <UndoAssist onUndo={() => { setText(before); setBefore(null); }} />}
 
           {mode === "photo" && (
             <div className="relative overflow-hidden rounded-2xl border border-line">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={ART[art]} alt="attachment preview" className="aspect-[5/2] w-full object-cover" />
-              <button onClick={() => setArt((a) => (a + 1) % ART.length)} className="absolute bottom-2 right-2 rounded-full bg-black/55 px-3 py-1 text-[12px] font-semibold text-white backdrop-blur transition hover:bg-black/70">
+              <button onClick={() => { setArt((a) => (a + 1) % ART.length); setCheck(null); }} className="absolute bottom-2 right-2 rounded-full bg-black/55 px-3 py-1 text-[12px] font-semibold text-white backdrop-blur transition hover:bg-black/70">
                 Shuffle art
               </button>
             </div>
@@ -229,12 +305,14 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
 }
 
 function ChannelPicker({
-  ch, open, setOpen, onSelect,
+  ch, open, setOpen, onSelect, can, lockedTo,
 }: {
   ch: (typeof channels)[number];
   open: boolean;
   setOpen: (v: boolean) => void;
   onSelect: (id: string) => void;
+  can: (id: string) => boolean;
+  lockedTo: string;
 }) {
   const ref = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
@@ -250,15 +328,19 @@ function ChannelPicker({
       </button>
       {open && (
         <div className="absolute left-0 top-full z-20 mt-1 w-60 overflow-hidden rounded-xl border border-line bg-card py-1 shadow-[0_12px_30px_-10px_rgba(20,20,40,0.3)]">
-          {channels.map((c) => (
-            <button key={c.id} onClick={() => onSelect(c.id)} className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition hover:bg-soft">
-              <span className="text-[16px]" aria-hidden>{c.emoji}</span>
-              <span className="min-w-0">
-                <span className="block text-[14px] font-semibold text-ink">{c.name}</span>
-                <span className="block truncate text-[12px] text-faint">{c.desc}</span>
-              </span>
-            </button>
-          ))}
+          {channels.map((c) => {
+            const ok = can(c.id);
+            return (
+              <button key={c.id} disabled={!ok} onClick={() => onSelect(c.id)} className="flex min-h-[44px] w-full items-center gap-2.5 px-3 py-2 text-left transition enabled:hover:bg-soft disabled:cursor-not-allowed lg:min-h-0">
+                <span className={`text-[16px] ${ok ? "" : "opacity-50"}`} aria-hidden>{c.emoji}</span>
+                <span className="min-w-0 flex-1">
+                  <span className={`block text-[14px] font-semibold ${ok ? "text-ink" : "text-faint"}`}>{c.name}</span>
+                  <span className="block truncate text-[12px] text-faint">{ok ? c.desc : `Posting here is for ${lockedTo}`}</span>
+                </span>
+                {!ok && <Lock className="h-3.5 w-3.5 shrink-0 text-faint" aria-label="Locked" />}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

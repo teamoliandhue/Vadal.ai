@@ -250,6 +250,18 @@ export const feedItems: FeedItem[] = [
       c("f10c1", { name: "Priya", role: "Product Designer", img: AV(8) }, "Confirmed. I have notes.", "2d", 9),
     ],
   },
+  {
+    id: "f11",
+    type: "post",
+    author: { name: "Arjun K.", role: "Operations", img: AV(4) },
+    channel: "random",
+    time: "1h",
+    text: "Whoever keeps taking the last oat milk from the floor 3 fridge — we know who you are. 👀",
+    reactions: { "🔥": 9, "🙌": 4 },
+    reactedBy: [AV(2)],
+    views: 310,
+    comments: [],
+  },
 ];
 
 /* What the "new posts" pill delivers — real items, so the pill is not a fake scroll. */

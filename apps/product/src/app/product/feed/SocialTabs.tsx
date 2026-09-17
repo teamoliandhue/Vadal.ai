@@ -2,16 +2,24 @@
 /* Social has two rooms — the company stream and the communities people choose.
    One strip at the top of both, so neither is a place you have to find. */
 import Link from "next/link";
+import { canModerate } from "@/lib/posting";
+import { useViewAs } from "../useViewAs";
+import { useModeration } from "./useModeration";
 
 const TABS = [
   { id: "feed", label: "Feed", href: "/product/feed" },
   { id: "groups", label: "Communities", href: "/product/feed/groups" },
+  { id: "review", label: "Review", href: "/product/feed/review" },
 ] as const;
 
-export function SocialTabs({ active, count }: { active: "feed" | "groups"; count?: number }) {
+/* Review is the moderator's tab — admins only, per lib/access. */
+export function SocialTabs({ active, count }: { active: "feed" | "groups" | "review"; count?: number }) {
+  const [role] = useViewAs();
+  const { pending } = useModeration();
+  const tabs = TABS.filter((t) => t.id !== "review" || canModerate(role));
   return (
     <nav aria-label="Social" className="flex items-center gap-1 border-b border-line">
-      {TABS.map((t) => {
+      {tabs.map((t) => {
         const on = t.id === active;
         return (
           <Link
@@ -25,6 +33,9 @@ export function SocialTabs({ active, count }: { active: "feed" | "groups"; count
             {t.label}
             {t.id === "groups" && count ? (
               <span className="rounded-full bg-soft px-1.5 py-0.5 text-[12px] font-semibold text-muted">{count}</span>
+            ) : null}
+            {t.id === "review" && pending.length > 0 ? (
+              <span className="rounded-full bg-[var(--warning)]/15 px-1.5 py-0.5 text-[12px] font-semibold text-[var(--warning)]">{pending.length}</span>
             ) : null}
           </Link>
         );

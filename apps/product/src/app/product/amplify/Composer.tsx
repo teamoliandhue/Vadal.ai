@@ -34,6 +34,9 @@ import {
   checkPolicy, draftCaption, draftFromMoment, hashtagsFor, isHiringPost, referralLinkFor,
   PLATFORM_ASPECT, type Moment, type Voice,
 } from "@/lib/ai/engines/advocacy";
+import { usePostingPolicy } from "../usePostingPolicy";
+import { useViewAs } from "../useViewAs";
+import { AUDIENCE_PHRASE, allowed } from "@/lib/posting";
 import { bestTimeToPost, type Platform } from "@/lib/ai/engines/timing";
 import { myReferralCode, socialPolicy, type CompanyPost } from "@/lib/amplify";
 import { canWebShare, routeFor, openShare } from "@/lib/share";
@@ -231,6 +234,9 @@ export function Composer({
   const timing = bestTimeToPost(platform);
   const tags = hashtagsFor(sourceText, platform);
   const policy = checkPolicy(value);
+  const [rules] = usePostingPolicy();
+  const [viewRole] = useViewAs();
+  const mayShare = allowed(rules.share, viewRole);
   const blocked = policy.issues.filter((i) => i.severity === "block");
   const warnings = policy.issues.filter((i) => i.severity === "warn");
   const aspect = PLATFORM_ASPECT[platform];
@@ -417,9 +423,10 @@ export function Composer({
         url={referral ?? url}
         caption={value}
         onPosted={() => { /* the count lives in the parent's persisted state */ }}
-        disabled={blocked.length > 0 || over}
+        disabled={!mayShare || blocked.length > 0 || over}
         disabledReason={
-          blocked.length > 0 ? "Clear the flagged detail above first — that one needs sign-off before it goes public."
+          !mayShare ? `Sharing outside the company is open to ${AUDIENCE_PHRASE[rules.share]} in this workspace.`
+          : blocked.length > 0 ? "Clear the flagged detail above first — that one needs sign-off before it goes public."
           : over ? `Trim it under ${limit.toLocaleString()} characters for ${platform}.`
           : undefined
         }

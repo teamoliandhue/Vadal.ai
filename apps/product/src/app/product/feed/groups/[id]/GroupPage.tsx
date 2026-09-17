@@ -16,6 +16,9 @@ import { PANE, SPLIT } from "../../../panes";
 import { Faces, JoinButton } from "../GroupCard";
 import { useGroups } from "../useGroups";
 import { useMe } from "../../../useSession";
+import { toast } from "../../../Toaster";
+import { useModeration } from "../../useModeration";
+import { PendingPosts } from "../../PendingPosts";
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 type Tab = "posts" | "members" | "about";
@@ -56,6 +59,7 @@ export function GroupPage({ id }: { id: string }) {
   const g = useGroups();
   const me = useMe();
   const feed = useFeedState();
+  const mod = useModeration();
   const [tab, setTab] = React.useState<Tab>("posts");
   const [openId, setOpenId] = React.useState<string | null>(null);
 
@@ -63,11 +67,12 @@ export function GroupPage({ id }: { id: string }) {
   const member = group ? g.isMember(group.id) : false;
 
   const posts = React.useMemo(() => {
-    const all = [...feed.mine, ...groupPosts].filter((p) => p.group?.id === id).map(feed.toDisplay);
+    const all = [...feed.mine, ...mod.approved, ...groupPosts].filter((p) => p.group?.id === id && !mod.removed.has(p.id)).map(feed.toDisplay);
     const pinned = all.filter((p) => p.pinned);
     const rest = all.filter((p) => !p.pinned).sort((a, b) => timeMins(a.time) - timeMins(b.time) || score(b) - score(a));
     return [...pinned, ...rest];
-  }, [feed.mine, feed.toDisplay, id]);
+  }, [feed.mine, feed.toDisplay, id, mod.approved, mod.removed]);
+  const myQueue = mod.items.filter((q) => q.kind === "held" && q.post.group?.id === id && q.post.author.name === me.fullName && (q.status === "pending" || q.status === "returned"));
   const openItem = openId ? posts.find((p) => p.id === openId) ?? null : null;
 
   /* A created room is only known once localStorage has been read. */
@@ -191,7 +196,10 @@ export function GroupPage({ id }: { id: string }) {
           ) : (
             <>
               {member ? (
-                <Composer group={refOf(group)} onPost={feed.addMine} />
+                <>
+                  <Composer group={refOf(group)} onPost={feed.addMine} />
+                  <PendingPosts items={myQueue} />
+                </>
               ) : (
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-[22px] bg-[var(--lav)] px-5 py-3.5">
                   <p className="text-[14px] font-semibold text-[var(--purple)]">Join to post and to see this room in your feed.</p>
@@ -216,7 +224,7 @@ export function GroupPage({ id }: { id: string }) {
                       onGoing={() => feed.rsvp(it.id)}
                       onOpen={() => setOpenId(it.id)}
                       onShare={() => feed.share(it.id)}
-                      onMenu={feed.menu}
+                      onMenu={(l) => (l === "Report" ? toast(mod.report(it, me.fullName) ? "Reported — a moderator will look. It stays up until they decide." : "You've already reported this one") : feed.menu(l))}
                     />
                   ))}
                 </div>

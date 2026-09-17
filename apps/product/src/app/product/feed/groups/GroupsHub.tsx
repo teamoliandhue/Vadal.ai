@@ -12,6 +12,9 @@ import { SocialTabs } from "../SocialTabs";
 import { CreateGroup } from "./CreateGroup";
 import { GroupCard, JoinButton } from "./GroupCard";
 import { useGroups } from "./useGroups";
+import { AUDIENCE_PHRASE, allowed } from "@/lib/posting";
+import { usePostingPolicy } from "../../usePostingPolicy";
+import { useViewAs } from "../../useViewAs";
 
 type View = "discover" | "yours";
 type KindFilter = "all" | GroupKind;
@@ -22,6 +25,9 @@ export function GroupsHub() {
   const [kind, setKind] = React.useState<KindFilter>("all");
   const [q, setQ] = React.useState("");
   const [creating, setCreating] = React.useState(false);
+  const [policy] = usePostingPolicy();
+  const [role] = useViewAs();
+  const canCreate = allowed(policy.communities, role);
 
   const pool = view === "yours" ? g.mineList : g.all.filter((x) => x.status === "published");
   const term = q.trim().toLowerCase();
@@ -44,7 +50,11 @@ export function GroupsHub() {
           <h1 className="text-[24px] font-bold tracking-tight text-ink">Communities</h1>
           <p className="text-[14px] text-muted">Project rooms and interest circles. Find your people.</p>
         </div>
-        <Button variant="brand" size="md" className="min-h-[44px] lg:min-h-0" leadingIcon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>New community</Button>
+        {canCreate ? (
+          <Button variant="brand" size="md" className="min-h-[44px] lg:min-h-0" leadingIcon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>New community</Button>
+        ) : (
+          <p className="max-w-[260px] text-right text-[13px] leading-snug text-faint">Communities are started by {AUDIENCE_PHRASE[policy.communities]} in this workspace.</p>
+        )}
       </header>
 
       {/* Nudge — suggested for you */}
@@ -103,7 +113,7 @@ export function GroupsHub() {
           <p className="max-w-[360px] text-[14px] text-faint">
             {term ? "Try a different word — or start the room yourself." : "Join one from Discover, or make the room you wish existed."}
           </p>
-          <Button variant="secondary" size="sm" className="mt-2 min-h-[44px] lg:min-h-0" onClick={() => setCreating(true)}>New community</Button>
+          {canCreate && <Button variant="secondary" size="sm" className="mt-2 min-h-[44px] lg:min-h-0" onClick={() => setCreating(true)}>New community</Button>}
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -122,7 +132,7 @@ export function GroupsHub() {
         </div>
       )}
 
-      <CreateGroup open={creating} onClose={() => setCreating(false)} onCreate={onCreate} />
+      <CreateGroup open={creating && canCreate} onClose={() => setCreating(false)} onCreate={onCreate} />
     </div>
   );
 }

@@ -141,6 +141,10 @@ const SLURS_AND_ABUSE = ["idiot", "stupid", "moron", "useless", "shut up", "lose
 const HARASSMENT = ["threat", "kill you", "hurt you", "watch your back", "you'll regret"];
 const TARGETED = ["women can't", "men can't", "these people", "go back to", "your kind"];
 
+/** The word lists, exported so the pre-publish check can say which phrase
+ *  tripped it rather than only that something did. */
+export const MODERATION_TERMS = { abuse: SLURS_AND_ABUSE, threat: HARASSMENT, targeting: TARGETED } as const;
+
 export type Moderation = {
   risk: "none" | "low" | "high";
   /** What tripped it — shown to the moderator, never to the author as an accusation. */
