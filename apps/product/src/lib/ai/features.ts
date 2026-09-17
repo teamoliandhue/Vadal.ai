@@ -48,7 +48,7 @@ export const FEATURES: FeatureStatus[] = [
   /* ── Pillar 1 · Pulse ────────────────────────────────────── */
   { id: "pulse-checkin", pillar: "Pulse", brief: "Conversational check-ins converted into a structured Pulse entry to confirm", module: "engines/survey", entry: "draftCheckIn", agentic: false, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
   { id: "pulse-log", pillar: "Pulse", brief: "AGENTIC — converts the exchange into a structured Pulse entry for the person to confirm before it's logged", module: "tools", entry: "log_mood_entry", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
-  { id: "pulse-sentiment", pillar: "Pulse", brief: "Sentiment and theme extraction, clustering comments into themes", module: "engines/text", entry: "extractThemes", agentic: false, surface: "screen", wiredTo: null },
+  { id: "pulse-sentiment", pillar: "Pulse", brief: "Sentiment and theme extraction, clustering comments into themes", module: "engines/text", entry: "extractThemes", agentic: false, surface: "screen", wiredTo: "app/product/sentiment/SentimentDashboard.tsx" },
   { id: "pulse-anomaly", pillar: "Pulse", brief: "Anomaly detection ... and drafts a suggested manager action", module: "engines/signals", entry: "detectAnomaly", agentic: false, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
   { id: "pulse-adaptive", pillar: "Pulse", brief: "Adaptive survey length — the next question is chosen based on prior answers", module: "engines/survey", entry: "nextQuestion", agentic: false, surface: "engine-only", wiredTo: null },
   { id: "pulse-summary", pillar: "Pulse", brief: "AI-generated plain-language summary of each wave, with source quotes retained", module: "engines/text", entry: "summariseWave", agentic: false, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
@@ -58,7 +58,7 @@ export const FEATURES: FeatureStatus[] = [
   { id: "pulse-chase", pillar: "Pulse", brief: "AGENTIC — chase incomplete mandatory surveys on its own initiative", module: "tools", entry: "chase_survey", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
 
   /* ── Pillar 2 · Connect ──────────────────────────────────── */
-  { id: "connect-compose", pillar: "Connect", brief: "AI-assisted post creation from a rough voice note or a couple of phrases", module: "engines/text", entry: "composePost", agentic: false, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
+  { id: "connect-compose", pillar: "Connect", brief: "AI-assisted post creation from a rough voice note or a couple of phrases", module: "engines/text", entry: "composePost", agentic: false, surface: "copilot", wiredTo: "app/product/feed/WriteAssist.tsx" },
   { id: "connect-tagging", pillar: "Connect", brief: "Auto-tagging of posts by team, topic and sentiment", module: "engines/text", entry: "tagPost", agentic: false, surface: "engine-only", wiredTo: null },
   { id: "connect-moderation", pillar: "Connect", brief: "Toxicity/harassment detection routed to the moderation queue before publish", module: "engines/text", entry: "moderate", agentic: false, surface: "engine-only", wiredTo: "lib/ai/mock.ts" },
   { id: "connect-ranking", pillar: "Connect", brief: "Personalised feed ranking balancing relevance with company-wide culture moments", module: "engines/personalize", entry: "rankFeed", agentic: false, surface: "engine-only", wiredTo: null },
@@ -95,7 +95,7 @@ export const FEATURES: FeatureStatus[] = [
   { id: "thrive-benefit", pillar: "Thrive", brief: "AGENTIC — flag an unused benefit before open enrolment and offer to book a call", module: "tools", entry: "book_benefit_call", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
 
   /* ── Pillar 5 · Broadcast ────────────────────────────────── */
-  { id: "bc-draft", pillar: "Broadcast", brief: "AI drafting assistant — bullet points into a clear announcement in company tone", module: "engines/text", entry: "composePost", agentic: false, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
+  { id: "bc-draft", pillar: "Broadcast", brief: "AI drafting assistant — bullet points into a clear announcement in company tone", module: "engines/text", entry: "composePost", agentic: false, surface: "copilot", wiredTo: "app/product/feed/WriteAssist.tsx" },
   { id: "bc-translate", pillar: "Broadcast", brief: "Automatic translation and reading-level simplification per recipient", module: "engines/text", entry: "localise", agentic: false, surface: "engine-only", wiredTo: null },
   { id: "bc-qa", pillar: "Broadcast", brief: "AI Q&A over the policy library — a sourced answer, not a PDF search", module: "retrieve", entry: "retrieve", agentic: false, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
   { id: "bc-delivery", pillar: "Broadcast", brief: "Delivery-optimisation — best channel/time per segment", module: "engines/timing", entry: "planSegment", agentic: false, surface: "engine-only", wiredTo: null },
@@ -109,7 +109,7 @@ export const FEATURES: FeatureStatus[] = [
   /* Points at reviewQueue, not nextReview: the screen calls the explaining
      wrapper now, and the reachability script correctly stopped seeing the inner
      function at any call site. */
-  { id: "grow-adaptive", pillar: "Grow", brief: "Adaptive quizzing with spaced repetition", module: "engines/learning", entry: "reviewQueue", agentic: false, surface: "screen", wiredTo: "app/product/grow/GrowHub.tsx" },
+  { id: "grow-adaptive", pillar: "Grow", brief: "Adaptive quizzing with spaced repetition", module: "engines/learning", entry: "reviewQueue", agentic: false, surface: "screen", wiredTo: "app/product/get-started/Demos.tsx" },
   { id: "grow-timefit", pillar: "Grow", brief: "Match learning to the time actually available, at lesson granularity", module: "engines/learning", entry: "whatFitsIn", agentic: false, surface: "screen", wiredTo: "app/product/grow/Rail.tsx" },
   { id: "grow-tutor", pillar: "Grow", brief: "AI tutor answering only from that module's source content", module: "engines/learning", entry: "tutor", agentic: false, surface: "screen", wiredTo: "app/product/grow/GrowHub.tsx" },
   { id: "grow-make", pillar: "Grow", brief: "AGENTIC — 'make this a course' from pasted notes or an SOP", module: "tools", entry: "make_course", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
@@ -120,7 +120,7 @@ export const FEATURES: FeatureStatus[] = [
   { id: "help-triage", pillar: "One-to-One Help", brief: "Need and urgency triage into a band — never a clinical diagnosis", module: "engines/support", entry: "triage", agentic: false, surface: "screen", wiredTo: "app/api/ai/features/route.ts" },
   { id: "help-handoff", pillar: "One-to-One Help", brief: "Consent-based handoff summary, with explicit sign-off", module: "engines/support", entry: "buildHandoff", agentic: false, surface: "screen", wiredTo: "app/product/help/HelpHub.tsx" },
   { id: "help-resources", pillar: "One-to-One Help", brief: "Self-serve resource matching for lower-stakes moments", module: "engines/support", entry: "matchResources", agentic: false, surface: "screen", wiredTo: "app/product/help/Companion.tsx" },
-  { id: "help-crisis", pillar: "One-to-One Help", brief: "Always-visible crisis resources, never gated behind a conversation", module: "engines/support", entry: "crisisResources", agentic: false, surface: "screen", wiredTo: "app/product/help/HelpHub.tsx" },
+  { id: "help-crisis", pillar: "One-to-One Help", brief: "Always-visible crisis resources, never gated behind a conversation", module: "engines/support", entry: "crisisResources", agentic: false, surface: "screen", wiredTo: "app/product/get-started/Demos.tsx" },
   { id: "help-book", pillar: "One-to-One Help", brief: "AGENTIC — book a session and pass the handoff summary, with consent", module: "tools", entry: "book_counsellor", agentic: true, surface: "copilot", blocked: "Clinical, legal and HR sign-off on triage thresholds and data-access rules is a hard blocker on launch.", wiredTo: "lib/ai/mock.ts" },
   { id: "help-escalate", pillar: "One-to-One Help", brief: "AGENTIC — acute-risk escalation per the org's configured, human-reviewed policy", module: "engines/support", entry: "escalate", agentic: true, surface: "copilot", blocked: "Requires a signed escalation policy — assertLaunchable() throws without one.", wiredTo: "lib/ai/mock.ts" },
 

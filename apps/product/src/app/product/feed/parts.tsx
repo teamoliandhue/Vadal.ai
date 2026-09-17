@@ -68,7 +68,9 @@ export function PostHeader({ item, trailing }: { item: DisplayItem; trailing?: R
           <span className="text-[12px] text-faint">{item.author.role}</span>
         </div>
         <div className="mt-0.5 flex items-center gap-2 text-[12px] text-faint">
-          <span>{item.time === "now" ? "just now" : `${item.time} ago`}</span>
+          <Link href={`/product/feed/post/${item.id}`} onClick={(e) => e.stopPropagation()} className="relative transition after:absolute after:-inset-x-1 after:-inset-y-3.5 after:content-[''] hover:text-ink hover:underline" title="Open full view">
+            {item.time === "now" ? "just now" : `${item.time} ago`}
+          </Link>
           <span aria-hidden>·</span>
           {item.group ? <GroupChip group={item.group} /> : <ChannelChip channel={channel} />}
         </div>
@@ -277,7 +279,7 @@ export function EngagementBar({
               onClick={() => setPick((p) => !p)}
               aria-haspopup="true"
               aria-expanded={pick}
-              className={`flex items-center gap-1.5 rounded-full py-1 pl-1.5 pr-2.5 text-[13px] font-semibold transition hover:bg-soft ${
+              className={`flex min-h-[44px] items-center gap-1.5 rounded-full py-1 pl-1.5 pr-2.5 text-[13px] font-semibold transition hover:bg-soft lg:min-h-0 ${
                 item.myReaction ? "text-[var(--purple)]" : "text-muted"
               }`}
             >
@@ -294,16 +296,16 @@ export function EngagementBar({
               onClick={() => setPick((p) => !p)}
               aria-haspopup="true"
               aria-expanded={pick}
-              className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[13px] font-semibold text-muted transition hover:bg-soft hover:text-[var(--purple)]"
+              className="flex min-h-[44px] items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[13px] font-semibold text-muted transition hover:bg-soft hover:text-[var(--purple)] lg:min-h-0"
             >
               <Smile className="h-4 w-4" /> React
             </button>
           )}
         </div>
-        <button onClick={onComment} className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[13px] font-semibold text-muted transition hover:bg-soft hover:text-ink">
+        <button onClick={onComment} className="flex min-h-[44px] items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[13px] font-semibold text-muted transition hover:bg-soft hover:text-ink lg:min-h-0">
           <MessageCircle className="h-4 w-4" /> {item.commentCount > 0 ? nfmt(item.commentCount) : "Comment"}
         </button>
-        <button onClick={onShare} className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[13px] font-semibold text-muted transition hover:bg-soft hover:text-ink">
+        <button onClick={onShare} className="flex min-h-[44px] items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[13px] font-semibold text-muted transition hover:bg-soft hover:text-ink lg:min-h-0">
           <Share2 className="h-4 w-4" /> <span className="max-sm:hidden">Share</span>
         </button>
       </div>
@@ -312,7 +314,8 @@ export function EngagementBar({
         <button
           onClick={onBookmark}
           aria-pressed={item.bookmarked}
-          className={`grid h-8 w-8 place-items-center rounded-full transition hover:bg-soft ${item.bookmarked ? "text-[var(--purple)]" : "text-faint hover:text-ink"}`}
+          aria-label={item.bookmarked ? "Remove bookmark" : "Bookmark"}
+          className={`grid h-11 w-11 place-items-center rounded-full transition hover:bg-soft lg:h-8 lg:w-8 ${item.bookmarked ? "text-[var(--purple)]" : "text-faint hover:text-ink"}`}
         >
           <Bookmark className="h-4 w-4" fill={item.bookmarked ? "currentColor" : "none"} />
         </button>

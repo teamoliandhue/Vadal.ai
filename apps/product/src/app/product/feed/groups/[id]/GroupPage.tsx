@@ -215,7 +215,7 @@ export function GroupPage({ id }: { id: string }) {
                       onVote={(o) => feed.vote(it.id, o)}
                       onGoing={() => feed.rsvp(it.id)}
                       onOpen={() => setOpenId(it.id)}
-                      onShare={feed.share}
+                      onShare={() => feed.share(it.id)}
                       onMenu={feed.menu}
                     />
                   ))}
@@ -260,7 +260,7 @@ export function GroupPage({ id }: { id: string }) {
         onBookmark={() => openItem && feed.bookmark(openItem.id)}
         onVote={(o) => openItem && feed.vote(openItem.id, o)}
         onGoing={() => openItem && feed.rsvp(openItem.id)}
-        onShare={feed.share}
+        onShare={() => openItem && feed.share(openItem.id)}
         onComment={(t) => openItem && feed.addComment(openItem.id, t)}
         onLikeComment={feed.likeComment}
       />

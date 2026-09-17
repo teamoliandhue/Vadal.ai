@@ -6,7 +6,7 @@
 import * as React from "react";
 import { ArrowUp, Sparkles } from "lucide-react";
 import { SparkMark } from "@vadal/design-system";
-import { feedItems, type FeedItem } from "@/lib/feed";
+import { feedItems, freshItems, type FeedItem } from "@/lib/feed";
 import { groupPosts } from "@/lib/groups";
 import { Composer } from "./Composer";
 import { PostCard } from "./PostCard";
@@ -20,11 +20,7 @@ import { PANE, SPLIT } from "../panes";
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 type Sort = "trending" | "recent";
 
-/* fresh posts the "new posts" pill actually delivers (not a fake scroll) */
-const FRESH: FeedItem[] = [
-  { id: "fresh-1", type: "kudos", author: { name: "Anita Desai", role: "Engineering", img: "/avatars/user-5.svg" }, channel: "wins", time: "now", text: "Just shipped the billing fix with **Aarav** — clean rollback plan, zero downtime. 👏", kudos: { to: [{ name: "Aarav S.", role: "Engineering", img: "/avatars/user-2.svg" }], values: ["Ownership"] }, reactions: { "👏": 3 }, reactedBy: ["/avatars/user-2.svg"], comments: [], views: 12 },
-  { id: "fresh-2", type: "post", author: { name: "People Team", role: "Company-wide", img: "/avatars/user-8.svg" }, channel: "wellbeing", time: "now", text: "Reminder: the wellbeing perk vote closes tomorrow — get your pick in. 🌿", reactions: { "🙌": 2 }, reactedBy: [], comments: [], views: 8 },
-];
+const FRESH = freshItems;
 
 export function FeedHub() {
   const { mine, toDisplay, react, bookmark, vote, rsvp, likeComment, addComment, addMine, share, menu } = useFeedState();
@@ -152,7 +148,7 @@ export function FeedHub() {
                 onVote={(o) => vote(it.id, o)}
                 onGoing={() => rsvp(it.id)}
                 onOpen={() => setOpenId(it.id)}
-                onShare={share}
+                onShare={() => share(it.id)}
                 onMenu={menu}
               />
             ))}
@@ -169,7 +165,7 @@ export function FeedHub() {
         onBookmark={() => openItem && bookmark(openItem.id)}
         onVote={(o) => openItem && vote(openItem.id, o)}
         onGoing={() => openItem && rsvp(openItem.id)}
-        onShare={share}
+        onShare={() => openItem && share(openItem.id)}
         onComment={(t) => openItem && addComment(openItem.id, t)}
         onLikeComment={likeComment}
       />

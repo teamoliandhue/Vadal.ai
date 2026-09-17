@@ -313,3 +313,131 @@ export function weeklyDigest(items: { title: string; when: string; priority?: st
   ];
   return lines.join("\n");
 }
+
+/* ── writing assist (Social composer) ──────────────────────────── */
+
+export type RewriteMode = "polish" | "shorter" | "friendlier" | "professional" | "simpler";
+
+export const REWRITE_LABEL: Record<RewriteMode, string> = {
+  polish: "Fix spelling & grammar",
+  shorter: "Make it shorter",
+  friendlier: "Friendlier",
+  professional: "More professional",
+  simpler: "Simpler words",
+};
+
+export type Rewrite = {
+  mode: RewriteMode;
+  text: string;
+  /** False when the draft already reads that way — say so rather than pretend. */
+  changed: boolean;
+  /** One line on what was done, shown beside the suggestion. */
+  note: string;
+  grade: number;
+  words: { before: number; after: number };
+};
+
+const TYPOS: [RegExp, string][] = [
+  [/\bteh\b/gi, "the"], [/\brecieve/gi, "receive"], [/\bdefinately\b/gi, "definitely"], [/\bseperate/gi, "separate"],
+  [/\balot\b/gi, "a lot"], [/\bthier\b/gi, "their"], [/\buntill\b/gi, "until"], [/\btommorow\b/gi, "tomorrow"],
+  [/\boccured\b/gi, "occurred"], [/\bacheive/gi, "achieve"], [/\bwich\b/gi, "which"], [/\bbeleive/gi, "believe"],
+  [/\bthx\b/gi, "thanks"], [/\bpls\b/gi, "please"], [/\bu\b/g, "you"], [/\bur\b/g, "your"],
+];
+const FILLER = /\b(?:just|really|very|actually|basically|literally|honestly|simply|quite|kind of|sort of|I think that|I feel like|needless to say,?)\s+/gi;
+const CONTRACT: [RegExp, string][] = [
+  [/\bdo not\b/gi, "don't"], [/\bdoes not\b/gi, "doesn't"], [/\bcannot\b/gi, "can't"], [/\bwill not\b/gi, "won't"],
+  [/\bwe are\b/gi, "we're"], [/\bit is\b/gi, "it's"], [/\bI am\b/g, "I'm"], [/\byou are\b/gi, "you're"],
+  [/\bwe have\b/gi, "we've"], [/\bthat is\b/gi, "that's"], [/\blet us\b/gi, "let's"],
+];
+const EXPAND: [RegExp, string][] = [
+  [/\bdon't\b/gi, "do not"], [/\bdoesn't\b/gi, "does not"], [/\bcan't\b/gi, "cannot"], [/\bwon't\b/gi, "will not"],
+  [/\bwe're\b/gi, "we are"], [/\bit's\b/gi, "it is"], [/\bI'm\b/g, "I am"], [/\byou're\b/gi, "you are"],
+  [/\bwe've\b/gi, "we have"], [/\bthat's\b/gi, "that is"], [/\blet's\b/gi, "let us"],
+];
+const CASUAL: [RegExp, string][] = [
+  [/\bgonna\b/gi, "going to"], [/\bwanna\b/gi, "want to"], [/\bguys\b/gi, "everyone"], [/\bawesome\b/gi, "excellent"],
+  [/\bsuper\b/gi, "very"], [/\basap\b/gi, "as soon as possible"], [/\bhey\b/gi, "Hello"], [/\bhuge\b/gi, "significant"],
+  [/\bstuff\b/gi, "items"], [/\bkinda\b/gi, "somewhat"],
+];
+const STIFF: [RegExp, string][] = [
+  [/\bthat you must\b/gi, "that you"], [/\byou must\b/gi, "please"], [/\bit is mandatory to\b/gi, "please"], [/\bkindly\b/gi, "please"],
+  [/\bensure that you\b/gi, "make sure you"], [/\bfailure to\b/gi, "if you don't"],
+];
+const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]+/gu;
+const GREETING = /^(hi|hey|hello|team|all|everyone|folks|good (morning|afternoon|evening))\b/i;
+
+const sentencesOf = (t: string) => t.split(/(?<=[.!?…])\s+/).map((s) => s.trim()).filter(Boolean);
+const wordCount = (t: string) => t.split(/\s+/).filter(Boolean).length;
+const tidy = (t: string) => t.replace(/[ \t]{2,}/g, " ").replace(/\s+([,.!?;:])/g, "$1").replace(/ +\n/g, "\n").trim();
+/** Apply a replacement but keep a leading capital — "We are" → "We're", not "we're". */
+const swap = (text: string, pairs: [RegExp, string][]) =>
+  pairs.reduce((out, [re, to]) => out.replace(re, (m) => (m[0] === m[0].toUpperCase() && m[0] !== m[0].toLowerCase() ? to[0].toUpperCase() + to.slice(1) : to)), text);
+
+const PROPER = /\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday|january|february|march|april|june|july|august|september|october|november|december)\b/g;
+
+function polish(text: string): string {
+  let out = swap(text, TYPOS).replace(PROPER, (m) => m[0].toUpperCase() + m.slice(1)).replace(/\bi\b/g, "I").replace(/([!?])\1+/g, "$1").replace(/\.{4,}/g, "…");
+  out = tidy(out);
+  out = sentencesOf(out).map((s) => s.replace(/^(\*\*)?([a-z])/, (_m, b = "", c: string) => `${b}${c.toUpperCase()}`)).join(" ");
+  return /[.!?…)*]$|\p{Extended_Pictographic}$/u.test(out) ? out : `${out}.`;
+}
+
+function shorter(text: string): string {
+  const stripped = tidy(swap(text.replace(FILLER, ""), [[/\bin order to\b/gi, "to"], [/\bat this point in time\b/gi, "now"], [/\bdue to the fact that\b/gi, "because"]]));
+  const all = sentencesOf(stripped);
+  if (all.length < 3) return stripped;
+  /* Keep what carries the message: the opening, anything with a number or a
+     bolded phrase, and a question. Drop the rest, in order, to ~60%. */
+  const budget = Math.max(12, Math.round(wordCount(text) * 0.6));
+  const ranked = all
+    .map((s, i) => ({ s, i, score: (i === 0 ? 3 : 0) + (/\d/.test(s) ? 2 : 0) + (/\*\*/.test(s) ? 2 : 0) + (/\?$/.test(s) ? 1 : 0) }))
+    .sort((a, b) => b.score - a.score || a.i - b.i);
+  const keep = new Set<number>();
+  let used = 0;
+  for (const r of ranked) {
+    const w = wordCount(r.s);
+    if (keep.size > 0 && used + w > budget) continue;
+    keep.add(r.i); used += w;
+  }
+  return all.filter((_s, i) => keep.has(i)).join(" ");
+}
+
+function friendlier(text: string): string {
+  let out = swap(swap(text, STIFF), CONTRACT);
+  out = tidy(out);
+  if (!GREETING.test(out)) out = `Hi all — ${out[0].toLowerCase() === out[0] ? out : out[0].toLowerCase() + out.slice(1)}`.replace(/^Hi all — i\b/, "Hi all — I");
+  if (!EMOJI.test(out) && !/thank/i.test(out)) out = `${out.replace(/[.\s]+$/, "")}. Thanks, everyone 🙌`;
+  return out;
+}
+
+function professional(text: string): string {
+  let out = swap(swap(text, EXPAND), CASUAL).replace(EMOJI, "").replace(/!+/g, ".").replace(/\s+—\s+that is all\.?/i, ".");
+  out = tidy(out).replace(/\.{2,}/g, ".").replace(/\s+\./g, ".");
+  return polish(out);
+}
+
+/**
+ * Rewrite a draft one way. Deterministic and explainable: every mode is a set
+ * of named edits, so the person can see what changed and the same draft always
+ * gets the same suggestion. It never publishes — it proposes, and the composer
+ * keeps the original until the person chooses.
+ */
+export function rewrite(text: string, mode: RewriteMode): Rewrite {
+  const src = text.trim();
+  const out =
+    mode === "polish" ? polish(src)
+    : mode === "shorter" ? polish(shorter(src))
+    : mode === "friendlier" ? friendlier(polish(src))
+    : mode === "professional" ? professional(src)
+    : polish(simplify(src, "simple"));
+  const before = wordCount(src), after = wordCount(out);
+  const changed = out !== src;
+  const note = !changed
+    ? "This already reads that way — nothing to change."
+    : mode === "shorter" ? `${before} words down to ${after}.`
+    : mode === "polish" ? "Spelling, capitals and punctuation."
+    : mode === "friendlier" ? "Warmer opening, softer asks, contractions."
+    : mode === "professional" ? "No emoji or slang, full forms, calmer punctuation."
+    : "Plainer words and shorter sentences.";
+  return { mode, text: out, changed, note, grade: readability(out).grade, words: { before, after } };
+}

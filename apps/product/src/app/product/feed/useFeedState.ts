@@ -55,7 +55,12 @@ export function useFeedState() {
     setMyComments((p) => ({ ...p, [id]: [...(p[id] ?? []), cm] }));
   };
   const addMine = (item: FeedItem) => setMine((m) => [item, ...m]);
-  const share = () => toast("Post link copied ✓");
+  /* the link is real now that a post has a page of its own */
+  const share = (id: string) => {
+    const url = `${window.location.origin}/product/feed/post/${id}`;
+    navigator.clipboard?.writeText(url).then(() => toast("Post link copied ✓"), () => toast("Could not copy — the link is in the address bar of the full view"));
+    if (!navigator.clipboard) toast("Open the full view to copy its link");
+  };
   const menu = (label: string) => toast(label === "Report" ? "Reported — thank you" : `${label} ✓`);
 
   return { mine, toDisplay, react, bookmark, vote, rsvp, likeComment, addComment, addMine, share, menu };

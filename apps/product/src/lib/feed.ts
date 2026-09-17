@@ -252,6 +252,12 @@ export const feedItems: FeedItem[] = [
   },
 ];
 
+/* What the "new posts" pill delivers — real items, so the pill is not a fake scroll. */
+export const freshItems: FeedItem[] = [
+  { id: "fresh-1", type: "kudos", author: { name: "Anita Desai", role: "Engineering", img: AV(5) }, channel: "wins", time: "now", text: "Just shipped the billing fix with **Aarav** — clean rollback plan, zero downtime. 👏", kudos: { to: [{ name: "Aarav S.", role: "Engineering", img: AV(2) }], values: ["Ownership"] }, reactions: { "👏": 3 }, reactedBy: [AV(2)], comments: [], views: 12 },
+  { id: "fresh-2", type: "post", author: { name: "People Team", role: "Company-wide", img: AV(8) }, channel: "wellbeing", time: "now", text: "Reminder: the wellbeing perk vote closes tomorrow — get your pick in. 🌿", reactions: { "🙌": 2 }, reactedBy: [], comments: [], views: 8 },
+];
+
 /* AI "Catch me up" — a seeded digest of what happened since the last visit. */
 export const feedDigest = {
   since: "yesterday",

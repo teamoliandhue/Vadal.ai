@@ -3,11 +3,12 @@
    full editor with a channel picker, four modes (Text / Photo / Poll / Kudos),
    and a "Draft with Vadal" AI assist. Emits a fully-formed FeedItem to the hub. */
 import * as React from "react";
-import { BarChart3, ChevronDown, Award, ImageIcon, Sparkles, X } from "lucide-react";
+import { BarChart3, ChevronDown, Award, ImageIcon, X } from "lucide-react";
 import { Avatar, Badge, Button } from "@vadal/design-system";
 import { useMe } from "../useSession";
 import { channels, type FeedItem, type GroupRef, type Person } from "@/lib/feed";
 import { toast } from "../Toaster";
+import { AssistMenu, AssistSuggestion, UndoAssist, suggest, type Suggestion } from "./WriteAssist";
 
 type Mode = "text" | "photo" | "poll" | "kudos";
 
@@ -21,12 +22,6 @@ const ROSTER: Person[] = [
   { name: "Rahul Verma", role: "Sales", img: "/avatars/user-1.svg" },
 ];
 const VALUES = ["Ownership", "Craft", "Grit", "Customer-first"];
-const AI_DRAFTS = [
-  "Quick win to share — we cut our release checklist from 40 minutes to 12 by automating the smoke tests. Happy to walk anyone through it. 🚀",
-  "Reminder that no-meeting Wednesday is tomorrow. Protect your focus blocks and ship something you're proud of. 💜",
-  "Grateful for this team this week — calm under pressure, generous with help. Tag someone who made your week easier. 🙌",
-];
-
 /* `group` fixes where the post goes: inside a community there is no channel to
    pick, and the post carries the room it was made in. */
 export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; group?: GroupRef }) {
@@ -40,29 +35,23 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
   const [pollOpts, setPollOpts] = React.useState(["", ""]);
   const [recips, setRecips] = React.useState<Person[]>([]);
   const [values, setValues] = React.useState<string[]>([]);
-  const [thinking, setThinking] = React.useState(false);
-  const draftIx = React.useRef(0);
+  const [sugg, setSugg] = React.useState<Suggestion | null>(null);
+  const [before, setBefore] = React.useState<string | null>(null); // the draft as it was, for Undo
   const ch = channels.find((c) => c.id === channel)!;
 
   function reset() {
     setOpen(false); setMode("text"); setText(""); setChannel(channels[0].id);
-    setPollOpts(["", ""]); setRecips([]); setValues([]); setArt(0);
+    setPollOpts(["", ""]); setRecips([]); setValues([]); setArt(0); setSugg(null); setBefore(null);
   }
 
   const validPoll = mode === "poll" && pollOpts.filter((o) => o.trim()).length >= 2;
   const validKudos = mode === "kudos" && recips.length > 0;
   const canPost = text.trim().length > 0 && (mode === "text" || mode === "photo" || validPoll || validKudos);
 
-  function draftWithVadal() {
-    setThinking(true);
-    setMode((m) => (m === "poll" || m === "kudos" ? "text" : m));
-    window.setTimeout(() => {
-      setText(AI_DRAFTS[draftIx.current % AI_DRAFTS.length]);
-      draftIx.current += 1;
-      setThinking(false);
-      toast("Vadal drafted a post — edit and send ✨");
-    }, 700);
-  }
+  const applySuggestion = () => {
+    if (!sugg) return;
+    setBefore(text); setText(sugg.text); setSugg(null);
+  };
 
   function submit() {
     if (!canPost) return;
@@ -129,7 +118,7 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
           <textarea
             autoFocus
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => { setText(e.target.value); setBefore(null); }}
             rows={3}
             placeholder={mode === "kudos" ? "Say what they did well…" : "What's on your mind?"}
             /* Negative margin + equal padding: the text still lines up optically
@@ -139,6 +128,17 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
                fine until someone types the wrong first letter. */
             className="-mx-1 w-[calc(100%+0.5rem)] resize-none rounded-xl bg-transparent px-1 text-[16px] leading-relaxed text-ink outline-none placeholder:text-faint"
           />
+
+          {sugg && (
+            <AssistSuggestion
+              s={sugg}
+              original={text}
+              onUse={applySuggestion}
+              onDiscard={() => setSugg(null)}
+              onRetone={(m) => setSugg(suggest(text, m))}
+            />
+          )}
+          {!sugg && before !== null && <UndoAssist onUndo={() => { setText(before); setBefore(null); }} />}
 
           {mode === "photo" && (
             <div className="relative overflow-hidden rounded-2xl border border-line">
@@ -213,13 +213,7 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
                   <t.icon className="h-4 w-4" /> <span className="max-sm:hidden">{t.label}</span>
                 </button>
               ))}
-              <button
-                onClick={draftWithVadal}
-                disabled={thinking}
-                className="ml-1 flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold text-[var(--ai-accent)] transition hover:bg-[var(--ai-surface)] disabled:opacity-60"
-              >
-                <Sparkles className={`h-4 w-4 ${thinking ? "ai-breathe" : ""}`} /> {thinking ? "Drafting…" : "Draft with Vadal"}
-              </button>
+              <AssistMenu text={text} onSuggest={setSugg} />
             </div>
             <div className="flex items-center gap-2">
               <Button variant="tertiary" size="sm" onClick={reset}>Cancel</Button>

@@ -8,8 +8,9 @@ import { Avatar } from "@vadal/design-system";
 import type { ReactionEmoji } from "@/lib/feed";
 import {
   EngagementBar, EventBlock, KudosBlock, MilestoneBlock, PinnedTag, PollBlock,
-  PostHeader, PostMedia, renderRich, type DisplayItem,
+  PostHeader, PostMedia, type DisplayItem,
 } from "./parts";
+import { PostText } from "./Translate";
 
 function PostMenu({ onAction }: { onAction: (label: string) => void }) {
   const [open, setOpen] = React.useState(false);
@@ -78,7 +79,7 @@ export function PostCard({
       {item.pinned && <PinnedTag />}
       <PostHeader item={item} trailing={<PostMenu onAction={onMenu} />} />
 
-      {item.text && <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-ink/90">{renderRich(item.text)}</p>}
+      {item.text && <PostText id={item.id} text={item.text} />}
 
       {item.type === "kudos" && item.kudos && <KudosBlock kudos={item.kudos} />}
       {item.type === "poll" && item.poll && <PollBlock poll={item.poll} myVote={item.myVote} onVote={onVote} />}

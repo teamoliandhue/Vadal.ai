@@ -26,7 +26,7 @@ Unblocked now (no dependency on the decisions above):
 
 - [x] **Login page redesign** · S — photo + rounded panel (Swiftt pattern); spec 024
 - [x] **Groups & Communities** under Social · M (spec 025) — a group object (channels exist, groups don't); project communities (create, publish, join) and interest communities; group feed; join/leave. Not a Jira.
-- [ ] **Feed** · M — full-view post state; AI writing assist in the composer; inline translate on a post (UI now, provider later).
+- [x] **Feed** · M (spec 026) — full-view post state; AI writing assist in the composer; inline translate on a post (UI now, provider later).
 - [ ] **Moderation + posting rights** · M — AI pre-publish check for images and language with a soft rejection; per-tenant config for who may post and share (everyone / leadership only).
 - [ ] **Amplify analytics screen** · S — posts out, by platform, who approved, reach. Data mostly exists.
 - [ ] **Insight: points-independent adoption** · S — DAU/WAU and check-in rate as first-class metrics.
@@ -72,6 +72,7 @@ Waiting on a decision:
 
 ## Done this cycle
 
+- [x] Feed — a page per post, Write with Nudge (proposes, never overwrites), translate in place (Hindi live, six languages waiting on the provider)
 - [x] Communities — hub, create/draft/publish, join / ask to join / leave, community page, community posts in the company feed
 - [x] Mobile bottom bar labels repaired after the renaming (it had fallen back to the first four nav items)
 - [x] Sign-in slideshow — seven graded team photographs
