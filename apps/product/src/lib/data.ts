@@ -370,7 +370,7 @@ export const managers = [
 ] as const;
 
 /* 7 · Employee Experience Feed (content layer — the biggest gap) */
-export const experience = { dau: "8.1K", wau: "11.2K", dauPct: 65, views: "42K", reactions: "9.3K", comments: "2.1K" };
+/* Adoption figures (active people, check-ins, stickiness) live in lib/adoption — computed per team, never from points. */
 
 export type FeedPost = {
   kind: "Leadership" | "Recognition" | "Announcement" | "Team";

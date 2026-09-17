@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark, Trend, type BadgeTone } from "@vadal/design-system";
 import { ArcGauge, Sparkline, TrendChart } from "@/components/charts";
+import { BarList, Legend, LineChart, ViewToggle } from "@/components/viz";
+import { deriveAdoption, type AdoptionView } from "@/lib/adoption";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { useScope } from "../useViewAs";
 import { ScopeNotice } from "../ScopeNotice";
@@ -49,10 +51,10 @@ function CardHead({ eyebrow, title, action }: { eyebrow: string; title: string; 
   );
 }
 function Explore({ q }: { q: string }) {
-  return <button onClick={() => ask(q)} className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5">Explore <ArrowRight className="h-3 w-3" /></button>;
+  return <button onClick={() => ask(q)} className="flex min-h-[44px] items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5 lg:min-h-0">Explore <ArrowRight className="h-3 w-3" /></button>;
 }
 function AnalyticsLink({ metric, dim = "team", label = "Slice in Analytics" }: { metric: string; dim?: string; label?: string }) {
-  return <Link href={analyticsHref(metric, dim)} className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5">{label} <ArrowUpRight className="h-3 w-3" /></Link>;
+  return <Link href={analyticsHref(metric, dim)} className="flex min-h-[44px] items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5 lg:min-h-0">{label} <ArrowUpRight className="h-3 w-3" /></Link>;
 }
 /* Honest marker for cards that stay org-level even when a team scope is active. */
 function OrgWideTag({ show }: { show: boolean }) {
@@ -402,16 +404,151 @@ function ManagersCard({ v, onOpen, className = "" }: { v: PulseView; onOpen: (m:
     </Card>
   );
 }
-function AdoptionCard({ v, className = "" }: { v: PulseView; className?: string }) {
-  const a = v.adoption;
-  const stats: [string, string][] = [[a.dau, "Daily active"], [a.wau, "Weekly active"], [a.views, "Views"], [a.reactions, "Reactions"]];
+/* ════════════════════════ Adoption — points-independent ════════════════════════
+   Whether people use Vadal, counted from what they did — opened it, checked in,
+   posted, asked — never from points, so it reads the same in a workspace with
+   points switched off. First-class: a strip on Overview, a full tab here. */
+const fmtK = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K` : `${n}`);
+
+function AdoptionTile({ label, value, note, change, spark, id }: { label: string; value: string; note: string; change?: number; spark?: number[]; id: string }) {
+  return (
+    <div className="card-lift flex flex-col rounded-2xl border border-line bg-card p-4">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[13px] text-muted">{label}</span>
+        {change !== undefined && (
+          <span className="text-[12px] font-semibold tabular-nums" style={{ color: change > 0 ? TONE.good : change < 0 ? TONE.bad : "var(--faint)" }}>
+            {change > 0 ? "+" : change < 0 ? "−" : ""}{Math.abs(change)} pts
+          </span>
+        )}
+      </div>
+      <div className="mt-1 text-[24px] font-bold tracking-tight">{value}</div>
+      {spark && <Figure label={`${label} over the last 12 weeks`}><Sparkline values={spark} color="var(--viz-1)" id={`adopt-${id}`} height={26} className="mt-1" /></Figure>}
+      <div className="mt-1 text-[12px] leading-snug text-faint">{note}</div>
+    </div>
+  );
+}
+
+function AdoptionTiles({ a, className = "" }: { a: AdoptionView; className?: string }) {
+  return (
+    <div className={`grid grid-cols-2 gap-4 xl:grid-cols-4 ${className}`}>
+      <AdoptionTile id="active" label="Weekly active" value={`${a.weeklyActive.pct}%`} change={a.weeklyActive.change4w} spark={a.series.activeFull} note={`${a.weeklyActive.count.toLocaleString("en-US")} of ${a.people.toLocaleString("en-US")} people opened Vadal this week`} />
+      <AdoptionTile id="checkin" label="Checked in this week" value={`${a.checkedIn.pct}%`} change={a.checkedIn.change4w} spark={a.series.checkinFull} note={`${a.checkedIn.count.toLocaleString("en-US")} people did the daily check-in at least once`} />
+      <AdoptionTile id="sticky" label="Daily / monthly" value={`${a.stickiness.pct}%`} note={`${fmtK(a.stickiness.daily)} on a typical day of ${fmtK(a.stickiness.monthly)} active this month`} />
+      <AdoptionTile id="activated" label="Activated" value={`${a.activated.pct}%`} note={`${a.activated.count.toLocaleString("en-US")} have signed in at least once`} />
+    </div>
+  );
+}
+
+/** Overview: adoption sits beside the other headline signals, not a tab away. */
+function AdoptionStrip({ a, onOpen }: { a: AdoptionView; onOpen: () => void }) {
+  return (
+    <section aria-label="Adoption" className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <Eyebrow>Adoption</Eyebrow>
+          <p className="mt-1 text-[14px] text-muted">Are people using it? Counted from what they did, not from points. Change is over the last 4 weeks.</p>
+        </div>
+        <button onClick={onOpen} className="flex min-h-[44px] items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5 lg:min-h-0">See adoption <ArrowRight className="h-3 w-3" /></button>
+      </div>
+      <AdoptionTiles a={a} />
+    </section>
+  );
+}
+
+function AdoptionTrendCard({ a, period, className = "" }: { a: AdoptionView; period: string; className?: string }) {
+  const [table, setTable] = React.useState(false);
+  const series = [
+    { key: "active", label: "Weekly active", color: "var(--viz-1)", values: a.series.active },
+    { key: "checkin", label: "Checked in", color: "var(--viz-2)", values: a.series.checkin },
+  ];
   return (
     <Card className={className}>
-      <CardHead eyebrow="Adoption" title="Platform usage" action={<span className="flex items-center gap-1.5 text-[14px] text-muted"><span className="text-[20px] font-bold tracking-tight text-ink">{a.dauPct}%</span> DAU/MAU</span>} />
-      <div className="mt-4 grid flex-1 grid-cols-2 gap-3">{stats.map(([val, l]) => <div key={l} className="rounded-2xl border border-line p-3"><div className="text-[18px] font-bold tracking-tight">{val}</div><div className="mt-0.5 text-[12px] text-faint">{l}</div></div>)}</div>
+      <CardHead eyebrow={`Adoption · ${period}`} title="Weekly active and check-ins" action={<ViewToggle table={table} onChange={setTable} label="Weekly active and check-ins" />} />
+      <p className="mt-1 text-[14px] text-muted">Share of {a.isTeam ? a.scope : "everyone"}, per week.</p>
+      <div className="mt-4"><Legend series={series} shape="line" /></div>
+      <div className="mt-3">
+        <LineChart
+          labels={a.series.labels} series={series} unit="%" domain={[Math.min(40, ...a.series.checkin), 100]} height={230} table={table}
+          caption={`Weekly active and checked-in share of ${a.isTeam ? a.scope : "everyone"}, last ${a.weeks} weeks`}
+          tooltipTitle={(l) => `Week of ${l}`}
+        />
+      </div>
+      <div className="mt-3 flex items-start gap-2 rounded-2xl bg-soft p-3.5 text-[14px] leading-relaxed text-muted"><Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--purple)]" /><span className="flex-1">{a.readings.trend}</span></div>
+      <div className="mt-3 flex justify-end"><AnalyticsLink metric="weeklyActive" /></div>
     </Card>
   );
 }
+
+function ProfilesCard({ a, className = "" }: { a: AdoptionView; className?: string }) {
+  return (
+    <Card className={className}>
+      <CardHead eyebrow="Desk and frontline" title={a.profiles.length === 2 ? "Who is using it" : `${a.scope} is a ${a.profiles[0].label.toLowerCase()} team`} />
+      <div className="mt-4 flex flex-col gap-5">
+        <div>
+          <p className="text-[13px] font-semibold text-ink">Weekly active</p>
+          <div className="mt-2"><BarList caption="Weekly active by profile" max={100} unit="%" rows={a.profiles.map((p) => ({ label: p.label, value: p.weeklyActive, note: `${p.people.toLocaleString("en-US")} people` }))} /></div>
+        </div>
+        <div>
+          <p className="text-[13px] font-semibold text-ink">Checked in this week</p>
+          <div className="mt-2"><BarList caption="Checked in by profile" max={100} unit="%" rows={a.profiles.map((p) => ({ label: p.label, value: p.checkedIn }))} /></div>
+        </div>
+      </div>
+      <p className="mt-4 text-[13px] leading-relaxed text-muted">{a.readings.profile}</p>
+    </Card>
+  );
+}
+
+function TeamsAdoptionCard({ a, className = "" }: { a: AdoptionView; className?: string }) {
+  return (
+    <Card className={className}>
+      <CardHead eyebrow="By team" title="Where it's landing" action={<OrgWideTag show={a.isTeam} />} />
+      <p className="mt-1 text-[14px] text-muted">Lowest weekly active first. Change is over the last 4 weeks.</p>
+      <div className="-mx-1 mt-3 overflow-x-auto">
+        <table className="w-full min-w-[480px] border-collapse text-[13px]">
+          <thead>
+            <tr className="text-left text-[12px] text-faint">
+              <th scope="col" className="px-1 pb-2 font-semibold">Team</th>
+              <th scope="col" className="px-1 pb-2 text-right font-semibold">People</th>
+              <th scope="col" className="px-1 pb-2 text-right font-semibold">Weekly active</th>
+              <th scope="col" className="px-1 pb-2 text-right font-semibold">Change</th>
+              <th scope="col" className="px-1 pb-2 text-right font-semibold">Checked in</th>
+              <th scope="col" className="px-1 pb-2 text-right font-semibold">On a typical day</th>
+            </tr>
+          </thead>
+          <tbody>
+            {a.byTeam.map((t) => {
+              const mine = a.isTeam && t.team === a.scope;
+              return (
+                <tr key={t.team} className={`border-t border-line ${mine ? "bg-[var(--lav)]" : ""}`}>
+                  <th scope="row" className="px-1 py-2.5 text-left font-medium text-ink">{t.team}</th>
+                  <td className="px-1 py-2.5 text-right tabular-nums text-muted">{t.headcount.toLocaleString("en-US")}</td>
+                  <td className="px-1 py-2.5 text-right font-semibold tabular-nums text-ink">{t.weeklyActive}%</td>
+                  <td className="px-1 py-2.5 text-right font-semibold tabular-nums" style={{ color: t.change4w > 0 ? TONE.good : t.change4w < 0 ? TONE.bad : "var(--faint)" }}>
+                    {t.change4w > 0 ? "▲ " : t.change4w < 0 ? "▼ " : ""}{t.change4w === 0 ? "flat" : `${Math.abs(t.change4w)} pts`}
+                  </td>
+                  <td className="px-1 py-2.5 text-right tabular-nums text-muted">{t.checkedIn}%</td>
+                  <td className="px-1 py-2.5 text-right tabular-nums text-muted">{t.dailyActivePct}%</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="mt-3 flex items-start gap-2 rounded-2xl bg-soft p-3.5 text-[14px] leading-relaxed text-muted"><Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--purple)]" /><span className="flex-1">{a.readings.team}</span></div>
+    </Card>
+  );
+}
+
+function ComeBackCard({ a, className = "" }: { a: AdoptionView; className?: string }) {
+  return (
+    <Card className={className}>
+      <CardHead eyebrow="What brings people back" title="Used this week" action={<Explore q={`What brings people back to Vadal${a.isTeam ? ` in ${a.scope}` : ""}, and what should we build on?`} />} />
+      <p className="mt-1 text-[14px] text-muted">Share of weekly-active people who used each part of Vadal.</p>
+      <div className="mt-4"><BarList caption="Share of weekly-active people who used each part" max={100} unit="%" rows={a.surfaces} /></div>
+    </Card>
+  );
+}
+
 function KnowledgeCard({ isTeam = false, className = "" }: { isTeam?: boolean; className?: string }) {
   return (
     <Card className={className}>
@@ -522,6 +659,7 @@ export function PulseDashboard() {
   const pinned = dataScope === "own-team" && myTeam ? myTeam : null;
   const scope = pinned ?? storedScope;
   const view = React.useMemo(() => derivePulse(scope, period), [scope, period]);
+  const adoption = React.useMemo(() => deriveAdoption(scope, period), [scope, period]);
   const scopes = [ALL_TEAMS, ...departments.map((d) => d.name)];
 
   return (
@@ -555,6 +693,7 @@ export function PulseDashboard() {
       {tab === "Overview" && (<>
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><HealthCard v={view} className="xl:col-span-4" /><TrendCard v={view} period={period} className="xl:col-span-8" /></div>
         <KpiRow v={view} />
+        <AdoptionStrip a={adoption} onOpen={() => setTab("Adoption")} />
         <ActionQueueCard />
         <BusinessImpactStrip isTeam={view.isTeam} />
       </>)}
@@ -578,9 +717,12 @@ export function PulseDashboard() {
         <DepartmentsCard scope={scope} />
       </>)}
 
-      {tab === "Adoption" && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:items-start"><AdoptionCard v={view} /><KnowledgeCard isTeam={view.isTeam} /></div>
-      )}
+      {tab === "Adoption" && (<>
+        <AdoptionTiles a={adoption} />
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><AdoptionTrendCard a={adoption} period={period} className="xl:col-span-8" /><ProfilesCard a={adoption} className="xl:col-span-4" /></div>
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><TeamsAdoptionCard a={adoption} className="xl:col-span-7" /><ComeBackCard a={adoption} className="xl:col-span-5" /></div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:items-start"><KnowledgeCard isTeam={view.isTeam} /></div>
+      </>)}
 
       <DetailDrawer detail={detail} onClose={() => setDetail(null)} />
     </div>

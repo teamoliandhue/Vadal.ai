@@ -29,7 +29,7 @@ Unblocked now (no dependency on the decisions above):
 - [x] **Feed** · M (spec 026) — full-view post state; AI writing assist in the composer; inline translate on a post (UI now, provider later).
 - [x] **Moderation + posting rights** · M (spec 027) — AI pre-publish check for images and language with a soft rejection; per-tenant config for who may post and share (everyone / leadership only).
 - [x] **Amplify analytics screen** · S (spec 028) — posts out, by platform, who approved, reach. Data mostly exists.
-- [ ] **Insight: points-independent adoption** · S — DAU/WAU and check-in rate as first-class metrics.
+- [x] **Insight: points-independent adoption** · S (spec 029) — DAU/WAU and check-in rate as first-class metrics.
 - [x] Broadcast card on Home → opens Campaigns for roles that can (managers and up); Knowledge for everyone else · XS
 
 Waiting on a decision:
@@ -72,6 +72,7 @@ Waiting on a decision:
 
 ## Done this cycle
 
+- [x] Amplify Results (who approved, shares by platform, modelled reach) and Insight adoption (weekly active, check-ins, stickiness, desk vs frontline) — both on validated chart colours
 - [x] Moderation — pre-publish check with soft rejection (nudge or hold), Report, a Review queue for admins, per-workspace posting and sharing rights in Settings
 - [x] Feed — a page per post, Write with Nudge (proposes, never overwrites), translate in place (Hindi live, six languages waiting on the provider)
 - [x] Communities — hub, create/draft/publish, join / ask to join / leave, community page, community posts in the company feed

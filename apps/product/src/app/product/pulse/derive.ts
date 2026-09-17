@@ -11,7 +11,7 @@
 import { experienceScore } from "@/lib/experience";
 import {
   health, engagementTrend, attrition, voice, recognitionBoard, briefingImpact,
-  experience, flightRisks, managers, departments,
+  flightRisks, managers, departments,
 } from "@/lib/data";
 
 export const ALL_TEAMS = "All teams";
@@ -21,7 +21,6 @@ const teamRoot = (t: string) => t.split("·")[0].trim();               // "Sales
 const hash = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
 const weight = (name: string) => 0.07 + (hash(name) % 8) / 100;       // team's ~share of org (0.07–0.14)
 const fmt = (n: number) => n.toLocaleString("en-US");
-const K = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K` : `${n}`);
 const rescale = (arr: readonly number[], target: number) => {
   const last = arr[arr.length - 1] || 1;
   return arr.map((v) => Math.max(0, Math.round((v * target) / last)));
@@ -157,16 +156,6 @@ export function derivePulse(scope: string, period: string) {
   const recoTotal = rec;
   const coverage = isTeam ? clamp(score - 6, 30, 92) : recognitionBoard.coverage;
 
-  /* ── adoption (dau/wau·stock, views/reactions·flow) ── */
-  const dauPct = isTeam ? clamp(score - 8, 35, 92) : experience.dauPct;
-  const adoption = {
-    dau: isTeam ? K(Math.round(8100 * w)) : experience.dau,
-    wau: isTeam ? K(Math.round(11200 * w)) : experience.wau,
-    views: K(Math.round((isTeam ? 42000 * w : 42000) * flow)),
-    reactions: K(Math.round((isTeam ? 9300 * w : 9300) * flow)),
-    dauPct,
-  };
-
   /* ── filtered rosters ── */
   const fr = isTeam ? flightRisks.filter((r) => teamRoot(r.team) === scope) : flightRisks.map((r) => ({ ...r }));
   const mgr = isTeam ? managers.filter((m) => teamRoot(m.team) === scope) : managers.map((m) => ({ ...m }));
@@ -227,7 +216,6 @@ export function derivePulse(scope: string, period: string) {
     attrition: { predicted, predictedDelta, segmentation, drivers: aDrivers },
     voice: { comments, mood, themes: vThemes, quote: vQuote },
     recognition: { total: recoTotal, coverage, leaders: recoLeaders },
-    adoption,
     managerIndex: isTeam ? mgrScore : 78,
     flightRisks: fr,
     managers: mgr,

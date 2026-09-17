@@ -12,6 +12,7 @@ import { ArrowLeft, ArrowUpRight, Bookmark, Download, Grid3x3, X } from "lucide-
 import { Button, SparkMark } from "@vadal/design-system";
 import { Sparkline, TrendChart } from "@/components/charts";
 import { engagementTrend, departments } from "@/lib/data";
+import { MONTHLY, TEAMS as ADOPTION_TEAMS } from "@/lib/adoption";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { toast } from "../Toaster";
 
@@ -27,6 +28,9 @@ const METRICS = {
   recognition: { label: "Recognition coverage", unit: "%", goodHigh: true, range: [42, 86] as const },
   manager: { label: "Manager score", unit: "", goodHigh: true, range: [60, 90] as const },
   attrition: { label: "Attrition risk", unit: "%", goodHigh: false, range: [2, 9] as const },
+  /* adoption — counted from what people did, never from points */
+  weeklyActive: { label: "Weekly active", unit: "%", goodHigh: true, range: [80, 97] as const },
+  checkin: { label: "Check-in rate", unit: "%", goodHigh: true, range: [50, 84] as const },
 } as const;
 type MetricKey = keyof typeof METRICS;
 const METRIC_KEYS = Object.keys(METRICS) as MetricKey[];
@@ -52,6 +56,10 @@ function value(metric: MetricKey, cat: string): number {
     const dept = departments.find((d) => d.name === cat);
     if (dept) return dept.score;
   }
+  if (metric === "weeklyActive" || metric === "checkin") {
+    const t = ADOPTION_TEAMS.find((x) => x.team === cat);
+    if (t) return metric === "weeklyActive" ? t.weeklyActive : t.checkedIn;
+  }
   const [lo, hi] = METRICS[metric].range;
   const v = lo + (hash(metric + "|" + cat) % ((hi - lo) * 10)) / 10;
   return metric === "attrition" ? Math.round(v * 10) / 10 : Math.round(v);
@@ -73,6 +81,8 @@ function toneFor(metric: MetricKey, v: number): string {
 }
 function trendFor(metric: MetricKey): number[] {
   if (metric === "engagement") return engagementTrend.series;
+  if (metric === "weeklyActive") return MONTHLY.weeklyActive;
+  if (metric === "checkin") return MONTHLY.checkedIn;
   const [lo, hi] = METRICS[metric].range;
   const mid = (lo + hi) / 2, amp = (hi - lo) * 0.32, h = hash(metric);
   return Array.from({ length: 14 }, (_, i) =>

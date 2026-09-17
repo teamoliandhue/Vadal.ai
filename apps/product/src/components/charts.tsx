@@ -59,6 +59,7 @@ export function TrendChart({
   caption?: string;
 }) {
   const W = 800;
+  const gid = id.replace(/[^\w-]/g, "-");
   // scale both series against the union so they share an axis
   const all = benchmark ? [...series, ...benchmark] : series;
   const scale = { min: Math.min(...all), max: Math.max(...all) };
@@ -74,12 +75,12 @@ export function TrendChart({
       aria-hidden
     >
       <defs>
-        <linearGradient id={`${id}-fill`} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${gid}-fill`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor={color} stopOpacity="0.22" />
           <stop offset="1" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={`${m.d} L ${W} ${height} L 0 ${height} Z`} fill={`url(#${id}-fill)`} />
+      <path d={`${m.d} L ${W} ${height} L 0 ${height} Z`} fill={`url(#${gid}-fill)`} />
       {b && (
         <path
           d={b.d}
@@ -150,6 +151,9 @@ export function Sparkline({
   benchmark?: number[];
 }) {
   const W = 300;
+  /* An id with a space ("kpi-Employees at risk") breaks url(#…) and the fill
+     falls back to solid black — so ids are made safe here, not at every caller. */
+  const gid = id.replace(/[^\w-]/g, "-");
   const all = benchmark ? [...values, ...benchmark] : values;
   const scale = { min: Math.min(...all), max: Math.max(...all) };
   const m = smoothPath(values, W, height, 5, scale);
@@ -163,12 +167,12 @@ export function Sparkline({
       aria-hidden
     >
       <defs>
-        <linearGradient id={`${id}-fill`} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${gid}-fill`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor={color} stopOpacity="0.18" />
           <stop offset="1" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={`${m.d} L ${W} ${height} L 0 ${height} Z`} fill={`url(#${id}-fill)`} />
+      <path d={`${m.d} L ${W} ${height} L 0 ${height} Z`} fill={`url(#${gid}-fill)`} />
       {b && (
         <path
           d={b.d}
