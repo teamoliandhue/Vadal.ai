@@ -6,7 +6,7 @@
    Seeded data (lib/settings). */
 import * as React from "react";
 import {
-  Award, Bell, Building2, Check, Lock, MessageSquareWarning, Palette, Plug, ShieldCheck, Sparkles, UserPlus, Users, type LucideIcon,
+  Award, Bell, Building2, Check, Languages, Lock, MessageSquareWarning, Palette, Plug, ShieldCheck, Sparkles, UserPlus, Users, type LucideIcon,
 } from "lucide-react";
 import { Avatar, Badge, Button, Switch, type BadgeTone } from "@vadal/design-system";
 import { toast } from "../Toaster";
@@ -18,6 +18,7 @@ import {
 import { BrandingPanel } from "./BrandingPanel";
 import { PostingPanel } from "./PostingPanel";
 import { PointsPanel } from "./PointsPanel";
+import { TranslationPanel } from "./TranslationPanel";
 
 const soft = (c: string, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
 
@@ -29,6 +30,7 @@ const TABS: Tab[] = [
   { key: "members", label: "Members", icon: Users },
   { key: "posting", label: "Posting & moderation", icon: MessageSquareWarning },
   { key: "points", label: "Recognition & points", icon: Award },
+  { key: "translation", label: "Translation", icon: Languages },
   { key: "integrations", label: "Integrations", icon: Plug },
   { key: "notifications", label: "Notifications", icon: Bell },
   { key: "privacy", label: "Data & privacy", icon: Lock },
@@ -281,6 +283,7 @@ const PANELS: Record<string, React.ReactNode> = {
   members: <MembersPanel />,
   posting: <PostingPanel />,
   points: <PointsPanel />,
+  translation: <TranslationPanel />,
   integrations: <IntegrationsPanel />,
   notifications: <NotificationsPanel />,
   privacy: <PrivacyPanel />,

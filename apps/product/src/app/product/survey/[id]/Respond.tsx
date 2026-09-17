@@ -10,14 +10,17 @@
    manager sees anything). Text answers are optional — Skip is always there. */
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, Lock } from "lucide-react";
+import { ArrowLeft, Check, Languages, Lock } from "lucide-react";
 import { Button, SparkMark } from "@vadal/design-system";
 import { nextQuestion, remainingCount, type Answers, type Question } from "@/lib/ai/engines/survey";
+import { TRANSLATE_LANGS, surveyAvailable, surveyText } from "@/lib/ai/engines/translate";
 import { EARN_RULES } from "@/lib/points";
 import { SURVEYS } from "@/lib/programmes";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { usePoints } from "../../usePointsMode";
 import { toast } from "../../Toaster";
+import { useTranslatePref } from "../../social/Translate";
+import { useTranslates } from "../../useTranslationAddon";
 
 const MOODS = [
   { v: 1, emoji: "😣", label: "Rough" }, { v: 2, emoji: "😕", label: "Not great" }, { v: 3, emoji: "😐", label: "Okay" },
@@ -33,6 +36,11 @@ export function Respond({ id }: { id: string }) {
   const [text, setText] = React.useState("");
   const [, setDone] = usePersistentState<string[]>("vadal:surveys-done", []);
   const [finished, setFinished] = React.useState(false);
+  /* Answer in your language. What is stored is always the English question id
+     and the English choice, so a Hindi answer and an English one count the same. */
+  const translates = useTranslates("surveys");
+  const [pref] = useTranslatePref();
+  const [inLang, setInLang] = React.useState(false);
 
   if (!survey) {
     return (
@@ -44,6 +52,15 @@ export function Respond({ id }: { id: string }) {
       </div>
     );
   }
+
+  const lang = TRANSLATE_LANGS.find((l) => l.code === pref.lang) ?? TRANSLATE_LANGS[0];
+  const strings = [
+    ...survey.bank.flatMap((x) => [x.text, ...(x.choices ?? [])]),
+    ...MOODS.map((m) => m.label), ...SCALE, "Not at all", "A little", "Somewhat", "Mostly", "Completely", "Next", "Skip", "In your own words — optional",
+  ];
+  const available = translates && surveyAvailable(strings, lang.code);
+  const reading = available && inLang;
+  const t = (english: string) => (reading ? surveyText(english, lang.code).text : english);
 
   const q = finished ? null : nextQuestion(answers, survey.bank);
   const asked = Object.keys(answers).length;
@@ -98,6 +115,16 @@ export function Respond({ id }: { id: string }) {
           <Lock className="h-3.5 w-3.5" />
           {survey.anonymous ? "Anonymous. Your manager sees team results only when 5 or more people answer." : "Your answers go to the People team. Your manager sees a summary, not your words."}
         </p>
+        {translates && (
+          available ? (
+            <div className="mt-3 flex w-fit rounded-full bg-soft p-1" role="group" aria-label="Answer in">
+              <button onClick={() => setInLang(false)} aria-pressed={!reading} className={`min-h-[44px] rounded-full px-4 text-[13px] font-semibold lg:min-h-[32px] ${!reading ? "bg-card text-ink shadow-sm" : "text-muted"}`}>English</button>
+              <button onClick={() => setInLang(true)} aria-pressed={reading} lang={lang.code} className={`flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold lg:min-h-[32px] ${reading ? "bg-card text-ink shadow-sm" : "text-muted"}`}><Languages className="h-3.5 w-3.5" /> {lang.label}</button>
+            </div>
+          ) : (
+            <p className="mt-2 flex items-center gap-1.5 text-[12px] text-faint"><Languages className="h-3.5 w-3.5" /> {lang.english} for this survey arrives with the translation provider.</p>
+          )
+        )}
       </header>
 
       <section key={q.id} className="rise rounded-[28px] border border-line bg-card p-6 sm:p-8" aria-live="polite">
@@ -105,14 +132,15 @@ export function Respond({ id }: { id: string }) {
           <span>Question {asked + 1}</span>
           <span>{left <= 1 ? "Probably the last one" : `About ${left - 1} more after this`}</span>
         </div>
-        <h1 className="mt-3 text-[clamp(22px,3vw,28px)] font-bold leading-snug tracking-tight">{q.text}</h1>
+        <h1 lang={reading ? lang.code : "en"} className="mt-3 text-[clamp(22px,3vw,28px)] font-bold leading-snug tracking-tight">{t(q.text)}</h1>
+        {reading && <p className="mt-1 text-[13px] text-faint">{q.text}</p>}
 
         {q.kind === "mood" && (
           <div className="mt-6 grid grid-cols-5 gap-2" role="group" aria-label={q.text}>
             {MOODS.map((m) => (
               <button key={m.v} onClick={() => answer(q, m.v)} className="flex min-h-[88px] flex-col items-center justify-center gap-1.5 rounded-2xl border border-line bg-soft/40 transition hover:border-[var(--purple)] hover:bg-[var(--lav)]">
                 <span className="text-[30px]" aria-hidden>{m.emoji}</span>
-                <span className="text-[12px] font-semibold text-muted">{m.label}</span>
+                <span className="text-[12px] font-semibold text-muted">{t(m.label)}</span>
               </button>
             ))}
           </div>
@@ -122,7 +150,7 @@ export function Respond({ id }: { id: string }) {
           <div className="mt-6 grid gap-2 sm:grid-cols-5" role="group" aria-label={q.text}>
             {(SCALE_Q.test(q.text) ? ["Not at all", "A little", "Somewhat", "Mostly", "Completely"] : SCALE).map((label, i) => (
               <button key={label} onClick={() => answer(q, i + 1)} className="min-h-[52px] rounded-2xl border border-line bg-soft/40 px-2 text-[13px] font-semibold text-ink transition hover:border-[var(--purple)] hover:bg-[var(--lav)]">
-                {label}
+                {t(label)}
               </button>
             ))}
           </div>
@@ -132,7 +160,7 @@ export function Respond({ id }: { id: string }) {
           <div className="mt-6 flex flex-col gap-2" role="group" aria-label={q.text}>
             {q.choices!.map((c) => (
               <button key={c} onClick={() => answer(q, c)} className="min-h-[52px] rounded-2xl border border-line bg-soft/40 px-4 text-left text-[15px] font-medium text-ink transition hover:border-[var(--purple)] hover:bg-[var(--lav)]">
-                {c}
+                {t(c)}
               </button>
             ))}
           </div>
@@ -141,11 +169,11 @@ export function Respond({ id }: { id: string }) {
         {q.kind === "text" && (
           <div className="mt-6">
             <label htmlFor={`a-${q.id}`} className="sr-only">{q.text}</label>
-            <textarea id={`a-${q.id}`} value={text} onChange={(e) => setText(e.target.value)} rows={4} placeholder="In your own words — optional"
+            <textarea id={`a-${q.id}`} value={text} onChange={(e) => setText(e.target.value)} rows={4} placeholder={t("In your own words — optional")}
               className="w-full resize-none rounded-2xl border border-line bg-transparent px-4 py-3 text-[16px] leading-relaxed outline-none focus:border-[var(--purple)] focus:ring-4 focus:ring-[var(--purple)]/10" />
             <div className="mt-3 flex flex-wrap gap-2">
-              <Button variant="brand" size="md" disabled={!text.trim()} onClick={() => answer(q, text.trim())}>Next</Button>
-              <Button variant="tertiary" size="md" onClick={() => answer(q, "")}>Skip</Button>
+              <Button variant="brand" size="md" disabled={!text.trim()} onClick={() => answer(q, text.trim())}>{t("Next")}</Button>
+              <Button variant="tertiary" size="md" onClick={() => answer(q, "")}>{t("Skip")}</Button>
             </div>
           </div>
         )}

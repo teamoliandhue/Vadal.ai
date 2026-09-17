@@ -12,7 +12,7 @@
    The mandatory human-review step is enforced, not described: a generated course
    is born a draft, and a safety-critical one needs a named reviewer to publish. */
 import * as React from "react";
-import { BookOpen, Check, Clock, FileText, GraduationCap, Lock, RotateCcw, Sparkles, TriangleAlert } from "lucide-react";
+import { BookOpen, Check, Clock, FileText, GraduationCap, Languages, Lock, RotateCcw, Sparkles, TriangleAlert } from "lucide-react";
 import { Badge, Button, SparkMark, type BadgeTone } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { generateCourse, recommendPaths, reviewQueue, nextDifficulty, tutor, publishCourse, pathMinutes, type Course as GenCourse } from "@/lib/ai/engines/learning";
@@ -22,6 +22,9 @@ import { useViewAs } from "../useViewAs";
 import { Badges, ComplianceRecord, TeamProgress, TimeFit } from "./Rail";
 import { useSession } from "../useSession";
 import { toast } from "../Toaster";
+import { TRANSLATE_LANGS, quizIn } from "@/lib/ai/engines/translate";
+import { useTranslatePref } from "../social/Translate";
+import { useTranslates } from "../useTranslationAddon";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
@@ -311,11 +314,18 @@ function AdaptiveQuiz() {
   const [answers, setAnswers] = React.useState<Record<string, number>>({});
   const [tutorQ, setTutorQ] = React.useState("");
   const [tutorA, setTutorA] = React.useState<{ answer: string; grounded: boolean } | null>(null);
+  // Practice in your language. The answer index is the same in every language.
+  const translates = useTranslates("learning");
+  const [pref] = useTranslatePref();
+  const [inLang, setInLang] = React.useState(false);
+  const lang = TRANSLATE_LANGS.find((l) => l.code === pref.lang) ?? TRANSLATE_LANGS[0];
 
   const recent = sampleQuiz.filter((q) => q.id in answers).map((q) => answers[q.id] === q.answer);
   const difficulty = nextDifficulty(recent);
   const queue = reviewQueue(retention, 3);
   const question = sampleQuiz.find((q) => !(q.id in answers) && q.difficulty === difficulty) ?? sampleQuiz.find((q) => !(q.id in answers));
+  const translated = translates && inLang && question ? quizIn(question.id, lang.code) : null;
+  const shown = translated ?? question;
 
   const module = {
     id: "m1", title: "Equipment handling refresher", minutes: 4,
@@ -329,13 +339,18 @@ function AdaptiveQuiz() {
         <span className="ai-grad grid h-7 w-7 place-items-center rounded-full"><SparkMark size={15} tone="solid" /></span>
         <Eyebrow>Adaptive practice</Eyebrow>
         <Badge tone="info" variant="soft" size="sm">Difficulty {difficulty}/3</Badge>
+        {translates && question && quizIn(question.id, lang.code) && (
+          <button onClick={() => setInLang((v) => !v)} aria-pressed={inLang} className="ml-auto inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-2 text-[13px] font-semibold text-[var(--ai-accent)] hover:opacity-80 lg:min-h-[28px]">
+            <Languages className="h-4 w-4" /> {inLang ? "English" : <span lang={lang.code}>{lang.label}</span>}
+          </button>
+        )}
       </div>
 
       {question ? (
         <div className="mt-4 rounded-2xl border border-line p-4">
-          <p className="text-[16px] font-semibold leading-snug">{question.text}</p>
+          <p lang={translated ? lang.code : "en"} className="text-[16px] font-semibold leading-snug">{shown!.text}</p>
           <div className="mt-3 grid gap-2">
-            {question.options.map((o, i) => {
+            {shown!.options.map((o, i) => {
               const answered = question.id in answers;
               const picked = answers[question.id] === i;
               const correct = i === question.answer;
@@ -355,7 +370,7 @@ function AdaptiveQuiz() {
           </div>
           {question.id in answers && (
             <p className="mt-3 rounded-xl bg-soft p-3 text-[14px] leading-relaxed text-muted">
-              <b className="font-semibold text-ink">From the source:</b> {question.source}
+              <b className="font-semibold text-ink">{translated ? "स्रोत से:" : "From the source:"}</b> {shown!.source}
             </p>
           )}
         </div>

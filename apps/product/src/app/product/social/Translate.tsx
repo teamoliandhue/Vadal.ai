@@ -10,6 +10,7 @@ import * as React from "react";
 import { Check, ChevronDown, Languages } from "lucide-react";
 import { TRANSLATE_LANGS, translatePost } from "@/lib/ai/engines/translate";
 import { renderRich } from "./parts";
+import { useTranslates } from "../useTranslationAddon";
 
 type Pref = { lang: string; auto: boolean };
 const KEY = "vadal:translate";
@@ -40,11 +41,13 @@ export function useTranslatePref() {
 
 export function PostText({ id, text, size = "md" }: { id: string; text: string; size?: "md" | "lg" }) {
   const [p, set] = useTranslatePref();
+  // No add-on, no control — and no translation left showing from "always translate".
+  const on = useTranslates("feed");
   /* null = follow the "always" preference; true/false = this post, chosen by hand */
   const [manual, setManual] = React.useState<boolean | null>(null);
   const [menu, setMenu] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
-  const shown = manual ?? p.auto;
+  const shown = on && (manual ?? p.auto);
   const lang = TRANSLATE_LANGS.find((l) => l.code === p.lang) ?? TRANSLATE_LANGS[0];
   const result = shown ? translatePost(id, text, lang.code) : null;
 
@@ -65,7 +68,7 @@ export function PostText({ id, text, size = "md" }: { id: string; text: string; 
       <p className={`whitespace-pre-line text-ink/90 ${body}`}>{renderRich(text)}</p>
 
       {/* everything below is a control inside a clickable card — keep clicks here */}
-      <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+      {on && <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
         {result?.ok && (
           <div lang={lang.code} className="mt-3 rounded-2xl border border-[var(--ai-border)] bg-[var(--ai-surface)] px-4 py-3">
             <p className={`whitespace-pre-line text-ink ${body}`}>{renderRich(result.text)}</p>
@@ -109,7 +112,7 @@ export function PostText({ id, text, size = "md" }: { id: string; text: string; 
             </div>
           )}
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

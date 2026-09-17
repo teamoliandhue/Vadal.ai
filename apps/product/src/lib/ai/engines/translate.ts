@@ -78,3 +78,95 @@ export function translatePost(postId: string, text: string, code: string): Trans
       : `${lang.english} arrives with the translation provider.`,
   };
 }
+
+/* ── beyond the feed: surveys, learning, summaries ─────────────────
+   Same contract as posts: seeded Hindi where the demo has it, an honest
+   "unavailable" everywhere else. Survey answers are always stored against the
+   English question and choice, so results in any language stay comparable. */
+
+/** Hindi for survey questions, choices and the answer scales, keyed by the English. */
+const HI_SURVEY: Record<string, string> = {
+  // September pulse
+  "How has this week been?": "यह हफ़्ता कैसा रहा?",
+  "How manageable was your workload?": "आपका काम का बोझ कितना संभालने लायक था?",
+  "What got in your way most?": "सबसे ज़्यादा रुकावट किस चीज़ से आई?",
+  "Workload": "काम का बोझ",
+  "Equipment or tools": "उपकरण या टूल",
+  "Unclear priorities": "प्राथमिकताएँ साफ़ नहीं थीं",
+  "Support from my manager": "मैनेजर से सहयोग",
+  "Something else": "कुछ और",
+  "Anything you'd want changed about that?": "इसमें आप क्या बदलना चाहेंगे?",
+  "Did you get the support you needed?": "क्या आपको ज़रूरत के मुताबिक़ सहयोग मिला?",
+  "Anything that went well worth sharing?": "कुछ अच्छा हुआ जो आप बताना चाहें?",
+  // Onboarding check-ins
+  "How settled do you feel so far?": "अब तक आप कितना सहज महसूस कर रहे हैं?",
+  "Do you know what's expected of you in your first month?": "क्या आपको पता है कि पहले महीने में आपसे क्या अपेक्षा है?",
+  "What's been missing?": "किस चीज़ की कमी रही?",
+  "A clear plan": "एक साफ़ योजना",
+  "Time with my manager": "मैनेजर के साथ समय",
+  "Access or equipment": "एक्सेस या उपकरण",
+  "Knowing who to ask": "यह पता होना कि किससे पूछें",
+  "Tell us a bit more — People will follow up.": "थोड़ा और बताइए — पीपल टीम आपसे संपर्क करेगी।",
+  "Anything your buddy or team did that made a difference?": "आपके बडी या टीम ने ऐसा क्या किया जिससे फ़र्क़ पड़ा?",
+  // Scales and moods
+  "Rough": "बहुत मुश्किल", "Not great": "ठीक नहीं", "Okay": "ठीक-ठाक", "Good": "अच्छा", "Great": "बहुत अच्छा",
+  "Strongly disagree": "बिल्कुल असहमत", "Disagree": "असहमत", "Neutral": "न सहमत, न असहमत", "Agree": "सहमत", "Strongly agree": "पूरी तरह सहमत",
+  "Not at all": "बिल्कुल नहीं", "A little": "थोड़ा", "Somewhat": "कुछ हद तक", "Mostly": "ज़्यादातर", "Completely": "पूरी तरह",
+  // Controls
+  "Next": "आगे", "Skip": "छोड़ें", "In your own words — optional": "अपने शब्दों में — ज़रूरी नहीं",
+};
+
+/** Hindi for the equipment-handling practice questions. */
+const HI_QUIZ: Record<string, { text: string; options: string[]; source: string }> = {
+  q1: {
+    text: "मशीन चालू करने से पहले, प्री-स्टार्ट सूची में कितनी जाँचें होती हैं?",
+    options: ["3", "5", "7", "9"],
+    source: "प्री-स्टार्ट सूची में पाँच जाँचें हैं, और मशीन चलाने से पहले पाँचों पूरी होनी चाहिए।",
+  },
+  q2: {
+    text: "सही या ग़लत: कोई भी ऑपरेटर फ़ॉल्ट कोड ख़ुद हटा सकता है।",
+    options: ["सही", "ग़लत"],
+    source: "फ़ॉल्ट कोड सिर्फ़ योग्य टेक्नीशियन ही हटा सकता है, और वह भी वजह दर्ज करने के बाद।",
+  },
+  q3: {
+    text: "मशीन चलते समय आपको कोई अजीब आवाज़ सुनाई देती है। सबसे पहले क्या करेंगे?",
+    options: ["बैच पूरा करें", "लाइन रोकें और रिपोर्ट करें", "शिफ़्ट के अंत में नोट करें", "जाँचने के लिए स्पीड बढ़ाएँ"],
+    source: "लाइन तुरंत रोकें और ख़राबी की रिपोर्ट करें; चलती मशीन में ख़ुद वजह ढूँढने की कोशिश न करें।",
+  },
+};
+
+/** Hindi summaries of the most-read policies — Indian-language summaries ship first. */
+const HI_SUMMARY: Record<string, string> = {
+  "leave-policy": "हर फ़ुल-टाइम कर्मचारी को साल में 18 सवेतन छुट्टियाँ मिलती हैं — हर महीने 1.5 दिन। सिक लीव (साल में 12) और कैज़ुअल लीव अलग गिनी जाती हैं। छुट्टी Home से या Vadal से पूछकर लें; मंज़ूरी आपके मैनेजर देते हैं। 6 तक बची सवेतन छुट्टियाँ अगले साल जुड़ जाती हैं, बाक़ी 31 दिसंबर को ख़त्म हो जाती हैं। सिक लीव आगे नहीं जुड़ती।",
+  "onboarding-week1": "पहला हफ़्ता लोगों और माहौल को समझने का है, काम की रफ़्तार का नहीं। आपको एक बडी मिलेगा, आप अपनी टीम से मिलेंगे और अकाउंट सेट करेंगे। करने के काम: प्रोफ़ाइल और पेरोल की जानकारी भरें, बडी और मैनेजर से 1:1 मिलें, और टीम के काम करने के तरीक़े पढ़ लें।",
+  eap: "हमारा EAP मुफ़्त और गोपनीय काउंसलिंग देता है, 24 घंटे हेल्पलाइन के साथ। साल में 4 मेंटल-हेल्थ डे भी मिलते हैं, बिना कोई सवाल पूछे — इन्हें आम छुट्टी की तरह बुक करें।",
+};
+
+const langFor = (code: string) => TRANSLATE_LANGS.find((l) => l.code === code) ?? TRANSLATE_LANGS[0];
+
+/** A survey string in the reader's language, or the English when there isn't one. */
+export function surveyText(english: string, code: string): { text: string; translated: boolean } {
+  const hit = code === "hi" ? HI_SURVEY[english] : undefined;
+  return hit ? { text: hit, translated: true } : { text: english, translated: false };
+}
+
+/** Whether a whole survey bank has a translation in this language. */
+export function surveyAvailable(strings: string[], code: string): boolean {
+  return code === "hi" && strings.every((s) => Boolean(HI_SURVEY[s]));
+}
+
+export function quizIn(id: string, code: string): { text: string; options: string[]; source: string } | null {
+  return code === "hi" ? HI_QUIZ[id] ?? null : null;
+}
+
+export function summaryIn(docId: string, code: string): Translation {
+  const lang = langFor(code);
+  const hit = code === "hi" ? HI_SUMMARY[docId] : undefined;
+  if (hit) return { ok: true, text: hit, lang, from: "English" };
+  return {
+    ok: false, lang,
+    reason: lang.live
+      ? "A summary of this document is written once the translation provider is connected."
+      : `${lang.english} summaries arrive with the translation provider.`,
+  };
+}

@@ -15,7 +15,7 @@
    corrections they own. */
 import * as React from "react";
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, BookOpen, Check, FileText, Lock, Search, Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
+import { AlertTriangle, ArrowRight, BookOpen, Check, FileText, Languages, Lock, Search, Sparkles, ThumbsDown, ThumbsUp } from "lucide-react";
 import { Badge, Button, SparkMark } from "@vadal/design-system";
 import { canAccess } from "@/lib/access";
 import { didAction } from "@/lib/tour";
@@ -25,6 +25,9 @@ import {
   type Article, type CorrectionReason,
 } from "@/lib/knowledge";
 import { Drawer } from "../Drawer";
+import { TRANSLATE_LANGS, summaryIn } from "@/lib/ai/engines/translate";
+import { useTranslatePref } from "../social/Translate";
+import { useTranslates } from "../useTranslationAddon";
 import { toast } from "../Toaster";
 import { useViewAs } from "../useViewAs";
 
@@ -342,6 +345,7 @@ export function KnowledgeHub() {
             <h2 className="mt-2 text-[22px] font-bold leading-tight tracking-tight">{open.title}</h2>
             <p className="mt-1 text-[12px] text-faint">{open.updated} · {open.views.toLocaleString()} views</p>
             <div className="mt-4"><StaleNote a={open} /></div>
+            <Summary key={open.id} docId={open.id} />
 
             <div className="mt-5 flex flex-col gap-4">
               {open.sections.map((s, i) => (
@@ -359,6 +363,31 @@ export function KnowledgeHub() {
           </>
         )}
       </Drawer>
+    </div>
+  );
+}
+
+/* A summary in the reader's language — Indian-language summaries ship first
+   (roadmap v3). A reading aid: the document above is what applies. */
+function Summary({ docId }: { docId: string }) {
+  const on = useTranslates("summaries");
+  const [pref] = useTranslatePref();
+  const [open, setOpen] = React.useState(false);
+  if (!on) return null;
+  const lang = TRANSLATE_LANGS.find((l) => l.code === pref.lang) ?? TRANSLATE_LANGS[0];
+  const result = open ? summaryIn(docId, lang.code) : null;
+  return (
+    <div className="mt-4">
+      <button onClick={() => setOpen((v) => !v)} aria-expanded={open} className="inline-flex min-h-[44px] items-center gap-1.5 text-[13px] font-semibold text-[var(--ai-accent)] hover:opacity-80 lg:min-h-[28px]">
+        <Languages className="h-4 w-4" /> {open ? "Hide summary" : <>Summary in <span lang={lang.code}>{lang.label}</span></>}
+      </button>
+      {result?.ok && (
+        <div lang={lang.code} className="mt-2 rounded-2xl border border-[var(--ai-border)] bg-[var(--ai-surface)] px-4 py-3">
+          <p className="text-[15px] leading-relaxed text-ink">{result.text}</p>
+          <p lang="en" className="mt-2 text-[12px] text-muted">Summarised in {lang.english} by Nudge · a reading aid — the policy below is what applies</p>
+        </div>
+      )}
+      {result && !result.ok && <p className="mt-2 rounded-2xl border border-dashed border-line px-4 py-3 text-[13px] text-muted">{result.reason}</p>}
     </div>
   );
 }

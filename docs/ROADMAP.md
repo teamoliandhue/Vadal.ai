@@ -59,7 +59,7 @@ Unblocked by the decisions:
 
 ## 3 · v3
 
-- [ ] **Translation across feed, surveys and learning** — evaluate cost first (Google business tier vs Sarvam for Indian languages); billed as a paid add-on; Indian-language summaries ship first. "100+ languages" on the site only once the provider is chosen.
+- [x] **Translation across feed, surveys and learning** (spec 041, docs/TRANSLATION.md — Sarvam for Indian languages, Google for the rest) — evaluate cost first (Google business tier vs Sarvam for Indian languages); billed as a paid add-on; Indian-language summaries ship first. "100+ languages" on the site only once the provider is chosen.
 - [ ] **Mobile** — a separate design pass, not a responsive squeeze; employees configure their own widgets.
 - [ ] **Link · Trust · Launch** surfaces (integrations, security & compliance, implementation).
 
