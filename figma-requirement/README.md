@@ -59,3 +59,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 041 | [Translation — the paid add-on](./041-translation-add-on.md) | Built · needs Figma |
 | 042 | [Link · Trust · Launch — the platform surfaces](./042-link-trust-launch.md) | Built · needs Figma |
 | 043 | [Mobile pass — Home a phone arranges, and bottom sheets](./043-mobile-pass.md) | Built · needs Figma |
+| 044 | [Social v2 — a calmer feed, must reads, questions, saved](./044-social-v2.md) | Built · needs Figma |

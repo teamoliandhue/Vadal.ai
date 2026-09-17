@@ -22,6 +22,8 @@ export function useFeedState() {
   const [myComments, setMyComments] = usePersistentState<Record<string, Comment[]>>("vadal:feed2-comments", {});
   const [going, setGoing] = usePersistentState<string[]>("vadal:feed2-going", []);
   const [likedC, setLikedC] = usePersistentState<string[]>("vadal:feed2-likedc", []);
+  const [acks, setAcks] = usePersistentState<Record<string, string>>("vadal:feed2-acks", {});
+  const [accepted, setAccepted] = usePersistentState<Record<string, string>>("vadal:feed2-answers", {});
 
   const toDisplay = React.useCallback((it: FeedItem): DisplayItem => {
     const myReaction = reacts[it.id];
@@ -37,8 +39,10 @@ export function useFeedState() {
       going: going.includes(it.id),
       comments,
       commentCount: comments.length,
+      ackedOn: acks[it.id],
+      acceptedId: accepted[it.id] ?? it.question?.acceptedId,
     };
-  }, [reacts, votes, bookmarks, myComments, going, likedC]);
+  }, [reacts, votes, bookmarks, myComments, going, likedC, acks, accepted]);
 
   const react = (id: string, e: ReactionEmoji) =>
     setReacts((p) => { const n = { ...p }; if (n[id] === e) delete n[id]; else n[id] = e; return n; });
@@ -55,6 +59,14 @@ export function useFeedState() {
     setMyComments((p) => ({ ...p, [id]: [...(p[id] ?? []), cm] }));
   };
   const addMine = (item: FeedItem) => setMine((m) => [item, ...m]);
+  /* Must-read: confirming is a record, so it can't be un-confirmed from the feed. */
+  const acknowledge = (id: string) => {
+    setAcks((p) => (p[id] ? p : { ...p, [id]: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short" }) }));
+    toast("Confirmed — thanks for reading it");
+  };
+  /* Only the person who asked can choose the answer; the screen enforces who sees the button. */
+  const acceptAnswer = (postId: string, commentId: string) =>
+    setAccepted((p) => { const n = { ...p }; if (n[postId] === commentId) delete n[postId]; else n[postId] = commentId; return n; });
   /* the link is real now that a post has a page of its own */
   const share = (id: string) => {
     const url = `${window.location.origin}/product/social/post/${id}`;
@@ -63,7 +75,7 @@ export function useFeedState() {
   };
   const menu = (label: string) => toast(label === "Report" ? "Reported — thank you" : `${label} ✓`);
 
-  return { mine, toDisplay, react, bookmark, vote, rsvp, likeComment, addComment, addMine, share, menu };
+  return { mine, toDisplay, react, bookmark, vote, rsvp, likeComment, addComment, addMine, share, menu, acknowledge, acceptAnswer };
 }
 
 /* Shared ordering helpers. */

@@ -6,15 +6,13 @@ import Link from "next/link";
 import { Maximize2 } from "lucide-react";
 import type { ReactionEmoji } from "@/lib/feed";
 import { Drawer } from "../Drawer";
-import {
-  EngagementBar, EventBlock, KudosBlock, MilestoneBlock, PinnedTag, PollBlock,
-  PostHeader, PostMedia, type DisplayItem,
-} from "./parts";
+import { EngagementBar, PostHeader, type DisplayItem } from "./parts";
+import { PostBlocks, PostKicker } from "./PostBlocks";
 import { CommentBox, CommentList } from "./Thread";
 import { PostText } from "./Translate";
 
 export function PostDrawer({
-  item, onClose, onReact, onBookmark, onVote, onGoing, onShare, onComment, onLikeComment,
+  item, onClose, onReact, onBookmark, onVote, onGoing, onShare, onComment, onLikeComment, onAck, onAccept,
 }: {
   item: DisplayItem | null;
   onClose: () => void;
@@ -25,6 +23,8 @@ export function PostDrawer({
   onShare: () => void;
   onComment: (text: string) => void;
   onLikeComment: (commentId: string) => void;
+  onAck?: () => void;
+  onAccept?: (commentId: string) => void;
 }) {
   return (
     <Drawer open={!!item} title="Post" onClose={onClose}>
@@ -36,25 +36,21 @@ export function PostDrawer({
           >
             <Maximize2 className="h-3.5 w-3.5" /> Open full view
           </Link>
-          {item.pinned && <PinnedTag />}
+          <PostKicker item={item} />
           <PostHeader item={item} />
-          {item.text && <PostText id={item.id} text={item.text} />}
+          {item.text && <PostText id={item.id} text={item.text} fold={false} />}
 
-          {item.type === "kudos" && item.kudos && <KudosBlock kudos={item.kudos} />}
-          {item.type === "poll" && item.poll && <PollBlock poll={item.poll} myVote={item.myVote} onVote={onVote} />}
-          {item.type === "event" && item.event && <EventBlock event={item.event} going={item.going} onGoing={onGoing} />}
-          {item.type === "milestone" && item.milestone && <MilestoneBlock milestone={item.milestone} />}
-          {item.media && <PostMedia media={item.media} />}
+          <PostBlocks item={item} actions={{ onVote, onGoing, onAck, onComment }} />
 
           <EngagementBar item={item} onReact={onReact} onComment={() => {}} onBookmark={onBookmark} onShare={onShare} />
 
-          <div className="mt-4"><CommentList item={item} onLikeComment={onLikeComment} /></div>
+          <div className="mt-4"><CommentList item={item} onLikeComment={onLikeComment} onAccept={onAccept} /></div>
         </div>
       )}
 
       {/* composer pinned to bottom */}
       {item && (
-        <div className="sticky bottom-0 -mx-7 -mb-7 mt-4 border-t border-line bg-card px-7 py-4">
+        <div className="sticky bottom-0 -mx-6 -mb-[calc(1.5rem+env(safe-area-inset-bottom))] mt-4 border-t border-line bg-card px-6 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 md:-mx-7 md:-mb-7 md:px-7 md:pb-4">
           <CommentBox key={item.id} postId={item.id} onComment={onComment} />
         </div>
       )}

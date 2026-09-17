@@ -10,10 +10,8 @@ import { Avatar, SparkMark } from "@vadal/design-system";
 import { analyseSentiment } from "@/lib/ai/engines/text";
 import { channelMap, feedItems, freshItems, type FeedItem } from "@/lib/feed";
 import { groupPosts } from "@/lib/groups";
-import {
-  EngagementBar, EventBlock, KudosBlock, MilestoneBlock, PinnedTag, PollBlock,
-  PostHeader, PostMedia, nfmt, type DisplayItem,
-} from "../../parts";
+import { EngagementBar, PostHeader, nfmt, type DisplayItem } from "../../parts";
+import { PostBlocks, PostKicker } from "../../PostBlocks";
 import { CommentBox, CommentList } from "../../Thread";
 import { PostText } from "../../Translate";
 import { useFeedState } from "../../useFeedState";
@@ -88,15 +86,18 @@ export function PostView({ id }: { id: string }) {
         </Link>
 
         <article className={`rounded-[22px] border bg-card p-5 sm:p-7 ${item.pinned ? "border-[var(--purple)]/35 ring-1 ring-[var(--purple)]/15" : "border-line"}`}>
-          {item.pinned && <PinnedTag />}
+          <PostKicker item={item} />
           <PostHeader item={item} />
-          {item.text && <PostText id={item.id} text={item.text} size="lg" />}
+          {item.text && <PostText id={item.id} text={item.text} size="lg" fold={false} />}
 
-          {item.type === "kudos" && item.kudos && <KudosBlock kudos={item.kudos} />}
-          {item.type === "poll" && item.poll && <PollBlock poll={item.poll} myVote={item.myVote} onVote={(o) => feed.vote(item.id, o)} />}
-          {item.type === "event" && item.event && <EventBlock event={item.event} going={item.going} onGoing={() => feed.rsvp(item.id)} />}
-          {item.type === "milestone" && item.milestone && <MilestoneBlock milestone={item.milestone} />}
-          {item.media && <PostMedia media={item.media} />}
+          <PostBlocks
+            item={item}
+            actions={{
+              onVote: (o) => feed.vote(item.id, o), onGoing: () => feed.rsvp(item.id), onAck: () => feed.acknowledge(item.id),
+              onComment: (t) => feed.addComment(item.id, t),
+              onOpen: () => document.getElementById("post-comment")?.querySelector("textarea")?.focus(),
+            }}
+          />
 
           <EngagementBar
             item={item}
@@ -129,7 +130,7 @@ export function PostView({ id }: { id: string }) {
 
         {/* the conversation */}
         <section className="rounded-[22px] border border-line bg-card p-5 sm:p-7">
-          <CommentList item={item} onLikeComment={feed.likeComment} />
+          <CommentList item={item} onLikeComment={feed.likeComment} onAccept={(cid) => feed.acceptAnswer(item.id, cid)} />
           <div id="post-comment" className={item.commentCount > 0 ? "mt-5 border-t border-line pt-5" : "mt-4"}>
             <CommentBox key={item.id} postId={item.id} onComment={(t) => feed.addComment(item.id, t)} />
           </div>

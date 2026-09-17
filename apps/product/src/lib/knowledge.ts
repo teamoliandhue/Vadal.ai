@@ -144,7 +144,7 @@ export type Answer = { keywords: string[]; answer: string; sources: string[] };
 export const answers: Answer[] = [
   { keywords: ["leave", "paid leave", "how many days", "holiday", "vacation", "pto", "time off"], sources: ["leave-policy"],
     answer: "You get **18 paid leaves a year**, accruing 1.5 days a month, plus 12 sick days tracked separately. Apply from Home → Apply for leave (or just ask me) and it routes to your manager. Up to 6 unused paid leaves carry into next year — the rest lapse on 31 December." },
-  { keywords: ["reimburse", "expense", "claim expense", "spend"], sources: ["reimburse"],
+  { keywords: ["reimburse", "expense", "claim expense", "spend", "claim back", "internet bill", "phone bill"], sources: ["reimburse"],
     answer: "Submit expenses **within 30 days** with a receipt. Anything under ₹5,000 is auto-approved; above that needs manager sign-off. Approved claims are paid with the next payroll run, usually in 7–10 working days." },
   { keywords: ["wfh", "work from home", "remote", "hybrid", "office days"], sources: ["wfh"],
     answer: "We're **hybrid** — 3 days in-office (Tue–Thu) and 2 flexible, with **no-meeting Wednesdays**. Full-remote for a set period is approved case-by-case through your manager." },

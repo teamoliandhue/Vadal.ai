@@ -4,8 +4,10 @@
    and a "Draft with Vadal" AI assist. Emits a fully-formed FeedItem to the hub. */
 import * as React from "react";
 import Link from "next/link";
-import { BarChart3, ChevronDown, Award, ImageIcon, Lock, X } from "lucide-react";
-import { Avatar, Badge, Button } from "@vadal/design-system";
+import { BadgeCheck, BarChart3, BookOpen, ChevronDown, Award, HelpCircle, ImageIcon, Lock, X } from "lucide-react";
+import { Avatar, Badge, Button, SparkMark } from "@vadal/design-system";
+import { articles, findAnswer } from "@/lib/knowledge";
+import { workspace } from "@/lib/settings";
 import { useMe } from "../useSession";
 import { channels, type FeedItem, type GroupRef, type Person } from "@/lib/feed";
 import { toast } from "../Toaster";
@@ -18,7 +20,7 @@ import { moderation } from "./useModeration";
 import { CheckPanel } from "./PrePublish";
 import { AssistMenu, AssistSuggestion, UndoAssist, suggest, type Suggestion } from "./WriteAssist";
 
-type Mode = "text" | "photo" | "poll" | "kudos";
+type Mode = "text" | "photo" | "poll" | "kudos" | "question";
 
 /* Attachable images offered in the composer — real photography, same set the feed uses. */
 const ART = ["/feed/wellbeing.jpg", "/feed/ship.jpg", "/feed/plant.jpg", "/feed/milestone.jpg", "/feed/coldbrew.jpg", "/feed/screen.jpg"];
@@ -46,6 +48,7 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
   const [sugg, setSugg] = React.useState<Suggestion | null>(null);
   const [before, setBefore] = React.useState<string | null>(null); // the draft as it was, for Undo
   const [check, setCheck] = React.useState<{ c: PostCheck; item: FeedItem } | null>(null);
+  const [mustRead, setMustRead] = React.useState(false);
   const textRef = React.useRef<HTMLTextAreaElement>(null);
   const [policy] = usePostingPolicy();
   const [role] = useViewAs();
@@ -72,12 +75,17 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
 
   function reset() {
     setOpen(false); setMode("text"); setText(""); setChannel(channels[0].id);
-    setPollOpts(["", ""]); setRecips([]); setValues([]); setArt(0); setSugg(null); setBefore(null); setCheck(null);
+    setPollOpts(["", ""]); setRecips([]); setValues([]); setArt(0); setSugg(null); setBefore(null); setCheck(null); setMustRead(false);
   }
 
   const validPoll = mode === "poll" && pollOpts.filter((o) => o.trim()).length >= 2;
   const validKudos = mode === "kudos" && recips.length > 0;
-  const canPost = text.trim().length > 0 && (mode === "text" || mode === "photo" || validPoll || validKudos);
+  const canPost = text.trim().length > 0 && (mode === "text" || mode === "photo" || mode === "question" || validPoll || validKudos);
+  /* Must read: only where announcements go, and only for people who may post them. */
+  const canMustRead = !group && effective === "company" && allowed(policy.announcements, role) && (mode === "text" || mode === "photo");
+  /* Ask: Knowledge first — the fastest answer is the one nobody has to write. */
+  const kb = mode === "question" && text.trim().length >= 12 ? findAnswer(text, role) : null;
+  const kbArticle = kb?.matched ? articles.find((a) => a.id === kb.sources[0]) : undefined;
 
   const applySuggestion = () => {
     if (!sugg) return;
@@ -88,7 +96,7 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
     if (!canPost) return;
     const base: FeedItem = {
       id: `me-${Date.now()}`,
-      type: mode === "poll" ? "poll" : mode === "kudos" ? "kudos" : "post",
+      type: mode === "poll" ? "poll" : mode === "kudos" ? "kudos" : mode === "question" ? "question" : canMustRead && mustRead ? "announcement" : "post",
       author: { name: me.fullName, role: `${me.title} · You`, img: me.img },
       channel: group ? "" : effective,
       ...(group ? { group } : {}),
@@ -104,6 +112,8 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
       base.poll = { closesIn: "3 days", options: pollOpts.filter((o) => o.trim()).map((label, i) => ({ id: `o${i}`, label: label.trim(), votes: 0 })) };
     }
     if (mode === "kudos") base.kudos = { to: recips, values: values.length ? values : ["Ownership"] };
+    if (mode === "question") base.question = {};
+    if (canMustRead && mustRead) base.ack = { by: "Fri 25 Sep", confirmed: 0, audience: workspace.seats };
 
     /* the pre-publish check — most posts pass straight through */
     const c = checkPost({ text: base.text, media: base.media }, policy);
@@ -114,7 +124,7 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
   function publish(item: FeedItem) {
     onPost(item);
     const tags = tagPost(item.text).topics.map((t) => TOPIC_LABEL[t] ?? t);
-    toast(`${item.type === "kudos" ? "Kudos sent 🏆" : group ? `Posted to ${group.name} ${group.emoji}` : "Posted to the feed 🎉"}${tags.length ? ` · Nudge tagged it ${tags.slice(0, 2).join(", ")}` : ""}`);
+    toast(`${item.type === "kudos" ? "Kudos sent 🏆" : item.type === "question" ? "Question posted — it's in Questions" : item.ack ? "Posted as a must read" : group ? `Posted to ${group.name} ${group.emoji}` : "Posted to the feed 🎉"}${tags.length ? ` · Nudge tagged it ${tags.slice(0, 2).join(", ")}` : ""}`);
     reset();
   }
 
@@ -129,6 +139,7 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
     { id: "photo", label: "Photo", icon: ImageIcon },
     { id: "poll", label: "Poll", icon: BarChart3 },
     { id: "kudos", label: "Kudos", icon: Award },
+    { id: "question", label: "Ask", icon: HelpCircle },
   ];
 
   if (!group && !canFeed) {
@@ -153,7 +164,7 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
         {!open ? (
           <button
             onClick={() => setOpen(true)}
-            className="min-w-0 flex-1 truncate rounded-full bg-soft px-4 py-2.5 text-left text-[14px] text-faint transition hover:bg-[var(--lav)]"
+            className="min-h-[44px] min-w-0 flex-1 truncate rounded-full bg-soft px-4 py-2.5 text-left text-[14px] text-faint transition hover:bg-[var(--lav)]"
           >
             {group ? `Post to ${group.name}…` : "Share something with the company…"}
           </button>
@@ -165,9 +176,9 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
           <ChannelPicker ch={ch} open={chOpen} setOpen={setChOpen} can={canChannel} lockedTo={AUDIENCE_PHRASE[policy.announcements]} onSelect={(id) => { setChannel(id); setChOpen(false); setCheck(null); }} />
         )}
         {!open && (
-          <div className="flex items-center gap-1 text-faint">
+          <div className="hidden items-center gap-1 text-faint sm:flex">
             {tabs.map((t) => (
-              <button key={t.id} onClick={() => { setOpen(true); setMode(t.id); }} aria-label={t.label} className="grid h-9 w-9 place-items-center rounded-lg transition hover:bg-soft hover:text-[var(--purple)]">
+              <button key={t.id} onClick={() => { setOpen(true); setMode(t.id); if (t.id === "question") setChannel("people"); }} aria-label={t.label} className="grid h-11 w-11 place-items-center rounded-lg transition hover:bg-soft hover:text-[var(--purple)] lg:h-9 lg:w-9">
                 <t.icon className="h-[18px] w-[18px]" />
               </button>
             ))}
@@ -183,7 +194,7 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
             ref={textRef}
             onChange={(e) => { setText(e.target.value); setBefore(null); setCheck(null); }}
             rows={3}
-            placeholder={mode === "kudos" ? "Say what they did well…" : "What's on your mind?"}
+            placeholder={mode === "kudos" ? "Say what they did well…" : mode === "question" ? "What do you want to know? The people who know will see it." : "What's on your mind?"}
             /* Negative margin + equal padding: the text still lines up optically
                with the card's content edge, but the box extends 4px further out
                so a glyph with left side-bearing — Q, J, an italic f — cannot be
@@ -216,6 +227,27 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
             />
           )}
           {!sugg && before !== null && <UndoAssist onUndo={() => { setText(before); setBefore(null); }} />}
+
+          {kbArticle && kb && (
+            <div className="rounded-2xl border border-[var(--ai-border)] bg-[var(--ai-surface)] p-3.5">
+              <p className="flex items-center gap-1.5 text-[13px] font-semibold text-ink"><SparkMark size={14} tone="gradient" /> This might already be answered</p>
+              <p className="mt-1 text-[14px] leading-relaxed text-muted">{kb.answer.replace(/\*\*/g, "")}</p>
+              <Link href="/product/knowledge" className="mt-1 inline-flex min-h-[44px] items-center gap-1.5 text-[13px] font-semibold text-[var(--purple)] hover:underline lg:min-h-[28px]">
+                <BookOpen className="h-4 w-4" /> {kbArticle.title}
+              </Link>
+              <p className="text-[12px] text-faint">Still want to ask? Post it — people can add what the article doesn&apos;t cover.</p>
+            </div>
+          )}
+
+          {canMustRead && (
+            <label className="flex min-h-[44px] cursor-pointer items-start gap-3 rounded-2xl bg-soft px-3.5 py-3">
+              <input type="checkbox" checked={mustRead} onChange={(e) => setMustRead(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[var(--purple)]" />
+              <span className="min-w-0">
+                <span className="flex items-center gap-1.5 text-[14px] font-semibold text-ink"><BadgeCheck className="h-4 w-4 text-[var(--warning)]" /> Must read — ask everyone to confirm by Friday</span>
+                <span className="block text-[13px] text-muted">It stays at the top of everyone&apos;s feed until they confirm. You&apos;ll see who has, and can send one reminder.</span>
+              </span>
+            </label>
+          )}
 
           {mode === "photo" && (
             <div className="relative overflow-hidden rounded-2xl border border-line">
@@ -284,18 +316,18 @@ export function Composer({ onPost, group }: { onPost: (item: FeedItem) => void; 
               {tabs.map((t) => (
                 <button
                   key={t.id}
-                  onClick={() => setMode((m) => (m === t.id ? "text" : t.id))}
-                  className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold transition ${mode === t.id ? "bg-[var(--lav)] text-[var(--purple)]" : "text-muted hover:bg-soft"}`}
+                  onClick={() => { setMode((m) => (m === t.id ? "text" : t.id)); if (t.id === "question" && mode !== "question") setChannel("people"); }}
+                  className={`flex min-h-[44px] items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-semibold transition lg:min-h-0 ${mode === t.id ? "bg-[var(--lav)] text-[var(--purple)]" : "text-muted hover:bg-soft"}`}
                 >
                   <t.icon className="h-4 w-4" /> <span className="max-sm:hidden">{t.label}</span>
                 </button>
               ))}
               <AssistMenu text={text} onSuggest={setSugg} />
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="tertiary" size="sm" onClick={reset}>Cancel</Button>
-              <Button variant="brand" size="sm" disabled={!canPost} onClick={submit}>
-                {mode === "kudos" ? "Send kudos" : "Post"}
+            <div className="ml-auto flex items-center gap-2">
+              <Button variant="tertiary" size="sm" className="min-h-[44px] lg:min-h-0" onClick={reset}>Cancel</Button>
+              <Button variant="brand" size="sm" className="min-h-[44px] lg:min-h-0" disabled={!canPost} onClick={submit}>
+                {mode === "kudos" ? "Send kudos" : mode === "question" ? "Ask" : "Post"}
               </Button>
             </div>
           </div>

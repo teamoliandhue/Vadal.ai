@@ -10,6 +10,7 @@ import {
   REACTION_SET, VALUE_TONE, channelMap,
   type Channel, type FeedItem, type PollOption, type ReactionEmoji,
 } from "@/lib/feed";
+import { TranslateToggle } from "./translateState";
 
 /* The runtime shape the UI renders — base seed merged with my interactions. */
 export type DisplayItem = FeedItem & {
@@ -18,6 +19,10 @@ export type DisplayItem = FeedItem & {
   bookmarked: boolean;
   going?: boolean;
   commentCount: number;
+  /** The date I confirmed a must-read, if I have. */
+  ackedOn?: string;
+  /** The comment marked as the answer to a question. */
+  acceptedId?: string;
 };
 
 /* **bold** → <strong>. Keeps the seed text human to author. */
@@ -308,9 +313,10 @@ export function EngagementBar({
         <button onClick={onShare} className="flex min-h-[44px] items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[13px] font-semibold text-muted transition hover:bg-soft hover:text-ink lg:min-h-0">
           <Share2 className="h-4 w-4" /> <span className="max-sm:hidden">Share</span>
         </button>
+        <TranslateToggle id={item.id} />
       </div>
       <div className="flex items-center gap-2 text-[12px] text-faint">
-        <span className="tabular-nums max-sm:hidden">{nfmt(item.views)} views</span>
+        <span className="tabular-nums max-sm:hidden">{nfmt(item.views)} {item.views === 1 ? "view" : "views"}</span>
         <button
           onClick={onBookmark}
           aria-pressed={item.bookmarked}

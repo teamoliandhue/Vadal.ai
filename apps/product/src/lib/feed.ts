@@ -24,7 +24,7 @@ export type Comment = {
 
 export type PollOption = { id: string; label: string; votes: number };
 
-export type FeedType = "announcement" | "post" | "kudos" | "poll" | "event" | "milestone";
+export type FeedType = "announcement" | "post" | "kudos" | "poll" | "event" | "milestone" | "question";
 
 /** A post made inside a community carries where it was made, so the company
  *  stream can say so without looking the group up (groups people create live
@@ -45,6 +45,11 @@ export type FeedItem = {
   poll?: { options: PollOption[]; closesIn: string };
   event?: { title: string; when: string; where: string; goingCount: number; going: string[] };
   milestone?: { emoji: string; headline: string };
+  /** Must-read: people confirm they have read it, by a date. Counts are the
+   *  seeded org-wide numbers; the reader's own confirmation is added on top. */
+  ack?: { by: string; confirmed: number; audience: number };
+  /** A question. `acceptedId` is the comment its author marked as the answer. */
+  question?: { acceptedId?: string };
   reactions: Partial<Record<ReactionEmoji, number>>;
   reactedBy: string[];
   comments: Comment[];
@@ -263,6 +268,85 @@ export const feedItems: FeedItem[] = [
     comments: [],
   },
 ];
+
+/* Must-reads and questions (Social v2, spec 044). */
+feedItems.splice(1, 0,
+  {
+    id: "f-ack-1",
+    type: "announcement",
+    author: { name: "People Team", role: "Company-wide", img: AV(8) },
+    channel: "company",
+    time: "4h",
+    text: "**Travel and expense policy — what changes on 1 October.** Hotel limits go up for metro cities, and any expense over ₹500 now needs a receipt. The full policy is in Knowledge. Please confirm you've read it by Friday.",
+    ack: { by: "Fri 25 Sep", confirmed: 7904, audience: 12480 },
+    reactions: { "👏": 31, "💡": 12 },
+    reactedBy: [AV(1), AV(5)],
+    views: 9120,
+    comments: [
+      c("fa1c1", { name: "Rahul Verma", role: "Sales · West", img: AV(1) }, "Does the metro limit apply to Pune as well?", "3h", 6),
+      c("fa1c2", { name: "Priya Sharma", role: "People Partner", img: AV(8) }, "Yes — Pune, Mumbai, Delhi NCR, Bengaluru, Chennai and Hyderabad.", "3h", 14),
+    ],
+  },
+  {
+    id: "f-q-1",
+    type: "question",
+    author: { name: "Kavya Reddy", role: "Support · joined this month", img: AV(8) },
+    channel: "people",
+    time: "3h",
+    text: "New here — how do I claim back my home internet bill? Is there a form, or do I attach the bill somewhere?",
+    question: {},
+    reactions: { "💡": 4 },
+    reactedBy: [AV(7)],
+    views: 186,
+    comments: [
+      c("fq1c1", { name: "Meera Pillai", role: "Support", img: AV(7) }, "I think it goes through expenses? Not 100% sure.", "2h", 1),
+    ],
+  },
+);
+feedItems.push(
+  {
+    id: "f-ack-2",
+    type: "announcement",
+    author: { name: "Plant Safety", role: "EHS · Plant Ops", img: AV(4) },
+    channel: "company",
+    time: "1d",
+    text: "**Dock 3 has new floor markings from Monday.** Forklift lanes are yellow, walkways are green — walk only on green, and cross at the marked points. Please confirm before your next shift.",
+    ack: { by: "Mon 21 Sep", confirmed: 612, audience: 940 },
+    reactions: { "👏": 48, "🙌": 20 },
+    reactedBy: [AV(4), AV(7)],
+    views: 1420,
+    comments: [],
+  },
+  {
+    id: "f-q-2",
+    type: "question",
+    author: { name: "Rahul Verma", role: "Sales · West", img: AV(1) },
+    channel: "people",
+    time: "20h",
+    text: "Does the Goa offsite include travel, or do we book our own flights?",
+    question: { acceptedId: "fq2c1" },
+    reactions: { "💡": 17, "🙌": 6 },
+    reactedBy: [AV(5), AV(2)],
+    views: 940,
+    comments: [
+      c("fq2c1", { name: "Priya Sharma", role: "People Partner", img: AV(8) }, "People books flights for everyone. You'll get a form on Monday asking for your home airport — no need to book anything yourself.", "19h", 42),
+      c("fq2c2", { name: "Neha R.", role: "Design Lead", img: AV(5) }, "Thank you — I nearly booked mine 😅", "18h", 5),
+    ],
+  },
+  {
+    id: "f-q-3",
+    type: "question",
+    author: { name: "Arjun K.", role: "Operations", img: AV(4) },
+    channel: "product",
+    time: "6h",
+    text: "Is there a way to see what people search for most? Would help us write better shift guides.",
+    question: {},
+    reactions: {},
+    reactedBy: [],
+    views: 120,
+    comments: [],
+  },
+);
 
 /* What the "new posts" pill delivers — real items, so the pill is not a fake scroll. */
 export const freshItems: FeedItem[] = [

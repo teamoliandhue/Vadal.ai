@@ -224,6 +224,8 @@ export function GroupPage({ id }: { id: string }) {
                       onGoing={() => feed.rsvp(it.id)}
                       onOpen={() => setOpenId(it.id)}
                       onShare={() => feed.share(it.id)}
+                      onAck={() => feed.acknowledge(it.id)}
+                      onComment={(t) => feed.addComment(it.id, t)}
                       onMenu={(l) => (l === "Report" ? toast(mod.report(it, me.fullName) ? "Reported — a moderator will look. It stays up until they decide." : "You've already reported this one") : feed.menu(l))}
                     />
                   ))}
@@ -271,6 +273,8 @@ export function GroupPage({ id }: { id: string }) {
         onShare={() => openItem && feed.share(openItem.id)}
         onComment={(t) => openItem && feed.addComment(openItem.id, t)}
         onLikeComment={feed.likeComment}
+        onAck={() => openItem && feed.acknowledge(openItem.id)}
+        onAccept={(cid) => openItem && feed.acceptAnswer(openItem.id, cid)}
       />
     </div>
   );
