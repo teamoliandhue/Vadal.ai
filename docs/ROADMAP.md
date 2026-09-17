@@ -47,7 +47,7 @@ Unblocked by the decisions:
 - [x] **Marketplace + redemption catalogue** (spec 032) · L — partner integration (Advantage Club–type) bridged by API, not in-house fulfilment; tiered ladder (100 → mug … 50,000 → ₹10k voucher); client-branded merch; configurable non-marketplace options (offsites, lunches, travel; appraisal/bonus only with HR sign-off). Managers earn too.
 - [x] **Health leaderboards** · M (spec 033; ranked by activity, never points) — walking/running/swimming points; opt-in via the existing consent pattern; role-aware so the frontline isn't scored on its job.
 - [x] **Widget library + drag-and-drop Home** · L (spec 034) — 10–15 widgets, user-arranged.
-- [ ] **Amplify AI copy** improvements · S
+- [x] **Amplify AI copy** improvements · S (spec 040) — per-person openers, whole sentences, platform shape, template-phrase hints
 - [x] **Onboard** and **Alumni** screens · M each (spec 039) — joiner journey + setup assistant, joiner cohort, alumni network
 - [x] **Pulse programmes** · M (spec 037) — onboarding (day 7/30/90), stay interview, manager effectiveness, exit
 - [x] Wired (spec 035): `tagPost` → Social topics, `rankFeed` → For you, `scanAnomalies` → Kudos spotted, PersonProfile → Home order.

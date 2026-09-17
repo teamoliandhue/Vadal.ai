@@ -55,3 +55,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 037 | [Pulse programmes, smart send, and answering a pulse](./037-pulse-programmes-and-responding.md) | Built · needs Figma |
 | 038 | [Campaigns — delivery preview](./038-campaign-delivery-preview.md) | Built · needs Figma |
 | 039 | [Onboard and Alumni](./039-onboard-and-alumni.md) | Built · needs Figma |
+| 040 | [Amplify — captions that sound like a person](./040-amplify-caption-copy.md) | Built · needs Figma |

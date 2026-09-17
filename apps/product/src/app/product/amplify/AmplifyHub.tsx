@@ -31,7 +31,7 @@ import Image from "next/image";
 import { Copy, Heart, MessageCircle, Repeat2, ShieldCheck, ThumbsDown } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark, Switch } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
-import { draftCaption, rankMoments, scoreAdvocacy, type Voice } from "@/lib/ai/engines/advocacy";
+import { draftCaption, draftFromMoment, rankMoments, scoreAdvocacy, type Voice } from "@/lib/ai/engines/advocacy";
 import {
   advocacyStats, companyPosts, companyPostReach, myMoments, recentSharers, shares,
   DEFAULT_PREFS, type CompanyPost,
@@ -39,6 +39,7 @@ import {
 import { DECLINE_REASONS, type DeclineReason } from "@/lib/share";
 import { canAccess } from "@/lib/access";
 import { useViewAs } from "../useViewAs";
+import { useSession } from "../useSession";
 import { toast } from "../Toaster";
 import { Eyebrow, Mark, PlatformLine } from "./parts";
 import { AmplifyRail, type Prefs } from "./Rail";
@@ -250,6 +251,11 @@ function OptInHero({
   featured: CompanyPost | null; impact: ReturnType<typeof scoreAdvocacy>;
 }) {
   const sample = myMoments[0];
+  const { session } = useSession();
+  const first = session?.name.split(" ")[0];
+  const sampleText = sample
+    ? draftFromMoment({ ...sample, withPeople: sample.withPeople?.filter((n) => n !== first) }, "warm", "LinkedIn").text
+    : draftCaption(featured?.text ?? "", "warm", "LinkedIn", undefined, session?.email).text;
   return (
     <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card shadow-[0_1px_2px_rgba(20,20,40,0.04),0_24px_56px_-32px_rgba(20,20,40,0.32)]">
       <span aria-hidden className="ai-grad absolute inset-x-0 top-0 h-[2px] opacity-70" />
@@ -317,7 +323,7 @@ function OptInHero({
               <span className="text-[12px] font-semibold text-muted">Your caption</span>
             </div>
             <p className="mt-2.5 text-[14px] leading-relaxed text-muted">
-              “{sample ? `Aarav, Dev and I just ${sample.what.charAt(0).toLowerCase()}${sample.what.slice(1)}. Good week.` : draftCaption(featured?.text ?? "", "warm", "LinkedIn").text}”
+              “{sampleText}”
             </p>
             <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[var(--purple)] px-3 py-1.5 text-[12px] font-semibold text-white">
               <Copy className="h-3 w-3" /> Copy caption

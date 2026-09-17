@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 import { Button, SparkMark } from "@vadal/design-system";
 import {
-  checkPolicy, draftCaption, draftFromMoment, hashtagsFor, isHiringPost, referralLinkFor,
+  checkPolicy, draftCaption, draftFromMoment, hashtagsFor, isHiringPost, referralLinkFor, replaceTemplated, templatedPhrases,
   PLATFORM_ASPECT, type Moment, type Voice,
 } from "@/lib/ai/engines/advocacy";
 import { usePostingPolicy } from "../usePostingPolicy";
@@ -227,13 +227,15 @@ export function Composer({
   const sourceText = subject.kind === "post" ? subject.post.text : subject.moment.what;
 
   const draft = subject.kind === "post"
-    ? draftCaption(subject.post.text, voice, platform, session?.title)
-    : draftFromMoment(subject.moment, voice, platform, session?.title);
+    ? draftCaption(subject.post.text, voice, platform, session?.title, session?.email)
+    // Never name the person posting as one of the people they post with.
+    : draftFromMoment({ ...subject.moment, withPeople: subject.moment.withPeople?.filter((n) => n !== session?.name.split(" ")[0] && n !== session?.name) }, voice, platform, session?.title);
 
   const value = edited ?? draft.text;
   const timing = bestTimeToPost(platform);
   const tags = hashtagsFor(sourceText, platform);
   const policy = checkPolicy(value);
+  const templated = templatedPhrases(value);
   const [rules] = usePostingPolicy();
   const [viewRole] = useViewAs();
   const mayShare = allowed(rules.share, viewRole);
@@ -285,7 +287,7 @@ export function Composer({
       <textarea
         value={value}
         onChange={(e) => setEdited(e.target.value)}
-        rows={3}
+        rows={platform === "X" ? 3 : 6}
         aria-label="Your caption"
         className="mt-3 w-full resize-y rounded-xl border border-line bg-card p-3 text-[16px] leading-relaxed outline-none transition focus:border-[var(--ai-accent)]"
       />
@@ -298,6 +300,29 @@ export function Composer({
         </span>
         {over && <span style={{ color: "var(--danger)" }}>— {platform} will cut it off</span>}
       </div>
+
+      {/* Phrases people scroll past. Advisory — one tap swaps in plainer words. */}
+      {templated.length > 0 && (
+        <div className="mt-3 rounded-xl bg-card p-3.5 ring-1 ring-[var(--ai-border)]">
+          <p className="flex items-center gap-1.5 text-[14px] font-semibold">
+            <SparkMark size={13} tone="gradient" /> Reads a little like a template
+          </p>
+          <ul className="mt-2 flex flex-col gap-1.5">
+            {templated.map((t) => (
+              <li key={t.match} className="flex flex-wrap items-center gap-x-2 text-[13px]">
+                <span className="text-muted">“{t.match}”</span>
+                <button
+                  onClick={() => setEdited(replaceTemplated(value, t))}
+                  className="min-h-[44px] rounded-full px-1 font-semibold text-[var(--ai-accent)] hover:underline lg:min-h-0"
+                >
+                  {t.instead ? `Use “${t.instead}”` : "Remove it"}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1.5 text-[12px] text-faint">Saying what happened, in your words, is what gets read.</p>
+        </div>
+      )}
 
       {/* ── policy ── only present when there is something to say ── */}
       {policy.issues.length > 0 && (

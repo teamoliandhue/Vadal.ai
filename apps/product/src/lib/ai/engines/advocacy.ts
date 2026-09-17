@@ -41,33 +41,133 @@ const LIMITS: Record<Platform, number> = { LinkedIn: 3000, X: 280, Instagram: 22
  *
  * "In their own voice/tone" is the requirement that makes this worth doing — a
  * feed of identical corporate reshares is transparently astroturfed and does the
- * company more harm than no advocacy at all.
+ * company more harm than no advocacy at all. So:
+ *
+ *  · The opener varies by person. `seed` (the person, plus the post) picks one of
+ *    several per voice, so forty colleagues resharing the same post do not all
+ *    open with the same sentence.
+ *  · The company's words are kept whole. Sentences that fit the platform's
+ *    budget go in; a sentence is only cut when the first one alone is too long,
+ *    and then at a word, never mid-word.
+ *  · Press-release lead-ins are stripped. "We are thrilled to announce that" in
+ *    a personal post is the tell that nobody wrote it.
+ *  · Each platform gets its shape: LinkedIn puts the personal line on its own,
+ *    Instagram leads with the news (the feed cuts after a line), X stays short
+ *    enough to leave room for the link.
  */
-export function draftCaption(companyPost: string, voice: Voice, platform: Platform, role?: string): CaptionDraft {
-  const gist = companyPost.replace(/\s+/g, " ").trim().split(/(?<=[.!?])\s/)[0] ?? companyPost;
-  const short = gist.length > 120 ? `${gist.slice(0, 117).trimEnd()}…` : gist;
+export function draftCaption(companyPost: string, voice: Voice, platform: Platform, role?: string, seed = ""): CaptionDraft {
+  const news = stripLeadIn(companyPost.replace(/\s+/g, " ").trim());
+  const gist = fitSentences(news, BUDGET[platform]);
+  const pick = (xs: string[], salt: string) => xs[hash(`${companyPost}|${voice}|${salt}|${seed}`) % xs.length];
+  const hiring = isHiringPost(companyPost);
 
-  const openers: Record<Voice, string> = {
-    plain: "Sharing this from our team:",
-    warm: "Genuinely pleased to see this one go out —",
-    proud: "This is the kind of thing I joined for.",
-    technical: "Worth reading if you work in this space —",
+  const openers: Record<Voice, string[]> = {
+    plain: ["Sharing this from our team.", "From our side this week.", "Passing this on."],
+    warm: ["Really glad this one is out.", "This one made my week.", "Good news from the team, and worth a read."],
+    proud: ["This is the kind of work I joined for.", "Proud to work alongside the people behind this.", "This is why I like where I work."],
+    technical: ["Worth reading if you work in this space.", "The detail here is the interesting part.", "A good write-up of how we approached this."],
   };
 
-  const closers: Record<Voice, string> = {
-    plain: "",
-    warm: " Proud of the people behind it.",
-    proud: role ? ` Glad to be part of it as ${role}.` : " Glad to be part of it.",
-    technical: " Happy to answer questions on the approach.",
+  const closers: Record<Voice, string[]> = {
+    plain: [""],
+    warm: ["Proud of the people behind it.", "Well done, everyone involved.", ""],
+    proud: role ? [`Glad to be part of it as ${withArticle(role)}.`] : ["Glad to be part of it."],
+    technical: ["Happy to answer questions on the approach.", "Ask me about how it works."],
   };
 
-  const body =
-    platform === "X"
-      ? `${openers[voice]} ${short}`
-      : `${openers[voice]} ${short}${closers[voice]}`;
+  /* A hiring post is an invitation, not news — "proud of the people behind
+     it" under a job ad reads oddly. The offer that works is to talk. */
+  if (hiring) {
+    // The post already says "we're hiring" — the opener shouldn't say it again.
+    openers.warm = ["It's a good team to join.", "If you've been thinking about a move, read this."];
+    openers.proud = ["I'd recommend working here.", "Good people to work with."];
+    openers.technical = ["Open roles on our side — worth a look if this is your field."];
+    closers.warm = ["Happy to tell you what it's like here."];
+    closers.technical = ["Message me if you want the inside view."];
+  }
 
-  const text = body.trim();
+  const opener = pick(openers[voice], "open");
+  const closer = pick(closers[voice], "close");
+
+  let text: string;
+  if (platform === "X") text = `${opener} ${gist}`;
+  else if (platform === "Instagram") text = [gist, [opener, closer].filter(Boolean).join(" ")].join("\n\n");
+  else text = [opener, [gist, closer].filter(Boolean).join(" ")].join("\n\n");
+
+  text = text.trim();
   return { platform, text, voice, withinLimit: text.length <= LIMITS[platform], editableBeforePosting: true };
+}
+
+/** How much of the company's own post each platform's caption carries. X leaves room for the link. */
+const BUDGET: Record<Platform, number> = { X: 190, LinkedIn: 420, Instagram: 320, Facebook: 420 };
+
+const LEAD_IN = /^(?:we(?:'re| are)|i(?:'m| am)|our team is)\s+(?:so\s+|very\s+|incredibly\s+)?(?:thrilled|excited|delighted|proud|pleased|happy)\s+to\s+(?:announce|share|say|tell you)\s*(?:that\s+)?/i;
+
+function stripLeadIn(text: string): string {
+  const out = text.replace(LEAD_IN, "");
+  return out === text ? text : out.charAt(0).toUpperCase() + out.slice(1);
+}
+
+/** Whole sentences up to the budget; one sentence cut at a word only if it alone is over. */
+function fitSentences(text: string, budget: number): string {
+  const sentences = text.split(/(?<=[.!?])\s+/);
+  let out = "";
+  for (const sentence of sentences) {
+    const next = out ? `${out} ${sentence}` : sentence;
+    if (next.length > budget) break;
+    out = next;
+  }
+  if (out) return out;
+  const cut = sentences[0].slice(0, budget - 1);
+  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:—–-]\s*$/, "")}…`;
+}
+
+function withArticle(role: string): string {
+  const r = role.toLowerCase();
+  return `${/^[aeiou]/.test(r) ? "an" : "a"} ${r}`;
+}
+
+/** FNV-1a — cheap, and spreads a one-letter change in the seed across the whole value. */
+function hash(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+
+/* ── phrases that read as a template ───────────────────────────────
+   Advisory, like the policy check: we point at the phrase and offer plainer
+   words, and the person decides. These are the phrases people scroll past
+   because they have read them a thousand times. */
+
+export type TemplatePhrase = { match: string; instead: string };
+
+const TEMPLATE_PHRASES: { re: RegExp; instead: string }[] = [
+  { re: /\b(?:thrilled|excited|delighted) to (?:announce|share)(?: that)?\s*/i, instead: "" },
+  { re: /\bbeyond (?:excited|thrilled|proud)\b/i, instead: "really glad" },
+  { re: /\b(?:I'm |I am )?humbled\b(?: (?:and honou?red|to))?/i, instead: "glad" },
+  { re: /\bgame[- ]changer\b/i, instead: "real change" },
+  { re: /\b(?:synergy|synergies)\b/i, instead: "working together" },
+  { re: /\bleverag(?:e|ing)\b/i, instead: "using" },
+  { re: /\b(?:world-class|best-in-class|cutting-edge)\s*/i, instead: "" },
+  { re: /\bpassionate about\b/i, instead: "care about" },
+  { re: /\bexciting journey\b/i, instead: "the work" },
+];
+
+export function templatedPhrases(text: string): TemplatePhrase[] {
+  return TEMPLATE_PHRASES.flatMap(({ re, instead }) => {
+    const m = text.match(re);
+    return m ? [{ match: m[0].trim(), instead }] : [];
+  });
+}
+
+/** Swap one templated phrase for its plainer version, keeping the sentence readable. */
+export function replaceTemplated(text: string, phrase: TemplatePhrase): string {
+  const i = text.indexOf(phrase.match);
+  if (i < 0) return text;
+  let out = `${text.slice(0, i)}${phrase.instead}${text.slice(i + phrase.match.length)}`.replace(/ {2,}/g, " ").replace(/ ([.,!?])/g, "$1").trimStart();
+  // A removal at the start of a sentence leaves it lowercase.
+  out = out.replace(/(^|[.!?]\s+|\n)([a-z])/g, (_, a: string, c: string) => a + c.toUpperCase());
+  return out;
 }
 
 /* ── impact scoring ────────────────────────────────────────────── */
