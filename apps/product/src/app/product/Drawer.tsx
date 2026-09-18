@@ -16,11 +16,15 @@ export function Drawer({
   title,
   onClose,
   children,
+  footer,
 }: {
   open: boolean;
   title?: string;
   onClose: () => void;
   children: React.ReactNode;
+  /** Actions pinned under the scrolling content — always at the bottom edge,
+   *  never floating over fields, on a phone above the home indicator. */
+  footer?: React.ReactNode;
 }) {
   const [show, setShow] = React.useState(false);
   const panelRef = React.useRef<HTMLDivElement>(null);
@@ -84,7 +88,8 @@ export function Drawer({
           <span className="h-1.5 w-10 rounded-full bg-[var(--line)]" />
         </div>
         <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 z-10 grid h-11 w-11 place-items-center rounded-full text-faint transition hover:bg-soft hover:text-ink md:right-4 md:top-4 md:h-8 md:w-8"><X className="h-4 w-4" /></button>
-        <div className="flex-1 overflow-y-auto px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-2 md:p-7">{children}</div>
+        <div className={`flex-1 overflow-y-auto px-6 pt-2 md:p-7 ${footer ? "pb-6" : "pb-[calc(1.5rem+env(safe-area-inset-bottom))]"}`}>{children}</div>
+        {footer && <div className="shrink-0 border-t border-line bg-card px-6 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 md:px-7 md:pb-4">{footer}</div>}
       </div>
     </div>
   );

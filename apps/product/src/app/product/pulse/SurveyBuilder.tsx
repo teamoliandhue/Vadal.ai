@@ -88,7 +88,13 @@ export function SurveyBuilder({ seed, onClose, onLaunch }: { seed: BuilderSeed; 
   }
 
   return (
-    <Drawer open={!!seed} title="New survey" onClose={onClose}>
+    <Drawer open={!!seed} title="New survey" onClose={onClose} footer={<div className="flex items-center justify-between gap-2">
+        <span className="text-[12px] text-faint">{questions.filter((q) => q.text.trim()).length} question{questions.filter((q) => q.text.trim()).length === 1 ? "" : "s"} ready</span>
+        <div className="flex items-center gap-2">
+          <Button variant="tertiary" size="sm" onClick={onClose}>Cancel</Button>
+          <Button variant="brand" size="sm" disabled={!valid} leadingIcon={<SparkMark size={14} tone="solid" />} onClick={launch}>Launch survey</Button>
+        </div>
+      </div>}>
       <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">New survey</p>
       <h2 className="mt-1.5 text-[20px] font-bold tracking-tight">Build &amp; launch</h2>
 
@@ -153,13 +159,7 @@ export function SurveyBuilder({ seed, onClose, onLaunch }: { seed: BuilderSeed; 
         <Plus className="h-3.5 w-3.5" /> Add question
       </button>
 
-      <div className="sticky bottom-0 -mx-7 -mb-7 mt-6 flex items-center justify-between gap-2 border-t border-line bg-card px-7 py-4">
-        <span className="text-[12px] text-faint">{questions.filter((q) => q.text.trim()).length} question{questions.filter((q) => q.text.trim()).length === 1 ? "" : "s"} ready</span>
-        <div className="flex items-center gap-2">
-          <Button variant="tertiary" size="sm" onClick={onClose}>Cancel</Button>
-          <Button variant="brand" size="sm" disabled={!valid} leadingIcon={<SparkMark size={14} tone="solid" />} onClick={launch}>Launch survey</Button>
-        </div>
-      </div>
+      
     </Drawer>
   );
 }

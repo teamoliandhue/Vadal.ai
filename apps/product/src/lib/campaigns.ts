@@ -200,6 +200,29 @@ export function collisions(list: Campaign[], limit: number): Collision[] {
     .sort((a, b) => a.week.localeCompare(b.week) || b.count - a.count);
 }
 
+/** First and last send — the span a campaign occupies on a timeline. */
+export function spanOf(c: Campaign): { start: string; end: string } | null {
+  const dates = c.steps.map((s) => s.date).filter((d): d is string => Boolean(d)).sort();
+  return dates.length ? { start: dates[0], end: dates[dates.length - 1] } : null;
+}
+
+/** Whole days from a to b. */
+export function daysBetween(a: string, b: string): number {
+  return Math.round((new Date(`${b}T00:00:00`).getTime() - new Date(`${a}T00:00:00`).getTime()) / 86400000);
+}
+
+/** Non-critical, not-yet-sent messages per team per week — the planner's load grid. */
+export function loadGrid(list: Campaign[], weeks: string[]): { team: string; counts: number[] }[] {
+  const rows = TEAMS.map((team) => ({
+    team,
+    counts: weeks.map((w) => list
+      .filter((c) => c.status === "live" || c.status === "scheduled")
+      .filter((c) => covers(c.audience, team))
+      .reduce((n, c) => n + c.steps.filter((s) => s.date && !s.done && !s.critical && weekOf(s.date) === w).length, 0)),
+  }));
+  return rows.filter((r) => r.counts.some((n) => n > 0));
+}
+
 /** Shift a campaign's undone steps by n days. */
 export function shiftCampaign(c: Campaign, days: number): Campaign {
   if (!days) return c;

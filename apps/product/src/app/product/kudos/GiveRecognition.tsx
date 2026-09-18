@@ -116,7 +116,13 @@ export function GiveRecognition({
   const active = values.find((v) => v.name === value)!;
 
   return (
-    <Drawer open={open} title="Give recognition" onClose={onClose}>
+    <Drawer open={open} title="Give recognition" onClose={onClose} footer={<div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-[12px] text-faint">{points ? <>You get <span className="font-semibold text-muted">+{GIVE}</span> · {people.length > 1 ? "each of them" : who} gets <span className="font-semibold text-muted">+{GET}</span></> : "Counts toward their Top recogniser badge"}</span>
+        <div className="ml-auto flex items-center gap-2">
+          <Button variant="tertiary" size="sm" className="min-h-[44px] lg:min-h-0" onClick={onClose}>Cancel</Button>
+          <Button variant="brand" size="sm" className="min-h-[44px] lg:min-h-0" disabled={!valid} leadingIcon={<SparkMark size={14} tone="solid" />} onClick={send}>Send recognition</Button>
+        </div>
+      </div>}>
       <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">Give recognition</p>
       <h2 className="mt-1.5 pr-10 text-[20px] font-bold tracking-tight">Catch someone doing it right</h2>
 
@@ -232,13 +238,7 @@ export function GiveRecognition({
         />
       </div>
 
-      <div className="sticky bottom-0 -mx-6 -mb-[calc(1.5rem+env(safe-area-inset-bottom))] mt-6 flex flex-wrap items-center justify-between gap-2 border-t border-line bg-card px-6 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 md:-mx-7 md:-mb-7 md:px-7 md:pb-4">
-        <span className="text-[12px] text-faint">{points ? <>You get <span className="font-semibold text-muted">+{GIVE}</span> · {people.length > 1 ? "each of them" : who} gets <span className="font-semibold text-muted">+{GET}</span></> : "Counts toward their Top recogniser badge"}</span>
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="tertiary" size="sm" className="min-h-[44px] lg:min-h-0" onClick={onClose}>Cancel</Button>
-          <Button variant="brand" size="sm" className="min-h-[44px] lg:min-h-0" disabled={!valid} leadingIcon={<SparkMark size={14} tone="solid" />} onClick={send}>Send recognition</Button>
-        </div>
-      </div>
+      
     </Drawer>
   );
 }

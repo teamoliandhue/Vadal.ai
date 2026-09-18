@@ -62,3 +62,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 044 | [Social v2 — a calmer feed, must reads, questions, saved](./044-social-v2.md) | Built · needs Figma |
 | 045 | [Kudos v2 — role-fit recognition, boosts, thanks back, cards to sign](./045-kudos-v2.md) | Built · needs Figma |
 | 046 | [Campaigns v2 — dated plans, the weekly send limit, honest results, run it again](./046-campaigns-v2.md) | Built · needs Figma |
+| 047 | [Campaigns v3 — Overview, Planner, Results, and a four-step builder](./047-campaigns-v3.md) | Built · needs Figma |

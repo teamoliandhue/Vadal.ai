@@ -27,7 +27,7 @@ export function PostDrawer({
   onAccept?: (commentId: string) => void;
 }) {
   return (
-    <Drawer open={!!item} title="Post" onClose={onClose}>
+    <Drawer open={!!item} title="Post" onClose={onClose} footer={item ? <CommentBox key={item.id} postId={item.id} onComment={onComment} /> : undefined}>
       {item && (
         <div className="space-y-1">
           <Link
@@ -48,12 +48,6 @@ export function PostDrawer({
         </div>
       )}
 
-      {/* composer pinned to bottom */}
-      {item && (
-        <div className="sticky bottom-0 -mx-6 -mb-[calc(1.5rem+env(safe-area-inset-bottom))] mt-4 border-t border-line bg-card px-6 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 md:-mx-7 md:-mb-7 md:px-7 md:pb-4">
-          <CommentBox key={item.id} postId={item.id} onComment={onComment} />
-        </div>
-      )}
     </Drawer>
   );
 }
