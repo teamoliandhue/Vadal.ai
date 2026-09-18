@@ -64,7 +64,7 @@ export function StatusPill({ status }: { status: PulseStatus }) {
 }
 
 /** Change since the last round, said in words as well as an arrow. */
-export function Delta({ now, before, unit = " pts", quiet = false }: { now: number; before?: number; unit?: string; quiet?: boolean }) {
+export function Delta({ now, before, unit = " pts", quiet = false, sr = " since last round" }: { now: number; before?: number; unit?: string; quiet?: boolean; sr?: string }) {
   if (before == null) return null;
   const d = now - before;
   const Icon = d > 0 ? ArrowUpRight : d < 0 ? ArrowDownRight : Minus;
@@ -73,7 +73,7 @@ export function Delta({ now, before, unit = " pts", quiet = false }: { now: numb
     <span className="inline-flex items-center gap-0.5 text-[13px] font-semibold tabular-nums" style={{ color }}>
       <Icon className="h-3.5 w-3.5" aria-hidden />
       {d > 0 ? "+" : ""}{d}{unit}
-      <span className="sr-only"> since last round</span>
+      {sr && <span className="sr-only">{sr}</span>}
     </span>
   );
 }
