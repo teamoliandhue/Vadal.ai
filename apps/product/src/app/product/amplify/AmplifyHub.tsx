@@ -27,24 +27,22 @@
    first, so the gate is stated on the card rather than discovered after a
    click. */
 import * as React from "react";
-import Image from "next/image";
-import { Copy, Heart, MessageCircle, Repeat2, ShieldCheck, ThumbsDown } from "lucide-react";
-import { Avatar, Badge, Button, SparkMark, Switch } from "@vadal/design-system";
+import { Copy, ShieldCheck, SlidersHorizontal } from "lucide-react";
+import { Avatar, Button, SparkMark, Switch } from "@vadal/design-system";
 import { usePersistentState } from "@/lib/usePersistentState";
-import { draftCaption, draftFromMoment, rankMoments, scoreAdvocacy, type Voice } from "@/lib/ai/engines/advocacy";
+import { draftCaption, draftFromMoment, rankMoments, scoreAdvocacy } from "@/lib/ai/engines/advocacy";
 import {
-  advocacyStats, companyPosts, companyPostReach, myMoments, recentSharers, shares,
+  advocacyStats, companyPosts, companyPostReach, myAdvocacy, myMoments, recentSharers, shares,
   DEFAULT_PREFS, type CompanyPost,
 } from "@/lib/amplify";
-import { DECLINE_REASONS, type DeclineReason } from "@/lib/share";
+import type { DeclineReason } from "@/lib/share";
 import { canAccess } from "@/lib/access";
 import { useViewAs } from "../useViewAs";
 import { useSession } from "../useSession";
 import { toast } from "../Toaster";
-import { Eyebrow, Mark, PlatformLine } from "./parts";
-import { AmplifyRail, type Prefs } from "./Rail";
-import { Composer } from "./Composer";
-import { MomentHero, MomentStrip } from "./Moments";
+import { Eyebrow, Mark } from "./parts";
+import { ExemplarsCard, FaqCard, FeasibilityCard, ReachCard, SentCard, VoiceCard, type Prefs } from "./Rail";
+import { Studio, type Item } from "./Studio";
 import { Programme } from "./Programme";
 import { Results } from "./Results";
 
@@ -59,8 +57,6 @@ export function AmplifyHub() {
      of an unreadable consent value is "they did not consent". */
   const [optInRaw, setOptIn] = usePersistentState<boolean>("vadal:advocacy-optin", false);
   const optIn = optInRaw === true;
-  const [open, setOpen] = React.useState<string | null>(null);
-  const [openMoment, setOpenMoment] = React.useState<string | null>(null);
   /* How the person wants to be asked — see Rail.VoiceCard. These are not
      decorative settings: `scope` decides what this screen is allowed to put in
      front of them at all. */
@@ -69,156 +65,127 @@ export function AmplifyHub() {
      fastest way to make an optional feature feel like nagging. */
   const [passed, setPassed] = usePersistentState<string[]>("vadal:advocacy-passed", []);
   const [passedMoments, setPassedMoments] = usePersistentState<string[]>("vadal:advocacy-passed-moments", []);
-  const [declining, setDeclining] = React.useState(false);
+  const [prefsOpen, setPrefsOpen] = React.useState(false);
 
   const impact = scoreAdvocacy(shares, companyPostReach);
 
-  /* "Only my own" and "only the company's" are real filters, not labels. A
-     person who said they never want a marketing post put in front of them
-     should not see one, anywhere on the screen. */
+  /* "Only my own" and "only the company's" are real filters, not labels. */
   const wantsCompany = prefs.scope !== "mine";
   const wantsMine = prefs.scope !== "company";
-
   const live = wantsCompany ? companyPosts.filter((p) => !passed.includes(p.id)) : [];
   const featured = live.find((p) => p.featured) ?? live[0] ?? null;
   const moments = wantsMine ? rankMoments(myMoments, passedMoments) : [];
-  const heroMoment = optIn ? moments[0] ?? null : null;
 
-  /* When a moment takes the hero, the company's pick does not vanish — it drops
-     into the browse list, still marked. Yours first, theirs still there. */
-  const rest = heroMoment ? live : live.filter((p) => p.id !== featured?.id);
+  /* Yours first, then the company's — the featured pick leads its group. */
+  const items: Item[] = [
+    ...moments.map((m) => ({ kind: "moment" as const, id: m.id, moment: m })),
+    ...[...live].sort((a, b) => Number(b.id === featured?.id) - Number(a.id === featured?.id)).map((p) => ({ kind: "post" as const, id: p.id, post: p })),
+  ];
 
-  function decline(reason: DeclineReason) {
-    if (!featured) return;
-    setPassed((all) => [...all, featured.id]);
-    setDeclining(false);
+  function decline(id: string, reason: DeclineReason) {
+    setPassed((all) => [...all, id]);
     toast(reason === "never" ? "Noted — we'll stop putting these in front of you" : "Passed. We'll show you something else.");
   }
 
+  const tabs = isAdmin ? <Tabs tab={tab} setTab={setTab} /> : null;
+
   if (isAdmin && tab !== "share") {
     return (
-      <div className="flex flex-col gap-6">
-        <Tabs tab={tab} setTab={setTab} />
+      <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
+        <PageHeader tabs={tabs} subtitle={tab === "programme" ? "Run the programme — what's queued for people to share, what's working, and why people pass." : "What sharing did for the company — reach, applications and hires traced to a share."} />
         {tab === "programme" ? <Programme /> : <Results />}
       </div>
     );
   }
 
-  return (
-    <div className="flex flex-col gap-6">
-      {isAdmin && <Tabs tab={tab} setTab={setTab} />}
-
-      {/* ══ HERO ══ four states, and yours outranks theirs ══ */}
-      {!optIn ? (
+  if (!optIn) {
+    return (
+      <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
+        {tabs}
         <OptInHero optIn={optIn} setOptIn={setOptIn} featured={featured} impact={impact} />
-      ) : heroMoment ? (
-        <MomentHero
-          moment={heroMoment}
-          defaultVoice={prefs.voice}
-          defaultPlatform={prefs.platform}
-          onPass={() => { setPassedMoments((a) => [...a, heroMoment.id]); toast("Skipped — we'll leave that one alone"); }}
-        />
-      ) : featured ? (
-        <CompanyHero
-          post={featured}
-          defaultVoice={prefs.voice}
-          declining={declining}
-          setDeclining={setDeclining}
-          onDecline={decline}
-        />
-      ) : (
-        /* Nothing left to ask for. An empty queue should read as finished, not
-           broken — and it is the one moment we can say thank you plainly. */
-        <header className="rise rounded-[28px] border border-line bg-card p-8 text-center sm:p-10">
-          <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-soft text-[var(--purple)]">
-            <SparkMark size={22} tone="gradient" />
-          </span>
-          <h1 className="mt-4 text-[22px] font-bold tracking-tight">You&apos;re all caught up</h1>
-          <p className="mx-auto mt-2 max-w-sm text-[16px] leading-relaxed text-muted">
-            Nothing queued, and nothing of your own waiting. We&apos;ll put something here when there
-            is — and never more than one thing at a time.
-          </p>
-          {(passed.length > 0 || passedMoments.length > 0) && (
-            <button
-              onClick={() => { setPassed([]); setPassedMoments([]); toast("Showing everything again"); }}
-              className="mt-5 min-h-[44px] rounded-full border border-line px-4 text-[14px] font-semibold transition hover:bg-soft"
-            >
-              Show the ones I passed on
-            </button>
-          )}
-        </header>
-      )}
-
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
-        <div className="flex flex-col gap-6 xl:col-span-8">
-          {/* ══ the rest of your own moments ══ */}
-          {optIn && <MomentStrip moments={moments.slice(1)} openId={openMoment} onOpen={setOpenMoment} defaultVoice={prefs.voice} defaultPlatform={prefs.platform} />}
-
-          {/* ══ the rest of what the company said ══ */}
-          {rest.length > 0 && (
-            <div>
-              <div className="pb-3">
-                <Eyebrow>From the company</Eyebrow>
-                <p className="mt-1 text-[14px] text-muted">
-                  Clearly marked as external — this is what the outside world sees.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                {rest.map((p) => {
-                  const isOpen = open === p.id;
-                  return (
-                    <article key={p.id} className="card-lift overflow-hidden rounded-[26px] border border-line bg-card">
-                      {p.image && (
-                        <div className="relative aspect-[16/7] w-full">
-                          <Image src={p.image} alt="" fill sizes="(max-width: 1280px) 100vw, 60vw" className="object-cover" />
-                        </div>
-                      )}
-                      <div className="p-6">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <PlatformLine p={p.platform} posted={p.posted} />
-                          {p.inAdvocacyQueue && <Badge tone="brand" variant="soft" size="sm">Picked by HR</Badge>}
-                        </div>
-                        <p className="mt-3 text-[16px] leading-relaxed">{p.text}</p>
-
-                        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] text-faint">
-                          <span className="flex items-center gap-1"><Heart className="h-3 w-3" />{p.likes.toLocaleString()}</span>
-                          <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" />{p.comments}</span>
-                          <span className="flex items-center gap-1"><Repeat2 className="h-3 w-3" />{p.shares}</span>
-                          {p.sharedBy ? <span>· {p.sharedBy} shared</span> : null}
-                          {p.passedBy ? <span>· {p.passedBy} passed</span> : null}
-                          {optIn && (
-                            <Button size="sm" variant={isOpen ? "tertiary" : "secondary"}
-                              className="ml-auto min-h-[44px] lg:min-h-0"
-                              onClick={() => setOpen(isOpen ? null : p.id)}>
-                              {isOpen ? "Close" : "Write my caption"}
-                            </Button>
-                          )}
-                        </div>
-
-                        {isOpen && optIn && (
-                          <div className="mt-4"><Composer subject={{ kind: "post", post: p }} defaultVoice={prefs.voice} /></div>
-                        )}
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* ══ right rail ══ the person's own record, and nothing of anyone else's ══ */}
-        <div className="xl:col-span-4">
-          <AmplifyRail
-            optIn={optIn}
-            prefs={prefs}
-            setPrefs={setPrefs}
-            onOptOut={() => { setOptIn(false); toast("Opted out. Nothing will be put in front of you."); }}
-          />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <FaqCard />
+          <ExemplarsCard />
+          <FeasibilityCard />
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
+      <PageHeader
+        tabs={tabs}
+        aside={(
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-line bg-card px-3.5 py-2 text-[13px] text-muted">
+              <span className="font-semibold tabular-nums text-ink">{myAdvocacy.estimatedReach.toLocaleString("en-IN")}</span> people reached · <span className="font-semibold tabular-nums text-ink">{myAdvocacy.shares}</span> shares
+            </span>
+            <Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" leadingIcon={<SlidersHorizontal className="h-4 w-4" />} onClick={() => setPrefsOpen((v) => !v)} aria-expanded={prefsOpen}>
+              Preferences
+            </Button>
+          </div>
+        )}
+      />
+
+      {prefsOpen && (
+        <div className="lg:max-w-[520px] lg:self-end">
+          <VoiceCard prefs={prefs} setPrefs={setPrefs} optIn={optIn} onOptOut={() => { setOptIn(false); toast("Opted out. Nothing will be put in front of you."); }} />
+        </div>
+      )}
+
+      <Studio
+        items={items}
+        prefs={prefs}
+        onPassMoment={(id) => { setPassedMoments((a) => [...a, id]); toast("Skipped — we'll leave that one alone"); }}
+        onDeclinePost={decline}
+        caughtUp={(
+          <section className="rounded-[28px] border border-line bg-card p-8 text-center sm:p-10">
+            <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-soft text-[var(--purple)]"><SparkMark size={22} tone="gradient" /></span>
+            <h2 className="mt-4 text-[22px] font-bold tracking-tight">You&apos;re all caught up</h2>
+            <p className="mx-auto mt-2 max-w-sm text-[16px] leading-relaxed text-muted">Nothing queued, and nothing of your own waiting. We&apos;ll put something here when there is.</p>
+            {(passed.length > 0 || passedMoments.length > 0) && (
+              <button onClick={() => { setPassed([]); setPassedMoments([]); toast("Showing everything again"); }} className="mt-5 min-h-[44px] rounded-full border border-line px-4 text-[14px] font-semibold transition hover:bg-soft">
+                Show the ones I passed on
+              </button>
+            )}
+          </section>
+        )}
+      />
+
+      <section aria-labelledby="record-h" className="flex flex-col gap-3">
+        <h2 id="record-h" className="text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Your record</h2>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <ReachCard />
+          <SentCard />
+        </div>
+      </section>
+
+      <section aria-labelledby="know-h" className="flex flex-col gap-3">
+        <h2 id="know-h" className="text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Good to know</h2>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <ExemplarsCard />
+          <FaqCard />
+          <FeasibilityCard />
+        </div>
+      </section>
     </div>
+  );
+}
+
+function PageHeader({ tabs, aside, subtitle }: { tabs: React.ReactNode; aside?: React.ReactNode; subtitle?: string }) {
+  return (
+    <>
+      <header className="rise flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <Eyebrow>Engage</Eyebrow>
+          <h1 className="mt-2 text-[clamp(28px,3.2vw,38px)] font-bold leading-[1.05] tracking-[-0.03em]">Amplify</h1>
+          <p className="mt-2.5 max-w-xl text-[15px] leading-relaxed text-muted">{subtitle ?? "Your wins and the company’s news, shared in your own words. Nothing ever posts without you."}</p>
+        </div>
+        {aside}
+      </header>
+      {tabs}
+    </>
   );
 }
 
@@ -226,20 +193,14 @@ export function AmplifyHub() {
 type AmplifyTab = "share" | "programme" | "results";
 function Tabs({ tab, setTab }: { tab: AmplifyTab; setTab: (t: AmplifyTab) => void }) {
   return (
-    <div className="flex w-fit rounded-full bg-soft p-1 text-[14px] font-semibold">
+    <nav aria-label="Amplify" className="flex items-center gap-1 border-b border-line">
       {([["share", "Share"], ["programme", "Programme"], ["results", "Results"]] as const).map(([k, label]) => (
-        <button
-          key={k}
-          onClick={() => setTab(k)}
-          aria-pressed={tab === k}
-          className={`min-h-[44px] rounded-full px-5 transition lg:min-h-[36px] ${
-            tab === k ? "bg-card text-ink shadow-sm" : "text-muted hover:text-ink"
-          }`}
-        >
+        <button key={k} onClick={() => setTab(k)} aria-current={tab === k ? "page" : undefined}
+          className={`-mb-px min-h-[44px] border-b-2 px-3.5 text-[14px] font-semibold transition lg:min-h-[42px] ${tab === k ? "border-[var(--purple)] text-ink" : "border-transparent text-muted hover:text-ink"}`}>
           {label}
         </button>
       ))}
-    </div>
+    </nav>
   );
 }
 
@@ -330,71 +291,6 @@ function OptInHero({
             </span>
           </div>
           <p className="mt-2.5 text-center text-[12px] text-faint">Written for you, in four tones. Yours to edit.</p>
-        </div>
-      </div>
-    </header>
-  );
-}
-
-/* ── opted in, nothing of your own: today's company pick ── */
-function CompanyHero({
-  post, defaultVoice, declining, setDeclining, onDecline,
-}: {
-  post: CompanyPost; defaultVoice?: Voice; declining: boolean;
-  setDeclining: (f: (v: boolean) => boolean) => void;
-  onDecline: (r: DeclineReason) => void;
-}) {
-  return (
-    <header className="rise overflow-hidden rounded-[28px] border border-line bg-card shadow-[0_1px_2px_rgba(20,20,40,0.04),0_24px_56px_-32px_rgba(20,20,40,0.32)]">
-      <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
-        {post.image && (
-          <div className="relative min-h-[220px] lg:min-h-full">
-            <Image src={post.image} alt="" fill sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover" priority />
-          </div>
-        )}
-        <div className="min-w-0 p-7 sm:p-8">
-          <div className="flex flex-wrap items-center gap-2">
-            <Eyebrow>Worth sharing today</Eyebrow>
-            {post.sharedBy ? <span className="text-[12px] text-faint">· {post.sharedBy} colleagues already have</span> : null}
-            {/* Saying no has to be as easy as saying yes, or the ask stops being
-                an invitation. It is also the signal HR would never otherwise
-                get: which posts our own people won't put their name on. */}
-            <button
-              onClick={() => setDeclining((v) => !v)}
-              aria-expanded={declining}
-              className="ml-auto flex min-h-[44px] items-center gap-1.5 rounded-full px-2.5 text-[12px] font-semibold text-faint transition hover:bg-soft hover:text-ink lg:min-h-[36px]"
-            >
-              <ThumbsDown className="h-3.5 w-3.5" /> Not for me
-            </button>
-          </div>
-
-          {declining && (
-            <div className="mt-3 rounded-2xl bg-soft p-4">
-              <p className="text-[14px] font-semibold">No problem. Anything we should know?</p>
-              <p className="mt-1 text-[12px] text-faint">Optional, and never attributed to you.</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {DECLINE_REASONS.map((r) => (
-                  <button
-                    key={r.key}
-                    onClick={() => onDecline(r.key)}
-                    className="min-h-[40px] rounded-full border border-line bg-card px-3.5 text-[14px] font-medium transition hover:border-faint/50 hover:bg-[var(--card-hover)]"
-                  >
-                    {r.label}
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => onDecline("not-now")}
-                className="mt-3 text-[12px] font-semibold text-faint underline-offset-2 hover:underline"
-              >
-                Just skip it
-              </button>
-            </div>
-          )}
-
-          <p className="mt-3 text-[18px] font-semibold leading-relaxed tracking-[-0.01em]">{post.text}</p>
-          <div className="mt-3"><PlatformLine p={post.platform} posted={post.posted} /></div>
-          <div className="mt-5"><Composer subject={{ kind: "post", post }} defaultVoice={defaultVoice} /></div>
         </div>
       </div>
     </header>

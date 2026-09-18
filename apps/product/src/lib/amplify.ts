@@ -208,7 +208,7 @@ export const queueCandidates: QueueCandidate[] = [
 export const advocacyCampaign = {
   name: "Apprenticeship intake",
   goal: "Fill 40 floor roles before the October intake closes",
-  window: "12–26 Sept",
+  window: "12–26 Sep",
   targetShares: 120,
   shares: 47,
   /** Referral applications attributable to employee shares. */

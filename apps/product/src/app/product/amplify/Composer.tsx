@@ -42,7 +42,7 @@ import { myReferralCode, socialPolicy, type CompanyPost } from "@/lib/amplify";
 import { canWebShare, routeFor, openShare } from "@/lib/share";
 import { useSession } from "../useSession";
 import { toast } from "../Toaster";
-import { Eyebrow, PlatformPicker, VOICES } from "./parts";
+import { Eyebrow, Mark, PlatformPicker, VOICES } from "./parts";
 
 /** What the composer is writing about. */
 export type Subject =
@@ -200,11 +200,13 @@ function Detail({
 }
 
 export function Composer({
-  subject, title, defaultVoice = "warm", defaultPlatform = "LinkedIn",
+  subject, title, defaultVoice = "warm", defaultPlatform = "LinkedIn", layout = "stack",
 }: {
   subject: Subject; title?: string;
   /** From the person's own settings — see Rail.VoiceCard. */
   defaultVoice?: Voice; defaultPlatform?: Platform;
+  /** "studio" puts a live preview of the post beside the editor (Amplify v2, spec 048). */
+  layout?: "stack" | "studio";
 }) {
   const { session } = useSession();
   /* Derived rather than initialised-once, so changing your default voice in the
@@ -251,8 +253,9 @@ export function Composer({
     setEdited(next);
   }
 
-  return (
-    <div className="rounded-2xl bg-[var(--ai-surface)] p-4 ring-1 ring-[var(--ai-border)]">
+  const studio = layout === "studio";
+  const editor = (
+    <>
       <div className="flex flex-wrap items-center gap-2">
         <span className="ai-grad grid h-6 w-6 place-items-center rounded-full"><SparkMark size={13} tone="solid" /></span>
         <Eyebrow>{title ?? "Your caption"}</Eyebrow>
@@ -456,6 +459,78 @@ export function Composer({
           : undefined
         }
       />
+    </>
+  );
+
+  if (!studio) {
+    return <div className="rounded-2xl bg-[var(--ai-surface)] p-4 ring-1 ring-[var(--ai-border)]">{editor}</div>;
+  }
+  return (
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)]">
+      <div className="min-w-0">{editor}</div>
+      <div className="min-w-0 xl:sticky xl:top-4 xl:self-start">
+        <PostPreview
+          platform={platform} caption={value} limit={limit}
+          image={subject.kind === "moment" ? subject.moment.image : undefined}
+          quoted={subject.kind === "post" ? subject.post : undefined}
+          aspect={aspect.ratio}
+        />
+      </div>
     </div>
+  );
+}
+
+/* ── the post, before it's a post ───────────────────────────────────
+   What people will actually see: your name, your words, the picture or the
+   company post you're resharing. Deliberately neutral chrome — it shows the
+   shape of the post, not an imitation of any platform's interface. On X the
+   part past 280 characters is marked, so trimming is obvious. */
+function PostPreview({ platform, caption, limit, image, quoted, aspect }: {
+  platform: Platform; caption: string; limit: number; image?: string; quoted?: CompanyPost; aspect: string;
+}) {
+  const { session } = useSession();
+  const within = caption.slice(0, limit);
+  const overflow = caption.slice(limit);
+  return (
+    <figure>
+      <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-faint">How it will look</p>
+      <div className="overflow-hidden rounded-2xl border border-line bg-card shadow-[0_18px_40px_-30px_rgba(20,20,40,0.45)]">
+        <div className="flex items-center gap-2.5 px-4 pt-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={session?.img ?? "/avatars/user-2.svg"} alt="" className="h-10 w-10 rounded-full bg-soft object-cover" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[14px] font-semibold text-ink">{session?.name ?? "You"}</p>
+            <p className="truncate text-[12px] text-faint">{session?.title ?? "Your role"} · now</p>
+          </div>
+          <Mark platform={platform} size={22} />
+        </div>
+        <p className="whitespace-pre-line px-4 pt-3 text-[14px] leading-relaxed text-ink">
+          {within}
+          {overflow && <mark className="rounded-sm bg-[color-mix(in_srgb,var(--danger)_18%,transparent)] text-ink">{overflow}</mark>}
+        </p>
+        {quoted ? (
+          <div className="mx-4 mt-3 overflow-hidden rounded-xl border border-line">
+            {quoted.image && (
+              <div className="relative aspect-[16/7] w-full bg-soft">
+                <Image src={quoted.image} alt="" fill sizes="360px" className="object-cover" />
+              </div>
+            )}
+            <div className="p-3">
+              <p className="text-[12px] font-semibold text-muted">oliandhue · {quoted.platform}</p>
+              <p className="mt-1 line-clamp-3 text-[13px] leading-snug text-ink/90">{quoted.text}</p>
+            </div>
+          </div>
+        ) : image ? (
+          <div className="relative mt-3 w-full bg-soft" style={{ aspectRatio: aspect }}>
+            <Image src={image} alt="" fill sizes="420px" className="object-cover" />
+          </div>
+        ) : null}
+        <div className="mt-3 flex items-center gap-5 border-t border-line px-4 py-2.5 text-[12px] text-faint">
+          <span>Like</span><span>Comment</span><span>Share</span>
+          <span className="ml-auto tabular-nums">{caption.length.toLocaleString()} / {limit.toLocaleString()}</span>
+        </div>
+      </div>
+      <figcaption className="mt-2 text-[12px] text-faint">A preview of the shape — {platform} shows it in its own layout. You press post there.</figcaption>
+    </figure>
   );
 }
