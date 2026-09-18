@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import {
   campaigns, channels as CHANNELS, covers, daysBetween, fmtDate, objectives, shiftCampaign, spanOf,
-  type Campaign, type CampaignStatus, type Step,
+  type Campaign, type CampaignStatus,
 } from "@/lib/campaigns";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { useScope } from "../useViewAs";
@@ -94,53 +94,57 @@ export function ObjTile({ objective, size = 44 }: { objective: string; size?: nu
   );
 }
 
-/* ── mini timeline ──────────────────────────────────────────────────
-   One line per campaign: the span of its sends, a dot per send (filled once
-   sent, a ring until then, red-ringed when it's a safety send), and today. */
-export function MiniTimeline({ c, className = "" }: { c: Campaign; className?: string }) {
+/* ── send progress ──────────────────────────────────────────────────
+   One segment per send — filled once it's gone out, outlined for the next
+   one, empty for the rest — and the words that make it unambiguous: how many
+   have gone, and what goes next, when. (It replaced a dot timeline whose
+   "Today" label didn't sit under the today line and whose dots were
+   unlabelled icons.) */
+const inDays = (iso: string) => {
+  const n = daysBetween(TODAY, iso);
+  return n === 0 ? "today" : n === 1 ? "tomorrow" : n < 0 ? `${-n} days ago` : `in ${n} days`;
+};
+
+export function SendProgress({ c }: { c: Campaign }) {
+  const sent = c.steps.filter((x) => x.done).length;
+  const next = c.steps.find((x) => !x.done);
   const span = spanOf(c);
-  if (!span) return null;
-  const total = Math.max(1, daysBetween(span.start, span.end));
-  const pos = (d: string) => `${Math.min(100, Math.max(0, (daysBetween(span.start, d) / total) * 100))}%`;
-  const showToday = TODAY >= span.start && TODAY <= span.end;
-  const doneTo = c.steps.filter((s) => s.done && s.date).map((s) => s.date!).sort().at(-1);
-  const progressTo = showToday ? TODAY : doneTo && c.status !== "scheduled" ? doneTo : null;
+  const NextIcon = CH_ICON[next?.channel ?? "feed"] ?? Newspaper;
+
+  const summary = c.status === "completed"
+    ? `All ${c.steps.length} sent${span ? ` · ended ${fmtDate(span.end)}` : ""}`
+    : c.status === "scheduled"
+      ? `${c.steps.length} sends · starts ${span ? `${fmtDate(span.start)}, ${inDays(span.start)}` : "soon"}`
+      : c.status === "paused"
+        ? `Paused after ${sent} of ${c.steps.length}`
+        : `${sent} of ${c.steps.length} sent${span ? ` · ends ${fmtDate(span.end)}` : ""}`;
 
   return (
-    <div className={`relative ${className}`}>
-      <div className="relative h-7" role="img" aria-label={`${c.steps.length} sends from ${fmtDate(span.start)} to ${fmtDate(span.end)}${showToday ? `, today is ${fmtDate(TODAY)}` : ""}`}>
-        <span className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-[var(--line)]" />
-        {progressTo && <span className="absolute left-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-ink/70" style={{ width: pos(progressTo) }} />}
-        {c.steps.filter((s) => s.date).map((s, i) => <Dot key={i} step={s} left={pos(s.date!)} />)}
-        {showToday && (
-          <span className="absolute top-0 flex h-full -translate-x-1/2 flex-col items-center" style={{ left: pos(TODAY) }}>
-            <span className="h-full w-[2px] rounded-full bg-[var(--purple)]" />
-          </span>
-        )}
-      </div>
-      <div className="mt-0.5 flex justify-between text-[11px] tabular-nums text-faint">
-        <span>{shortDate(span.start)}</span>
-        {showToday && <span className="font-semibold text-[var(--purple)]">Today</span>}
-        <span>{shortDate(span.end)}</span>
-      </div>
+    <div className="min-w-0">
+      <ol className="flex h-2 gap-1" aria-label={summary}>
+        {c.steps.map((x, i) => {
+          const isNext = next === x && c.status !== "completed";
+          return (
+            <li
+              key={i}
+              title={`${x.label} · ${x.date ? fmtDate(x.date) : x.when} · ${chLabel(x.channel ?? "feed")}${x.done ? " · sent" : ""}`}
+              className="h-full flex-1 rounded-full"
+              style={
+                x.done ? { background: "var(--purple)" }
+                  : isNext ? { boxShadow: "inset 0 0 0 2px var(--purple)", background: soft("var(--purple)", 12) }
+                  : { background: "var(--line)" }
+              }
+            />
+          );
+        })}
+      </ol>
+      <p className="mt-2 text-[13px] font-semibold text-ink">{summary}</p>
+      {next && c.status !== "completed" && (
+        <p className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[13px] text-muted">
+          <NextIcon className="h-3.5 w-3.5 shrink-0 text-faint" />
+          <span className="truncate">Next: <span className="text-ink">{next.label}</span>{next.date ? ` · ${fmtDate(next.date)}, ${inDays(next.date)}` : ""}</span>
+        </p>
+      )}
     </div>
-  );
-}
-
-function Dot({ step, left }: { step: Step; left: string }) {
-  const Icon = CH_ICON[step.channel ?? "feed"] ?? Newspaper;
-  return (
-    <span
-      className="group/dot absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
-      style={{ left }}
-      title={`${fmtDate(step.date!)} · ${step.label} · ${chLabel(step.channel ?? "feed")}${step.critical ? " · safety" : ""}`}
-    >
-      <span
-        className={`grid h-5 w-5 place-items-center rounded-full border-2 ${step.done ? "border-ink bg-ink text-[var(--card)]" : "border-ink/40 bg-card text-muted"}`}
-        style={step.critical ? { borderColor: "var(--danger)", color: step.done ? undefined : "var(--danger)" } : undefined}
-      >
-        <Icon className="h-2.5 w-2.5" strokeWidth={2.4} />
-      </span>
-    </span>
   );
 }

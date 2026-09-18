@@ -36,11 +36,14 @@ what finished.
 - **Group headings:** 13px uppercase faint + count (*RUNNING NOW 3*, *STARTING SOON 2*, *FINISHED 1*).
 - **Campaign row** (radius 22; hover border tints purple with a soft lift; from `lg`, 4 columns):
   1. **Identity:** a 44px neutral objective tile (emoji on `--soft`, 1px line — no objective colours) ·
-     name (16px semibold) + **status pill** · *Reduce burnout · All org* · a *Next · Mid-week pulse check ·
-     Mon 21 Sep* line with the channel icon. Scheduled campaigns say *Starts in 10 days · …*.
-  2. **Mini timeline:** a 3px track spanning first→last send; an `--ink` 70% progress fill up to today; a
-     20px dot per send (filled `--ink` with a white channel icon once sent, a ring until then, red ring for
-     safety); a 2px `--purple` today line; start and end dates under the ends, with *Today* in purple.
+     name (16px semibold) + **status pill** · *Reduce burnout · All org*.
+  2. **Send progress** (replaced the dot timeline — its *Today* label didn't sit under the today line and its
+     dots were unlabelled icons): an 8px bar with **one segment per send**, 4px gaps — sent = `--purple`,
+     next = purple 2px outline on a 12% tint, later = `--line`. Hovering a segment names the send, its date
+     and its channel. Under it, two lines:
+     - 13px semibold — *2 of 5 sent · ends Mon 28 Sep*; for scheduled, *4 sends · starts Mon 28 Sep, in 10
+       days*; for paused, *Paused after 2 of 5*; for finished, *All 3 sent · ended Mon 17 Aug*;
+     - 13px muted, with the channel icon — *Next: Mid-week pulse check · Mon 21 Sep, in 3 days*.
   3. **Metrics:** *76%* took part · *+5.2* pts lift (success), or *0/4 sent* before results exist. 18px bold
      tabular, 12px faint labels.
   4. Chevron.
@@ -92,7 +95,7 @@ what finished.
 
 ## 5 · Campaign drawer
 
-Header (48px tile, 20px name, status pill, objective, *To … · run by …*) → mini timeline → Reached / Took
+Header (48px tile, 20px name, status pill, objective, *To … · run by …*) → send progress → Reached / Took
 part / **Its own lift** tiles → a plain sentence on the comparison group → participation by channel → **the
 plan as a vertical timeline** (28px nodes: a check once sent, the channel icon until then, red for safety;
 the connector is ink once sent, line after) → Aurora readout → lessons → actions (Pause / Resume / End now
@@ -111,11 +114,10 @@ the connector is ink once sent, line after) → Aurora readout → lessons → a
    - Warning box: *Most of Plant Ops is on shared phones. None of these sends go by WhatsApp or SMS, so many
      won't see them.* · **Send them on WhatsApp** (sets every send). The check is judged on what the sends
      use, not on which channels are ticked.
-   - *YOUR PLAN* mini timeline, live.
    - Send cards: number · name · remove, then *Day [n]* · date · channel.
    - **Draft the sends** (Aurora) · **Add a send**.
 3. **Message:** a 6-row textarea + *Draft for this objective* + the delivery preview (spec 038).
-4. **Review:** a summary card (tile, name, objective · audience, mini timeline, Starts · Sends · Channels),
+4. **Review:** a summary card (tile, name, objective · audience, Starts · Sends · Channels, then every send as a row: date · channel icon · name),
    then either *✓ Every team stays within 3 messages a week* or the warning with **Start a week later**.
 - **Footer**, pinned under the scroll: Cancel / **Back** on the left; **Next: Sends →** or **Schedule for 28
   Sep** / **Launch now** on the right.

@@ -9,10 +9,10 @@ import * as React from "react";
 import { AlertTriangle, CalendarClock, CheckCircle2, ChevronRight, Pause, Play, RotateCcw, Sparkles } from "lucide-react";
 import { Button, SparkMark } from "@vadal/design-system";
 import { FATIGUE_LIMIT_PER_WEEK } from "@/lib/ai/engines/timing";
-import { addDays, collisions, daysBetween, fmtDate, spanOf, suggested, type Campaign } from "@/lib/campaigns";
+import { addDays, collisions, spanOf, suggested, type Campaign } from "@/lib/campaigns";
 import { toast } from "../Toaster";
 import {
-  CH_ICON, MiniTimeline, ObjTile, StatusPill, TODAY, ask, objOf, shortDate, soft, type CampaignsState,
+  ObjTile, SendProgress, StatusPill, ask, objOf, shortDate, soft, type CampaignsState,
 } from "./parts";
 import type { CampaignSeed } from "./CampaignBuilder";
 
@@ -169,10 +169,6 @@ function Metric({ value, label, tone }: { value: string; label: string; tone?: s
 
 /* One campaign: who and what on the left, its sends across time in the middle, how it's doing on the right. */
 function Row({ c, s, onOpen }: { c: Campaign; s: CampaignsState; onOpen: (id: string) => void }) {
-  const next = c.steps.find((x) => !x.done);
-  const NextIcon = CH_ICON[next?.channel ?? "feed"];
-  const span = spanOf(c);
-  const startsIn = c.status === "scheduled" && span ? daysBetween(TODAY, span.start) : null;
   const sent = c.steps.filter((x) => x.done).length;
   const o = objOf(c.objective);
 
@@ -190,16 +186,10 @@ function Row({ c, s, onOpen }: { c: Campaign; s: CampaignsState; onOpen: (id: st
               <StatusPill status={c.status} />
             </span>
             <span className="mt-1 block truncate text-[13px] text-faint">{o.label} · {c.audience}{s.teamScoped && c.owner !== "You" ? ` · run by ${c.owner}` : ""}</span>
-            {next && (
-              <span className="mt-1.5 flex items-center gap-1.5 text-[13px] text-muted">
-                <NextIcon className="h-3.5 w-3.5 shrink-0 text-faint" />
-                <span className="truncate">{startsIn !== null ? (startsIn <= 0 ? "Starts today" : `Starts in ${startsIn} day${startsIn === 1 ? "" : "s"}`) : "Next"} · <span className="text-ink">{next.label}</span>{next.date ? ` · ${fmtDate(next.date)}` : ""}</span>
-              </span>
-            )}
           </span>
         </span>
 
-        <MiniTimeline c={c} />
+        <SendProgress c={c} />
 
         <span className="flex items-center gap-6 lg:justify-end">
           {c.participation > 0 ? (

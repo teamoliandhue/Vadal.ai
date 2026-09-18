@@ -8,7 +8,7 @@ import { BarList } from "@/components/viz";
 import { fmtDate, type Campaign } from "@/lib/campaigns";
 import { Drawer } from "../Drawer";
 import { toast } from "../Toaster";
-import { CH_ICON, MiniTimeline, ObjTile, StatusPill, ask, chLabel, objOf, type CampaignsState } from "./parts";
+import { CH_ICON, ObjTile, SendProgress, StatusPill, ask, chLabel, objOf, type CampaignsState } from "./parts";
 
 export function CampaignDrawer({ c, s, onClose, onRerun }: { c: Campaign | null; s: CampaignsState; onClose: () => void; onRerun: (c: Campaign) => void }) {
   return (
@@ -36,7 +36,7 @@ function Body({ c, s, onRerun }: { c: Campaign; s: CampaignsState; onRerun: (c: 
         </div>
       </header>
 
-      <MiniTimeline c={c} />
+      <SendProgress c={c} />
 
       {c.participation > 0 && (
         <section aria-label="Results" className="flex flex-col gap-3">

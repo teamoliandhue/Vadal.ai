@@ -19,7 +19,7 @@ import { Drawer } from "../Drawer";
 import { toast } from "../Toaster";
 import { useScope } from "../useViewAs";
 import { DeliveryPreview } from "./DeliveryPreview";
-import { MiniTimeline, ObjTile, TODAY, chLabel, shortDate, soft } from "./parts";
+import { CH_ICON, ObjTile, TODAY, chLabel, shortDate, soft } from "./parts";
 
 export type CampaignSeed =
   | { name: string; objective: string; audience?: string; duration?: string; steps?: string[]; channels?: string[]; fresh?: boolean }
@@ -260,12 +260,6 @@ export function CampaignBuilder({ seed, existing, onClose, onLaunch }: { seed: C
                 )}
               </div>
 
-              {real.length > 0 && (
-                <div className="rounded-2xl border border-line bg-soft/50 p-4">
-                  <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-faint">Your plan</p>
-                  <MiniTimeline c={draft} />
-                </div>
-              )}
 
               <div>
                 <div className="flex items-center justify-between">
@@ -328,7 +322,18 @@ export function CampaignBuilder({ seed, existing, onClose, onLaunch }: { seed: C
                     <p className="mt-0.5 text-[13px] text-faint">{objectives.find((o) => o.key === objective)?.label} · {audience}</p>
                   </div>
                 </div>
-                <div className="mt-4"><MiniTimeline c={draft} /></div>
+                <ol className="mt-4 flex flex-col gap-2 border-t border-line pt-3">
+                  {draft.steps.map((x, i) => {
+                    const Icon = CH_ICON[x.channel ?? "feed"];
+                    return (
+                      <li key={i} className="flex items-center gap-2.5 text-[13px]">
+                        <span className="w-[84px] shrink-0 tabular-nums text-faint">{fmtDate(x.date!)}</span>
+                        <Icon className="h-3.5 w-3.5 shrink-0 text-faint" />
+                        <span className="min-w-0 truncate text-ink">{x.label}</span>
+                      </li>
+                    );
+                  })}
+                </ol>
                 <dl className="mt-4 grid grid-cols-3 gap-2 text-[13px]">
                   <div><dt className="text-faint">Starts</dt><dd className="font-semibold text-ink">{live ? "Today" : shortDate(start)}</dd></div>
                   <div><dt className="text-faint">Sends</dt><dd className="font-semibold text-ink">{real.length}</dd></div>
