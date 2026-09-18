@@ -136,7 +136,7 @@ export function TranslationPanel() {
             </tbody>
           </table>
           <p className="mt-2 text-[12px] leading-relaxed text-faint">
-            {workspace.seats.toLocaleString("en-IN")} people. Dollar prices at ₹88 to $1. Summaries also use a language model to write the summary; that is billed under AI &amp; guardrails.
+            {workspace.seats.toLocaleString("en-IN")}{" "}people. Dollar prices at ₹88 to $1. Summaries also use a language model to write the summary; that is billed under AI &amp; guardrails.
           </p>
         </details>
 

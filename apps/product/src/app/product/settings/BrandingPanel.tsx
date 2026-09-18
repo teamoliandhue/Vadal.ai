@@ -137,7 +137,7 @@ export function BrandingPanel() {
           <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-[var(--warning)]/40 bg-[color-mix(in_srgb,var(--warning)_10%,transparent)] p-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-[var(--warning)]" />
             <div className="min-w-0 text-[13px] leading-relaxed text-muted">
-              <span className="font-semibold text-ink">{active.toUpperCase()} is {reason}.</span> We&rsquo;ll use a balanced variant so it stays legible everywhere:
+              <span className="font-semibold text-ink">{active.toUpperCase()} is {reason}.</span>{" "}We&rsquo;ll use a balanced variant so it stays legible everywhere:
               <span className="mt-2 flex items-center gap-2">
                 <span className="h-5 w-5 rounded-md border border-line" style={{ background: active }} />
                 <span className="text-faint">→</span>

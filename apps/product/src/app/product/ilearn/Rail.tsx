@@ -87,7 +87,7 @@ export function TimeFit({ done }: { done: string[] }) {
       )}
 
       <p className="mt-3 border-t border-line pt-3 text-[12px] leading-snug text-faint">
-        {minutesThisMonth} minutes this month — about {Math.round(minutesThisMonth / 6)} courses&apos; worth,
+        {minutesThisMonth} minutes this month — about {Math.round(minutesThisMonth / 6)}{" "}courses&apos; worth,
         taken in breaks.
       </p>
     </Card>

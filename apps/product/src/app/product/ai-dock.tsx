@@ -191,7 +191,7 @@ export function AiDock() {
             {messages.length === 0 ? (
               <>
                 <p className="text-[16px] leading-relaxed text-muted">
-                  Hi {me.ready ? me.name : "there"} 👋 Ask me about leave, policies or payroll — or tell me what you&apos;d like done.
+                  Hi {me.ready ? me.name : "there"}{" "}👋 Ask me about leave, policies or payroll — or tell me what you&apos;d like done.
                 </p>
                 <div className="flex flex-col gap-2 pt-1">
                   {suggested.map((s) => (

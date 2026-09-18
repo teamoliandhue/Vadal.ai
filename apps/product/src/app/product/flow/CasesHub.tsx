@@ -109,7 +109,7 @@ export function CasesHub() {
         <section className="rise flex flex-wrap items-center justify-between gap-4 rounded-[22px] border border-[var(--ai-border)] bg-[var(--ai-surface)] p-5">
           <div className="flex items-start gap-2.5">
             <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[var(--ai-accent)]" />
-            <p className="text-[14px] leading-relaxed text-muted"><span className="font-semibold text-ink">{pulseSuggested.length} flight-risk & burnout signals from Pulse aren&rsquo;t tracked as cases yet.</span> Open them so they get an owner and an SLA.</p>
+            <p className="text-[14px] leading-relaxed text-muted"><span className="font-semibold text-ink">{pulseSuggested.length}{" "}flight-risk & burnout signals from Pulse aren&rsquo;t tracked as cases yet.</span> Open them so they get an owner and an SLA.</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="brand" size="sm" onClick={openFromPulse}>Open {pulseSuggested.length} cases</Button>

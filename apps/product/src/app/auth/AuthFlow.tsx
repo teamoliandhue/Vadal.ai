@@ -94,7 +94,7 @@ export function AuthFlow() {
     if (!res.ok) {
       if (res.reason === "invalid") setError("That doesn't look like an email address.");
       else if (res.reason === "personal")
-        setError(<>Vadal is for teams — <b>personal addresses like @{res.domain} can&rsquo;t sign in</b>. Use your company email instead.</>);
+        setError(<>Vadal is for teams — <b>personal addresses like @{res.domain}{" "}can&rsquo;t sign in</b>. Use your company email instead.</>);
       else
         setError(<><b>No workspace found for @{res.domain}.</b> If your company uses Vadal, check the address — or <a className="font-semibold text-[var(--purple)] underline" href="https://vadal.ai" target="_blank" rel="noreferrer">talk to us</a> about bringing Vadal to your team.</>);
       return;

@@ -259,7 +259,7 @@ export function Results() {
 
         <p className="mt-4 border-t border-line pt-3 text-[12px] leading-relaxed text-faint">
           <span className="font-semibold text-muted">Record</span> — who approved and when. ·{" "}
-          <span className="font-semibold text-muted">Reported</span> — shares people confirmed; we can&apos;t see their accounts. ·{" "}
+          <span className="font-semibold text-muted">Reported</span>{" "}— shares people confirmed; we can&apos;t see their accounts. ·{" "}
           <span className="font-semibold text-muted">Modelled</span> — reach from follower counts and typical organic reach; an order of magnitude. ·{" "}
           Referral clicks are counted by our own link, on hiring posts only.
         </p>
