@@ -24,15 +24,12 @@ const CHANNEL: Record<string, string> = { app: "Vadal app", push: "Push", sms: "
 
 export function Programmes() {
   const [on, setOn] = usePersistentState<Record<string, boolean>>("vadal:programmes-on", { onboarding: true, stay: true, manager: true, exit: true });
-  const plans = SAMPLE_RECIPIENTS.map((r) => ({ r, p: planSend(r) }));
-  const blocked = plans.filter((x) => !x.p.allowed).length;
 
   return (
-    <>
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-3" aria-labelledby="prog-h">
         <div>
-          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">Lifecycle programmes</p>
-          <p className="mt-1 text-[14px] text-muted">Surveys that run themselves on a trigger. Every one is adaptive — people only get the questions their answers make worth asking.</p>
+          <h2 id="prog-h" className="text-[18px] font-bold tracking-tight">Run on their own</h2>
+          <p className="mt-0.5 text-[14px] text-muted">Surveys sent when something happens — a start date, a resignation. Each is adaptive: people only get the questions their answers make worth asking.</p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           {PROGRAMMES.map((p) => {
@@ -77,40 +74,35 @@ export function Programmes() {
         </div>
       </section>
 
-      <section className="card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7">
+  );
+}
+
+/** When each person gets a survey — shown inside a survey's details. */
+export function SmartSend() {
+  const plans = SAMPLE_RECIPIENTS.map((r) => ({ r, p: planSend(r) }));
+  const blocked = plans.filter((x) => !x.p.allowed).length;
+  return (
+      <section className="flex flex-col">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">Smart send</p>
-            <h2 className="mt-1.5 text-[18px] font-bold tracking-tight">When each person gets it</h2>
-            <p className="mt-1 max-w-2xl text-[14px] text-muted">Their own response history first, their shift second. Quiet hours ({hh(DEFAULT_QUIET.from)}–{hh(DEFAULT_QUIET.to)}) and the limit of {FATIGUE_LIMIT_PER_WEEK} sends a week are enforced, not suggested.</p>
+            <h3 className="text-[16px] font-bold tracking-tight">When each person gets it</h3>
+            <p className="mt-1 max-w-2xl text-[13px] leading-snug text-muted">Their own response history first, their shift second. Quiet hours ({hh(DEFAULT_QUIET.from)}–{hh(DEFAULT_QUIET.to)}) and the limit of {FATIGUE_LIMIT_PER_WEEK} sends a week are enforced, not suggested.</p>
           </div>
           {blocked > 0 && <Badge tone="warning" size="sm">{blocked} held back</Badge>}
         </div>
-        <div className="-mx-1 mt-4 overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-[13px]">
-            <thead>
-              <tr className="text-left text-[12px] text-faint">
-                <th scope="col" className="px-1 pb-2 font-semibold">Who (sample)</th>
-                <th scope="col" className="px-1 pb-2 font-semibold">Arrives</th>
-                <th scope="col" className="px-1 pb-2 font-semibold">Why</th>
-              </tr>
-            </thead>
-            <tbody>
-              {plans.map(({ r, p }) => (
-                <tr key={r.email} className="border-t border-line align-top">
-                  <th scope="row" className="px-1 py-2.5 text-left font-medium text-ink">{r.label}<span className="block text-[12px] font-normal text-faint">{r.shift === "desk" ? "Desk" : `${r.shift[0].toUpperCase()}${r.shift.slice(1)} shift`}</span></th>
-                  <td className="whitespace-nowrap px-1 py-2.5">
-                    {p.allowed
-                      ? <span className="font-semibold tabular-nums text-ink">{hh(p.hour)} · {CHANNEL[p.channel]}</span>
-                      : <span className="inline-flex items-center gap-1 font-semibold text-[var(--warning)]">{p.blockedBy === "quiet-hours" ? <Moon className="h-3.5 w-3.5" /> : <BellOff className="h-3.5 w-3.5" />}{p.blockedBy === "quiet-hours" ? "Held — quiet hours" : "Held — too many this week"}</span>}
-                  </td>
-                  <td className="px-1 py-2.5 text-muted">{p.reason}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="mt-3 flex flex-col divide-y divide-[var(--line)]">
+          {plans.map(({ r, p }) => (
+            <li key={r.email} className="py-3">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                <span className="text-[14px] font-medium text-ink">{r.label} <span className="font-normal text-faint">· {r.shift === "desk" ? "Desk" : `${r.shift[0].toUpperCase()}${r.shift.slice(1)} shift`}</span></span>
+                {p.allowed
+                  ? <span className="text-[14px] font-semibold tabular-nums text-ink">{hh(p.hour)} · {CHANNEL[p.channel]}</span>
+                  : <span className="inline-flex items-center gap-1 text-[14px] font-semibold text-[var(--warning)]">{p.blockedBy === "quiet-hours" ? <Moon className="h-3.5 w-3.5" /> : <BellOff className="h-3.5 w-3.5" />}{p.blockedBy === "quiet-hours" ? "Held — quiet hours" : "Held — too many this week"}</span>}
+              </div>
+              <p className="mt-0.5 text-[13px] leading-snug text-muted">{p.reason}</p>
+            </li>
+          ))}
+        </ul>
       </section>
-    </>
   );
 }

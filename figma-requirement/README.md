@@ -64,3 +64,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 046 | [Campaigns v2 — dated plans, the weekly send limit, honest results, run it again](./046-campaigns-v2.md) | Built · needs Figma |
 | 047 | [Campaigns v3 — Overview, Planner, Results, and a four-step builder](./047-campaigns-v3.md) | Built · needs Figma |
 | 048 | [Amplify v2 — the share studio with a live post preview (+ 048.1 polish)](./048-amplify-v2.md) | Built · needs Figma |
+| 049 | [Pulse v2 — Overview, Surveys, Results with answer spreads, drivers, team heatmap, and follow-ups that post "You said, we did"](./049-pulse-v2.md) | Built · needs Figma |
