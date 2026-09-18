@@ -10,10 +10,10 @@ Pulse was six admin tools stacked on one page (counts, a table, automatic survey
 Header: eyebrow **Listen** · H1 **Pulse** · summary line "3 live · 57% have answered Q3 Engagement Pulse · 3 follow-ups open, 1 due this week" · **New survey** (brand). Underline tabs **Overview · Surveys · Results** (same as Campaigns and Amplify).
 
 ## 1. Overview — what needs you
-- **Needs you (N)** — cards with a 3px coloured left edge and a single action:
-  - team behind on a live survey (warning, bell icon): "Plant Ops · night shift is at 34%" → **Send a reminder** (respects each person's own time and the weekly send limit).
-  - late follow-up (danger, clock): "…was due Tue 15 Sep" → **Mark done**.
-  - early read ready (AI spark): "Growth is down 6 points since last round" → **See results**.
+- **Needs you (N)** — one card holding an inbox-style list (rows split by hairlines, no coloured edges). Each row: a 40px tinted circle with the icon, a small uppercase label in the same colour saying what kind of item it is, a 15px title, a 14px explanation, and the one action on the right (below the text on phones, lined up with it):
+  - **Behind on a survey** (warning, bell): "Plant Ops · night shift is at 34%" → **Send a reminder** (respects each person's own time and the weekly send limit).
+  - **Follow-up is late** (danger, clock): "Ravi's follow-up was due Tue 15 Sep…" → **Mark done**.
+  - **Early read** (AI spark): "Q3 Engagement Pulse has enough answers to read" → **See results**.
 - **Live now** — one card per live survey: status pill (breathing dot), kind · audience, big % answered, progress bar with a dashed tail to the projected finish, "7,110 of 12,480 · Closes Fri 25 Sep, in 7 days · On pace for about 71%". **By team, lowest first**: name, mini bar (warning colour + ⚠ when under 45%), %, **Remind** / "Reminded". Buttons: Early read · Details.
 - **What we promised** — follow-ups grouped In progress / Planned / Done: status dot, title, topic · audience · due (late in red: "3 days late · was due 15 Sep"), owner avatar, **Start** / **Done**. "+ Add".
 - **Coming up** — scheduled surveys ("Opens Mon 5 Oct · People managers · 240 people") and "4 surveys run on their own" → Surveys tab.

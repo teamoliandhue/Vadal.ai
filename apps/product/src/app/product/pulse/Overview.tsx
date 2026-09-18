@@ -46,15 +46,15 @@ export function Overview({ s, onResults, onOpen, onCommit, onDone, onSurveys }: 
           <h2 id="needs-h" className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">
             Needs you <span className="rounded-full bg-[color-mix(in_srgb,var(--warning)_16%,transparent)] px-1.5 text-[11px] tracking-normal text-[var(--warning)]">{needs}</span>
           </h2>
-          <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <ul className="mt-3 divide-y divide-[var(--line)] overflow-hidden rounded-[24px] border border-line bg-card">
             {behind.map(({ survey, team }) => (
-              <Need key={`${survey.id}${team.team}`} icon={<BellRing className="h-4 w-4" />} tone="var(--warning)"
+              <Need key={`${survey.id}${team.team}`} kind="Behind on a survey" icon={<BellRing className="h-[18px] w-[18px]" />} tone="var(--warning)"
                 title={`${team.team} is at ${pct(team.responded, team.invited)}%`}
                 body={`On ${survey.name} — ${(team.invited - team.responded).toLocaleString("en-US")} people haven't answered, ${daysBetween(s.today, survey.closes!)} days to go.`}
                 action={<Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" onClick={() => remind(survey, team.team)}>Send a reminder</Button>} />
             ))}
             {late.map((f) => (
-              <Need key={f.id} icon={<Clock3 className="h-4 w-4" />} tone="var(--danger)"
+              <Need key={f.id} kind="Follow-up is late" icon={<Clock3 className="h-[18px] w-[18px]" />} tone="var(--danger)"
                 title={`${f.title}`}
                 body={`${f.owner.name.split(" ")[0]}'s follow-up was due ${fmtDate(f.due, true)}. People who answered are waiting to hear.`}
                 action={<Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" leadingIcon={<Check className="h-3.5 w-3.5" />} onClick={() => onDone(f)}>Mark done</Button>} />
@@ -63,13 +63,13 @@ export function Overview({ s, onResults, onOpen, onCommit, onDone, onSurveys }: 
               const weakest = [...r!.questions].filter((q) => q.topic !== "outcome" && q.previous != null)
                 .sort((a, b) => (favourable(a.spread) - a.previous!) - (favourable(b.spread) - b.previous!))[0];
               return (
-                <Need key={x.id} icon={<SparkMark size={14} tone="gradient" />} tone="var(--ai-accent)"
-                  title={`${x.name}: early read is in`}
+                <Need key={x.id} kind="Early read" icon={<SparkMark size={16} tone="gradient" />} tone="var(--ai-accent)"
+                  title={`${x.name} has enough answers to read`}
                   body={weakest ? `${topicLabel(weakest.topic as never)} is down ${weakest.previous! - favourable(weakest.spread)} points since last round, from ${x.responses.toLocaleString("en-US")} answers so far.` : "Enough answers to read."}
                   action={<Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" trailingIcon={<ArrowRight className="h-3.5 w-3.5" />} onClick={() => onResults(x.id)}>See results</Button>} />
               );
             })}
-          </div>
+          </ul>
         </section>
       )}
 
@@ -128,15 +128,21 @@ export function Overview({ s, onResults, onOpen, onCommit, onDone, onSurveys }: 
   );
 }
 
-function Need({ icon, tone, title, body, action }: { icon: React.ReactNode; tone: string; title: string; body: string; action: React.ReactNode }) {
+/* One inbox row per thing that needs a decision: what kind of thing it is,
+   what's going on, and the one action — on the right, where the eye ends. */
+function Need({ kind, icon, tone, title, body, action }: { kind: string; icon: React.ReactNode; tone: string; title: string; body: string; action: React.ReactNode }) {
   return (
-    <article className="flex flex-col rounded-2xl border border-line bg-card p-4" style={{ boxShadow: `inset 3px 0 0 ${tone}` }}>
-      <p className="flex items-start gap-2 text-[14px] font-semibold leading-snug text-ink">
-        <span className="mt-0.5 shrink-0" style={{ color: tone }}>{icon}</span>{title}
-      </p>
-      <p className="mt-1 flex-1 pl-6 text-[13px] leading-snug text-muted">{body}</p>
-      <div className="mt-3 pl-6">{action}</div>
-    </article>
+    <li className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:gap-4">
+      <div className="flex min-w-0 flex-1 items-start gap-3.5">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full" style={{ background: `color-mix(in srgb, ${tone} 12%, transparent)`, color: tone }}>{icon}</span>
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.1em]" style={{ color: tone }}>{kind}</p>
+          <p className="mt-0.5 text-[15px] font-semibold leading-snug text-ink">{title}</p>
+          <p className="mt-0.5 text-[14px] leading-snug text-muted">{body}</p>
+        </div>
+      </div>
+      <div className="shrink-0 pl-[54px] sm:pl-0">{action}</div>
+    </li>
   );
 }
 
