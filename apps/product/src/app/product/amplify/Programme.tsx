@@ -30,7 +30,7 @@ import { toast } from "../Toaster";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { useMe } from "../useSession";
 import type { Approval } from "./Results";
-import { Card, Eyebrow, PlatformLine } from "./parts";
+import { Card, Eyebrow, PlatformLine, localToday } from "./parts";
 
 const inr = (n: number) => `₹${(n / 100000).toFixed(1)}L`;
 
@@ -75,12 +75,12 @@ export function Programme() {
               <Eyebrow>Live campaign</Eyebrow>
               <Badge tone="brand" variant="soft" size="sm">{advocacyCampaign.window}</Badge>
             </div>
-            <h1 className="mt-2 text-[clamp(24px,2.8vw,32px)] font-bold leading-[1.05] tracking-[-0.025em]">
+            <h2 className="mt-2 text-[clamp(24px,2.8vw,32px)] font-bold leading-[1.05] tracking-[-0.025em]">
               {advocacyCampaign.name}
               <span className="mt-1 block text-[16px] font-normal leading-snug tracking-normal text-muted">
                 {advocacyCampaign.goal}
               </span>
-            </h1>
+            </h2>
           </div>
 
           {/* The numbers that are COUNTED, set apart from everything modelled.
@@ -174,7 +174,7 @@ export function Programme() {
                               leadingIcon={<Check className="h-3.5 w-3.5" />}
                               onClick={() => {
                                 setDecided((d) => ({ ...d, [q.id]: "in" }));
-                                setApprovals((a) => ({ ...a, [q.id]: { by: me.fullName, img: me.img, on: "2026-09-17" } }));
+                                setApprovals((a) => ({ ...a, [q.id]: { by: me.fullName, img: me.img, on: localToday() } }));
                                 toast(`Queued to ${q.audience.join(", ")} — it's in Results with your name on it`);
                               }}>
                               Queue it
@@ -224,6 +224,23 @@ export function Programme() {
                 ))}
               </tbody>
             </table>
+          </Card>
+
+          <Card>
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-[var(--purple)]" />
+              <Eyebrow>Taking part</Eyebrow>
+            </div>
+            <div className="mt-3 flex items-end gap-2">
+              <span className="text-[30px] font-bold leading-none tracking-tight tabular-nums">{advocacyStats.participants}</span>
+              <span className="pb-1 text-[14px] text-faint">
+                of {advocacyStats.ofEmployees.toLocaleString()} — {((advocacyStats.participants / advocacyStats.ofEmployees) * 100).toFixed(1)}%
+              </span>
+            </div>
+            <p className="mt-2.5 text-[14px] leading-relaxed text-muted">
+              Opt-in and off by default. A low number here is not a failure — it is the number of
+              people who genuinely chose to lend you their name.
+            </p>
           </Card>
         </div>
 
@@ -302,22 +319,6 @@ export function Programme() {
             <p className="mt-3 text-[12px] leading-snug text-faint">{impact.caveat}</p>
           </Card>
 
-          <Card>
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-[var(--purple)]" />
-              <Eyebrow>Taking part</Eyebrow>
-            </div>
-            <div className="mt-3 flex items-end gap-2">
-              <span className="text-[30px] font-bold leading-none tracking-tight tabular-nums">{advocacyStats.participants}</span>
-              <span className="pb-1 text-[14px] text-faint">
-                of {advocacyStats.ofEmployees.toLocaleString()} — {((advocacyStats.participants / advocacyStats.ofEmployees) * 100).toFixed(1)}%
-              </span>
-            </div>
-            <p className="mt-2.5 text-[14px] leading-relaxed text-muted">
-              Opt-in and off by default. A low number here is not a failure — it is the number of
-              people who genuinely chose to lend you their name.
-            </p>
-          </Card>
         </div>
       </div>
     </div>

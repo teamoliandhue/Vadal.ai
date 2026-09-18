@@ -27,7 +27,7 @@
 import * as React from "react";
 import Image from "next/image";
 import {
-  AlertTriangle, ArrowUpRight, Check, ChevronDown, Clock, Copy, Hash, ImageIcon, Link2, Share2, ShieldCheck,
+  AlertTriangle, ArrowUpRight, Check, ChevronDown, Clock, Copy, Eye, Hash, ImageIcon, Link2, Share2, ShieldCheck,
 } from "lucide-react";
 import { Button, SparkMark } from "@vadal/design-system";
 import {
@@ -220,6 +220,7 @@ export function Composer({
   const [edited, setEdited] = React.useState<string | null>(null);
   const [openDetail, setOpenDetail] = React.useState<null | "tags" | "image" | "timing">(null);
   const [scheduled, setScheduled] = React.useState(false);
+  const [preview, setPreview] = React.useState(false);
 
   // A moment has no platform of its own — where it goes is the person's call.
   const [momentPlatform, setMomentPlatform] = React.useState<Platform>(defaultPlatform);
@@ -270,7 +271,7 @@ export function Composer({
               aria-pressed={voice === v.key}
               /* 44px on touch, compact on desktop. This is the primary control
                  on the screen for someone on a phone; 26px was not tappable. */
-              className={`min-h-[44px] flex-1 rounded-full px-2 text-[14px] font-semibold transition lg:min-h-[30px] lg:flex-none lg:px-2.5 lg:text-[12px] ${
+              className={`min-h-[44px] flex-1 rounded-full px-2 text-[14px] font-semibold transition lg:min-h-[32px] lg:flex-none lg:px-3 lg:text-[13px] ${
                 voice === v.key ? "bg-soft text-ink" : "text-muted hover:text-ink"
               }`}
             >
@@ -465,16 +466,28 @@ export function Composer({
   if (!studio) {
     return <div className="rounded-2xl bg-[var(--ai-surface)] p-4 ring-1 ring-[var(--ai-border)]">{editor}</div>;
   }
+  /* Beside the editor when there's room. Below 1280 it would push the
+     finished post a phone-length away from the caption, so it waits behind a
+     toggle instead. */
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)]">
       <div className="min-w-0">{editor}</div>
       <div className="min-w-0 xl:sticky xl:top-4 xl:self-start">
+        <button
+          onClick={() => setPreview((v) => !v)} aria-expanded={preview}
+          className="flex min-h-[44px] w-full items-center justify-between gap-2 rounded-xl border border-line bg-card px-4 text-[14px] font-semibold text-ink transition hover:bg-soft xl:hidden"
+        >
+          <span className="flex items-center gap-2"><Eye className="h-4 w-4 text-faint" /> {preview ? "Hide the preview" : "Preview the post"}</span>
+          <ChevronDown className={`h-4 w-4 text-faint transition-transform ${preview ? "rotate-180" : ""}`} />
+        </button>
+        <div className={`${preview ? "mt-4 block" : "hidden"} xl:mt-0 xl:block`}>
         <PostPreview
           platform={platform} caption={value} limit={limit}
           image={subject.kind === "moment" ? subject.moment.image : undefined}
           quoted={subject.kind === "post" ? subject.post : undefined}
           aspect={aspect.ratio}
         />
+        </div>
       </div>
     </div>
   );
@@ -527,7 +540,7 @@ function PostPreview({ platform, caption, limit, image, quoted, aspect }: {
         ) : null}
         <div className="mt-3 flex items-center gap-5 border-t border-line px-4 py-2.5 text-[12px] text-faint">
           <span>Like</span><span>Comment</span><span>Share</span>
-          <span className="ml-auto tabular-nums">{caption.length.toLocaleString()} / {limit.toLocaleString()}</span>
+          {overflow && <span className="ml-auto font-semibold tabular-nums" style={{ color: "var(--danger)" }}>{overflow.length.toLocaleString()} over</span>}
         </div>
       </div>
       <figcaption className="mt-2 text-[12px] text-faint">A preview of the shape — {platform} shows it in its own layout. You press post there.</figcaption>

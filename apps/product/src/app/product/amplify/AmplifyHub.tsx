@@ -40,6 +40,7 @@ import { canAccess } from "@/lib/access";
 import { useViewAs } from "../useViewAs";
 import { useSession } from "../useSession";
 import { toast } from "../Toaster";
+import { Drawer } from "../Drawer";
 import { Eyebrow, Mark } from "./parts";
 import { ExemplarsCard, FaqCard, FeasibilityCard, ReachCard, SentCard, VoiceCard, type Prefs } from "./Rail";
 import { Studio, type Item } from "./Studio";
@@ -101,9 +102,9 @@ export function AmplifyHub() {
   if (!optIn) {
     return (
       <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
-        {tabs}
+        <PageHeader tabs={tabs} />
         <OptInHero optIn={optIn} setOptIn={setOptIn} featured={featured} impact={impact} />
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start">
           <FaqCard />
           <ExemplarsCard />
           <FeasibilityCard />
@@ -118,21 +119,22 @@ export function AmplifyHub() {
         tabs={tabs}
         aside={(
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-line bg-card px-3.5 py-2 text-[13px] text-muted">
-              <span className="font-semibold tabular-nums text-ink">{myAdvocacy.estimatedReach.toLocaleString("en-IN")}</span> people reached · <span className="font-semibold tabular-nums text-ink">{myAdvocacy.shares}</span> shares
-            </span>
-            <Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" leadingIcon={<SlidersHorizontal className="h-4 w-4" />} onClick={() => setPrefsOpen((v) => !v)} aria-expanded={prefsOpen}>
+            {/* The headline of "Your record" — a jump to it, not a second copy. */}
+            <a href="#record-h" className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-line bg-card px-3.5 text-[14px] text-muted transition hover:bg-soft lg:min-h-[36px] lg:text-[13px]">
+              <span className="font-semibold tabular-nums text-ink">{myAdvocacy.estimatedReach.toLocaleString("en-IN")}</span> <span className="hidden sm:inline">people</span> reached · <span className="font-semibold tabular-nums text-ink">{myAdvocacy.shares}</span> shares
+            </a>
+            <Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-[36px]" leadingIcon={<SlidersHorizontal className="h-4 w-4" />} onClick={() => setPrefsOpen(true)} aria-haspopup="dialog">
               Preferences
             </Button>
           </div>
         )}
       />
 
-      {prefsOpen && (
-        <div className="lg:max-w-[520px] lg:self-end">
-          <VoiceCard prefs={prefs} setPrefs={setPrefs} optIn={optIn} onOptOut={() => { setOptIn(false); toast("Opted out. Nothing will be put in front of you."); }} />
-        </div>
-      )}
+      <Drawer open={prefsOpen} title="Preferences" onClose={() => setPrefsOpen(false)}>
+        <h2 className="pr-12 text-[22px] font-bold tracking-tight">Preferences</h2>
+        <p className="mb-6 mt-1.5 text-[14px] leading-relaxed text-muted">What we put in front of you, and how your drafts start. Changes apply straight away.</p>
+        <VoiceCard bare prefs={prefs} setPrefs={setPrefs} optIn={optIn} onOptOut={() => { setPrefsOpen(false); setOptIn(false); toast("Opted out. Nothing will be put in front of you."); }} />
+      </Drawer>
 
       <Studio
         items={items}
@@ -153,8 +155,8 @@ export function AmplifyHub() {
         )}
       />
 
-      <section aria-labelledby="record-h" className="flex flex-col gap-3">
-        <h2 id="record-h" className="text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Your record</h2>
+      <section aria-labelledby="record-h" className="flex scroll-mt-6 flex-col gap-3">
+        <h2 id="record-h" tabIndex={-1} className="text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Your record</h2>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <ReachCard />
           <SentCard />
@@ -163,7 +165,7 @@ export function AmplifyHub() {
 
       <section aria-labelledby="know-h" className="flex flex-col gap-3">
         <h2 id="know-h" className="text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">Good to know</h2>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start">
           <ExemplarsCard />
           <FaqCard />
           <FeasibilityCard />
@@ -227,10 +229,10 @@ function OptInHero({
       />
       <div className="relative grid gap-8 p-7 sm:p-9 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <div className="min-w-0">
-          <Eyebrow>Amplify</Eyebrow>
-          <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">
+          <Eyebrow>Before you start</Eyebrow>
+          <h2 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">
             Your work, in your words
-          </h1>
+          </h2>
           <p className="mt-3 max-w-md text-[16px] leading-relaxed text-muted">
             When something you did is worth the outside seeing — or something good goes out publicly —
             Vadal writes you a caption in your own voice. You read it, change what you want, and post

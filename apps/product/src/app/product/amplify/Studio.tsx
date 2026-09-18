@@ -88,10 +88,11 @@ export function Studio({ items, prefs, onPassMoment, onDeclinePost, caughtUp }: 
 function Group({ title, hint, items, current, onPick }: { title: string; hint: string; items: Item[]; current: string | null; onPick: (id: string) => void }) {
   return (
     <section>
-      <div className="flex items-baseline justify-between gap-2 px-1">
-        <h2 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">{title} <span className="tabular-nums">{items.length}</span></h2>
-      </div>
-      <p className="px-1 text-[12px] text-faint">{hint}</p>
+      <h2 className="flex items-center gap-2 px-1 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">
+        {title}
+        <span className="rounded-full bg-soft px-1.5 py-px text-[11px] tracking-normal tabular-nums text-muted">{items.length}</span>
+      </h2>
+      <p className="mt-0.5 px-1 text-[13px] text-faint">{hint}</p>
       <ul className="mt-2 flex flex-col gap-1.5">
         {items.map((it) => {
           const on = current === it.id;
@@ -101,16 +102,16 @@ function Group({ title, hint, items, current, onPick }: { title: string; hint: s
               <button
                 onClick={() => onPick(it.id)}
                 aria-current={on ? "true" : undefined}
-                className={`flex w-full items-center gap-3 rounded-2xl border p-2.5 text-left transition ${on ? "border-[color-mix(in_srgb,var(--purple)_45%,var(--line))] bg-[var(--lav)]" : "border-transparent hover:bg-soft"}`}
+                className={`flex w-full items-center gap-3 rounded-2xl border p-2.5 text-left transition ${on ? "border-[color-mix(in_srgb,var(--purple)_45%,var(--line))] bg-[var(--lav)]" : "border-line bg-card hover:bg-soft lg:border-transparent lg:bg-transparent"}`}
               >
                 <Thumb item={it} />
                 <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-1.5 text-[12px] text-faint">
+                  <span className="flex min-w-0 items-center gap-1.5 text-[12px] text-faint">
                     {it.kind === "moment" ? <>{KIND[it.moment.kind].label} · {it.moment.when}</> : <><Mark platform={it.post.platform} size={14} /> {it.post.posted}</>}
                     {upcoming && <Badge tone="brand" variant="soft" size="sm">Soon</Badge>}
                     {it.kind === "post" && it.post.inAdvocacyQueue && <Badge tone="brand" variant="soft" size="sm">Picked</Badge>}
                   </span>
-                  <span className="mt-0.5 line-clamp-2 block text-[14px] font-semibold leading-snug text-ink">{it.kind === "moment" ? it.moment.what : it.post.text}</span>
+                  <span className="mt-0.5 line-clamp-2 text-[14px] font-semibold leading-snug text-ink">{it.kind === "moment" ? it.moment.what : it.post.text}</span>
                 </span>
               </button>
             </li>
@@ -134,38 +135,29 @@ function Panel({ item, prefs, onPass, onDecline }: {
   const [declining, setDeclining] = React.useState(false);
   const isMoment = item.kind === "moment";
   const Icon = isMoment ? KIND[item.moment.kind].icon : Sparkles;
+  React.useEffect(() => {
+    if (!declining) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setDeclining(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [declining]);
 
-  return (
-    <div className="flex flex-col gap-5">
-      <header className="pr-10 lg:pr-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-soft px-2.5 py-1 text-[12px] font-semibold text-muted">
-            <Icon className="h-3.5 w-3.5" /> {isMoment ? `${KIND[item.moment.kind].label} · ${item.moment.when}` : `${item.post.platform} · ${item.post.posted}`}
-          </span>
-          {!isMoment && item.post.sharedBy ? <span className="text-[12px] text-faint">{item.post.sharedBy} colleagues shared it</span> : null}
-          <button
-            onClick={() => (isMoment ? onPass() : setDeclining((v) => !v))}
-            aria-expanded={isMoment ? undefined : declining}
-            className="ml-auto flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold text-muted transition hover:bg-soft hover:text-ink lg:min-h-[34px]"
-          >
-            <ThumbsDown className="h-3.5 w-3.5" /> {isMoment ? "Not this one" : "Not for me"}
-          </button>
-        </div>
-        <h2 className={`mt-3 font-bold leading-[1.25] tracking-[-0.02em] text-ink ${isMoment ? "text-[clamp(20px,2vw,24px)]" : "line-clamp-3 text-[clamp(18px,1.8vw,21px)]"}`}>
-          {isMoment ? item.moment.what : item.post.text}
-        </h2>
-        {!isMoment && <p className="mt-2 text-[13px] text-faint">The company&rsquo;s post is attached to yours — see it in the preview.</p>}
-        {isMoment && (
-          <p className="mt-2.5 flex items-start gap-2 text-[14px] leading-relaxed text-muted">
-            <SparkMark size={14} tone="gradient" className="mt-[3px] shrink-0" /> {item.moment.why}
-          </p>
-        )}
-      </header>
-
+  /* Passing is a real answer, so it gets a real control — top right on a
+     desktop, where the eye lands after reading the subject; at the end on a
+     phone, where the header shares a line with the sheet's close button. */
+  const pass = (where: "top" | "end") => (
+    <div className={where === "top" ? "hidden lg:block" : "border-t border-line pt-4 lg:hidden"}>
+      <button
+        onClick={() => (isMoment ? onPass() : setDeclining((v) => !v))}
+        aria-expanded={isMoment ? undefined : declining}
+        className={`flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-[14px] font-semibold text-muted transition hover:bg-soft hover:text-ink lg:min-h-[36px] lg:text-[13px] ${where === "end" ? "mx-auto" : ""}`}
+      >
+        <ThumbsDown className="h-3.5 w-3.5" /> {isMoment ? "Not this one" : "Not for me"}
+      </button>
       {declining && !isMoment && (
-        <div className="rounded-2xl bg-soft p-4">
+        <div className={`mt-3 rounded-2xl bg-soft p-4 ${where === "top" ? "absolute right-0 z-10 w-[360px] border border-line bg-card shadow-[0_24px_48px_-24px_rgba(20,20,40,0.35)]" : ""}`}>
           <p className="text-[14px] font-semibold">No problem. Anything we should know?</p>
-          <p className="mt-1 text-[12px] text-faint">Optional, and never attributed to you.</p>
+          <p className="mt-1 text-[13px] text-faint">Optional, and never attributed to you.</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {DECLINE_REASONS.map((r) => (
               <button key={r.key} onClick={() => onDecline(r.key)} className="min-h-[44px] rounded-full border border-line bg-card px-3.5 text-[14px] font-medium transition hover:border-[var(--purple)] lg:min-h-[38px]">
@@ -173,15 +165,47 @@ function Panel({ item, prefs, onPass, onDecline }: {
               </button>
             ))}
           </div>
-          <button onClick={() => onDecline("not-now")} className="mt-2 min-h-[44px] text-[13px] font-semibold text-muted hover:text-ink lg:min-h-0">Just skip it</button>
+          <button onClick={() => onDecline("not-now")} className="mt-2 min-h-[44px] text-[14px] font-semibold text-muted hover:text-ink lg:min-h-[36px]">Just skip it</button>
         </div>
       )}
+    </div>
+  );
 
-      <Composer
-        subject={isMoment ? { kind: "moment", moment: item.moment } : { kind: "post", post: item.post }}
-        title="Written as you" defaultVoice={prefs.voice} defaultPlatform={prefs.platform} layout="studio"
-      />
+  return (
+    <div className="flex flex-col gap-6">
+      <header className="relative">
+        <div className="flex items-start gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-soft px-2.5 py-1 text-[12px] font-semibold text-muted">
+                {isMoment ? <Icon className="h-3.5 w-3.5" /> : <Mark platform={item.post.platform} size={14} />}
+                {isMoment ? `${KIND[item.moment.kind].label} · ${item.moment.when}` : `${item.post.platform} · ${item.post.posted}`}
+              </span>
+              {!isMoment && item.post.sharedBy ? <span className="text-[13px] text-faint">{item.post.sharedBy} colleagues shared it</span> : null}
+            </div>
+            <h2 className={`mt-3 font-bold leading-[1.3] tracking-[-0.015em] text-ink ${isMoment ? "text-[clamp(19px,1.8vw,22px)]" : "line-clamp-3 text-[clamp(17px,1.6vw,19px)]"}`}>
+              {isMoment ? item.moment.what : item.post.text}
+            </h2>
+          </div>
+          {pass("top")}
+        </div>
+        {isMoment ? (
+          <p className="mt-2.5 flex items-start gap-2 text-[14px] leading-relaxed text-muted">
+            <SparkMark size={14} tone="gradient" className="mt-[3px] shrink-0" /> {item.moment.why}
+          </p>
+        ) : (
+          <p className="mt-2 text-[13px] text-faint">The company&rsquo;s post is attached to yours — see it in the preview.</p>
+        )}
+      </header>
+
+      <div className="border-t border-line pt-5">
+        <Composer
+          subject={isMoment ? { kind: "moment", moment: item.moment } : { kind: "post", post: item.post }}
+          title="Written as you" defaultVoice={prefs.voice} defaultPlatform={prefs.platform} layout="studio"
+        />
+      </div>
+
+      {pass("end")}
     </div>
   );
 }
-

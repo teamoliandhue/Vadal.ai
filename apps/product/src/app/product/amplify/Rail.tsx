@@ -43,16 +43,20 @@ const SCOPES: { key: AdvocacyScope; label: string; blurb: string }[] = [
 ];
 
 export function VoiceCard({
-  prefs, setPrefs, optIn, onOptOut,
+  prefs, setPrefs, optIn, onOptOut, bare = false,
 }: {
   prefs: Prefs; setPrefs: (p: Prefs) => void; optIn: boolean; onOptOut: () => void;
+  /** Just the settings, already open — for the Preferences sheet. */
+  bare?: boolean;
 }) {
-  const [open, setOpen] = React.useState(false);
+  const [openState, setOpen] = React.useState(false);
+  const open = bare || openState;
   if (!optIn) return null;
 
+  const Wrap = bare ? React.Fragment : Card;
   return (
-    <Card>
-      <button
+    <Wrap>
+      {!bare && <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         className="flex min-h-[44px] w-full items-center gap-2 text-left"
@@ -65,13 +69,13 @@ export function VoiceCard({
           </p>
         </div>
         <ChevronDown className={`h-4 w-4 shrink-0 text-faint transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
+      </button>}
 
       {open && (
-        <div className="mt-4 flex flex-col gap-4">
+        <div className={`flex flex-col gap-5 ${bare ? "" : "mt-4"}`}>
           {/* The setting that matters most, and the one that did not exist. */}
           <div>
-            <p className="text-[13px] font-semibold">What should we ask you about?</p>
+            <p className="text-[14px] font-semibold">What should we ask you about?</p>
             <div className="mt-2 flex flex-col gap-1.5">
               {SCOPES.map((s) => (
                 <button
@@ -92,14 +96,14 @@ export function VoiceCard({
           </div>
 
           <div>
-            <p className="text-[13px] font-semibold">Start drafts in</p>
+            <p className="text-[14px] font-semibold">Start drafts in</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {VOICES.map((v) => (
                 <button
                   key={v.key}
                   onClick={() => setPrefs({ ...prefs, voice: v.key })}
                   aria-pressed={prefs.voice === v.key}
-                  className={`min-h-[36px] rounded-full border px-3 text-[13px] font-medium transition ${
+                  className={`min-h-[44px] rounded-full border px-3.5 text-[14px] font-medium lg:min-h-[36px] transition ${
                     prefs.voice === v.key ? "border-transparent bg-soft text-ink" : "border-line text-muted hover:text-ink"
                   }`}
                 >
@@ -110,7 +114,7 @@ export function VoiceCard({
           </div>
 
           <div>
-            <p className="text-[13px] font-semibold">Default platform for your own moments</p>
+            <p className="text-[14px] font-semibold">Default platform for your own moments</p>
             <div className="mt-2 flex items-center gap-1.5">
               {ALL_PLATFORMS.map((p) => (
                 <button
@@ -118,7 +122,7 @@ export function VoiceCard({
                   onClick={() => setPrefs({ ...prefs, platform: p })}
                   aria-pressed={prefs.platform === p}
                   aria-label={p}
-                  className={`grid min-h-[40px] min-w-[40px] place-items-center rounded-full transition ${
+                  className={`grid min-h-[44px] min-w-[44px] place-items-center rounded-full transition ${
                     prefs.platform === p ? "bg-soft" : "opacity-45 hover:opacity-100"
                   }`}
                 >
@@ -143,7 +147,7 @@ export function VoiceCard({
           </div>
         </div>
       )}
-    </Card>
+    </Wrap>
   );
 }
 

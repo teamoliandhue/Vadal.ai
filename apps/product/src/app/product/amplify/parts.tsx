@@ -71,3 +71,13 @@ export function PlatformPicker({ value, onChange }: { value: Platform; onChange:
     </div>
   );
 }
+
+/* Dates by hand: ICU's en-GB short month is "Sept", which reads as a typo next
+   to every other month. And today is local, not UTC — toISOString() is
+   yesterday for anyone east of Greenwich before 5:30am. */
+const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export function localToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+export const shortDay = (iso: string) => { const [, m, d] = iso.split("-").map(Number); return `${d} ${MON[m - 1]}`; };

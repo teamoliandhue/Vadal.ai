@@ -15,7 +15,7 @@ import type { Platform } from "@/lib/ai/engines/timing";
 import { advocacyStats, publishedPosts, queueCandidates, shareWeeks, type PublishedPost } from "@/lib/amplify";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { StackedColumns, ViewToggle, Legend, type Series } from "@/components/viz";
-import { Card, Eyebrow, Mark } from "./parts";
+import { Card, Eyebrow, Mark, localToday, shortDay } from "./parts";
 
 /* colour follows the platform, never its rank or the window */
 const PLATFORM_COLOR: Record<Platform, string> = { LinkedIn: "var(--viz-1)", X: "var(--viz-2)", Instagram: "var(--viz-3)", Facebook: "var(--viz-4)" };
@@ -23,9 +23,8 @@ const PLATFORMS: Platform[] = ["LinkedIn", "X", "Instagram", "Facebook"];
 const WINDOWS = { 4: "Last 4 weeks", 8: "Last 8 weeks" } as const;
 type Win = keyof typeof WINDOWS;
 
-const TODAY = "2026-09-17";
 const WEEK_START: Record<Win, string> = { 4: "2026-08-18", 8: "2026-07-21" };
-const day = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+const day = shortDay;
 const compact = (n: number) => (n >= 10000 ? `${Math.round(n / 1000)}K` : n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K` : `${n}`);
 const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : 0);
 
@@ -56,6 +55,7 @@ type Row = PublishedPost & { reach: number; queuedOnly?: boolean };
 export function Results() {
   const [win, setWin] = usePersistentState<Win>("vadal:amplify-results-window", 4);
   const [table, setTable] = React.useState(false);
+  const TODAY = localToday();
   const [approvals] = usePersistentState<Record<string, Approval>>("vadal:advocacy-approvals", {});
 
   /* posts approved in Programme this session join the log straight away */
@@ -96,11 +96,8 @@ export function Results() {
   return (
     <div className="flex flex-col gap-6">
       {/* one filter row, above everything it scopes */}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-[22px] font-bold tracking-tight">Results</h2>
-          <p className="mt-1 text-[14px] text-muted">What went out, who approved it, and what came back.</p>
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-[14px] text-muted">Showing posts approved since <span className="font-semibold text-ink">{day(WEEK_START[win])}</span></p>
         <div role="group" aria-label="Period" className="flex rounded-full border border-line bg-soft p-1">
           {([4, 8] as Win[]).map((w) => <button key={w} className={seg(win === w)} aria-pressed={win === w} onClick={() => setWin(w)}>{WINDOWS[w]}</button>)}
         </div>

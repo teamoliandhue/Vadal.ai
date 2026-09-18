@@ -61,3 +61,16 @@ Card, soft, lav, purple, line, faint/muted/ink text; Badge (brand soft sm); Spar
 4. Phone 375 — list; and the bottom-sheet panel.
 5. Admin Programme and Results with underline tabs and tab-aware subtitle.
 6. Dark mode of 1.
+
+## 048.1 — Polish pass (fixes)
+- **List rows** clamp to 2 lines (the clamp was being overridden, so company posts ran 5+ lines). On phones rows are visible cards; on desktop they stay flat until selected.
+- **Group headings**: count sits in a small soft pill (`YOURS (4)`), hint 13px.
+- **Panel header**: subject 19–22px (it no longer shouts over the caption it repeats); company posts show the platform mark in the chip; a hairline separates the subject from "Written as you".
+- **Not this one / Not for me**: top-right on desktop, with the reasons as a small popover (Esc closes). On phones it moves to the end of the sheet, centred under a hairline — no more orphaned button under the close X.
+- **Preview**: the counter is gone from the preview (it's under the caption already); it only shows "N over" in red when the post is too long. Below 1280px the preview sits behind a "Preview the post" toggle so the share button isn't buried.
+- **Voice tabs** 13px on desktop (were 12px — under the type floor for controls).
+- **Header**: the reach chip is now a link to "Your record" ("412 reached · 3 shares" on phones, so chip + Preferences fit one row). **Preferences** opens a side sheet (bottom sheet on phones) titled "Preferences", settings already open — no second click.
+- **Good to know**: cards align to the top instead of stretching (the collapsed "Posting for you" card had a tall empty block).
+- **Opted out**: the page header (Engage · Amplify) comes first; the case card's title is an H2 with eyebrow "Before you start".
+- **Programme**: "Taking part" moved to the left column so the two columns end level; the campaign title is an H2 (one H1 per page).
+- **Results**: the duplicate "Results" heading is gone — the filter row reads "Showing posts approved since 18 Aug" with the period switch on the right. Dates are "14 Sep", not "14 Sept"; "Today" uses the real local date.
