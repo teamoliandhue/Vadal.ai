@@ -66,3 +66,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 048 | [Amplify v2 — the share studio with a live post preview (+ 048.1 polish)](./048-amplify-v2.md) | Built · needs Figma |
 | 049 | [Pulse v2 — Overview, Surveys, Results with answer spreads, drivers, team heatmap, and follow-ups that post "You said, we did"](./049-pulse-v2.md) | Built · needs Figma |
 | 050 | [Sentiment v2 — Nudge's read + worth a look, mood over time, themes getting better or worse, where it's felt, in their words](./050-sentiment-v2.md) | Built · needs Figma |
+| 051 | [SmartWork becomes the HR desk — ask, resolve, escalate; the help pillar moves to Support](./051-smartwork-hr-desk.md) | Built · needs Figma |

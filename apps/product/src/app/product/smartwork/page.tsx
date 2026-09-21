@@ -1,10 +1,10 @@
 import { Shell } from "../shell";
-import { HelpHub } from "./HelpHub";
+import { SmartWorkHub } from "./SmartWorkHub";
 
-export default function HelpPage() {
+export default function SmartWorkPage() {
   return (
     <Shell active="SmartWork" breadcrumb="SmartWork">
-      <HelpHub />
+      <SmartWorkHub />
     </Shell>
   );
 }

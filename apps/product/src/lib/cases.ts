@@ -23,6 +23,9 @@ export const categories: Record<string, { label: string; emoji: string; color: s
   er: { label: "Harassment / ER", emoji: "🔒", color: "var(--danger)" },
   wellbeing: { label: "Wellbeing", emoji: "💙", color: "var(--success)" },
   role: { label: "Role clarity", emoji: "🧭", color: "var(--purple)" },
+  /* An HR service request — a question SmartWork could not answer. These are
+     not people-risk cases, and filing them as one skews every risk report. */
+  request: { label: "HR request", emoji: "📮", color: "var(--info)" },
 };
 
 export type Owner = { name: string; role: string; img: string };

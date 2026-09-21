@@ -9,7 +9,7 @@
    routing and permissions in agreement. */
 import {
   BarChart3, BookOpen, ClipboardList, Compass, FolderKanban, Gauge, GraduationCap,
-  Cable, Handshake, HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio, Rocket,
+  Cable, Handshake, Heart, HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio, Rocket,
   Share2, ShieldCheck, Smile, Sparkles, Sprout, UsersRound, type LucideIcon,
 } from "lucide-react";
 import type { Role } from "@/lib/auth";
@@ -59,8 +59,9 @@ export const NAV: NavGroupModel[] = [
     ],
   },
   {
-    label: "Learn",
+    label: "Digital workplace",
     items: [
+      { label: "SmartWork", icon: LifeBuoy, href: "/product/smartwork" },
       { label: "iLearn", icon: GraduationCap, href: "/product/ilearn" },
       { label: "Knowledge", icon: BookOpen, href: "/product/knowledge" },
     ],
@@ -76,7 +77,7 @@ export const NAV: NavGroupModel[] = [
     label: "Wellbeing",
     items: [
       { label: "iThrive", icon: HeartPulse, href: "/product/ithrive" },
-      { label: "SmartWork", icon: LifeBuoy, href: "/product/smartwork" },
+      { label: "Support", icon: Heart, href: "/product/support" },
     ],
   },
   {

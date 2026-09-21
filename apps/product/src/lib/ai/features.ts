@@ -116,10 +116,10 @@ export const FEATURES: FeatureStatus[] = [
   { id: "grow-assign", pillar: "Grow", brief: "AGENTIC — auto-assign a matching path when Pulse flags a skills gap", module: "tools", entry: "assign_learning", agentic: true, surface: "copilot", wiredTo: "lib/ai/mock.ts" },
 
   /* ── Pillar 7 · One-to-One Help ──────────────────────────── */
-  { id: "help-intake", pillar: "One-to-One Help", brief: "Empathetic conversational intake in plain, warm language", module: "engines/support", entry: "intake", agentic: false, surface: "screen", wiredTo: "app/product/smartwork/Companion.tsx" },
+  { id: "help-intake", pillar: "One-to-One Help", brief: "Empathetic conversational intake in plain, warm language", module: "engines/support", entry: "intake", agentic: false, surface: "screen", wiredTo: "app/product/support/Companion.tsx" },
   { id: "help-triage", pillar: "One-to-One Help", brief: "Need and urgency triage into a band — never a clinical diagnosis", module: "engines/support", entry: "triage", agentic: false, surface: "screen", wiredTo: "app/api/ai/features/route.ts" },
-  { id: "help-handoff", pillar: "One-to-One Help", brief: "Consent-based handoff summary, with explicit sign-off", module: "engines/support", entry: "buildHandoff", agentic: false, surface: "screen", wiredTo: "app/product/smartwork/HelpHub.tsx" },
-  { id: "help-resources", pillar: "One-to-One Help", brief: "Self-serve resource matching for lower-stakes moments", module: "engines/support", entry: "matchResources", agentic: false, surface: "screen", wiredTo: "app/product/smartwork/Companion.tsx" },
+  { id: "help-handoff", pillar: "One-to-One Help", brief: "Consent-based handoff summary, with explicit sign-off", module: "engines/support", entry: "buildHandoff", agentic: false, surface: "screen", wiredTo: "app/product/support/HelpHub.tsx" },
+  { id: "help-resources", pillar: "One-to-One Help", brief: "Self-serve resource matching for lower-stakes moments", module: "engines/support", entry: "matchResources", agentic: false, surface: "screen", wiredTo: "app/product/support/Companion.tsx" },
   { id: "help-crisis", pillar: "One-to-One Help", brief: "Always-visible crisis resources, never gated behind a conversation", module: "engines/support", entry: "crisisResources", agentic: false, surface: "screen", wiredTo: "app/product/get-started/Demos.tsx" },
   { id: "help-book", pillar: "One-to-One Help", brief: "AGENTIC — book a session and pass the handoff summary, with consent", module: "tools", entry: "book_counsellor", agentic: true, surface: "copilot", blocked: "Clinical, legal and HR sign-off on triage thresholds and data-access rules is a hard blocker on launch.", wiredTo: "lib/ai/mock.ts" },
   { id: "help-escalate", pillar: "One-to-One Help", brief: "AGENTIC — acute-risk escalation per the org's configured, human-reviewed policy", module: "engines/support", entry: "escalate", agentic: true, surface: "copilot", blocked: "Requires a signed escalation policy — assertLaunchable() throws without one.", wiredTo: "lib/ai/mock.ts" },
@@ -127,7 +127,7 @@ export const FEATURES: FeatureStatus[] = [
   /* Built with the third-person crisis fix. Registered because they are real
      features with real surfaces — the registry exists so "is it built" has a
      checkable answer, and two of them were only in my head. */
-  { id: "help-concern", pillar: "One-to-One Help", brief: "Separate intake for someone worried about a COLLEAGUE — triage reads its input as first-person, so a third-party report was mis-banded", module: "engines/support", entry: "concernIntake", agentic: false, surface: "screen", wiredTo: "app/product/smartwork/Companion.tsx" },
+  { id: "help-concern", pillar: "One-to-One Help", brief: "Separate intake for someone worried about a COLLEAGUE — triage reads its input as first-person, so a third-party report was mis-banded", module: "engines/support", entry: "concernIntake", agentic: false, surface: "screen", wiredTo: "app/product/support/Companion.tsx" },
   { id: "help-crisis-tests", pillar: "One-to-One Help", brief: "Executable crisis-phrasing cases — 15 that must trip the crisis path, 10 ordinary phrases that must not", module: "engines/support", entry: "checkTriage", agentic: false, surface: "engine-only", wiredTo: "app/api/ai/features/route.ts" },
 
   /* ── §8 Cross-cutting AI layer ───────────────────────────── */

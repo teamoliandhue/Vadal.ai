@@ -197,7 +197,7 @@ export function ThriveHub() {
           <p className="mt-2 max-w-xl text-[16px] leading-relaxed">{check.message}</p>
           <p className="mt-2 text-[12px] text-faint">Noticed: {check.reason}. Not shared with anyone.</p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Link href="/product/smartwork"><Button variant="brand" className="min-h-[44px]">Talk to someone, privately</Button></Link>
+            <Link href="/product/support"><Button variant="brand" className="min-h-[44px]">Talk to someone, privately</Button></Link>
             <Switch checked={consent} onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setConsent(e.target.checked); toast(e.target.checked ? "Wellbeing checks on" : "Wellbeing checks off"); }} label="Keep checks on" />
           </div>
         </Card>
