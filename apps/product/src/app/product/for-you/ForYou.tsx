@@ -38,7 +38,7 @@ import { useViewAs } from "../useViewAs";
 import { useMe } from "../useSession";
 import { useModeration } from "../social/useModeration";
 import { toast } from "../Toaster";
-import { RailCard, SuggestionCard, type Suggestion } from "./parts";
+import { GroupHead, Meter, RailCard, SuggestionCard, WeekStrip, accentFor, type Suggestion } from "./parts";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -146,6 +146,7 @@ export function ForYou() {
   const [hidden, setHidden] = usePersistentState<Record<string, string>>("vadal:for-you-hidden", {});
   const [never, setNever] = usePersistentState<string[]>("vadal:for-you-never", []);
   const [order, setOrder] = usePersistentState<"matters" | "quickest">("vadal:for-you-order", "matters");
+  const [opened, setOpened] = usePersistentState<Record<string, string>>("vadal:for-you-opened", {});
   const { pending } = useModeration();
 
   if (!meta.ready || !hydrated) return <div className="mx-auto w-full max-w-[1180px] py-10" aria-busy="true" />;
@@ -164,10 +165,16 @@ export function ForYou() {
 
   const all = build(role, state).filter((s) => !never.includes(s.id));
   const sleeping = all.filter((s) => hidden[s.id] === today());
-  const awake = all.filter((s) => hidden[s.id] !== today());
+  const live = all.filter((s) => hidden[s.id] !== today());
+  /* Things you already opened today drop to the bottom, kept rather than
+     removed: a personalised page should show the day adding up. */
+  const picked = live.filter((s) => opened[s.id] === today());
+  const awake = live.filter((s) => opened[s.id] !== today());
   const sorted = order === "quickest" ? [...awake].sort((a, b) => (a.minutes ?? 99) - (b.minutes ?? 99)) : awake;
   const [lead, ...rest] = sorted;
   const quick = awake.filter((s) => (s.minutes ?? 99) <= 2).length;
+  const tourTotal = tourFor(role).length;
+  const when = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
   const streak = me.streak + (mood ? 1 : 0);
 
   const GROUPS: { key: string; label: string; hint: string; has: (s: Suggestion) => boolean }[] = [
@@ -184,6 +191,7 @@ export function ForYou() {
     setNever((n) => [...n, s.id]);
     toast("Noted — Nudge won't suggest that again");
   };
+  const open = (s: Suggestion) => setOpened((o) => ({ ...o, [s.id]: today() }));
   const wake = (s: Suggestion) => {
     setHidden((h) => { const next = { ...h }; delete next[s.id]; return next; });
   };
@@ -192,19 +200,32 @@ export function ForYou() {
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
       <header className="rise flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
-          <p className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">
+          <p className="flex flex-wrap items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">
             <SparkMark size={14} tone="gradient" state="idle" /> Nudge
+            <span aria-hidden className="h-3 w-px bg-[var(--line)]" />
+            <span className="tracking-[0.1em]">{when}</span>
           </p>
           <h1 className="mt-2 text-[clamp(28px,3.2vw,38px)] font-bold leading-[1.05] tracking-[-0.03em]">For you, {me.name}</h1>
-          <p className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] text-muted">
-            {awake.length === 0 ? <span>Nothing needs you right now.</span> : (
-              <>
-                <span><span className="font-semibold text-ink">{awake.length}</span> {awake.length === 1 ? "thing" : "things"} worth your time</span>
-                {quick > 0 && <><span aria-hidden className="text-faint">·</span><span><span className="font-semibold text-ink">{quick}</span> take a minute or two</span></>}
-                <span aria-hidden className="text-faint">·</span><span>none of it is urgent</span>
-              </>
-            )}
-          </p>
+          {awake.length === 0 ? (
+            <p className="mt-2.5 text-[15px] text-muted">Nothing needs you right now.</p>
+          ) : (
+            <ul className="mt-3 flex flex-wrap items-center gap-2">
+              <li className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] text-muted">
+                <span className="font-semibold tabular-nums text-ink">{awake.length}</span> worth your time
+              </li>
+              {quick > 0 && (
+                <li className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] text-muted">
+                  <span className="font-semibold tabular-nums text-ink">{quick}</span> take a minute
+                </li>
+              )}
+              {picked.length > 0 && (
+                <li className="rounded-full px-3 py-1.5 text-[13px] font-semibold" style={{ background: "color-mix(in srgb, var(--success) 12%, transparent)", color: "var(--success)" }}>
+                  {picked.length} picked up today
+                </li>
+              )}
+              <li className="text-[13px] text-faint">None of it is urgent.</li>
+            </ul>
+          )}
         </div>
         {awake.length > 1 && (
           <div role="group" aria-label="Order" className="flex rounded-full border border-line bg-soft p-1">
@@ -222,60 +243,78 @@ export function ForYou() {
         {/* ── the list ── */}
         <div className="flex flex-col gap-6">
           {awake.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 rounded-[24px] border border-dashed border-line px-6 py-16 text-center">
-              <SparkMark size={32} tone="gradient" state="idle" />
-              <p className="mt-2 text-[17px] font-semibold text-ink">You&apos;re all caught up</p>
-              <p className="max-w-[380px] text-[15px] leading-relaxed text-faint">
-                Nudge adds something here when there&apos;s a reason to. {sleeping.length > 0 ? "What you hid comes back tomorrow." : "Not before."}
-              </p>
+            <div className="relative overflow-hidden rounded-[28px] border border-dashed border-line px-6 py-16 text-center">
+              <span aria-hidden className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full blur-3xl" style={{ background: "radial-gradient(circle, color-mix(in srgb, var(--purple) 18%, transparent), transparent 70%)" }} />
+              <div className="relative flex flex-col items-center gap-2">
+                <SparkMark size={34} tone="gradient" state="idle" />
+                <p className="mt-2 text-[19px] font-bold tracking-tight text-ink">You&apos;re all caught up</p>
+                <p className="max-w-[380px] text-[15px] leading-relaxed text-faint">
+                  Nudge adds something here when there&apos;s a reason to. {sleeping.length > 0 ? "What you hid comes back tomorrow." : "Not before."}
+                </p>
+              </div>
             </div>
           ) : (
             <>
-              <SuggestionCard s={lead} lead onLater={later} onNever={nope} />
+              <SuggestionCard s={lead} lead onOpen={open} onLater={later} onNever={nope} />
 
               {GROUPS.map((g) => {
                 const items = rest.filter(g.has);
                 if (items.length === 0) return null;
                 return (
                   <section key={g.key} aria-labelledby={`g-${g.key}`} className="flex flex-col gap-3">
-                    <div>
-                      <h2 id={`g-${g.key}`} className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">
-                        {g.label}
-                        <span className="rounded-full bg-soft px-1.5 py-px text-[11px] tracking-normal tabular-nums text-muted">{items.length}</span>
-                      </h2>
-                      <p className="mt-0.5 text-[13px] text-faint">{g.hint}</p>
-                    </div>
-                    {items.map((s) => <SuggestionCard key={s.id} s={s} onLater={later} onNever={nope} />)}
+                    <GroupHead label={g.label} hint={g.hint} count={items.length} />
+                    {items.map((s, i) => (
+                      <SuggestionCard key={s.id} s={s} delay={Math.min(i, 6) * 45} onOpen={open} onLater={later} onNever={nope} />
+                    ))}
                   </section>
                 );
               })}
             </>
+          )}
+
+          {picked.length > 0 && (
+            <section aria-labelledby="g-picked" className="flex flex-col gap-3">
+              <GroupHead label="Picked up today" hint="Still here if you want another look." count={picked.length} />
+              {picked.map((s) => <SuggestionCard key={s.id} s={s} opened onOpen={open} onLater={later} onNever={nope} />)}
+            </section>
           )}
         </div>
 
         {/* ── the rail ── */}
         <div className="flex flex-col gap-4 xl:sticky xl:top-4">
           <RailCard title="Your week" hint="Yours only — none of this is a score anyone else sees.">
-            <ul className="flex flex-col divide-y divide-[var(--line)]">
-              {[
-                ["Check-in streak", streak > 0 ? `${streak} ${streak === 1 ? "day" : "days"}` : "Not yet this week"],
-                ["September pulse", state.pulseDone ? "Answered" : "Still open"],
-                ["Learning streak", `${growStats.streak} ${growStats.streak === 1 ? "day" : "days"}`],
-                ["Tour", state.tourLeft === 0 ? "All explored" : `${state.tourLeft} left`],
-              ].map(([k, v]) => (
-                <li key={k} className="flex items-baseline justify-between gap-3 py-2.5">
-                  <span className="text-[14px] text-muted">{k}</span>
-                  <span className="text-[15px] font-semibold tabular-nums text-ink">{v}</span>
-                </li>
-              ))}
+            <WeekStrip streak={me.streak} checkedInToday={Boolean(mood)} />
+            <div className="mt-4 flex items-baseline gap-2">
+              <span className="text-[30px] font-bold leading-none tracking-[-0.02em] tabular-nums">{streak}</span>
+              <span className="text-[14px] text-muted">day check-in streak</span>
+            </div>
+            <ul className="mt-4 flex flex-col gap-3 border-t border-line pt-3.5">
+              <li>
+                <div className="flex items-baseline justify-between gap-3 text-[14px]">
+                  <span className="text-muted">Learning streak</span>
+                  <span className="font-semibold tabular-nums text-ink">{growStats.streak} days</span>
+                </div>
+                <div className="mt-1.5"><Meter value={growStats.streak} max={7} color="var(--viz-2)" /></div>
+              </li>
+              <li>
+                <div className="flex items-baseline justify-between gap-3 text-[14px]">
+                  <span className="text-muted">Tour explored</span>
+                  <span className="font-semibold tabular-nums text-ink">{tourTotal - state.tourLeft} of {tourTotal}</span>
+                </div>
+                <div className="mt-1.5"><Meter value={tourTotal - state.tourLeft} max={tourTotal} color="var(--viz-3)" /></div>
+              </li>
+              <li className="flex items-baseline justify-between gap-3 text-[14px]">
+                <span className="text-muted">September pulse</span>
+                <span className="font-semibold text-ink">{state.pulseDone ? "Answered" : "Still open"}</span>
+              </li>
             </ul>
           </RailCard>
 
-          <RailCard title="Why these, today" hint="The signals this list was built from.">
+          <RailCard accent title="Why these, today" hint="The signals this list was built from.">
             <ul className="flex flex-col gap-2">
-              {signals(state, streak).map((s) => (
-                <li key={s} className="flex gap-2 text-[14px] leading-snug text-muted">
-                  <SparkMark size={12} tone="gradient" state="still" className="mt-[4px] shrink-0" />{s}
+              {signals(state, streak).map((sig) => (
+                <li key={sig} className="flex gap-2 text-[14px] leading-snug text-muted">
+                  <SparkMark size={12} tone="gradient" state="still" className="mt-[4px] shrink-0" />{sig}
                 </li>
               ))}
             </ul>
@@ -289,8 +328,9 @@ export function ForYou() {
             <RailCard title="Not today" hint="Back tomorrow, unless you want them sooner.">
               <ul className="flex flex-col divide-y divide-[var(--line)]">
                 {sleeping.map((s) => (
-                  <li key={s.id} className="flex items-center justify-between gap-3 py-2.5">
-                    <span className="min-w-0 text-[14px] leading-snug text-muted">{s.title}</span>
+                  <li key={s.id} className="flex items-center gap-2.5 py-2.5">
+                    <span aria-hidden className="h-6 w-[3px] shrink-0 rounded-full" style={{ background: accentFor(s.section) }} />
+                    <span className="min-w-0 flex-1 text-[14px] leading-snug text-muted">{s.title}</span>
                     <button onClick={() => wake(s)} className="min-h-[44px] shrink-0 rounded-full px-2.5 text-[14px] font-semibold text-[var(--purple)] transition hover:bg-soft lg:min-h-[36px]">Bring back</button>
                   </li>
                 ))}
@@ -307,11 +347,13 @@ export function ForYou() {
             </RailCard>
           )}
 
-          <RailCard title="Nothing here is a task list" hint="Vadal never counts what you skipped.">
-            <Link href="/product/get-started" className="inline-flex min-h-[44px] items-center gap-1.5 text-[14px] font-semibold text-[var(--purple)] hover:underline lg:min-h-0">
+          <div className="rounded-[22px] bg-soft/70 p-5">
+            <p className="text-[14px] font-semibold text-ink">Nothing here is a task list</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-muted">Vadal never counts what you skipped, and nobody sees this page but you.</p>
+            <Link href="/product/get-started" className="mt-2.5 inline-flex min-h-[44px] items-center gap-1.5 text-[14px] font-semibold text-[var(--purple)] hover:underline lg:min-h-0">
               See what else Vadal does <ArrowRight className="h-4 w-4" />
             </Link>
-          </RailCard>
+          </div>
         </div>
       </div>
     </div>

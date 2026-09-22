@@ -38,6 +38,17 @@ Unchanged in spirit: gradient spark, "You're all caught up", and a line that cha
 - Order switch re-sorts by minutes; the lead is always the first item of the current order.
 - Every suggestion is still access-gated by section, so nobody is offered a screen they cannot open.
 
+## The craft layer
+- **A colour system by module.** Each suggestion's section has an accent — violet (Home, For you), amber (Kudos), orange (iLearn, Get Started), green (iThrive, Social), blue-violet (Pulse, Manager hub, Amplify). It tints the icon medallion and its inner ring, and paints a 3px bar that slides in on hover. Colour says *where this belongs*, never how urgent it is.
+- **Medallions, not flat tiles.** 44px (60px on the lead) rounded squares, tinted 13% with a 22% inner ring.
+- **The lead card** carries the Aurora hairline, a radial wash of its own accent bleeding from the top-right, a 30px radius, a deeper shadow, and a brand button with a coloured drop shadow.
+- **Group heads** are a label, a count pill and a hairline that runs to the edge — the page's only divider.
+- **Motion**: cards rise in with a 45ms stagger, rows lift 2px on hover, and the "not useful" control only appears on hover or focus, so the resting state stays quiet.
+- **The week strip** in the rail: seven blocks, Monday-first — solid for a day you checked in, grey for a day you missed, an outline for a day that has not happened yet, and a ring on today. A streak is a shape before it is a number.
+- **Meters** for learning streak (orange) and tour progress (green), so the rail has rhythm rather than four identical rows.
+- **Picked up today**: opening a suggestion keeps it, moves it to its own group at the bottom at 70% opacity with a green "Opened today" check, and adds a count chip to the header. The day adds up instead of emptying out.
+- **Header**: eyebrow reads "Nudge · Tuesday 22 September"; the counts are chips rather than a sentence.
+
 ## Figma to build
 1. For you 1440 — lead + three groups + full rail.
 2. The same with something hidden (the "Not today" rail card) and one muted.
