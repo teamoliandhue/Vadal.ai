@@ -42,6 +42,8 @@ export type MarketItem = Reward & {
   /** redeemed in the last 90 days — the only "popular" we can honestly claim */
   taken90d: number;
   addedOn?: string;
+  /** photograph in /public/market, named after the id (see market/CREDITS.md) */
+  image: string;
 };
 
 /** Metadata for the eighteen that already existed, by id. */
@@ -67,7 +69,7 @@ const EXTRA: Record<string, Partial<MarketItem>> = {
 
 /* Things a person on the floor can actually reach, added because the first
    catalogue was built for people who sit at desks. */
-const LOCAL: MarketItem[] = [
+const LOCAL: Omit<MarketItem, "image">[] = [
   {
     id: "canteen-200", kind: "voucher", category: "local", name: "Canteen top-up", emoji: "🍛", cost: 400, value: 200,
     blurb: "₹200 on your canteen card, at any site.", fulfilment: "On the card by the next shift",
@@ -95,14 +97,18 @@ const LOCAL: MarketItem[] = [
   },
 ];
 
+/* One photograph per item, named after its id. A shop where every tile is an
+   emoji is a menu; people buy things they can see. */
+const withImage = <T extends { id: string }>(i: T) => ({ ...i, image: `/market/${i.id}.webp` });
+
 export const ITEMS: MarketItem[] = [
-  ...REWARDS.map((r) => ({
+  ...REWARDS.map((r) => withImage({
     ...r,
     category: r.kind as Category,
     seller: "oliandhue store", leadTime: "5–7 days", stock: null, limitPerYear: null, sites: null, taken90d: 0,
     ...EXTRA[r.id],
   })),
-  ...LOCAL,
+  ...LOCAL.map(withImage),
 ];
 
 export const itemById = (id: string) => ITEMS.find((i) => i.id === id);

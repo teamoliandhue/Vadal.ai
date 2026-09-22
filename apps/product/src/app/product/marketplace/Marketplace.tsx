@@ -19,6 +19,7 @@
    With points switched off there is nothing to spend, so the page becomes the
    experiences a manager can grant — the same behaviour the catalogue had. */
 import * as React from "react";
+import Image from "next/image";
 import { ArrowRight, Ban, Check, ChevronLeft, ChevronRight, Clock3, Gift, Package, Search, ShieldAlert, Sparkles, Truck, X } from "lucide-react";
 import { Avatar, Badge, Button, Switch, type BadgeTone } from "@vadal/design-system";
 import { canAccess } from "@/lib/access";
@@ -312,9 +313,11 @@ function Bento({ onPick, counts }: { onPick: (c: Category) => void; counts: numb
         className="card-lift group flex min-h-[260px] flex-col justify-between rounded-[26px] border border-line p-6 text-left transition sm:p-7"
         style={{ background: lead.tint }}
       >
-        <span className="flex gap-2">
+        <span className="flex gap-2.5">
           {preview.map((i) => (
-            <span key={i.id} className="grid h-14 w-14 place-items-center rounded-2xl bg-card/70 text-[26px] shadow-sm ring-1 ring-black/5" aria-hidden>{i.emoji}</span>
+            <span key={i.id} className="relative h-20 w-20 overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-black/5 sm:h-24 sm:w-24">
+              <Image src={i.image} alt="" fill sizes="96px" className="object-cover" />
+            </span>
           ))}
         </span>
         <span className="mt-5 block">
@@ -388,35 +391,42 @@ function Card({
   const blocker = points ? blockerFor(item, { balance, takenThisYear: taken, site: MY_SITE }) : null;
   const low = item.stock !== null && item.stock > 0 && item.stock <= 25;
   return (
-    <li className="card-lift flex flex-col rounded-[22px] border border-line bg-card p-5">
-      <div className="flex items-start justify-between gap-3">
-        <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[var(--lav)] text-[28px]" aria-hidden>{item.emoji}</span>
-        <div className="flex flex-col items-end gap-1">
+    <li className="card-lift flex flex-col overflow-hidden rounded-[22px] border border-line bg-card">
+      <button onClick={onPick} className="relative block aspect-[16/10] w-full overflow-hidden bg-soft text-left">
+        <Image
+          src={item.image} alt="" fill sizes="(max-width: 640px) 100vw, 320px"
+          className={`object-cover transition duration-500 hover:scale-[1.03] ${blocker && blocker.kind !== "points" ? "grayscale" : ""}`}
+        />
+        <span className="absolute left-3 top-3 flex gap-1.5">
           {item.addedOn && <Badge tone="brand" size="sm">New</Badge>}
-          {item.needsApproval && <span className="rounded-full bg-soft px-2 py-0.5 text-[12px] font-semibold text-muted">Manager approves</span>}
-        </div>
-      </div>
-      <h3 className="mt-3 text-[15px] font-bold leading-snug tracking-tight text-ink">{item.name}</h3>
-      <p className="mt-1 flex-1 text-[13px] leading-snug text-muted">{item.blurb}</p>
-      <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-faint">
-        <span>{item.seller}</span>
-        {low && <><span aria-hidden>·</span><span className="font-semibold text-[var(--warning)]">{item.stock} left</span></>}
-        {item.sites && <><span aria-hidden>·</span><span>{item.sites.includes(MY_SITE) ? "At your site" : item.sites.join(", ")}</span></>}
-      </p>
-      <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-3.5">
-        {points ? (
-          <span className="min-w-0">
-            <span className="block text-[16px] font-bold tabular-nums text-ink">{pts(cost)} <span className="text-[12px] font-semibold text-faint">pts</span></span>
-            <span className="block truncate text-[12px] text-faint">
-              {blocker ? blockerText(blocker) : item.value ? `${inr(item.value)} value` : "You can have this"}
-            </span>
-          </span>
-        ) : (
-          <span className="text-[12px] text-faint">{item.needsApproval ? "Granted by a manager" : ""}</span>
+          {low && <Badge tone="warning" size="sm">{item.stock} left</Badge>}
+        </span>
+        {item.needsApproval && (
+          <span className="absolute right-3 top-3 rounded-full bg-card/90 px-2 py-0.5 text-[12px] font-semibold text-muted backdrop-blur">Manager approves</span>
         )}
-        <Button variant={blocker ? "secondary" : "brand"} size="sm" className="min-h-[44px] shrink-0 lg:min-h-0" onClick={onPick}>
-          {blocker ? "Details" : action}
-        </Button>
+      </button>
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="text-[15px] font-bold leading-snug tracking-tight text-ink">{item.name}</h3>
+        <p className="mt-1 flex-1 text-[13px] leading-snug text-muted">{item.blurb}</p>
+        <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-faint">
+          <span>{item.seller}</span>
+          {item.sites && <><span aria-hidden>·</span><span>{item.sites.includes(MY_SITE) ? "At your site" : item.sites.join(", ")}</span></>}
+        </p>
+        <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-3.5">
+          {points ? (
+            <span className="min-w-0">
+              <span className="block text-[16px] font-bold tabular-nums text-ink">{pts(cost)} <span className="text-[12px] font-semibold text-faint">pts</span></span>
+              <span className="block truncate text-[12px] text-faint">
+                {blocker ? blockerText(blocker) : item.value ? `${inr(item.value)} value` : "You can have this"}
+              </span>
+            </span>
+          ) : (
+            <span className="text-[12px] text-faint">{item.needsApproval ? "Granted by a manager" : ""}</span>
+          )}
+          <Button variant={blocker ? "secondary" : "brand"} size="sm" className="min-h-[44px] shrink-0 lg:min-h-0" onClick={onPick}>
+            {blocker ? "Details" : action}
+          </Button>
+        </div>
       </div>
     </li>
   );
@@ -431,7 +441,9 @@ function ItemDetail({
   const blocker = points ? blockerFor(item, { balance, takenThisYear: taken, site: MY_SITE }) : null;
   return (
     <div className="flex flex-col gap-5">
-      <span className="grid h-20 w-20 place-items-center rounded-3xl bg-[var(--lav)] text-[40px]" aria-hidden>{item.emoji}</span>
+      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[22px] bg-soft">
+        <Image src={item.image} alt="" fill sizes="480px" className="object-cover" />
+      </div>
       <div>
         <h2 className="text-[22px] font-bold tracking-tight">{item.name}</h2>
         <p className="mt-1 text-[14px] text-muted">{item.blurb}</p>
@@ -493,7 +505,9 @@ function Orders({ orders }: { orders: Order[] }) {
           return (
             <li key={o.id} className="grid gap-3 py-4 first:pt-1 last:pb-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] md:items-start">
               <div className="flex min-w-0 items-start gap-3">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[var(--lav)] text-[22px]" aria-hidden>{item?.emoji ?? "🎁"}</span>
+                <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-soft">
+                  {item && <Image src={item.image} alt="" fill sizes="48px" className="object-cover" />}
+                </span>
                 <div className="min-w-0">
                   <p className="truncate text-[15px] font-semibold text-ink">{item?.name ?? "Reward"}</p>
                   <p className="text-[13px] text-faint">
@@ -689,7 +703,12 @@ function Supply({
               {ITEMS.map((i) => (
                 <tr key={i.id} className="border-t border-line">
                   <th scope="row" className="py-2.5 pr-3 text-left font-medium text-ink">
-                    <span aria-hidden className="mr-1.5">{i.emoji}</span>{i.name}
+                    <span className="flex items-center gap-2.5">
+                      <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-soft">
+                        <Image src={i.image} alt="" fill sizes="36px" className="object-cover" />
+                      </span>
+                      {i.name}
+                    </span>
                     {i.sites && <span className="block text-[13px] font-normal text-faint">{i.sites.join(", ")}</span>}
                   </th>
                   <td className="py-2.5 pr-3 text-muted">{i.seller}</td>
@@ -749,8 +768,9 @@ function Supply({
         </section>
       </div>
 
-      <p className="flex items-center gap-2 text-[13px] text-faint">
-        <Clock3 className="h-3.5 w-3.5" aria-hidden /> Stock and prices here are the workspace&rsquo;s own. Vadal holds no inventory and takes no margin.
+      <p className="flex items-start gap-2 text-[13px] text-faint">
+        <Clock3 className="mt-[2px] h-3.5 w-3.5 shrink-0" aria-hidden />
+        Stock and prices here are the workspace&rsquo;s own. Vadal holds no inventory and takes no margin. Item photographs are stand-ins from Unsplash until your store sends its own — swap a file in <code className="font-mono">/market</code> and the shelf updates.
       </p>
     </div>
   );
