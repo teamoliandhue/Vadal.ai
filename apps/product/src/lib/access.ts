@@ -63,6 +63,7 @@ export const SECTION_ACCESS: Record<string, Role[]> = {
   Home: ALL_ROLES,
   Social: ALL_ROLES,
   Kudos: ALL_ROLES,
+  Marketplace: ALL_ROLES,
   Knowledge: ALL_ROLES,
 
   // The four pillars from the brief that had no screens. All are employee-facing

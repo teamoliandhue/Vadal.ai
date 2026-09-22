@@ -1,13 +1,8 @@
-/* Marketplace — what points are spent on (Kudos › Marketplace).
-   The route keeps its /rewards path: it is linked from the digest, the tour and
-   the marketing site, and a working link is worth more than a tidy one. */
-import { Shell } from "../../shell";
-import { Marketplace } from "./Marketplace";
+/* The marketplace moved to its own section. This route stays because the
+   digest, the tour, Get Started and the marketing site all link to it — a
+   working link is worth more than a tidy one. */
+import { redirect } from "next/navigation";
 
-export default function MarketplacePage() {
-  return (
-    <Shell active="Kudos" breadcrumb="Marketplace">
-      <Marketplace />
-    </Shell>
-  );
+export default function RewardsPage() {
+  redirect("/product/marketplace");
 }

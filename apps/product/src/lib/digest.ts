@@ -57,7 +57,7 @@ export const WHATS_NEW: DigestLine[] = [
   { id: "n-campaign", emoji: "🌿", text: "The **Wellbeing campaign** starts Monday — focus weeks and no-meeting Wednesdays.", href: "/product/social/post/f1", section: "Social" },
   { id: "n-translate", emoji: "🌐", text: "New in Vadal: **translate any post into Hindi**, right under the original.", href: "/product/social", section: "Social" },
   { id: "n-photo", emoji: "📷", text: "New community: **Photo walks** — one walk a month, best frame wins the wall.", href: "/product/social/groups/photo-walk", section: "Social" },
-  { id: "n-rewards", emoji: "🎁", text: "**Rewards** is open — merch, vouchers, experiences and giving.", href: "/product/kudos/rewards", section: "Kudos" },
+  { id: "n-rewards", emoji: "🎁", text: "The **Marketplace** has five new things at your site — a canteen top-up, a bus pass, a hot meal on nights.", href: "/product/marketplace", section: "Marketplace" },
   { id: "n-results", emoji: "📊", text: "**Amplify Results** shows who approved each post and what it reached.", href: "/product/amplify", section: "Campaigns", roles: MGR },
 ];
 

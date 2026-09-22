@@ -23,7 +23,7 @@ import { SectionGuard } from "./SectionGuard";
 /* left-hand domain label per section (top-bar breadcrumb root) */
 const DOMAIN: Record<string, string> = {
   "Get Started": "Nudge", "For you": "Nudge",
-  Home: "My space", Social: "My space", Kudos: "My space",
+  Home: "My space", Social: "My space", Kudos: "My space", Marketplace: "My space",
   Campaigns: "Engage", Amplify: "Engage",
   Pulse: "Engagement & listening", Listen: "Engagement & listening", Sentiment: "Engagement & listening",
   SmartWork: "Digital workplace", iLearn: "Digital workplace", Knowledge: "Digital workplace",

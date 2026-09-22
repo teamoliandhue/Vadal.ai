@@ -1,5 +1,5 @@
 "use client";
-/* Marketplace — where points are spent (Kudos › Marketplace, spec 064).
+/* Marketplace — where points are spent (My space › Marketplace, spec 064/065).
 
    What was here was a catalogue: eighteen cards and a Redeem button that ended
    at a toast. A marketplace needs four things that a catalogue does not, and
@@ -19,7 +19,7 @@
    With points switched off there is nothing to spend, so the page becomes the
    experiences a manager can grant — the same behaviour the catalogue had. */
 import * as React from "react";
-import { Ban, Check, Clock3, Gift, Package, Search, ShieldAlert, Sparkles, Truck, X } from "lucide-react";
+import { ArrowRight, Ban, Check, ChevronLeft, ChevronRight, Clock3, Gift, Package, Search, ShieldAlert, Sparkles, Truck, X } from "lucide-react";
 import { Avatar, Badge, Button, Switch, type BadgeTone } from "@vadal/design-system";
 import { canAccess } from "@/lib/access";
 import {
@@ -28,13 +28,12 @@ import {
 } from "@/lib/marketplace";
 import { KIND_LABEL, KIND_SOURCE, NOT_ALLOWED, TIERS, tierOf, type RewardKind } from "@/lib/rewards";
 import { usePersistentState } from "@/lib/usePersistentState";
-import { Drawer } from "../../Drawer";
-import { KudosTabs } from "../KudosTabs";
-import { useWallet } from "../useWallet";
-import { cancellable, placeOrder, setOrderState, useOrders, type Order } from "../useOrders";
-import { usePoints } from "../../usePointsMode";
-import { useViewAs } from "../../useViewAs";
-import { toast } from "../../Toaster";
+import { Drawer } from "../Drawer";
+import { useWallet } from "../kudos/useWallet";
+import { cancellable, placeOrder, setOrderState, useOrders, type Order } from "../kudos/useOrders";
+import { usePoints } from "../usePointsMode";
+import { useViewAs } from "../useViewAs";
+import { toast } from "../Toaster";
 
 const CATEGORIES: Category[] = ["local", "merch", "voucher", "experience", "giving"];
 const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
@@ -49,10 +48,6 @@ const STATE_TONE: Record<OrderState, BadgeTone> = {
 };
 
 type View = "shop" | "orders" | "approvals" | "supply";
-
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
-}
 
 function Empty({ icon: Icon, title, line }: { icon: typeof Gift; title: string; line: string }) {
   return (
@@ -92,20 +87,21 @@ export function Marketplace() {
 
   return (
     <div className="flex flex-col gap-6">
-      <KudosTabs active="rewards" />
-
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div className="min-w-0">
-          <Eyebrow>{points ? `${tier.name} · ${pts(balance)} points to spend` : "Marketplace"}</Eyebrow>
-          <h1 className="mt-2 text-[clamp(26px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">{points ? "Marketplace" : "Experiences"}</h1>
-          <p className="mt-2 max-w-xl text-[14px] text-muted">
-            {points
-              ? nextTier
-                ? `${pts(nextTier.from - lifetime)} more lifetime points to ${nextTier.name}. Tiers never go down, and spending doesn't lower yours.`
-                : "You're at the top tier."
-              : "This workspace doesn't use points. These are the experiences a manager can give someone, as a thank-you."}
-          </p>
-        </div>
+      <header className="rise">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">My space</p>
+        <h1 className="mt-2 text-[clamp(28px,3.2vw,38px)] font-bold leading-[1.05] tracking-[-0.03em]">{points ? "Marketplace" : "Experiences"}</h1>
+        <p className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] text-muted">
+          {points ? (
+            <>
+              <span><span className="font-semibold text-ink">{pts(balance)}</span> points to spend</span>
+              <span aria-hidden className="text-faint">·</span>
+              <span>{tier.name}{nextTier ? `, ${pts(nextTier.from - lifetime)} from ${nextTier.name}` : " — the top tier"}</span>
+              {open > 0 && <><span aria-hidden className="text-faint">·</span><span><span className="font-semibold text-ink">{open}</span> order{open === 1 ? "" : "s"} open</span></>}
+            </>
+          ) : (
+            <span>This workspace doesn&rsquo;t use points. These are the experiences a manager can give someone, as a thank-you.</span>
+          )}
+        </p>
       </header>
 
       {points && (
@@ -154,6 +150,11 @@ export function Marketplace() {
 }
 
 /* ── 1 · the shop ────────────────────────────────────────────────── */
+/* A storefront, in the shape shops actually use (Fluz, PayPal gift cards, the
+   Klarna and Shopee store tabs): a banner that carries the search, a bento of
+   ways in, then numbered rails you can push sideways. Browsing collapses to a
+   plain grid the moment you search or pick a category, because at that point
+   you know what you want and the merchandising is in the way. */
 function Shop({
   points, balance, costOf, kindsOn, takenOf, onPick, isManager,
 }: {
@@ -167,6 +168,7 @@ function Shop({
 
   const catalogue = ITEMS.filter((i) => kindsOn[i.kind] !== false);
   const query = q.trim().toLowerCase();
+  const browsing = !query && cat === "all";
 
   let list = points ? catalogue : catalogue.filter((i) => i.kind === "experience");
   if (query) list = list.filter((i) => `${i.name} ${i.blurb} ${i.seller}`.toLowerCase().includes(query));
@@ -177,31 +179,24 @@ function Shop({
       : sort === "popular" ? b.taken90d - a.taken90d
         : Number(Boolean(b.addedOn)) - Number(Boolean(a.addedOn)) || costOf(a) - costOf(b));
 
+  const card = (i: MarketItem) => (
+    <Card key={i.id} item={i} cost={costOf(i)} balance={balance} points={points}
+      taken={takenOf(i.id)} onPick={() => onPick(i)} action={points ? "Get it" : isManager ? "Grant" : "Details"} />
+  );
+
+  /* Cheapest first here, most-taken in the rail below — two rails sorted the
+     same way are one rail printed twice. */
+  const affordable = catalogue.filter((i) => costOf(i) <= balance).sort((a, b) => costOf(a) - costOf(b));
+  const mostTaken = [...catalogue].sort((a, b) => b.taken90d - a.taken90d);
+  const fresh = catalogue.filter((i) => i.addedOn);
+
   const seg = (on: boolean) => `min-h-[44px] rounded-full px-3.5 text-[13px] font-semibold transition lg:min-h-[34px] ${on ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`;
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
       {points && (
         <>
-          <div className="flex flex-wrap items-center gap-3">
-            <label className="flex min-w-[240px] flex-1 items-center gap-2 rounded-full border border-line bg-card px-4 focus-within:border-[var(--purple)]">
-              <Search className="h-4 w-4 shrink-0 text-faint" aria-hidden />
-              <input
-                value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search the marketplace"
-                aria-label="Search the marketplace"
-                className="min-h-[44px] w-full bg-transparent text-[14px] outline-none placeholder:text-faint"
-              />
-              {q && <button onClick={() => setQ("")} aria-label="Clear search" className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-faint hover:bg-soft"><X className="h-4 w-4" /></button>}
-            </label>
-            <label className="flex items-center gap-2 text-[13px] text-faint">
-              Sort
-              <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="min-h-[44px] rounded-xl border border-line bg-card px-2.5 text-[13px] text-ink lg:min-h-[36px]">
-                <option value="cheapest">Fewest points</option>
-                <option value="popular">Most taken</option>
-                <option value="new">Newest</option>
-              </select>
-            </label>
-          </div>
+          <Banner q={q} setQ={setQ} />
 
           <div role="group" aria-label="Filter the marketplace" className="flex flex-wrap gap-1 rounded-full bg-soft p-1 lg:w-fit">
             <button className={seg(cat === "all")} aria-pressed={cat === "all"} onClick={() => setCat("all")}>Everything</button>
@@ -213,26 +208,175 @@ function Shop({
         </>
       )}
 
-      {list.length === 0 ? (
-        <Empty
-          icon={Gift}
-          title={cat === "affordable" ? "Nothing within your points yet" : query ? "Nothing matches that" : "Nothing in the marketplace"}
-          line={cat === "affordable"
-            ? "The hot meal on the night shift is 300 points — and a kudos received is 25."
-            : query ? "Try a different word, or clear the search." : "An admin can switch categories on under Supply."}
-        />
-      ) : (
-        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {list.map((i) => (
-            <Card
-              key={i.id} item={i} cost={costOf(i)} balance={balance} points={points}
-              taken={takenOf(i.id)} onPick={() => onPick(i)}
-              action={points ? "Get it" : isManager ? "Grant" : "Details"}
-            />
-          ))}
-        </ul>
+      {points && browsing && (
+        <>
+          <Bento onPick={setCat} counts={CATEGORIES.map((c) => catalogue.filter((i) => i.category === c).length)} />
+          <Rail n="01" title="Within your points" note={`${affordable.length} of ${catalogue.length} things you can have today`} onSeeAll={() => setCat("affordable")}>
+            {affordable.map(card)}
+          </Rail>
+          <Rail n="02" title="What people actually take" note="Ranked by the last 90 days, not by what we would like you to buy" onSeeAll={() => setSort("popular")}>
+            {mostTaken.map(card)}
+          </Rail>
+          {fresh.length > 0 && (
+            <Rail n="03" title="New at your site" note="Added this month, on the floor rather than at a desk" onSeeAll={() => setCat("local")}>
+              {fresh.map(card)}
+            </Rail>
+          )}
+        </>
       )}
+
+      <section aria-labelledby="all-h" className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{browsing ? "Everything" : "Results"}</p>
+            <h2 id="all-h" className="mt-1 text-[20px] font-bold tracking-tight">
+              {query ? `“${q.trim()}”` : cat === "affordable" ? "Within your points" : cat === "all" ? "The whole marketplace" : CATEGORY_LABEL[cat]}
+              <span className="ml-2 text-[14px] font-semibold text-faint">{list.length}</span>
+            </h2>
+          </div>
+          {points && (
+            <label className="flex items-center gap-2 text-[13px] text-faint">
+              Sort
+              <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="min-h-[44px] rounded-xl border border-line bg-card px-2.5 text-[13px] text-ink lg:min-h-[36px]">
+                <option value="cheapest">Fewest points</option>
+                <option value="popular">Most taken</option>
+                <option value="new">Newest</option>
+              </select>
+            </label>
+          )}
+        </div>
+
+        {list.length === 0 ? (
+          <Empty
+            icon={Gift}
+            title={cat === "affordable" ? "Nothing within your points yet" : query ? "Nothing matches that" : "Nothing in the marketplace"}
+            line={cat === "affordable"
+              ? "The hot meal on the night shift is 300 points — and a kudos received is 25."
+              : query ? "Try a different word, or clear the search." : "An admin can switch categories on under Supply."}
+          />
+        ) : (
+          <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{list.map(card)}</ul>
+        )}
+      </section>
     </div>
+  );
+}
+
+/* The banner carries the search, the way a shop's does — and the balance, which
+   is the one number that decides what any of the prices mean. */
+function Banner({ q, setQ }: { q: string; setQ: (v: string) => void }) {
+  return (
+    <section className="relative overflow-hidden rounded-[28px] border border-line bg-[var(--ink)] px-6 py-8 text-[var(--card)] sm:px-9 sm:py-10 dark:bg-card dark:text-ink">
+      <span aria-hidden className="ai-grad absolute inset-x-0 top-0 h-[3px] opacity-90" />
+      <span aria-hidden className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full opacity-25 blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} />
+      <div className="relative">
+        <h2 className="max-w-[18ch] text-[clamp(26px,3.4vw,40px)] font-bold leading-[1.05] tracking-[-0.03em]">
+          Recognition, turned into something you actually wanted.
+        </h2>
+        <p className="mt-2 max-w-[54ch] text-[15px] leading-relaxed opacity-75">
+          Merch, vouchers, experiences and a few things that only exist at your site. No margin, no upsell, and nothing here expires.
+        </p>
+        <label className="mt-6 flex max-w-[560px] items-center gap-2 rounded-full bg-card px-4 text-ink ring-1 ring-black/5 focus-within:ring-2 focus-within:ring-[var(--purple)]">
+          <Search className="h-4 w-4 shrink-0 text-faint" aria-hidden />
+          <input
+            value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search the marketplace"
+            aria-label="Search the marketplace"
+            className="min-h-[48px] w-full bg-transparent text-[15px] outline-none placeholder:text-faint"
+          />
+          {q && <button onClick={() => setQ("")} aria-label="Clear search" className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-faint hover:bg-soft"><X className="h-4 w-4" /></button>}
+        </label>
+      </div>
+    </section>
+  );
+}
+
+/** The ways in, as a bento: one big door and four small ones. */
+function Bento({ onPick, counts }: { onPick: (c: Category) => void; counts: number[] }) {
+  const tiles: { c: Category; head: string; line: string; tint: string }[] = [
+    { c: "local", head: "Things that exist at your site", line: "A canteen top-up, a bus pass, a hot meal after 1am — the shelf for people who are not at a desk.", tint: "var(--lav)" },
+    { c: "voucher", head: "Vouchers", line: "Food, shopping and travel, at five points to the rupee.", tint: "color-mix(in srgb, var(--purple) 10%, transparent)" },
+    { c: "experience", head: "Experiences", line: "A late start, a team lunch, a day off.", tint: "color-mix(in srgb, var(--success) 12%, transparent)" },
+    { c: "merch", head: "Merch", line: "The mug, the notebook, the night-shift hoodie.", tint: "color-mix(in srgb, var(--warning) 12%, transparent)" },
+    { c: "giving", head: "Giving", line: "Meals and trees, in your name rather than ours.", tint: "color-mix(in srgb, var(--info, var(--purple)) 8%, transparent)" },
+  ];
+  const [lead, ...rest] = tiles;
+  const countOf = (c: Category) => counts[CATEGORIES.indexOf(c)];
+  /* A shop shows you what is behind the door, so the big tile wears the three
+     things it actually holds rather than a stock photograph. */
+  const preview = ITEMS.filter((i) => i.category === lead.c).slice(0, 3);
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <button
+        onClick={() => onPick(lead.c)}
+        className="card-lift group flex min-h-[260px] flex-col justify-between rounded-[26px] border border-line p-6 text-left transition sm:p-7"
+        style={{ background: lead.tint }}
+      >
+        <span className="flex gap-2">
+          {preview.map((i) => (
+            <span key={i.id} className="grid h-14 w-14 place-items-center rounded-2xl bg-card/70 text-[26px] shadow-sm ring-1 ring-black/5" aria-hidden>{i.emoji}</span>
+          ))}
+        </span>
+        <span className="mt-5 block">
+          <span className="block text-[22px] font-bold leading-tight tracking-tight text-ink">{lead.head}</span>
+          <span className="mt-1 block max-w-[46ch] text-[14px] leading-snug text-muted">{lead.line}</span>
+          <span className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-card px-4 py-2.5 text-[13px] font-semibold text-ink ring-1 ring-line transition group-hover:gap-2.5">
+            Shop {countOf(lead.c)} things <ArrowRight className="h-3.5 w-3.5" />
+          </span>
+        </span>
+      </button>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {rest.map((t) => (
+          <button
+            key={t.c}
+            onClick={() => onPick(t.c)}
+            className="card-lift group flex min-h-[122px] flex-col justify-between rounded-[26px] border border-line p-5 text-left transition"
+            style={{ background: t.tint }}
+          >
+            <span className="block">
+              <span className="flex items-baseline justify-between gap-2">
+                <span className="text-[16px] font-bold tracking-tight text-ink">{t.head}</span>
+                <span className="text-[13px] tabular-nums text-faint">{countOf(t.c)}</span>
+              </span>
+              <span className="mt-1 block text-[13px] leading-snug text-muted">{t.line}</span>
+            </span>
+            <span className="mt-3 inline-flex w-fit items-center gap-1.5 text-[13px] font-semibold text-[var(--purple)] transition group-hover:gap-2.5">
+              Shop now <ArrowRight className="h-3.5 w-3.5" />
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** A numbered rail you can push sideways, with the arrows a shop puts there. */
+function Rail({ n, title, note, onSeeAll, children }: {
+  n: string; title: string; note: string; onSeeAll: () => void; children: React.ReactNode;
+}) {
+  const ref = React.useRef<HTMLUListElement>(null);
+  const push = (dir: 1 | -1) => ref.current?.scrollBy({ left: dir * 340, behavior: "smooth" });
+  return (
+    <section aria-labelledby={`rail-${n}`} className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <h2 id={`rail-${n}`} className="flex items-baseline gap-3 text-[20px] font-bold tracking-tight">
+            <span className="text-[16px] font-semibold tabular-nums text-faint">{n}</span>
+            <span className="text-faint" aria-hidden>/</span>
+            {title}
+          </h2>
+          <p className="mt-0.5 text-[13px] text-faint">{note}</p>
+        </div>
+        <div className="flex items-center gap-1">
+          <button onClick={onSeeAll} className="min-h-[44px] rounded-full px-3 text-[13px] font-semibold text-[var(--purple)] transition hover:bg-soft lg:min-h-[36px]">See all</button>
+          <button onClick={() => push(-1)} aria-label={`Scroll ${title} left`} className="grid h-11 w-11 place-items-center rounded-full border border-line text-muted transition hover:bg-soft lg:h-9 lg:w-9"><ChevronLeft className="h-4 w-4" /></button>
+          <button onClick={() => push(1)} aria-label={`Scroll ${title} right`} className="grid h-11 w-11 place-items-center rounded-full border border-line text-muted transition hover:bg-soft lg:h-9 lg:w-9"><ChevronRight className="h-4 w-4" /></button>
+        </div>
+      </div>
+      <ul ref={ref} className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2 [&>li]:w-[290px] [&>li]:shrink-0 [&>li]:snap-start">
+        {children}
+      </ul>
+    </section>
   );
 }
 

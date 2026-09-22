@@ -9,7 +9,7 @@
    routing and permissions in agreement. */
 import {
   BarChart3, BookOpen, ClipboardList, Compass, FolderKanban, Gauge, GraduationCap,
-  Cable, Handshake, Heart, HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio, Rocket,
+  Cable, Handshake, Heart, HeartHandshake, HeartPulse, House, LifeBuoy, Megaphone, Newspaper, Radio, Rocket, ShoppingBag,
   Share2, ShieldCheck, Smile, Sparkles, Sprout, UsersRound, type LucideIcon,
 } from "lucide-react";
 import type { Role } from "@/lib/auth";
@@ -32,13 +32,16 @@ export const NAV: NavGroupModel[] = [
     ],
   },
   /* Kudos sits in My space: it is the one engagement action every employee
-     takes, and it was buried under Engage beside two admin tools. */
+     takes, and it was buried under Engage beside two admin tools. The
+     Marketplace sits beside it for the same reason — spending what recognition
+     earned is the employee's own business, not a sub-page of an admin tool. */
   {
     label: "My space",
     items: [
       { label: "Home", icon: House, href: "/product/home" },
       { label: "Social", icon: Newspaper, href: "/product/social" },
       { label: "Kudos", icon: HeartHandshake, href: "/product/kudos" },
+      { label: "Marketplace", icon: ShoppingBag, href: "/product/marketplace" },
     ],
   },
   /* Then the meeting's order: Engage · Listen · Learn · Insight · Wellbeing, and

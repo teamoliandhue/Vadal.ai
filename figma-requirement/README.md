@@ -80,3 +80,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 062 | [Home v2 — one clock and one streak, "Waiting on you" in place of nine product tiles, and a team snapshot that keeps the check-in promise](./062-home-v2.md) | Built · needs Figma |
 | 063 | [Settings v2 — the anonymity floor cannot be lowered, retention and AI read the same source as Trust, and every control is reachable on a phone](./063-settings-v2.md) | Built · needs Figma |
 | 064 | [Marketplace — orders with states and refunds, approvals that need a reason, stock and limits, and what points cost the company](./064-marketplace.md) | Built · needs Figma |
+| 065 | [Marketplace as its own section under My space, rebuilt as a storefront — banner with search, category bento, numbered rails](./065-marketplace-section.md) | Built · needs Figma |

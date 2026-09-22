@@ -88,7 +88,7 @@ export function PointsPanel() {
       </section>
 
       <p className="text-[13px] text-muted">
-        Rewards and what they cost are set in <Link href="/product/kudos/rewards" className="font-semibold text-[var(--purple)] hover:underline">Kudos › Rewards</Link>.
+        What is on the shelf and what it costs are set in <Link href="/product/marketplace" className="font-semibold text-[var(--purple)] hover:underline">Marketplace › Supply</Link>.
       </p>
     </div>
   );

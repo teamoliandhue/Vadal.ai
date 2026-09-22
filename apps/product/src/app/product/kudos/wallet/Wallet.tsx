@@ -120,8 +120,8 @@ export function Wallet() {
               {redeemed.length} {redeemed.length === 1 ? "reward" : "rewards"} redeemed
             </p>
           </div>
-          <Link href="/product/kudos/rewards" className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full bg-[var(--purple)] px-5 text-[14px] font-semibold text-white transition hover:opacity-90">
-            Browse rewards <ArrowRight className="h-4 w-4" />
+          <Link href="/product/marketplace" className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full bg-[var(--purple)] px-5 text-[14px] font-semibold text-white transition hover:opacity-90">
+            Spend them <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </header>
