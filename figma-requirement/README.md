@@ -72,3 +72,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 054 | [Manager hub v2 — this week, your people (no private sentiment), and the team's own pulse results](./054-manager-hub-v2.md) | Built · needs Figma |
 | 055 | [Flow v2 — tasks, automations that state their limits, and SLA with every breach explained](./055-flow-v2.md) | Built · needs Figma |
 | 056 | [Onboard v2 — preboarding before day one, and the admin split into waiting-on-us and waiting-on-them](./056-onboard-v2.md) | Built · needs Figma |
+| 057 | [Alumni v2 — exit documents with owners and lateness, roles matched to alumni, and referrals that stall in the open](./057-alumni-v2.md) | Built · needs Figma |
