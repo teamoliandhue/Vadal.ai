@@ -5,13 +5,13 @@
    for untracked Pulse risks, and a detail drawer with the timeline, AI summary
    and status actions. Same Lumen shell + Aurora AI accents. Seeded (lib/cases). */
 import * as React from "react";
-import { Lock, Plus, ShieldCheck, Sparkles } from "lucide-react";
+import { Lock, ShieldCheck, Sparkles } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark, type BadgeTone } from "@vadal/design-system";
 import { toast } from "../Toaster";
 import { Drawer } from "../Drawer";
 import { usePersistentState } from "@/lib/usePersistentState";
 import {
-  cases as seedCases, categories, caseStats, pulseSuggested, statusOrder,
+  cases as seedCases, categories, pulseSuggested, statusOrder,
   type Case, type CaseStatus, type Priority,
 } from "@/lib/cases";
 
@@ -41,7 +41,7 @@ function Sla({ days, resolved }: { days: number; resolved: boolean }) {
 
 let seq = 200;
 
-export function CasesHub() {
+export function CasesView() {
   const [created, setCreated] = usePersistentState<Case[]>("vadal:cases-created", []);
   const [status, setStatus] = usePersistentState<Record<string, CaseStatus>>("vadal:cases-status", {});
   const [bannerDismissed, setBannerDismissed] = usePersistentState<boolean>("vadal:cases-banner", false);
@@ -51,8 +51,6 @@ export function CasesHub() {
   // apply any persisted status overrides on top of seed + created
   const all: Case[] = [...created, ...seedCases].map((c) => (status[c.id] ? { ...c, status: status[c.id] } : c));
   const rows = all.filter((c) => filter === "All" || c.status === filter);
-  const openCount = all.filter((c) => c.status !== "Resolved").length;
-  const breached = all.filter((c) => c.status !== "Resolved" && c.slaDays < 0).length;
   const detail = open ? all.find((c) => c.id === open.id) ?? open : null;
 
   function setCaseStatus(id: string, s: CaseStatus) {
@@ -74,36 +72,9 @@ export function CasesHub() {
     toast(`Opened ${now.length} cases from Pulse 🗂️`);
   }
 
-  const kpis: [string, string, string?][] = [
-    ["Open cases", String(openCount)],
-    ["SLA breached", String(breached), breached > 0 ? "needs action" : undefined],
-    ["Avg resolution", `${caseStats.avgResolutionDays}d`],
-    ["Confidential", "Protected"],
-  ];
 
   return (
     <div className="flex flex-col gap-6">
-      {/* header */}
-      <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card p-7 shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)] sm:p-9">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
-        <div className="relative flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <Eyebrow>Operations</Eyebrow>
-            <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Flow</h1>
-            <p className="mt-2 max-w-xl text-[14px] text-muted">Track and resolve people issues — from flight-risk follow-ups to ER cases. Owner, SLA and status on every one, confidential by design.</p>
-          </div>
-          <Button variant="brand" leadingIcon={<Plus className="h-4 w-4" />} onClick={() => toast("New case form (demo)", "info")}>New case</Button>
-        </div>
-        <div className="relative mt-6 grid grid-cols-2 gap-4 border-t border-line pt-5 lg:grid-cols-4">
-          {kpis.map(([label, val, note]) => (
-            <div key={label}>
-              <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-faint">{label}</div>
-              <div className="mt-1 flex items-baseline gap-1.5"><span className="text-[22px] font-bold tracking-tight">{val}</span>{note && <span className="text-[12px] font-bold text-[var(--danger)]">{note}</span>}</div>
-            </div>
-          ))}
-        </div>
-      </header>
-
       {/* AI banner — untracked Pulse risks */}
       {!bannerDismissed && (
         <section className="rise flex flex-wrap items-center justify-between gap-4 rounded-[22px] border border-[var(--ai-border)] bg-[var(--ai-surface)] p-5">
@@ -112,8 +83,8 @@ export function CasesHub() {
             <p className="text-[14px] leading-relaxed text-muted"><span className="font-semibold text-ink">{pulseSuggested.length}{" "}flight-risk & burnout signals from Pulse aren&rsquo;t tracked as cases yet.</span> Open them so they get an owner and an SLA.</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="brand" size="sm" onClick={openFromPulse}>Open {pulseSuggested.length} cases</Button>
-            <Button variant="tertiary" size="sm" onClick={() => setBannerDismissed(true)}>Dismiss</Button>
+            <Button variant="brand" size="sm" className="min-h-[44px] lg:min-h-0" onClick={openFromPulse}>Open {pulseSuggested.length} cases</Button>
+            <Button variant="tertiary" size="sm" className="min-h-[44px] lg:min-h-0" onClick={() => setBannerDismissed(true)}>Dismiss</Button>
           </div>
         </section>
       )}
@@ -124,7 +95,7 @@ export function CasesHub() {
           <div><Eyebrow>Caseload</Eyebrow><h2 className="mt-1.5 text-[18px] font-bold tracking-tight">All cases</h2></div>
           <div className="flex items-center gap-1 rounded-full border border-line bg-soft p-1">
             {FILTERS.map((f) => (
-              <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-3 py-1.5 text-[13px] font-semibold transition ${filter === f ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}>{f}</button>
+              <button key={f} onClick={() => setFilter(f)} className={`min-h-[44px] rounded-full px-3.5 text-[14px] font-semibold transition lg:min-h-[34px] ${filter === f ? "bg-card text-ink shadow-sm ring-1 ring-line" : "text-muted hover:text-ink"}`}>{f}</button>
             ))}
           </div>
         </div>
@@ -133,7 +104,7 @@ export function CasesHub() {
           {rows.map((c) => {
             const resolved = c.status === "Resolved";
             return (
-              <button key={c.id} onClick={() => setOpen(c)} className="group flex items-center gap-3 border-t border-line px-6 py-3.5 text-left transition hover:bg-soft/40 sm:px-7">
+              <button key={c.id} onClick={() => setOpen(c)} className="group flex min-h-[64px] items-center gap-3 border-t border-line px-6 py-3.5 text-left transition hover:bg-soft/40 sm:px-7">
                 <span className="h-8 w-1 shrink-0 rounded-full" style={{ background: PRIORITY_COLOR[c.priority] }} aria-hidden title={c.priority} />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -205,12 +176,12 @@ export function CasesHub() {
             {detail.status !== "Resolved" ? (
               <div className="mt-6 flex flex-wrap gap-2">
                 {statusOrder.filter((s) => s !== detail.status && s !== "Resolved").map((s) => (
-                  <Button key={s} variant="secondary" size="sm" onClick={() => setCaseStatus(detail.id, s)}>Move to {s}</Button>
+                  <Button key={s} variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" onClick={() => setCaseStatus(detail.id, s)}>Move to {s}</Button>
                 ))}
-                <Button variant="brand" size="sm" onClick={() => setCaseStatus(detail.id, "Resolved")}>Resolve</Button>
+                <Button variant="brand" size="sm" className="min-h-[44px] lg:min-h-0" onClick={() => setCaseStatus(detail.id, "Resolved")}>Resolve</Button>
               </div>
             ) : (
-              <div className="mt-6"><Button variant="secondary" size="sm" onClick={() => setCaseStatus(detail.id, "Open")}>Reopen</Button></div>
+              <div className="mt-6"><Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" onClick={() => setCaseStatus(detail.id, "Open")}>Reopen</Button></div>
             )}
           </>
         )}

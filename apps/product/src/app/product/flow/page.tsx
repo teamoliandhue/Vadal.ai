@@ -1,10 +1,10 @@
 import { Shell } from "../shell";
-import { CasesHub } from "./CasesHub";
+import { FlowHub } from "./FlowHub";
 
-export default function CasesPage() {
+export default function FlowPage() {
   return (
     <Shell active="Flow" breadcrumb="Flow">
-      <CasesHub />
+      <FlowHub />
     </Shell>
   );
 }
