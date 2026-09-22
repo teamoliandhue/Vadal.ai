@@ -12,10 +12,11 @@
    from here: it suggests someone on the same team who has been there a year. */
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight, Eye, UserRoundPlus } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock3, Eye, MessageCircle, TriangleAlert, UserRoundPlus, Zap } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark } from "@vadal/design-system";
 import { JOINERS, JOURNEY, OWNER_LABEL, SETTLED_LABEL, phaseFor, type Joiner, type Owner } from "@/lib/lifecycle";
 import { PROGRAMMES } from "@/lib/programmes";
+import { READY_LABEL, adminItems, adminStats, preStarters, type AdminState, type PreStarter } from "@/lib/onboard";
 import { usePersistentState } from "@/lib/usePersistentState";
 import { ScopeNotice } from "../ScopeNotice";
 import { toast } from "../Toaster";
@@ -38,7 +39,13 @@ const avg = (xs: Joiner[]) => xs.reduce((s, j) => s + (j.settled ?? 0), 0) / Mat
 const answeredAll = JOINERS.filter((j) => j.settled !== null);
 const BUDDY_GAP = avg(answeredAll.filter((j) => j.buddy)) - avg(answeredAll.filter((j) => !j.buddy));
 
+type View = "soon" | "cohort" | "admin";
+const VIEWS: { id: View; label: string }[] = [
+  { id: "soon", label: "Starting soon" }, { id: "cohort", label: "First 90 days" }, { id: "admin", label: "Admin" },
+];
+
 export function OnboardHub() {
+  const [view, setView] = React.useState<View>("soon");
   const { scope, team, role, ready } = useScope("Onboard");
   const [buddies, setBuddies] = usePersistentState<Record<string, string>>("vadal:onboard-buddies", {});
   if (!ready) return <div className="mx-auto w-full max-w-[1120px] py-10" aria-busy="true" />;
@@ -67,15 +74,37 @@ export function OnboardHub() {
   ];
 
   return (
-    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-6">
-      <header className="rise">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">Operations</p>
-        <h1 className="mt-2 text-[clamp(26px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Onboard</h1>
-        <p className="mt-2 max-w-[640px] text-[15px] leading-relaxed text-muted">
-          Everyone in their first 90 days — where they are, what&rsquo;s done, and who is having a harder start than they should.
-        </p>
+    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
+      <header className="rise flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">Talent intelligence</p>
+          <h1 className="mt-2 text-[clamp(28px,3.2vw,38px)] font-bold leading-[1.05] tracking-[-0.03em]">Onboard</h1>
+          <p className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] text-muted">
+            <span><span className="font-semibold text-ink">{preStarters.length}</span> starting soon</span>
+            <span aria-hidden className="text-faint">·</span>
+            <span><span className="font-semibold text-ink">{cohort.length}</span> in their first 90 days</span>
+            <span aria-hidden className="text-faint">·</span>
+            <span><span className="font-semibold text-ink">{adminStats.readyDayOne}%</span> ready on day one</span>
+          </p>
+        </div>
       </header>
 
+      <nav aria-label="Onboard views" className="flex items-center gap-1 border-b border-line">
+        {VIEWS.map((v) => {
+          const on = view === v.id;
+          return (
+            <button key={v.id} onClick={() => setView(v.id)} aria-current={on ? "page" : undefined}
+              className={`-mb-px min-h-[44px] border-b-2 px-3.5 text-[14px] font-semibold transition lg:min-h-[42px] ${on ? "border-[var(--purple)] text-ink" : "border-transparent text-muted hover:text-ink"}`}>
+              {v.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      {view === "soon" && <StartingSoon />}
+      {view === "admin" && <Admin />}
+
+      {view === "cohort" && <>
       {scope === "own-team" && team && <ScopeNotice team={team} what="onboarding progress" />}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -166,7 +195,9 @@ export function OnboardHub() {
         </>
       )}
 
-      {people && (
+      </>}
+
+      {people && view === "cohort" && (
         <section className="card-lift rounded-[26px] border border-line bg-card p-6 sm:p-7" aria-labelledby="template-h">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -210,4 +241,178 @@ function why(j: Joiner, people: boolean): string {
   }
   const s = parts.join(", ");
   return s.charAt(0).toUpperCase() + s.slice(1) + ".";
+}
+
+
+/* ── before day one ──────────────────────────────────────────────── */
+function StartingSoon() {
+  const missing = (p: PreStarter) => p.needs.filter((k) => !p.ready[k]);
+  const notReady = preStarters.filter((p) => missing(p).length > 0 || p.outstanding.length > 0);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <section className="relative overflow-hidden rounded-[24px] border border-line bg-card p-5 sm:p-7" aria-labelledby="soon-h">
+        <span aria-hidden className="ai-grad absolute inset-x-0 top-0 h-[2px] opacity-70" />
+        <div className="grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center">
+          <div className="flex gap-8 lg:flex-col lg:gap-5 lg:border-r lg:border-line lg:pr-8">
+            <div>
+              <p className="text-[14px] text-muted">Ready on day one</p>
+              <div className="mt-1 flex items-baseline gap-2">
+                <span className="text-[44px] font-bold leading-none tracking-[-0.03em] tabular-nums">{adminStats.readyDayOne}%</span>
+                <span className="text-[14px] font-semibold text-[var(--success)]">+{adminStats.readyDelta}</span>
+              </div>
+              <p className="mt-1.5 text-[13px] text-faint">last quarter, everything in place before they arrived</p>
+            </div>
+            <div>
+              <p className="text-[14px] text-muted">Offer to full access</p>
+              <div className="mt-1 text-[28px] font-bold leading-none tracking-tight tabular-nums">{adminStats.toAccessDays}d</div>
+              <p className="mt-1.5 text-[13px] text-faint">median, from signature</p>
+            </div>
+          </div>
+          <p className="flex items-start gap-2.5 text-[16px] leading-relaxed text-ink" id="soon-h">
+            <SparkMark size={16} tone="gradient" className="mt-[4px] shrink-0" />
+            <span>
+              The fortnight between signing and starting is the part nobody owns, and it is where onboarding usually goes wrong.
+              {notReady.length > 0 ? <> {notReady.length} of {preStarters.length} joiners still have something outstanding.</> : " Everyone starting soon is ready."}
+            </span>
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="pre-h" className="rounded-[24px] border border-line bg-card p-5 sm:p-7">
+        <h2 id="pre-h" className="text-[18px] font-bold tracking-tight">Starting soon</h2>
+        <p className="mt-0.5 text-[14px] text-muted">They have no company account yet, so everything reaches them on a channel they already use.</p>
+        <ul className="mt-5 flex flex-col divide-y divide-[var(--line)]">
+          {preStarters.map((p) => {
+            const gaps = missing(p);
+            return (
+              <li key={p.id} className="flex flex-col gap-3 py-4 lg:flex-row lg:items-center lg:gap-5">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <Avatar src={p.img} name={p.name} size="md" />
+                  <div className="min-w-0">
+                    <p className="truncate text-[15px] font-semibold text-ink">{p.name}</p>
+                    <p className="truncate text-[13px] text-faint">{p.title} · {p.team} · starts {p.starts}</p>
+                  </div>
+                </div>
+
+                <div className="min-w-0 lg:w-[320px]">
+                  <ul className="flex flex-wrap gap-1.5">
+                    {p.needs.map((k) => (
+                      <li key={k} className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[12px] font-semibold"
+                        style={{ background: p.ready[k] ? "color-mix(in srgb, var(--success) 12%, transparent)" : "var(--soft)", color: p.ready[k] ? "var(--success)" : "var(--muted)" }}>
+                        {p.ready[k] ? <CheckCircle2 className="h-3 w-3" /> : <Clock3 className="h-3 w-3" />}{READY_LABEL[k]}
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-1.5 text-[13px] text-faint">
+                    In {p.inDays} days · {p.channel}
+                    {p.packOpened ? " · opened the welcome pack" : " · has not opened the welcome pack"}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 lg:w-[210px] lg:justify-end">
+                  {p.outstanding.length > 0 && (
+                    <span className="inline-flex items-center gap-1 text-[13px] font-semibold" style={{ color: "var(--warning)" }}>
+                      <TriangleAlert className="h-3.5 w-3.5" />{p.outstanding.join(", ")}
+                    </span>
+                  )}
+                  <Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" leadingIcon={<MessageCircle className="h-4 w-4" />}
+                    onClick={() => toast(`Message drafted to ${p.name.split(" ")[0]} on ${p.channel} — yours to send`)}>
+                    {gaps.length > 0 || p.outstanding.length > 0 ? "Nudge them" : "Say hello"}
+                  </Button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="mt-4 border-t border-line pt-3 text-[13px] leading-snug text-faint">
+          Nothing here is sent to a manager as a report card. It exists so somebody notices before the person&rsquo;s first morning.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+/* ── the admin ───────────────────────────────────────────────────── */
+const STATE_STYLE: Record<AdminState, { color: string; Icon: typeof CheckCircle2 }> = {
+  Done: { color: "var(--success)", Icon: CheckCircle2 },
+  Automatic: { color: "var(--purple)", Icon: Zap },
+  Waiting: { color: "var(--muted)", Icon: Clock3 },
+  Late: { color: "var(--danger)", Icon: TriangleAlert },
+};
+
+function Admin() {
+  const auto = adminItems.filter((a) => a.state === "Automatic").length;
+  const waitingOnThem = adminItems.filter((a) => a.owner === "The joiner" && a.state !== "Done");
+  const waitingOnUs = adminItems.filter((a) => a.owner !== "The joiner" && (a.state === "Waiting" || a.state === "Late"));
+
+  return (
+    <div className="flex flex-col gap-6">
+      <section className="relative overflow-hidden rounded-[24px] border border-line bg-card p-5 sm:p-7" aria-labelledby="admin-h">
+        <span aria-hidden className="ai-grad absolute inset-x-0 top-0 h-[2px] opacity-70" />
+        <div className="grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center">
+          <div className="lg:border-r lg:border-line lg:pr-8">
+            <p className="text-[14px] text-muted">Handled without a person</p>
+            <div className="mt-1 text-[44px] font-bold leading-none tracking-[-0.03em] tabular-nums">{adminStats.automatic}%</div>
+            <p className="mt-1.5 text-[13px] text-faint">of onboarding admin, last quarter</p>
+          </div>
+          <p className="flex items-start gap-2.5 text-[16px] leading-relaxed text-ink" id="admin-h">
+            <SparkMark size={16} tone="gradient" className="mt-[4px] shrink-0" />
+            <span>
+              {auto} steps completed by themselves this week. What is left splits two ways, and they are different problems:
+              <span className="font-semibold"> {waitingOnUs.length} waiting on us</span>, {waitingOnThem.length} waiting on the joiner.
+            </span>
+          </p>
+        </div>
+      </section>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <AdminList title="Waiting on us" hint="Ours to finish before their first morning." items={waitingOnUs} />
+        <AdminList title="Waiting on the joiner" hint="Asked at most twice, never after hours." items={waitingOnThem} />
+      </div>
+
+      <section aria-labelledby="all-h" className="rounded-[24px] border border-line bg-card p-5 sm:p-7">
+        <h2 id="all-h" className="text-[18px] font-bold tracking-tight">Everything, and who owns it</h2>
+        <ul className="mt-4 flex flex-col divide-y divide-[var(--line)]">
+          {adminItems.map((a) => {
+            const st = STATE_STYLE[a.state];
+            return (
+              <li key={a.id} className="flex flex-col gap-2 py-3.5 sm:flex-row sm:items-start sm:gap-4">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full" style={{ background: `color-mix(in srgb, ${st.color} 12%, transparent)`, color: st.color }}>
+                  <st.Icon className="h-[17px] w-[17px]" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[15px] font-semibold leading-snug text-ink">{a.what}</p>
+                  <p className="mt-0.5 text-[13px] text-faint">{a.who} · {a.team} · {a.owner}</p>
+                  <p className="mt-1 text-[14px] leading-snug text-muted">{a.note}</p>
+                </div>
+                <span className="shrink-0 text-[13px] font-semibold" style={{ color: st.color }}>{a.state}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    </div>
+  );
+}
+
+function AdminList({ title, hint, items }: { title: string; hint: string; items: typeof adminItems }) {
+  return (
+    <section className="rounded-[24px] border border-line bg-card p-5 sm:p-7">
+      <h2 className="text-[18px] font-bold tracking-tight">{title}</h2>
+      <p className="mt-0.5 text-[14px] text-muted">{hint}</p>
+      {items.length === 0 ? (
+        <p className="mt-5 text-[15px] text-faint">Nothing outstanding.</p>
+      ) : (
+        <ul className="mt-4 flex flex-col divide-y divide-[var(--line)]">
+          {items.map((a) => (
+            <li key={a.id} className="py-3">
+              <p className="text-[15px] font-semibold leading-snug text-ink">{a.what}</p>
+              <p className="mt-0.5 text-[13px] text-faint">{a.who} · {a.owner}{a.state === "Late" ? " · late" : ""}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
 }
