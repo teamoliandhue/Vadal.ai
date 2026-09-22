@@ -91,12 +91,17 @@ export const aiDefaults = {
   enabled: true,
   scopeToWorkspace: true, // "keep the whole context on the company side" — call note
   sentiment: true,
-  monthlyBudget: 5, // million tokens
+  /* Stated the way an HR admin buys it, not the way a vendor bills it: a plan
+     allowance and what has been used, rather than millions of tokens. */
+  includedRequests: 120_000,
+  usedRequests: 74_300,
   perUserDailyCap: 40, // requests
 };
 
 export const privacyDefaults = {
-  anonymityThreshold: 5, // min responses before a slice is shown
-  retentionMonths: 24,
+  /** The floor the product enforces everywhere (lib/governance MIN_N). It can be
+      raised by an admin and never lowered — see the note in Settings. */
+  anonymityThreshold: 5,
+  anonymityFloor: 5,
   regionLock: "India (Mumbai)",
 };

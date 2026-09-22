@@ -99,7 +99,7 @@ export function BrandingPanel() {
             <img src={workspace.logo} alt={workspace.name} className="h-10 w-10 object-contain" />
           </div>
           <div className="flex flex-col gap-2">
-            <Button variant="secondary" size="sm" leadingIcon={<ImagePlus className="h-4 w-4" />} onClick={() => toast("Upload opens the asset picker (demo)", "info")}>Replace logo</Button>
+            <Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" leadingIcon={<ImagePlus className="h-4 w-4" />} onClick={() => toast("Upload opens the asset picker (demo)", "info")}>Replace logo</Button>
             <span className="text-[12px] text-faint">SVG or PNG, at least 128×128. Transparent background recommended.</span>
           </div>
         </div>
@@ -125,7 +125,7 @@ export function BrandingPanel() {
           </div>
           <div className="flex flex-wrap gap-1.5">
             {brandSwatches.map((s) => (
-              <button key={s} onClick={() => setDraft(s)} aria-label={`Use ${s}`} className="h-7 w-7 rounded-lg border border-line transition hover:scale-110" style={{ background: s }}>
+              <button key={s} onClick={() => setDraft(s)} aria-label={`Use ${s}`} className="grid h-11 w-11 place-items-center rounded-xl border border-line transition hover:scale-105 lg:h-7 lg:w-7 lg:rounded-lg" style={{ background: s }}>
                 {active.toLowerCase() === s.toLowerCase() && <Check className="mx-auto h-4 w-4 text-white mix-blend-difference" />}
               </button>
             ))}
@@ -163,7 +163,7 @@ export function BrandingPanel() {
               <img src={workspace.logo} alt="" className="h-7 w-7 rounded-lg object-contain" />
               <span className="text-[13px] font-semibold text-muted">{workspace.name}</span>
               {!whiteLabel && placement !== "Hidden" && (
-                <span className="ml-auto flex items-center gap-1 text-[11px] text-faint">
+                <span className="ml-auto flex items-center gap-1 text-[12px] text-faint">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/brand/signal-mark.svg" alt="" className="h-3.5 w-3.5" /> Powered by Vadal
                 </span>
@@ -191,7 +191,7 @@ export function BrandingPanel() {
           <div className="text-[13px] text-muted">Where the &ldquo;Powered by Vadal&rdquo; mark appears when not white-labelled.</div>
           <div className="mt-3 flex flex-wrap gap-2">
             {PLACEMENTS.map((p) => (
-              <button key={p} onClick={() => setPlacement(p)} className={`rounded-full border px-3 py-1.5 text-[13px] font-semibold transition ${placement === p ? "border-[var(--purple)] bg-[color-mix(in_srgb,var(--purple)_14%,transparent)] text-ink" : "border-line text-muted hover:text-ink"}`}>{p}</button>
+              <button key={p} onClick={() => setPlacement(p)} className={`min-h-[44px] rounded-full border px-3 py-1.5 text-[13px] font-semibold transition lg:min-h-[32px] ${placement === p ? "border-[var(--purple)] bg-[color-mix(in_srgb,var(--purple)_14%,transparent)] text-ink" : "border-line text-muted hover:text-ink"}`}>{p}</button>
             ))}
           </div>
         </div>
@@ -199,7 +199,7 @@ export function BrandingPanel() {
 
       <div className="sticky bottom-0 -mx-6 -mb-6 flex items-center justify-between gap-2 border-t border-line bg-card px-6 py-4 sm:-mx-7 sm:px-7">
         <span className="text-[12px] text-faint">Applied colour · <span className="font-semibold text-muted">{applied.toUpperCase()}</span></span>
-        <Button variant="brand" size="sm" onClick={save}>Save branding</Button>
+        <Button variant="brand" size="sm" className="min-h-[44px] lg:min-h-0" onClick={save}>Save branding</Button>
       </div>
     </div>
   );

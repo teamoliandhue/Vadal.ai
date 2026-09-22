@@ -99,11 +99,11 @@ export function TranslationPanel() {
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="text-[13px]">
             <span className="flex justify-between text-muted"><span>Languages in use besides English</span><span className="font-bold tabular-nums text-ink">{languages}</span></span>
-            <input type="range" min={1} max={7} value={languages} onChange={(e) => setLanguages(Number(e.target.value))} className="mt-2 w-full accent-[var(--purple)]" />
+            <input type="range" min={1} max={7} value={languages} onChange={(e) => setLanguages(Number(e.target.value))} className="mt-2 h-11 w-full accent-[var(--purple)]" />
           </label>
           <label className="text-[13px]">
             <span className="flex justify-between text-muted"><span>Comments opened in another language</span><span className="font-bold tabular-nums text-ink">{share}%</span></span>
-            <input type="range" min={5} max={80} step={5} value={share} onChange={(e) => setShare(Number(e.target.value))} className="mt-2 w-full accent-[var(--purple)]" />
+            <input type="range" min={5} max={80} step={5} value={share} onChange={(e) => setShare(Number(e.target.value))} className="mt-2 h-11 w-full accent-[var(--purple)]" />
           </label>
         </div>
 
