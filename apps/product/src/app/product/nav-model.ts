@@ -51,11 +51,11 @@ export const NAV: NavGroupModel[] = [
     ],
   },
   {
-    label: "Listen",
+    label: "Engagement & listening",
     items: [
       { label: "Pulse", icon: ClipboardList, href: "/product/pulse" },
       { label: "Sentiment", icon: Smile, href: "/product/sentiment" },
-      { label: "Always-on listening", icon: Radio, href: "/product/listening" },
+      { label: "Listen", icon: Radio, href: "/product/listen" },
     ],
   },
   {

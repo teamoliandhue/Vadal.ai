@@ -89,7 +89,7 @@ export function MobileNav({ active }: { active: string }) {
                 >
                   <item.icon className="size-[22px]" strokeWidth={on ? 2.1 : 1.75} />
                   <span className={`text-[12px] leading-none ${on ? "font-semibold" : "font-medium text-faint"}`}>
-                    {item.label === "Always-on listening" ? "Listening" : item.label}
+                    {item.label}
                   </span>
                 </Link>
               </li>

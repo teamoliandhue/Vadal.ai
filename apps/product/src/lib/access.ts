@@ -86,7 +86,7 @@ export const SECTION_ACCESS: Record<string, Role[]> = {
 
   Analytics: ADMIN_UP,
   Pulse: ADMIN_UP,
-  "Always-on listening": ADMIN_UP,
+  Listen: ADMIN_UP,
   Flow: ADMIN_UP,
   // Individual exit reasons are People-only.
   Alumni: ADMIN_UP,

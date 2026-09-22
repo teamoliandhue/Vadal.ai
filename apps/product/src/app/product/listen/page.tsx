@@ -3,7 +3,7 @@ import { ListeningHub } from "./ListeningHub";
 
 export default function ListeningPage() {
   return (
-    <Shell active="Always-on listening" breadcrumb="Always-on listening">
+    <Shell active="Listen" breadcrumb="Listen">
       <ListeningHub />
     </Shell>
   );

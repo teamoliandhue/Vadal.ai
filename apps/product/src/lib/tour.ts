@@ -90,7 +90,7 @@ export const TOUR: TourStep[] = [
       { label: "Insight", href: "/product" },
       { label: "Pulse", href: "/product/pulse" },
       { label: "Sentiment", href: "/product/sentiment" },
-      { label: "Always-on listening", href: "/product/listening" },
+      { label: "Listen", href: "/product/listen" },
       { label: "Analytics", href: "/product/analytics" },
     ],
     section: "Insight", href: "/product",
