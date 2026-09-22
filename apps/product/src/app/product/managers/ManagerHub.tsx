@@ -1,206 +1,380 @@
 "use client";
-/* MANAGER HUB — a people-leader's team cockpit (Operations group). Team health,
-   a prioritised "needs you now" action queue, the direct-report roster with
-   sentiment + 1:1 cadence + risk, AI coaching nudges, and a per-report drawer
-   with AI-drafted 1:1 prep. Same Lumen shell + Aurora AI accents as the rest.
-   Seeded data (lib/manager). */
+/* MANAGER HUB — the people-leader's week (Operations, spec 054).
+
+   Two things were wrong with the first build, one of them serious.
+
+   THE SERIOUS ONE. It printed a sentiment score and a six-point trend line for
+   each named report — "Rohan Mehta · 58 · down". Everywhere else the product
+   promises the opposite: For you says "your check-ins stay yours, nothing here
+   is sent to your manager", iThrive says the same, and Pulse hides any cut
+   under five people. A manager screen that quietly breaks that promise makes
+   every one of those lines a lie, and the first employee who notices stops
+   answering honestly. So individual feeling is gone. What a manager sees now
+   is what the person can see too: when we last spoke, whether anyone has
+   recognised them, what their workload actually looks like, and their own
+   learning. A flag here is built from those facts and says which ones.
+
+   THE OTHER. It was one long column with no sense of "today". It is three
+   views now — this week, your team, and (finally, the thing spec 049 owed)
+   the team's own pulse results, scoped to the people you actually manage. */
 import * as React from "react";
-import { CalendarClock, Check, HeartHandshake, Sparkles, TrendingDown, TrendingUp } from "lucide-react";
-import { Avatar, Badge, Button, SparkMark, type BadgeTone } from "@vadal/design-system";
+import Link from "next/link";
+import {
+  ArrowRight, CalendarClock, Check, HeartHandshake, Lock, MessageSquare, TriangleAlert, Users,
+} from "lucide-react";
+import { Avatar, Button, SparkMark } from "@vadal/design-system";
+import { canAccess } from "@/lib/access";
+import { coachingNudges, managerActions, reports, team, type Report } from "@/lib/manager";
+import { favourable, resultFor, teamScore, topicLabel, type Topic } from "@/lib/pulse";
+import { teamMoods } from "@/lib/sentiment";
+import { usePersistentState } from "@/lib/usePersistentState";
+import { useViewAs } from "../useViewAs";
+import { useMe } from "../useSession";
 import { toast } from "../Toaster";
 import { Drawer } from "../Drawer";
-import { usePersistentState } from "@/lib/usePersistentState";
-import { team, reports, managerActions, coachingNudges, type Report, type Risk } from "@/lib/manager";
+
+type View = "week" | "team" | "results";
+const VIEWS: { id: View; label: string }[] = [
+  { id: "week", label: "This week" }, { id: "team", label: "Your team" }, { id: "results", label: "Team results" },
+];
 
 const ask = (q: string) => window.dispatchEvent(new CustomEvent("vadal:ask", { detail: { q } }));
 const soft = (c: string, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
-const RISK_TONE: Record<Risk, BadgeTone> = { High: "danger", Med: "warning", Low: "success" };
-const ACTION_COLOR = { urgent: "var(--danger)", warn: "var(--warning)", normal: "var(--purple)" } as const;
-const sentColor = (v: number) => (v >= 75 ? "var(--success)" : v >= 60 ? "var(--warning)" : "var(--danger)");
+const TONE = { urgent: "var(--danger)", warn: "var(--warning)", normal: "var(--purple)" } as const;
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
 }
-function Card({ className = "", children }: { className?: string; children: React.ReactNode }) {
-  return <section className={`card-lift flex flex-col rounded-[26px] border border-line bg-card p-6 sm:p-7 ${className}`}>{children}</section>;
+function Card({ className = "", children, labelledBy }: { className?: string; children: React.ReactNode; labelledBy?: string }) {
+  return <section aria-labelledby={labelledBy} className={`rounded-[24px] border border-line bg-card p-5 sm:p-7 ${className}`}>{children}</section>;
 }
 
-/* tiny sentiment sparkline */
-function Spark({ data, color, w = 72, h = 24 }: { data: number[]; color: string; w?: number; h?: number }) {
-  const min = Math.min(...data), max = Math.max(...data), span = max - min || 1;
-  const pts = data.map((v, i) => `${(i / (data.length - 1)) * w},${h - ((v - min) / span) * (h - 4) - 2}`).join(" ");
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} fill="none" aria-hidden className="overflow-visible">
-      <polyline points={pts} stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={w} cy={h - ((data[data.length - 1] - min) / span) * (h - 4) - 2} r={2.5} fill={color} />
-    </svg>
-  );
-}
-function TrendIcon({ trend }: { trend: Report["trend"] }) {
-  if (trend === "up") return <TrendingUp className="h-3.5 w-3.5" style={{ color: "var(--success)" }} />;
-  if (trend === "down") return <TrendingDown className="h-3.5 w-3.5" style={{ color: "var(--danger)" }} />;
-  return <span className="text-faint">→</span>;
+/* What a manager may act on, built only from things the person can see too. */
+function watchFor(r: Report): string[] {
+  const out: string[] = [];
+  if (r.overdue || /week/.test(r.lastOneOnOne)) out.push(`No 1:1 in ${r.lastOneOnOne.replace(" ago", "")}`);
+  if (r.recognition30d === 0) out.push("No recognition in 30 days");
+  return out;
 }
 
 export function ManagerHub() {
-  const [doneIds, setDoneIds] = usePersistentState<string[]>("vadal:mgr-actions-done", []);
+  const [role] = useViewAs();
+  const me = useMe();
+  const [view, setView] = React.useState<View>("week");
+  const [done, setDone] = usePersistentState<string[]>("vadal:mgr-actions-done", []);
   const [open, setOpen] = React.useState<Report | null>(null);
 
-  const actions = managerActions.filter((a) => !doneIds.includes(a.id));
-  const complete = (id: string) => { setDoneIds((d) => [...d, id]); toast("Marked done ✓"); };
-  const openReport = (id?: string) => { const r = reports.find((x) => x.id === id); if (r) setOpen(r); };
+  const open_ = managerActions.filter((a) => !done.includes(a.id));
+  const myTeam = me.team ?? team.name;
 
-  const kpis: [string, string, string?][] = [
-    ["Team health", String(team.health), `▲ ${team.healthDelta}`],
-    ["1:1 completion", `${team.oneOnOneCompletion}%`],
-    ["Recognition coverage", `${team.recognitionCoverage}%`],
-    ["At-risk", `${team.atRisk}`, `${team.atRiskHigh} high`],
-  ];
+  return (
+    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-6">
+      <header className="rise flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <Eyebrow>Operations</Eyebrow>
+          <h1 className="mt-2 text-[clamp(28px,3.2vw,38px)] font-bold leading-[1.05] tracking-[-0.03em]">Your team</h1>
+          <p className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] text-muted">
+            <span><span className="font-semibold text-ink">{reports.length}</span> people</span>
+            <span aria-hidden className="text-faint">·</span>
+            <span><span className="font-semibold text-ink">{open_.length}</span> {open_.length === 1 ? "thing needs" : "things need"} you this week</span>
+            <span aria-hidden className="text-faint">·</span>
+            <span>{myTeam}</span>
+          </p>
+        </div>
+        <Button variant="secondary" className="min-h-[44px] lg:min-h-0" leadingIcon={<SparkMark size={14} tone="solid" />}
+          onClick={() => ask("What should I do for my team this week?")}>Ask Nudge about your team</Button>
+      </header>
+
+      <nav aria-label="Manager views" className="flex items-center gap-1 border-b border-line">
+        {VIEWS.map((v) => {
+          const on = view === v.id;
+          return (
+            <button key={v.id} onClick={() => setView(v.id)} aria-current={on ? "page" : undefined}
+              className={`-mb-px min-h-[44px] border-b-2 px-3.5 text-[14px] font-semibold transition lg:min-h-[42px] ${on ? "border-[var(--purple)] text-ink" : "border-transparent text-muted hover:text-ink"}`}>
+              {v.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      {view === "week" && <Week done={done} setDone={setDone} onOpen={setOpen} />}
+      {view === "team" && <Team onOpen={setOpen} />}
+      {view === "results" && <Results team={myTeam} canSeePulse={canAccess(role, "Pulse") || role === "manager"} canOpenPulse={canAccess(role, "Pulse")} />}
+
+      <PrepDrawer r={open} onClose={() => setOpen(null)} />
+    </div>
+  );
+}
+
+/* ── this week ───────────────────────────────────────────────────── */
+function Week({ done, setDone, onOpen }: {
+  done: string[]; setDone: (f: (d: string[]) => string[]) => void; onOpen: (r: Report) => void;
+}) {
+  const open = managerActions.filter((a) => !done.includes(a.id));
+  const finish = (id: string, label: string) => { setDone((d) => [...d, id]); toast(label); };
 
   return (
     <div className="flex flex-col gap-6">
-      {/* header */}
-      <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card p-7 shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)] sm:p-9">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full opacity-[0.08] blur-3xl" style={{ background: "radial-gradient(circle, var(--purple), transparent 70%)" }} aria-hidden />
-        <div className="relative flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <Eyebrow>Operations · your team</Eyebrow>
-            <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Manager hub</h1>
-            <p className="mt-2 max-w-xl text-[14px] text-muted">Everything you need to lift the {team.name} — what needs you now, how the team feels, and AI prep for every 1:1.</p>
+      <Card className="relative overflow-hidden" labelledBy="brief-h">
+        <span aria-hidden className="ai-grad absolute inset-x-0 top-0 h-[2px] opacity-70" />
+        <h2 id="brief-h" className="sr-only">Nudge&rsquo;s read</h2>
+        <div className="grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center">
+          <div className="flex gap-8 lg:flex-col lg:gap-5 lg:border-r lg:border-line lg:pr-8">
+            <div>
+              <p className="text-[14px] text-muted">1:1s on time</p>
+              <div className="mt-1 text-[40px] font-bold leading-none tracking-[-0.03em] tabular-nums">{team.oneOnOneCompletion}%</div>
+              <p className="mt-1.5 text-[13px] text-faint">across your team this quarter</p>
+            </div>
+            <div>
+              <p className="text-[14px] text-muted">Recognised in 30 days</p>
+              <div className="mt-1 text-[28px] font-bold leading-none tracking-tight tabular-nums">{team.recognitionCoverage}%</div>
+              <p className="mt-1.5 text-[13px] text-faint">company is at {team.orgHealth - 21}%</p>
+            </div>
           </div>
-          <Button variant="brand" leadingIcon={<SparkMark size={14} tone="solid" />} onClick={() => ask(`Give me a briefing on my team (${team.name}) and what to prioritise this week.`)}>Weekly briefing</Button>
+          <p className="flex items-start gap-2.5 text-[16px] leading-relaxed text-ink">
+            <SparkMark size={16} tone="gradient" className="mt-[4px] shrink-0" />
+            <span>{coachingNudges[1]}</span>
+          </p>
         </div>
-        <div className="relative mt-6 grid grid-cols-2 gap-4 border-t border-line pt-5 lg:grid-cols-4">
-          {kpis.map(([label, val, delta]) => (
-            <div key={label}>
-              <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-faint">{label}</div>
-              <div className="mt-1 flex items-baseline gap-1.5"><span className="text-[22px] font-bold tracking-tight">{val}</span>{delta && <span className="text-[12px] font-bold text-faint">{delta}</span>}</div>
-            </div>
-          ))}
-        </div>
-      </header>
+      </Card>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
-        {/* action queue */}
-        <div className="xl:col-span-7">
-          <Card className="!p-0">
-            <div className="flex items-center justify-between p-6 pb-3 sm:px-7">
-              <div><Eyebrow>Needs you now</Eyebrow><h2 className="mt-1.5 text-[18px] font-bold tracking-tight">Action queue</h2></div>
-              <span className="rounded-full bg-soft px-2.5 py-1 text-[12px] font-semibold text-muted">{actions.length} open</span>
-            </div>
-            <div className="flex flex-col">
-              {actions.length === 0 && <p className="px-6 pb-6 text-[14px] text-faint sm:px-7">All clear — nothing needs you right now. 🎉</p>}
-              {actions.map((a) => (
-                <div key={a.id} className="group flex items-center gap-3 border-t border-line px-6 py-3.5 sm:px-7">
-                  <span className="h-8 w-1 shrink-0 rounded-full" style={{ background: ACTION_COLOR[a.tone] }} aria-hidden />
-                  <button onClick={() => openReport(a.reportId)} className="min-w-0 flex-1 text-left" disabled={!a.reportId}>
-                    <div className="text-[14px] font-semibold group-hover:text-[var(--purple)]">{a.title}</div>
-                    <div className="mt-0.5 text-[12px] text-faint">{a.context}</div>
-                  </button>
-                  <span className="shrink-0 text-[12px] font-semibold" style={{ color: a.tone === "urgent" ? "var(--danger)" : "var(--faint)" }}>{a.due}</span>
-                  <button onClick={() => complete(a.id)} aria-label="Mark done" className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-line text-faint transition hover:border-[var(--success)] hover:bg-[color-mix(in_srgb,var(--success)_14%,transparent)] hover:text-[var(--success)]"><Check className="h-4 w-4" /></button>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-
-        {/* right rail: health + coaching */}
-        <div className="flex flex-col gap-6 xl:col-span-5">
-          <Card>
-            <div className="flex items-start justify-between">
-              <div><Eyebrow>Team health</Eyebrow><div className="mt-2 flex items-baseline gap-2"><span className="text-[40px] font-bold leading-none tracking-tight">{team.health}</span><span className="text-[13px] font-bold" style={{ color: "var(--success)" }}>▲ {team.healthDelta}</span></div></div>
-              <span className="rounded-full bg-soft px-2.5 py-1 text-[12px] font-semibold text-muted">Org {team.orgHealth}</span>
-            </div>
-            <span className="mt-3 block h-2 overflow-hidden rounded-full bg-soft"><span className="block h-full rounded-full bg-[var(--purple)]" style={{ width: `${team.health}%` }} /></span>
-            <p className="mt-2 text-[12px] text-faint">{team.orgHealth - team.health} pts below the org average — recognition and 1:1 cadence are the gap.</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {team.drivers.map((d) => {
-                const c = d.tone === "good" ? "var(--success)" : d.tone === "warn" ? "var(--warning)" : "var(--danger)";
-                return <span key={d.label} className="rounded-full px-2.5 py-1 text-[12px] font-semibold" style={{ background: soft(c), color: c }}>{d.label}</span>;
-              })}
-            </div>
-          </Card>
-
-          <Card>
-            <div className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-[var(--ai-accent)]" /><Eyebrow>Vadal coaching</Eyebrow></div>
-            <ul className="mt-3 flex flex-col gap-3">
-              {coachingNudges.map((n, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-[14px] leading-relaxed text-muted">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--ai-accent)]" aria-hidden />
-                  <span>{n}</span>
+      <section aria-labelledby="needs-h">
+        <h2 id="needs-h" className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">
+          Needs you
+          <span className="rounded-full bg-soft px-1.5 py-px text-[11px] tracking-normal tabular-nums text-muted">{open.length}</span>
+        </h2>
+        {open.length === 0 ? (
+          <div className="mt-3 rounded-[24px] border border-dashed border-line px-6 py-12 text-center">
+            <p className="text-[17px] font-semibold text-ink">Nothing outstanding</p>
+            <p className="mx-auto mt-1.5 max-w-sm text-[15px] leading-relaxed text-faint">Your 1:1s are current and everyone has been recognised this month. Nudge will put something here when that changes.</p>
+          </div>
+        ) : (
+          <ul className="mt-3 divide-y divide-[var(--line)] overflow-hidden rounded-[24px] border border-line bg-card">
+            {open.map((a) => {
+              const r = reports.find((x) => x.id === a.reportId);
+              const c = TONE[a.tone];
+              return (
+                <li key={a.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:gap-4">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full" style={{ background: soft(c, 12), color: c }}>
+                    {a.kind === "recognition" ? <HeartHandshake className="h-[18px] w-[18px]" />
+                      : a.kind === "survey" ? <MessageSquare className="h-[18px] w-[18px]" />
+                      : <CalendarClock className="h-[18px] w-[18px]" />}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.1em]" style={{ color: c }}>{a.due}</p>
+                    <p className="mt-0.5 text-[15px] font-semibold leading-snug text-ink">{a.title}</p>
+                    <p className="mt-0.5 text-[14px] leading-snug text-muted">{a.context}</p>
+                  </div>
+                  <div className="flex shrink-0 flex-wrap items-center gap-2 pl-[54px] sm:pl-0">
+                    {r && <Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" onClick={() => onOpen(r)}>Prep</Button>}
+                    <Button variant="tertiary" size="sm" className="min-h-[44px] lg:min-h-0" leadingIcon={<Check className="h-3.5 w-3.5" />}
+                      onClick={() => finish(a.id, "Marked done")}>Done</Button>
+                  </div>
                 </li>
-              ))}
-            </ul>
-            <Button variant="secondary" size="sm" className="mt-4 self-start" leadingIcon={<SparkMark size={14} tone="solid" />} onClick={() => ask("Coach me — how do I lift my team's health this quarter?")}>Ask Vadal</Button>
-          </Card>
-        </div>
-      </div>
-
-      {/* roster */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between"><Eyebrow>Your team · {team.size}</Eyebrow><span className="text-[12px] text-faint">Tap a person for their 1:1 prep</span></div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {reports.map((r) => (
-            <button key={r.id} onClick={() => setOpen(r)} className="card-lift flex flex-col rounded-2xl border border-line bg-card p-4 text-left transition">
-              <div className="flex items-center gap-3">
-                <Avatar src={r.img} name={r.name} size="md" />
-                <div className="min-w-0 flex-1"><div className="truncate text-[14px] font-semibold">{r.name}</div><div className="truncate text-[12px] text-faint">{r.role}</div></div>
-                <Badge tone={RISK_TONE[r.risk]} variant="soft" size="sm">{r.risk}</Badge>
-              </div>
-              <div className="mt-3 flex items-center justify-between">
-                <div className="flex items-center gap-1.5"><span className="text-[18px] font-bold tabular-nums" style={{ color: sentColor(r.sentiment) }}>{r.sentiment}</span><TrendIcon trend={r.trend} /></div>
-                <Spark data={r.spark} color={sentColor(r.sentiment)} />
-              </div>
-              <div className="mt-3 flex items-center justify-between border-t border-line pt-3 text-[12px]">
-                <span className={`flex items-center gap-1 font-semibold ${r.overdue ? "text-[var(--danger)]" : "text-muted"}`}><CalendarClock className="h-3.5 w-3.5" /> {r.nextOneOnOne === "Overdue" ? "1:1 overdue" : `1:1 ${r.nextOneOnOne}`}</span>
-                <span className={r.recognition30d === 0 ? "font-semibold text-[var(--warning)]" : "text-faint"}>{r.recognition30d === 0 ? "No kudos · 30d" : `${r.recognition30d} kudos`}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* report drawer */}
-      <Drawer open={!!open} title={open?.name} onClose={() => setOpen(null)}>
-        {open && (
-          <>
-            <div className="flex items-center gap-3">
-              <Avatar src={open.img} name={open.name} size="lg" />
-              <div className="min-w-0"><h2 className="text-[20px] font-bold tracking-tight">{open.name}</h2><p className="text-[13px] text-faint">{open.role} · {open.tenure}</p></div>
-              <span className="ml-auto"><Badge tone={RISK_TONE[open.risk]} variant="soft" size="sm">{open.risk} risk</Badge></span>
-            </div>
-
-            <div className="mt-4 flex items-center gap-3 rounded-2xl border border-line p-4">
-              <div><div className="text-[12px] text-faint">Sentiment</div><div className="mt-0.5 flex items-baseline gap-1.5"><span className="text-[24px] font-bold tabular-nums" style={{ color: sentColor(open.sentiment) }}>{open.sentiment}</span><TrendIcon trend={open.trend} /></div></div>
-              <div className="ml-auto"><Spark data={open.spark} color={sentColor(open.sentiment)} w={120} h={36} /></div>
-            </div>
-
-            <div className="mt-3 grid grid-cols-3 gap-3">
-              {[["Last 1:1", open.lastOneOnOne], ["Next 1:1", open.nextOneOnOne], ["Kudos · 30d", String(open.recognition30d)]].map(([l, v]) => (
-                <div key={l} className="rounded-2xl border border-line p-3"><div className="text-[12px] text-faint">{l}</div><div className={`mt-1 text-[14px] font-bold ${v === "Overdue" || v === "0" ? "text-[var(--danger)]" : ""}`}>{v}</div></div>
-              ))}
-            </div>
-
-            <p className="mt-4 text-[14px] text-muted">{open.note}</p>
-
-            <div className="mt-5 rounded-2xl bg-[var(--ai-surface)] p-4 ring-1 ring-[var(--ai-border)]">
-              <div className="flex items-center gap-2"><SparkMark size={14} /><span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--ai-accent)]">AI prep · your next 1:1</span></div>
-              <ul className="mt-2.5 flex flex-col gap-2">
-                {open.aiPrep.map((p, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[14px] leading-relaxed text-muted"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--ai-accent)]" aria-hidden /><span>{p}</span></li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="mt-5 flex flex-wrap gap-2">
-              <Button variant="brand" size="sm" leadingIcon={<CalendarClock className="h-4 w-4" />} onClick={() => toast(`1:1 with ${open.name.split(" ")[0]} scheduled 📅`)}>Schedule 1:1</Button>
-              <Button variant="secondary" size="sm" leadingIcon={<HeartHandshake className="h-4 w-4" />} onClick={() => toast(`Opening recognition for ${open.name.split(" ")[0]}…`, "info")}>Give recognition</Button>
-              <Button variant="tertiary" size="sm" leadingIcon={<SparkMark size={14} tone="solid" />} onClick={() => ask(`Help me prepare for my 1:1 with ${open.name} — draft an agenda.`)}>Draft agenda</Button>
-            </div>
-          </>
+              );
+            })}
+          </ul>
         )}
-      </Drawer>
+      </section>
     </div>
+  );
+}
+
+/* ── your team ───────────────────────────────────────────────────── */
+function Team({ onOpen }: { onOpen: (r: Report) => void }) {
+  return (
+    <div className="flex flex-col gap-6">
+      <Card labelledBy="ros-h">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="max-w-[620px]">
+            <h2 id="ros-h" className="text-[18px] font-bold tracking-tight">Your people</h2>
+            <p className="mt-0.5 text-[14px] leading-relaxed text-muted">
+              When you last spoke, whether anyone has recognised them, and what their week looks like. Everything here is something they can see too.
+            </p>
+          </div>
+        </div>
+
+        <ul className="mt-5 flex flex-col divide-y divide-[var(--line)]">
+          {reports.map((r) => {
+            const watch = watchFor(r);
+            return (
+              <li key={r.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:gap-4">
+                <Avatar src={r.img} name={r.name} size="md" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[15px] font-semibold leading-snug text-ink">{r.name}</p>
+                  <p className="mt-0.5 text-[14px] text-muted">{r.role} · {r.tenure}</p>
+                  {watch.length > 0 && (
+                    <p className="mt-1 flex flex-wrap items-center gap-x-2 text-[13px] font-semibold" style={{ color: "var(--warning)" }}>
+                      <TriangleAlert className="h-3.5 w-3.5" />{watch.join(" · ")}
+                    </p>
+                  )}
+                </div>
+                <dl className="grid shrink-0 grid-cols-3 gap-4 text-center sm:w-[300px]">
+                  <div>
+                    <dt className="text-[12px] text-faint">Last 1:1</dt>
+                    <dd className={`mt-0.5 text-[14px] font-semibold ${r.overdue ? "text-[var(--danger)]" : "text-ink"}`}>{r.lastOneOnOne}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[12px] text-faint">Next</dt>
+                    <dd className="mt-0.5 text-[14px] font-semibold text-ink">{r.nextOneOnOne}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[12px] text-faint">Kudos · 30d</dt>
+                    <dd className={`mt-0.5 text-[14px] font-semibold tabular-nums ${r.recognition30d === 0 ? "text-[var(--warning)]" : "text-ink"}`}>{r.recognition30d}</dd>
+                  </div>
+                </dl>
+                <Button variant="secondary" size="sm" className="min-h-[44px] shrink-0 lg:min-h-0" onClick={() => onOpen(r)}>Prep a 1:1</Button>
+              </li>
+            );
+          })}
+        </ul>
+
+        <p className="mt-4 flex items-start gap-2 border-t border-line pt-3 text-[13px] leading-relaxed text-faint">
+          <Lock className="mt-[2px] h-3.5 w-3.5 shrink-0" />
+          You are not shown anyone&rsquo;s check-ins, survey answers or what they wrote in a comment — not as a score, not as a trend. That is the promise the product makes them, and it is the reason they answer honestly.
+        </p>
+      </Card>
+    </div>
+  );
+}
+
+/* ── team results — the manager's own cut of Pulse ───────────────── */
+function Results({ team: myTeam, canSeePulse, canOpenPulse }: { team: string; canSeePulse: boolean; canOpenPulse: boolean }) {
+  const r = resultFor("q3");
+  const mood = teamMoods.find((t) => t.team === myTeam);
+  const n = r?.teams?.find((t) => t.team === myTeam)?.n ?? 0;
+
+  if (!r || !canSeePulse) {
+    return <Card><p className="text-[15px] text-muted">Results are shared with people leaders once a round closes.</p></Card>;
+  }
+  if (n < 5) {
+    return (
+      <Card>
+        <h2 className="text-[18px] font-bold tracking-tight">Hidden to protect anonymity</h2>
+        <p className="mt-1.5 max-w-lg text-[15px] leading-relaxed text-muted">
+          {n} of your team answered. Below five, showing the result would point at someone — so it stays hidden, including from you.
+        </p>
+      </Card>
+    );
+  }
+
+  const rows = r.questions.filter((q) => q.topic !== "outcome").map((q) => {
+    const company = favourable(q.spread);
+    const mine = teamScore(r, myTeam, q.topic) ?? company;
+    return { topic: q.topic as Topic, text: q.text, mine, company, gap: mine - company };
+  }).sort((a, b) => a.mine - b.mine);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <Card className="relative overflow-hidden" labelledBy="res-h">
+        <span aria-hidden className="ai-grad absolute inset-x-0 top-0 h-[2px] opacity-70" />
+        <div className="grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center">
+          <div className="lg:border-r lg:border-line lg:pr-8">
+            <p className="text-[14px] text-muted">Your team&rsquo;s mood</p>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-[44px] font-bold leading-none tracking-[-0.03em] tabular-nums">{mood?.net ?? "—"}</span>
+              {mood && <span className="text-[14px] font-semibold" style={{ color: mood.change < 0 ? "var(--danger)" : "var(--success)" }}>{mood.change > 0 ? "+" : ""}{mood.change} this month</span>}
+            </div>
+            <p className="mt-1.5 text-[13px] text-faint">Company is at 52 · {n} of your team answered</p>
+          </div>
+          <div className="min-w-0">
+            <h2 id="res-h" className="text-[18px] font-bold tracking-tight">Q3 Engagement Pulse — {myTeam}</h2>
+            <p className="mt-2 flex items-start gap-2.5 text-[15px] leading-relaxed text-ink">
+              <SparkMark size={15} tone="gradient" className="mt-[4px] shrink-0" />
+              <span>
+                {rows[0] ? (
+                  <>
+                    Your weakest answer is <span className="font-semibold">{topicLabel(rows[0].topic).toLowerCase()}</span>, at {rows[0].mine}%
+                    {rows[0].gap < 0
+                      ? <> — {Math.abs(rows[0].gap)} below the company.</>
+                      : rows[0].gap > 0
+                        ? <>, though that is still {rows[0].gap} above the company.</>
+                        : <>, level with the company.</>}{" "}
+                    Nobody can see who said what.
+                  </>
+                ) : "Not enough answers to read yet."}
+              </span>
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {canOpenPulse && (
+                <Link href="/product/pulse"><Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" trailingIcon={<ArrowRight className="h-4 w-4" />}>Open Pulse</Button></Link>
+              )}
+              <Button variant="tertiary" size="sm" className="min-h-[44px] lg:min-h-0" onClick={() => toast("Draft shared with your team in Social — yours to edit before it posts")}>Share this with the team</Button>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card labelledBy="q-h">
+        <h2 id="q-h" className="text-[18px] font-bold tracking-tight">Your team, against the company</h2>
+        <p className="mt-0.5 text-[14px] text-muted">Favourable answers, weakest first. The line marks the company.</p>
+        <ul className="mt-5 flex flex-col gap-4">
+          {rows.map((q) => (
+            <li key={q.topic}>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                <span className="text-[15px] font-semibold text-ink">{topicLabel(q.topic)}</span>
+                <span className="text-[14px] tabular-nums text-muted">
+                  <span className="font-semibold text-ink">{q.mine}%</span> · {q.gap === 0 ? "level with" : `${Math.abs(q.gap)} ${q.gap > 0 ? "above" : "below"}`} the company
+                </span>
+              </div>
+              <div className="relative mt-1.5 h-2.5 w-full rounded-full bg-soft">
+                <div className="h-full rounded-full" style={{ width: `${q.mine}%`, background: q.gap <= -5 ? "var(--viz-2)" : "var(--viz-1)" }} />
+                <span aria-hidden className="absolute -inset-y-1 w-[2px] rounded-full bg-ink/60" style={{ left: `${q.company}%` }} />
+              </div>
+              <p className="mt-1 text-[13px] text-faint">&ldquo;{q.text}&rdquo;</p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4 flex items-start gap-2 border-t border-line pt-3 text-[13px] leading-snug text-faint">
+          <Users className="mt-[2px] h-3.5 w-3.5 shrink-0" />
+          Your team&rsquo;s answers only, never an individual&rsquo;s. Teams under five answers are not shown at all.
+        </p>
+      </Card>
+    </div>
+  );
+}
+
+/* ── 1:1 prep ────────────────────────────────────────────────────── */
+function PrepDrawer({ r, onClose }: { r: Report | null; onClose: () => void }) {
+  return (
+    <Drawer open={!!r} title={r ? `1:1 with ${r.name}` : undefined} onClose={onClose} footer={r ? (
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0" onClick={() => { toast("Kudos drafted — review it in Kudos"); onClose(); }}>Recognise them</Button>
+        <Button variant="brand" size="sm" className="min-h-[44px] lg:min-h-0" onClick={() => { toast("1:1 put in both calendars for Thursday"); onClose(); }}>Book the 1:1</Button>
+      </div>
+    ) : undefined}>
+      {r && (
+        <>
+          <div className="flex items-center gap-3 pr-12">
+            <Avatar src={r.img} name={r.name} size="md" />
+            <div>
+              <h2 className="text-[20px] font-bold leading-tight tracking-tight">{r.name}</h2>
+              <p className="text-[14px] text-muted">{r.role} · {r.tenure}</p>
+            </div>
+          </div>
+
+          <dl className="mt-5 grid grid-cols-2 gap-3">
+            {[["Last 1:1", r.lastOneOnOne], ["Next", r.nextOneOnOne], ["Kudos · 30 days", String(r.recognition30d)], ["With you", r.tenure]].map(([k, v]) => (
+              <div key={k} className="rounded-2xl border border-line p-3">
+                <dt className="text-[13px] text-faint">{k}</dt>
+                <dd className="mt-0.5 text-[16px] font-bold">{v}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <h3 className="mt-6 flex items-center gap-2 text-[14px] font-bold"><SparkMark size={14} tone="gradient" /> What to open with</h3>
+          <ul className="mt-2 flex flex-col gap-2.5">
+            {r.aiPrep.map((p) => (
+              <li key={p} className="rounded-2xl bg-soft p-4 text-[15px] leading-relaxed text-ink">{p}</li>
+            ))}
+          </ul>
+
+          <p className="mt-5 flex items-start gap-2 rounded-2xl border border-line p-4 text-[13px] leading-relaxed text-faint">
+            <Lock className="mt-[2px] h-3.5 w-3.5 shrink-0" />
+            Drafted from things you can both see — 1:1 history, recognition, and what they shipped. Never from their check-ins or survey answers.
+          </p>
+        </>
+      )}
+    </Drawer>
   );
 }

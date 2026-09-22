@@ -69,3 +69,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 051 | [SmartWork becomes the HR desk — ask, resolve, escalate; the help pillar becomes iCare](./051-smartwork-hr-desk.md) | Built · needs Figma |
 | 052 | [For you v2 — a lead card, suggestions grouped by what they cost you, and a rail that explains the list](./052-for-you-v2.md) | Built · needs Figma |
 | 053 | [Listen — coverage (who we never hear from), signals with outcomes, and whose language they arrive in](./053-listen-v2.md) | Built · needs Figma |
+| 054 | [Manager hub v2 — this week, your people (no private sentiment), and the team's own pulse results](./054-manager-hub-v2.md) | Built · needs Figma |
