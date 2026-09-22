@@ -527,7 +527,7 @@ export function DayArea({
         {labels.map((l, i) => (
           <span
             key={i}
-            className={`flex-1 text-center text-[11px] tabular-nums transition-colors ${
+            className={`flex-1 text-center text-[12px] tabular-nums transition-colors ${
               i === active ? "font-semibold text-ink" : "text-faint"
             }`}
           >

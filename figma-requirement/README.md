@@ -73,3 +73,6 @@ here for the product designer, so Figma stays in sync with the built product.
 | 055 | [Flow v2 — tasks, automations that state their limits, and SLA with every breach explained](./055-flow-v2.md) | Built · needs Figma |
 | 056 | [Onboard v2 — preboarding before day one, and the admin split into waiting-on-us and waiting-on-them](./056-onboard-v2.md) | Built · needs Figma |
 | 057 | [Alumni v2 — exit documents with owners and lateness, roles matched to alumni, and referrals that stall in the open](./057-alumni-v2.md) | Built · needs Figma |
+| 058 | [Link v2 — sync runs, records held with the fix, and the one workforce record with what each gap costs](./058-link-v2.md) | Built · needs Figma |
+| 059 | [Trust v2 — the anonymity floor as a control, retention and residency, and a register of every AI use](./059-trust-v2.md) | Built · needs Figma |
+| 060 | [Launch v2 — who is not on it yet with the next thing to try, and ROI against a baseline with what we will not claim](./060-launch-v2.md) | Built · needs Figma |

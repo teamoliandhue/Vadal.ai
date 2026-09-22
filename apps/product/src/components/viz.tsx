@@ -157,7 +157,7 @@ export function StackedColumns({
         {yt.map((t) => (
           <g key={t}>
             <line x1={M.l} x2={W - M.r} y1={y(t)} y2={y(t)} stroke="var(--viz-grid)" strokeWidth={1} />
-            <text x={M.l - 8} y={y(t)} dy="0.32em" textAnchor="end" className="fill-[var(--faint)] text-[11px] tabular-nums">{comma(t)}</text>
+            <text x={M.l - 8} y={y(t)} dy="0.32em" textAnchor="end" className="fill-[var(--faint)] text-[12px] tabular-nums">{comma(t)}</text>
           </g>
         ))}
         {labels.map((l, i) => {
@@ -183,7 +183,7 @@ export function StackedColumns({
                 return <path key={s.key} d={d} fill={s.color} />;
               })}
               {(i % every === 0 || i === n - 1) && (
-                <text x={cx} y={height - 6} textAnchor="middle" className="fill-[var(--faint)] text-[11px]">{l}</text>
+                <text x={cx} y={height - 6} textAnchor="middle" className="fill-[var(--faint)] text-[12px]">{l}</text>
               )}
               {/* the latest total, on its cap — the one number the chart is about */}
               {i === n - 1 && (
@@ -261,11 +261,11 @@ export function LineChart({
         {yt.map((t) => (
           <g key={t}>
             <line x1={M.l} x2={W - M.r} y1={y(t)} y2={y(t)} stroke="var(--viz-grid)" strokeWidth={1} />
-            <text x={M.l - 8} y={y(t)} dy="0.32em" textAnchor="end" className="fill-[var(--faint)] text-[11px] tabular-nums">{t}{unit}</text>
+            <text x={M.l - 8} y={y(t)} dy="0.32em" textAnchor="end" className="fill-[var(--faint)] text-[12px] tabular-nums">{t}{unit}</text>
           </g>
         ))}
         {labels.map((l, i) => (i % every === 0 || i === n - 1) && (
-          <text key={l} x={x(i)} y={height - 6} textAnchor={i === 0 ? "start" : i === n - 1 ? "end" : "middle"} className="fill-[var(--faint)] text-[11px]">{l}</text>
+          <text key={l} x={x(i)} y={height - 6} textAnchor={i === 0 ? "start" : i === n - 1 ? "end" : "middle"} className="fill-[var(--faint)] text-[12px]">{l}</text>
         ))}
         {at !== null && <line x1={x(at)} x2={x(at)} y1={M.t} y2={M.t + ph} stroke="var(--faint)" strokeWidth={1} />}
         {series.map((s) => (
