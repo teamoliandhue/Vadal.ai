@@ -9,7 +9,7 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  ArrowUpRight, ArrowRight, Check, Heart, Sparkles, TriangleAlert,
+  ArrowUpRight, ArrowRight, Check, Heart, Lock, Sparkles, TriangleAlert, X,
 } from "lucide-react";
 import { Avatar, Badge, Button, SparkMark, Trend, type BadgeTone } from "@vadal/design-system";
 import { ArcGauge, Sparkline, TrendChart } from "@/components/charts";
@@ -20,6 +20,10 @@ import { useScope } from "../useViewAs";
 import { ScopeNotice } from "../ScopeNotice";
 import { toast } from "../Toaster";
 import { Drawer } from "../Drawer";
+import {
+  criticalRoles, notRecommending, recStats, recommendations, riskPromise, riskStats, successionRule,
+  successionStats, teamRisk, type Confidence, type Readiness, type RiskLevel,
+} from "@/lib/insight";
 import {
   org, actionQueue, actionProgress,
   recognitionExtra, departments, managerSummary, gamification,
@@ -53,7 +57,7 @@ function CardHead({ eyebrow, title, action }: { eyebrow: string; title: string; 
 function Explore({ q }: { q: string }) {
   return <button onClick={() => ask(q)} className="flex min-h-[44px] items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5 lg:min-h-0">Explore <ArrowRight className="h-3 w-3" /></button>;
 }
-function AnalyticsLink({ metric, dim = "team", label = "Slice in Analytics" }: { metric: string; dim?: string; label?: string }) {
+function AnalyticsLink({ metric, dim = "team", label = "Slice it in Explore" }: { metric: string; dim?: string; label?: string }) {
   return <Link href={analyticsHref(metric, dim)} className="flex min-h-[44px] items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5 lg:min-h-0">{label} <ArrowUpRight className="h-3 w-3" /></Link>;
 }
 /* Honest marker for cards that stay org-level even when a team scope is active. */
@@ -313,35 +317,182 @@ function AttritionCard({ v, className = "" }: { v: PulseView; className?: string
     </Card>
   );
 }
-const RISK_TONE: Record<string, BadgeTone> = { High: "danger", Med: "warning", Low: "neutral" };
-function FlightRiskScorecard({ v, onOpen, className = "" }: { v: PulseView; onOpen: (p: PulseView["flightRisks"][number]) => void; className?: string }) {
+const LEVEL_TONE: Record<RiskLevel, BadgeTone> = { Serious: "danger", "Under strain": "warning", Watch: "neutral" };
+
+/* Risk, at the level it can honestly be read: a team and a reason. The old
+   version of this card named people and gave each a confidence score, which is
+   the one thing Trust promises this product never does — and it made managers
+   manage the list instead of the rota underneath it. */
+function TeamRiskCard({ v, className = "" }: { v: PulseView; className?: string }) {
+  const rows = v.isTeam ? teamRisk.filter((t) => t.team.split("·")[0].trim() === v.scope) : teamRisk;
   return (
     <Card className={className}>
-      <CardHead eyebrow="Flight risk" title="Who might leave" action={<button onClick={() => ask(`Draft a retention plan for high flight-risk employees in ${v.scope}`)} className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] hover:gap-1.5"><Sparkles className="h-3 w-3" /> Retention plan</button>} />
-      {v.flightRisks.length === 0 ? (
-        <div className="mt-5 flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line py-10 text-center"><Check className="h-7 w-7" style={{ color: TONE.good }} /><p className="text-[14px] font-semibold">No flagged risk</p><p className="text-[14px] text-faint">No high flight-risk employees in {v.scope}.</p></div>
-      ) : (
-        <div className="mt-4 -mx-2 overflow-x-auto">
-          <table className="w-full min-w-[540px] border-collapse">
-            <thead><tr className="text-left text-[12px] uppercase tracking-wide text-faint">{["Person", "Team", "Driver", "Risk", "Conf.", ""].map((h, i) => <th key={i} className="px-2 pb-2 font-semibold">{h}</th>)}</tr></thead>
-            <tbody>
-              {v.flightRisks.map((r) => (
-                <tr key={r.name} tabIndex={0} onClick={() => onOpen(r)} onKeyDown={(e) => { if (e.key === "Enter") onOpen(r); }} className="cursor-pointer border-t border-line outline-none transition hover:bg-soft focus-visible:bg-soft">
-                  <td className="px-2 py-2.5"><div className="flex items-center gap-2.5"><Avatar src={r.img} name={r.name} size="sm" /><span className="text-[14px] font-semibold">{r.name}</span></div></td>
-                  <td className="px-2 py-2.5 text-[14px] text-muted">{r.team}</td>
-                  <td className="px-2 py-2.5 text-[14px] text-muted">{r.driver}</td>
-                  <td className="px-2 py-2.5"><Badge tone={RISK_TONE[r.level] ?? "neutral"} variant="soft" size="sm">{r.level}</Badge></td>
-                  <td className="px-2 py-2.5 text-[14px] font-bold tabular-nums">{r.confidence}</td>
-                  <td className="px-2 py-2.5 text-right"><ArrowUpRight className="h-4 w-4 text-faint" /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <CardHead eyebrow="Risk intelligence" title="Where the risk is" action={<span className="text-[12px] font-medium text-faint">{riskStats.serious} serious · {rows.length} teams watched</span>} />
+      {rows.length === 0 ? (
+        <div className="mt-5 flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line py-10 text-center">
+          <Check className="h-7 w-7" style={{ color: TONE.good }} />
+          <p className="text-[14px] font-semibold">Nothing under strain</p>
+          <p className="text-[14px] text-faint">No team in {v.scope} is showing a pattern worth acting on.</p>
         </div>
+      ) : (
+        <ul className="mt-4 flex flex-col divide-y divide-[var(--line)]">
+          {rows.map((t) => (
+            <li key={t.id} className="grid gap-3 py-4 first:pt-0 last:pb-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:items-start">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-[15px] font-semibold text-ink">{t.team}</p>
+                  <Badge tone={LEVEL_TONE[t.level]} variant="soft" size="sm">{t.level}</Badge>
+                </div>
+                <p className="mt-0.5 text-[13px] text-faint">{t.people.toLocaleString("en-US")} people · {t.leftSix}% left in six months</p>
+                <p className="mt-1.5 text-[13px] leading-snug text-muted">{t.changed}</p>
+              </div>
+              <div className="min-w-0 text-[13px]">
+                <ul className="flex flex-wrap gap-1.5">
+                  {t.drivers.map((d) => <li key={d} className="rounded-full border border-line px-2.5 py-1 text-[13px] text-muted">{d}</li>)}
+                </ul>
+                <p className="mt-2 flex items-start gap-1.5 leading-snug text-ink">
+                  <ArrowRight className="mt-[3px] h-3.5 w-3.5 shrink-0 text-[var(--purple)]" strokeWidth={2.5} />
+                  <span>{t.action} <span className="text-faint">· {t.owner}</span></span>
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
+      <ul className="mt-5 flex flex-col gap-2 border-t border-line pt-4 text-[13px] text-faint">
+        {riskPromise.map((r) => <li key={r} className="flex items-start gap-2"><Lock className="mt-[2px] h-3.5 w-3.5 shrink-0" />{r}</li>)}
+      </ul>
     </Card>
   );
 }
+
+/* ════════════════════════ succession ════════════════════════ */
+const READY_TONE: Record<Readiness, BadgeTone> = { "Ready now": "success", "1–2 years": "info", "No cover": "danger" };
+
+function SuccessionCards() {
+  return (
+    <>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {([
+          ["Critical roles", `${successionStats.roles}`, "the ones that stop work if they empty"],
+          ["Covered today", `${successionStats.covered}`, "someone ready now"],
+          ["No cover at all", `${successionStats.noCover}`, successionStats.noCover ? "one person, one process" : "every role has a name"],
+          ["People on the bench", `${successionStats.bench}`, "named by People, after a conversation"],
+        ] as [string, string, string][]).map(([label, value, note]) => (
+          <div key={label} className="card-lift rounded-[22px] border border-line bg-card p-4 sm:p-5">
+            <p className="text-[13px] text-muted">{label}</p>
+            <p className="mt-1 text-[26px] font-bold tabular-nums tracking-tight">{value}</p>
+            <p className="mt-0.5 text-[12px] text-faint">{note}</p>
+          </div>
+        ))}
+      </div>
+
+      <Card>
+        <CardHead eyebrow="Succession intelligence" title="If this person left on Friday" />
+        <p className="mt-1 max-w-[700px] text-[13px] text-faint">{successionRule}</p>
+        <ul className="mt-4 flex flex-col divide-y divide-[var(--line)]">
+          {criticalRoles.map((r) => {
+            const covered = r.successors.some((s) => s.readiness === "Ready now");
+            return (
+              <li key={r.id} className="grid gap-3 py-4 first:pt-1 last:pb-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-start">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-3">
+                    <Avatar src={r.holderImg} name={r.holder} size="md" />
+                    <div className="min-w-0">
+                      <p className="truncate text-[15px] font-semibold text-ink">{r.role}</p>
+                      <p className="truncate text-[13px] text-faint">{r.holder} · {r.team}</p>
+                    </div>
+                  </div>
+                  <p className="mt-1.5 text-[13px] leading-snug text-muted">{r.whyCritical}</p>
+                </div>
+                <div className="min-w-0">
+                  {r.successors.length === 0 ? (
+                    <p className="flex items-start gap-2 text-[13px] font-semibold text-ink">
+                      <Badge tone="danger" variant="soft" size="sm">No cover</Badge>
+                    </p>
+                  ) : (
+                    <ul className="flex flex-col gap-2">
+                      {r.successors.map((sx) => (
+                        <li key={sx.name} className="flex items-start gap-2.5">
+                          <Avatar src={sx.img} name={sx.name} size="sm" />
+                          <div className="min-w-0">
+                            <p className="flex flex-wrap items-center gap-2 text-[14px] font-semibold text-ink">
+                              {sx.name} <Badge tone={READY_TONE[sx.readiness]} variant="soft" size="sm">{sx.readiness}</Badge>
+                            </p>
+                            <p className="text-[13px] leading-snug text-muted">{sx.note}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <p className={`mt-2 text-[13px] leading-snug ${covered ? "text-faint" : "text-ink"}`}>{r.gap}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </Card>
+    </>
+  );
+}
+
+/* ════════════════════════ recommendations ════════════════════════ */
+const CONF_TONE: Record<Confidence, BadgeTone> = { High: "success", Medium: "info", Low: "neutral" };
+
+function RecommendationCards() {
+  const [done, setDone] = usePersistentState<string[]>("vadal:insight-recs-done", []);
+  const open = recommendations.filter((r) => !done.includes(r.id));
+  return (
+    <>
+      <Card>
+        <CardHead eyebrow="Recommendations" title="The next move, and the numbers behind it" action={<span className="text-[12px] font-medium text-faint">{open.length} open · {recStats.high} we would bet on</span>} />
+        {open.length === 0 ? (
+          <div className="mt-5 flex flex-col items-center gap-2 rounded-2xl border border-dashed border-line py-10 text-center">
+            <Check className="h-7 w-7" style={{ color: TONE.good }} />
+            <p className="text-[14px] font-semibold">Nothing outstanding</p>
+            <p className="text-[14px] text-faint">Every recommendation has been picked up. New ones appear as the data moves.</p>
+          </div>
+        ) : (
+          <ul className="mt-4 flex flex-col gap-4">
+            {open.map((r) => (
+              <li key={r.id} className="rounded-[22px] border border-line p-5">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <p className="min-w-0 text-[16px] font-bold tracking-tight text-ink">{r.title}</p>
+                  <Badge tone={CONF_TONE[r.confidence]} variant="soft" size="sm">{r.confidence} confidence</Badge>
+                </div>
+                <ul className="mt-3 flex flex-col gap-1.5 text-[14px] text-muted">
+                  {r.because.map((b) => <li key={b} className="flex items-start gap-2"><span aria-hidden className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-[var(--purple)]" />{b}</li>)}
+                </ul>
+                <div className="mt-3 grid gap-3 text-[13px] sm:grid-cols-2">
+                  <p className="text-ink"><span className="text-faint">Expect: </span>{r.expect}</p>
+                  <p className="text-ink"><span className="text-faint">Takes: </span>{r.effort} · {r.owner}</p>
+                  <p className="text-muted"><span className="text-faint">Why that confidence: </span>{r.basis}</p>
+                  <p className="text-muted"><span className="text-faint">What would change our mind: </span>{r.changeMind}</p>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <Link href={r.action.href}><Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-0">{r.action.label}</Button></Link>
+                  <button onClick={() => { setDone((d) => [...d, r.id]); toast("Picked up — it comes back if the numbers do"); }} className="min-h-[44px] rounded-full px-3 text-[13px] font-semibold text-muted transition hover:bg-soft hover:text-ink lg:min-h-[36px]">
+                    Mark as picked up
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+
+      <Card>
+        <CardHead eyebrow="Deliberately not" title="What we are not recommending" />
+        <ul className="mt-3 flex flex-col gap-3 text-[14px] text-muted">
+          {notRecommending.map((n) => (
+            <li key={n} className="flex items-start gap-2"><X className="mt-[3px] h-4 w-4 shrink-0" style={{ color: TONE.bad }} />{n}</li>
+          ))}
+        </ul>
+      </Card>
+    </>
+  );
+}
+
 function RecognitionCard({ v, className = "" }: { v: PulseView; className?: string }) {
   return (
     <Card className={className}>
@@ -362,7 +513,7 @@ function DepartmentsCard({ scope, className = "" }: { scope: string; className?:
   const max = Math.max(...departments.map((d) => d.score));
   return (
     <Card className={className}>
-      <CardHead eyebrow="By team" title="Department health" action={<AnalyticsLink metric="engagement" dim="team" label="Compare in Analytics" />} />
+      <CardHead eyebrow="By team" title="Department health" action={<AnalyticsLink metric="engagement" dim="team" label="Compare in Explore" />} />
       <ul className="mt-4 space-y-2.5">
         {sorted.map((d) => {
           const dim = scope !== ALL_TEAMS && d.name !== scope;
@@ -378,26 +529,25 @@ function DepartmentsCard({ scope, className = "" }: { scope: string; className?:
     </Card>
   );
 }
-const GRADE: Record<string, string> = { A: TONE.good, B: TONE.good, C: TONE.warn, D: TONE.bad };
 function ManagersCard({ v, onOpen, className = "" }: { v: PulseView; onOpen: (m: PulseView["managers"][number]) => void; className?: string }) {
   return (
     <Card className={className}>
-      <CardHead eyebrow="Manager effectiveness" title={`Index ${v.managerIndex}`} action={<span className="text-[12px] text-faint">{managerSummary.closureRate}% 1:1 closure · {managerSummary.withActions} need action</span>} />
+      <CardHead eyebrow="Manager practice" title="What managers are doing" action={<span className="text-[12px] text-faint">{managerSummary.closureRate}% of 1:1s held</span>} />
+      <p className="mt-1 text-[13px] text-faint">Practice, not a rating: 1:1s held, kudos given, and the team&rsquo;s own score — which belongs to the team, not to the person managing it.</p>
       <div className="mt-4 -mx-2 overflow-x-auto">
         <table className="w-full min-w-[500px] border-collapse">
-          <thead><tr className="text-left text-[12px] uppercase tracking-wide text-faint">{["Manager", "Grade", "Score", "1:1s", "At risk", ""].map((h, i) => <th key={i} className="px-2 pb-2 font-semibold">{h}</th>)}</tr></thead>
+          <thead><tr className="text-left text-[12px] uppercase tracking-wide text-faint">{["Manager", "Team score", "1:1s held", "Kudos given", ""].map((h, i) => <th key={i} className="px-2 pb-2 font-semibold">{h}</th>)}</tr></thead>
           <tbody>
             {v.managers.map((m) => (
               <tr key={m.name} tabIndex={0} onClick={() => onOpen(m)} onKeyDown={(e) => { if (e.key === "Enter") onOpen(m); }} className="cursor-pointer border-t border-line outline-none transition hover:bg-soft focus-visible:bg-soft">
                 <td className="px-2 py-2.5"><div className="flex items-center gap-2.5"><Avatar src={m.img} name={m.name} size="sm" /><div className="min-w-0"><div className="truncate text-[14px] font-semibold">{m.name}</div><div className="truncate text-[12px] text-faint">{m.team}</div></div></div></td>
-                <td className="px-2 py-2.5"><span className="grid h-6 w-6 place-items-center rounded-full text-[12px] font-bold text-white" style={{ background: GRADE[m.grade] ?? TONE.warn }}>{m.grade}</span></td>
                 <td className="px-2 py-2.5 text-[14px] font-bold tabular-nums">{m.score}</td>
                 <td className="px-2 py-2.5 text-[14px] tabular-nums text-muted">{m.closure}%</td>
-                <td className="px-2 py-2.5 text-[14px] font-semibold tabular-nums" style={{ color: m.atRisk > 4 ? TONE.bad : "var(--muted)" }}>{m.atRisk}</td>
+                <td className="px-2 py-2.5 text-[14px] tabular-nums text-muted">{m.recognition}</td>
                 <td className="px-2 py-2.5 text-right"><ArrowUpRight className="h-4 w-4 text-faint" /></td>
               </tr>
             ))}
-            {v.managers.length === 0 && <tr><td colSpan={6} className="px-2 py-6 text-center text-[14px] text-faint">No managers in {v.scope}.</td></tr>}
+            {v.managers.length === 0 && <tr><td colSpan={5} className="px-2 py-6 text-center text-[14px] text-faint">No managers in {v.scope}.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -561,26 +711,14 @@ function KnowledgeCard({ isTeam = false, className = "" }: { isTeam?: boolean; c
 }
 
 /* ════════════════════════ drill-down drawer ════════════════════════ */
-type Detail =
-  | { kind: "person"; data: PulseView["flightRisks"][number] }
-  | { kind: "manager"; data: PulseView["managers"][number] };
+type Detail = { kind: "manager"; data: PulseView["managers"][number] };
 
 function DetailDrawer({ detail, onClose }: { detail: Detail | null; onClose: () => void }) {
   return (
     <Drawer open={detail !== null} title="Details" onClose={onClose}>
-      {detail && (detail.kind === "person"
-        ? <PersonDetail p={detail.data} onClose={onClose} />
-        : <ManagerDetail m={detail.data} onClose={onClose} />)}
+      {detail && <ManagerDetail m={detail.data} onClose={onClose} />}
     </Drawer>
   );
-}
-function personActions(driver: string): string[] {
-  const d = driver.toLowerCase();
-  if (d.includes("manager") || d.includes("1:1")) return ["Schedule a 1:1 this week", "Brief their manager on retention", "Add to the weekly check-in list"];
-  if (d.includes("workload") || d.includes("burnout") || d.includes("commit")) return ["Run a workload review", "Rebalance the current sprint", "Offer recovery time"];
-  if (d.includes("pay") || d.includes("growth")) return ["Open a growth conversation", "Review the compensation band", "Map a 6-month growth path"];
-  if (d.includes("role") || d.includes("clarity")) return ["Clarify role & expectations", "Set clear quarterly goals", "Pair with a mentor"];
-  return ["Schedule a 1:1 this week", "Review recent survey signals", "Loop in their manager"];
 }
 function DrawerActions({ actions }: { actions: string[] }) {
   return (
@@ -589,36 +727,11 @@ function DrawerActions({ actions }: { actions: string[] }) {
     </ul>
   );
 }
-function PersonDetail({ p, onClose }: { p: PulseView["flightRisks"][number]; onClose: () => void }) {
-  function createCase() { toast(`Case opened for ${p.name} — routed to Cases ✓`); onClose(); }
-  return (
-    <>
-      <Eyebrow>Flight-risk detail</Eyebrow>
-      <div className="mt-3 flex items-center gap-3.5">
-        <Avatar src={p.img} name={p.name} size="lg" />
-        <div className="min-w-0"><h2 className="text-[20px] font-bold tracking-tight">{p.name}</h2><p className="text-[14px] text-muted">{p.team}</p></div>
-      </div>
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-line p-3"><div className="text-[12px] text-faint">Risk level</div><div className="mt-1"><Badge tone={RISK_TONE[p.level] ?? "neutral"} variant="soft" size="sm">{p.level}</Badge></div></div>
-        <div className="rounded-2xl border border-line p-3"><div className="text-[12px] text-faint">Model confidence</div><div className="mt-1 text-[18px] font-bold tabular-nums">{p.confidence}</div></div>
-      </div>
-      <h3 className="mt-5 text-[14px] font-bold">Why flagged</h3>
-      <p className="mt-1.5 rounded-2xl bg-soft p-3.5 text-[14px] leading-relaxed text-muted"><Sparkles className="mr-1 inline h-3.5 w-3.5 text-[var(--purple)]" />Primary driver: <span className="font-semibold text-ink">{p.driver}</span>. The model also weighs recent sentiment dips and recognition gaps for this profile.</p>
-      <h3 className="mt-5 text-[14px] font-bold">Recommended actions</h3>
-      <DrawerActions actions={personActions(p.driver)} />
-      <div className="mt-6 flex items-center gap-2.5">
-        <Button variant="brand" onClick={createCase}>Create case</Button>
-        <Button variant="secondary" leadingIcon={<Sparkles className="h-4 w-4" />} onClick={() => ask(`How do I retain ${p.name}? Their flight-risk driver is ${p.driver}.`)}>Ask Vadal</Button>
-      </div>
-    </>
-  );
-}
 function ManagerDetail({ m, onClose }: { m: PulseView["managers"][number]; onClose: () => void }) {
   const actions: string[] = [];
-  if (m.atRisk > 4) actions.push(`Review the ${m.atRisk} at-risk reports`);
   if (m.closure < 75) actions.push("Lift 1:1 completion above 80%");
   if (m.recognition < 20) actions.push("Increase recognition cadence");
-  if (m.grade === "A") actions.push("Capture what's working as a team playbook");
+  if (m.closure >= 85 && m.recognition >= 35) actions.push("Capture what's working as a team playbook");
   if (actions.length < 2) actions.push("Hold a team listening session");
   function createCase() { toast(`Coaching plan created for ${m.name} ✓`); onClose(); }
   return (
@@ -627,10 +740,9 @@ function ManagerDetail({ m, onClose }: { m: PulseView["managers"][number]; onClo
       <div className="mt-3 flex items-center gap-3.5">
         <Avatar src={m.img} name={m.name} size="lg" />
         <div className="min-w-0"><h2 className="text-[20px] font-bold tracking-tight">{m.name}</h2><p className="text-[14px] text-muted">{m.team}</p></div>
-        <span className="ml-auto grid h-9 w-9 place-items-center rounded-full text-[16px] font-bold text-white" style={{ background: GRADE[m.grade] ?? TONE.warn }}>{m.grade}</span>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-3">
-        {[[`${m.score}`, "Score"], [`${m.closure}%`, "1:1 closure"], [`${m.atRisk}`, "At-risk reports"]].map(([val, l]) => <div key={l} className="rounded-2xl border border-line p-3 text-center"><div className="text-[18px] font-bold tabular-nums">{val}</div><div className="mt-0.5 text-[12px] text-faint">{l}</div></div>)}
+        {[[`${m.score}`, "Team score"], [`${m.closure}%`, "1:1s held"], [`${m.recognition}`, "Kudos given"]].map(([val, l]) => <div key={l} className="rounded-2xl border border-line p-3 text-center"><div className="text-[18px] font-bold tabular-nums">{val}</div><div className="mt-0.5 text-[12px] text-faint">{l}</div></div>)}
       </div>
       <h3 className="mt-5 text-[14px] font-bold">Coaching focus</h3>
       <DrawerActions actions={actions} />
@@ -643,7 +755,7 @@ function ManagerDetail({ m, onClose }: { m: PulseView["managers"][number]; onClo
 }
 
 /* ════════════════════════ tabs + compose ════════════════════════ */
-const TABS = ["Overview", "Engagement", "Attrition & risk", "Recognition", "Managers", "Adoption"] as const;
+const TABS = ["Overview", "Engagement", "Risk", "Succession", "Recommendations", "Recognition", "Managers", "Adoption"] as const;
 type Tab = (typeof TABS)[number];
 
 export function PulseDashboard() {
@@ -675,14 +787,14 @@ export function PulseDashboard() {
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <Link href={analyticsHref("engagement")} className="hidden items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5 sm:flex">Slice in Analytics <ArrowUpRight className="h-3 w-3" /></Link>
+          <Link href={analyticsHref("engagement")} className="hidden items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5 sm:flex">Slice it in Explore <ArrowUpRight className="h-3 w-3" /></Link>
           {pinned ? (
             <span className="flex items-center gap-2 text-[12px] text-faint">Scope
               <span className="rounded-full border border-line bg-soft px-3 py-1.5 text-[14px] font-medium text-ink">{pinned}</span>
             </span>
           ) : (
             <label className="flex items-center gap-2 text-[12px] text-faint">Scope
-              <select value={scope} onChange={(e) => setScope(e.target.value)} className="rounded-full border border-line bg-card px-3 py-1.5 text-[14px] font-medium text-ink outline-none transition hover:border-faint/40">
+              <select value={scope} onChange={(e) => setScope(e.target.value)} className="min-h-[44px] rounded-full border border-line bg-card px-3 py-1.5 text-[14px] font-medium text-ink outline-none transition hover:border-faint/40 lg:min-h-[36px]">
                 {scopes.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </label>
@@ -703,9 +815,16 @@ export function PulseDashboard() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><VoiceCard v={view} className="xl:col-span-7" /><CampaignsCard isTeam={view.isTeam} className="xl:col-span-5" /></div>
       </>)}
 
-      {tab === "Attrition & risk" && (<>
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><AttritionCard v={view} className="xl:col-span-5" /><FlightRiskScorecard v={view} onOpen={(p) => setDetail({ kind: "person", data: p })} className="xl:col-span-7" /></div>
-        <ActionQueueCard />
+      {tab === "Risk" && (<>
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start"><AttritionCard v={view} className="xl:col-span-5" /><TeamRiskCard v={view} className="xl:col-span-7" /></div>
+      </>)}
+
+      {tab === "Succession" && (<>
+        <SuccessionCards />
+      </>)}
+
+      {tab === "Recommendations" && (<>
+        <RecommendationCards />
       </>)}
 
       {tab === "Recognition" && (

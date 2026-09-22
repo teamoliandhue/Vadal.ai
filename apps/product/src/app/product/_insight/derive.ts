@@ -11,8 +11,9 @@
 import { experienceScore } from "@/lib/experience";
 import {
   health, engagementTrend, attrition, voice, recognitionBoard, briefingImpact,
-  flightRisks, managers, departments,
+  managerSummary, managers, departments,
 } from "@/lib/data";
+import { teamRisk } from "@/lib/insight";
 
 export const ALL_TEAMS = "All teams";
 
@@ -157,7 +158,6 @@ export function derivePulse(scope: string, period: string) {
   const coverage = isTeam ? clamp(score - 6, 30, 92) : recognitionBoard.coverage;
 
   /* ── filtered rosters ── */
-  const fr = isTeam ? flightRisks.filter((r) => teamRoot(r.team) === scope) : flightRisks.map((r) => ({ ...r }));
   const mgr = isTeam ? managers.filter((m) => teamRoot(m.team) === scope) : managers.map((m) => ({ ...m }));
 
   /* ── voice themes + representative quote (scope-aware) ── */
@@ -182,13 +182,15 @@ export function derivePulse(scope: string, period: string) {
   const recoLeaders = isTeam && teamLeaders.length ? teamLeaders : recognitionBoard.leaders;
 
   /* ── AI briefing — derived from the scoped view (no hardcoded names) ── */
-  const highRisks = fr.filter((r) => r.level === "High");
-  const needyMgrs = mgr.filter((m) => m.atRisk > 4 || m.grade === "C" || m.grade === "D");
+  /* Risk is read at team level — see lib/insight. A briefing never names a person
+     as a flight risk, because this product does not rate individuals. */
+  const strained = teamRisk.filter((t) => t.level !== "Watch" && (!isTeam || teamRoot(t.team) === scope));
+  const needyMgrs = mgr.filter((m) => m.closure < 75);
   const briefing = {
     items: [
-      highRisks.length
-        ? { text: `${highRisks.length} ${highRisks.length === 1 ? "person" : "people"} at high flight-risk`, sub: `${highRisks.slice(0, 3).map((r) => r.name.split(" ")[0]).join(", ")} — act this week`, dot: "#f87171", to: "Attrition & risk", label: "Review risk" }
-        : { text: `Flight risk is low in ${isTeam ? scope : "the org"}`, sub: `${predicted} predicted attrition`, dot: "#22b873", to: "Attrition & risk", label: "See risk" },
+      strained.length
+        ? { text: `${strained.length} team${strained.length > 1 ? "s" : ""} under strain`, sub: `${strained[0].team} — ${strained[0].drivers[0].toLowerCase()}`, dot: "#f87171", to: "Risk", label: "Review risk" }
+        : { text: `No team is under strain in ${isTeam ? scope : "the org"}`, sub: `${predicted} predicted attrition`, dot: "#22b873", to: "Risk", label: "See risk" },
       {
         text: `Engagement ${score} · ${benchmarkDelta >= 0 ? "+" : ""}${benchmarkDelta} vs benchmark`,
         sub: benchmarkDelta >= 0 ? "Holding above peers" : "Workload theme rising",
@@ -196,8 +198,8 @@ export function derivePulse(scope: string, period: string) {
         to: "Engagement", label: "See engagement",
       },
       needyMgrs.length
-        ? { text: `${needyMgrs.length} manager action${needyMgrs.length > 1 ? "s" : ""} pending`, sub: `${needyMgrs[0].name} · ${needyMgrs[0].atRisk} at-risk reports`, dot: "#a5b4fc", to: "Managers", label: "Review managers" }
-        : { text: "Manager coverage is healthy", sub: `${isTeam ? mgrScore : 78} effectiveness index`, dot: "#22b873", to: "Managers", label: "See managers" },
+        ? { text: `${needyMgrs.length} team${needyMgrs.length > 1 ? "s" : ""} missing their 1:1s`, sub: `${needyMgrs[0].team} — ${needyMgrs[0].closure}% held`, dot: "#a5b4fc", to: "Managers", label: "Review managers" }
+        : { text: "1:1s are being held", sub: `${managerSummary.closureRate}% of them, across every team`, dot: "#22b873", to: "Managers", label: "See managers" },
     ],
     impact: isTeam ? `~₹${Math.max(2, Math.round(38 * w))}L exposure this quarter` : briefingImpact.value,
   };
@@ -217,7 +219,6 @@ export function derivePulse(scope: string, period: string) {
     voice: { comments, mood, themes: vThemes, quote: vQuote },
     recognition: { total: recoTotal, coverage, leaders: recoLeaders },
     managerIndex: isTeam ? mgrScore : 78,
-    flightRisks: fr,
     managers: mgr,
     briefing,
   };

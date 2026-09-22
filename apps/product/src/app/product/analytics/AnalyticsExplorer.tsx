@@ -179,8 +179,8 @@ export function AnalyticsExplorer() {
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <Link href="/product" className="flex items-center gap-1 text-[12px] font-semibold text-[var(--purple)] transition hover:gap-1.5"><ArrowLeft className="h-3 w-3" /> Back to Insight</Link>
-            <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Analytics</h1>
-            <p className="mt-2 max-w-xl text-[14px] text-muted">Slice any metric across any cut. Pulse tells you what needs attention — Analytics lets you ask why, your way.</p>
+            <h1 className="mt-2 text-[clamp(24px,3vw,34px)] font-bold leading-[1.05] tracking-[-0.025em]">Explore</h1>
+            <p className="mt-2 max-w-xl text-[14px] text-muted">Slice any metric across any cut. Insight says what needs attention; this is where you ask why, your way.</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="tertiary" size="sm" leadingIcon={<Bookmark className="h-4 w-4" />} onClick={saveView}>Save view</Button>

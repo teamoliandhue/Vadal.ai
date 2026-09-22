@@ -70,7 +70,7 @@ export const NAV: NavGroupModel[] = [
     label: "Insight",
     items: [
       { label: "Insight", icon: Gauge, href: "/product" },
-      { label: "Analytics", icon: BarChart3, href: "/product/analytics" },
+      { label: "Explore", icon: BarChart3, href: "/product/analytics" },
     ],
   },
   {

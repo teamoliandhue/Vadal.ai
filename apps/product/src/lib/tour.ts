@@ -91,7 +91,7 @@ export const TOUR: TourStep[] = [
       { label: "Pulse", href: "/product/pulse" },
       { label: "Sentiment", href: "/product/sentiment" },
       { label: "Listen", href: "/product/listen" },
-      { label: "Analytics", href: "/product/analytics" },
+      { label: "Explore", href: "/product/analytics" },
     ],
     section: "Insight", href: "/product",
     lockedNote: "The people team's view. Your check-ins reach it only anonymously.",

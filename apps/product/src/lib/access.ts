@@ -84,7 +84,7 @@ export const SECTION_ACCESS: Record<string, Role[]> = {
   Onboard: MANAGER_UP,
   Campaigns: MANAGER_UP, // brief: managers author team-only — scoped by scopeFor
 
-  Analytics: ADMIN_UP,
+  Explore: ADMIN_UP,
   Pulse: ADMIN_UP,
   Listen: ADMIN_UP,
   Flow: ADMIN_UP,

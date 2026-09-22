@@ -14,7 +14,7 @@ import { AnalyticsExplorer } from "./AnalyticsExplorer";
 
 export default function AnalyticsPage() {
   return (
-    <Shell active="Analytics" breadcrumb="Analytics">
+    <Shell active="Explore" breadcrumb="Explore">
       {/* useSearchParams needs a Suspense boundary of its own */}
       <Suspense fallback={null}>
         <AnalyticsExplorer />
