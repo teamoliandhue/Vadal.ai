@@ -79,3 +79,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 061 | [Insight v2 — team-level risk instead of named flight risks, succession, recommendations with falsifiers; Analytics becomes Explore](./061-insight-v2.md) | Built · needs Figma |
 | 062 | [Home v2 — one clock and one streak, "Waiting on you" in place of nine product tiles, and a team snapshot that keeps the check-in promise](./062-home-v2.md) | Built · needs Figma |
 | 063 | [Settings v2 — the anonymity floor cannot be lowered, retention and AI read the same source as Trust, and every control is reachable on a phone](./063-settings-v2.md) | Built · needs Figma |
+| 064 | [Marketplace — orders with states and refunds, approvals that need a reason, stock and limits, and what points cost the company](./064-marketplace.md) | Built · needs Figma |

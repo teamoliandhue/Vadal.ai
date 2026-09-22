@@ -1,11 +1,13 @@
-/* Rewards — what points are spent on (Kudos › Rewards). */
+/* Marketplace — what points are spent on (Kudos › Marketplace).
+   The route keeps its /rewards path: it is linked from the digest, the tour and
+   the marketing site, and a working link is worth more than a tidy one. */
 import { Shell } from "../../shell";
-import { Rewards } from "./Rewards";
+import { Marketplace } from "./Marketplace";
 
-export default function RewardsPage() {
+export default function MarketplacePage() {
   return (
-    <Shell active="Kudos" breadcrumb="Rewards">
-      <Rewards />
+    <Shell active="Kudos" breadcrumb="Marketplace">
+      <Marketplace />
     </Shell>
   );
 }

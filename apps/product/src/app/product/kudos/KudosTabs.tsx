@@ -1,6 +1,6 @@
 "use client";
-/* Kudos has up to three rooms: the wall, your wallet, and rewards. With points
-   off the wallet is "Badges" — same place, no numbers. */
+/* Kudos has up to three rooms: the wall, your wallet, and the marketplace.
+   With points off the wallet is "Badges" — same place, no numbers. */
 import Link from "next/link";
 import { usePoints } from "../usePointsMode";
 
@@ -9,7 +9,7 @@ export function KudosTabs({ active }: { active: "kudos" | "wallet" | "rewards" }
   const tabs = [
     { id: "kudos", label: "Kudos", href: "/product/kudos" },
     { id: "wallet", label: points ? "Wallet" : "Badges", href: "/product/kudos/wallet" },
-    { id: "rewards", label: "Rewards", href: "/product/kudos/rewards" },
+    { id: "rewards", label: "Marketplace", href: "/product/kudos/rewards" },
   ] as const;
   return (
     <nav aria-label="Kudos" className="flex items-center gap-1 border-b border-line">
