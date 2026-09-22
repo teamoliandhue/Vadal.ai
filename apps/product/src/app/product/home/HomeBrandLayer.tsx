@@ -25,7 +25,7 @@ export function VadalBadge({ className = "" }: { className?: string }) {
   const { white } = useBrand();
   if (white) return null;
   return (
-    <span className={`flex items-center gap-1 text-[11px] font-medium text-faint ${className}`}>
+    <span className={`flex items-center gap-1 text-[12px] font-medium text-faint ${className}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/brand/signal-mark.svg" alt="" className="h-3 w-3 opacity-80" /> Powered by Vadal
     </span>

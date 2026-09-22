@@ -13,7 +13,7 @@ import type { Role } from "./auth";
 
 export type DigestLine = { id: string; emoji: string; text: string; href?: string; section?: string; roles?: Role[] };
 export type WeekTile = { label: string; value: string; note: string; roles?: Role[] };
-export type AheadItem = { day: string; date: string; title: string; meta: string; href?: string; section?: string; roles?: Role[] };
+export type AheadItem = { inDays: number; title: string; meta: string; href?: string; section?: string; roles?: Role[] };
 
 const MGR: Role[] = ["manager", "admin", "superadmin"];
 const ADM: Role[] = ["admin", "superadmin"];
@@ -21,7 +21,9 @@ const ADM: Role[] = ["admin", "superadmin"];
 export const YESTERDAY: DigestLine[] = [
   { id: "y-kudos", emoji: "💜", text: "**Anita** recognised you for **Ownership** — “calm under pressure on the onboarding launch.”", href: "/product/kudos", section: "Kudos" },
   { id: "y-review", emoji: "🛡️", text: "**4 posts** are waiting for review — one names a hazard in bay 4.", href: "/product/social/review", section: "Settings", roles: ADM },
-  { id: "y-rohan", emoji: "📉", text: "**Rohan's** check-ins dipped three days running. He hasn't had a 1:1 in six weeks.", href: "/product/managers", section: "Manager hub", roles: MGR },
+  /* A manager sees the 1:1 they owe — a fact both people already know. What
+     Rohan told his check-in stays with Rohan, here as everywhere else. */
+  { id: "y-rohan", emoji: "🗓️", text: "**Rohan** has not had a 1:1 in six weeks. The next one is still unbooked.", href: "/product/managers", section: "Manager hub", roles: MGR },
   { id: "y-rooms", emoji: "🏃", text: "**14 new posts** in your communities — Runners club set Saturday's route.", href: "/product/social/groups", section: "Social" },
   { id: "y-arjun", emoji: "🎉", text: "**Arjun** hit three years. 41 people have left him a note.", href: "/product/social/post/f6", section: "Social" },
   { id: "y-safety", emoji: "🦺", text: "**Line 2** reached 200 days without a lost-time incident.", href: "/product/social/post/f6b", section: "Social" },
@@ -37,15 +39,17 @@ export const LAST_WEEK: WeekTile[] = [
 
 export const LAST_WEEK_LINE = "A steady week. The thing people on your team mentioned most was **clearer priorities** — up from fourth to first.";
 
+/* Offsets from today, not fixed dates — Home has one clock (lib/home). */
 export const WEEK_AHEAD: AheadItem[] = [
-  { day: "Mon", date: "21 Sep", title: "1:1 with Anita", meta: "3:00 PM · 30 min · Google Calendar" },
-  { day: "Tue", date: "22 Sep", title: "Plan two 1:1s you owe", meta: "Rohan and Ishaan · suggested times ready", href: "/product/managers", section: "Manager hub", roles: MGR },
-  { day: "Wed", date: "23 Sep", title: "No-meeting Wednesday", meta: "All day · Wellbeing campaign", href: "/product/social/post/f1", section: "Social" },
-  { day: "Thu", date: "24 Sep", title: "Search revamp demo", meta: "4:00 PM · in the community", href: "/product/social/groups/search-revamp", section: "Social" },
-  { day: "Fri", date: "25 Sep", title: "September pulse closes", meta: "About 2 minutes · only the questions that matter to you", href: "/product/survey/september-pulse", section: "Home" },
-  { day: "Fri", date: "25 Sep", title: "Compliance refresher due", meta: "12 minutes left in iLearn", href: "/product/ilearn", section: "iLearn" },
-  { day: "Fri", date: "25 Sep", title: "Pulse wave closes — 71% have answered", meta: "Night shift is at 48%", href: "/product/pulse", section: "Pulse", roles: ADM },
-  { day: "Sat", date: "26 Sep", title: "Runners club · lake run", meta: "6:00 AM · Ulsoor Lake gate", href: "/product/social/groups/runners", section: "Social" },
+  { inDays: 0, title: "1:1 with Anita", meta: "3:00 PM · 30 min · Google Calendar" },
+  /* Names live in one place (lib/home reads the manager rows); this line does not repeat them. */
+  { inDays: 0, title: "Plan the 1:1s you owe", meta: "Both overdue · suggested times ready", href: "/product/managers", section: "Manager hub", roles: MGR },
+  { inDays: 1, title: "No-meeting Wednesday", meta: "All day · Wellbeing campaign", href: "/product/social/post/f1", section: "Social" },
+  { inDays: 2, title: "Search revamp demo", meta: "4:00 PM · in the community", href: "/product/social/groups/search-revamp", section: "Social" },
+  { inDays: 3, title: "September pulse closes", meta: "About 2 minutes · only the questions that matter to you", href: "/product/survey/september-pulse", section: "Home" },
+  { inDays: 3, title: "Compliance refresher due", meta: "12 minutes left in iLearn", href: "/product/ilearn", section: "iLearn" },
+  { inDays: 3, title: "Pulse wave closes — 71% have answered", meta: "Night shift is at 48%", href: "/product/pulse", section: "Pulse", roles: ADM },
+  { inDays: 4, title: "Runners club · lake run", meta: "6:00 AM · Ulsoor Lake gate", href: "/product/social/groups/runners", section: "Social" },
 ];
 
 export const WHATS_NEW: DigestLine[] = [

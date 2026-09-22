@@ -77,3 +77,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 059 | [Trust v2 — the anonymity floor as a control, retention and residency, and a register of every AI use](./059-trust-v2.md) | Built · needs Figma |
 | 060 | [Launch v2 — who is not on it yet with the next thing to try, and ROI against a baseline with what we will not claim](./060-launch-v2.md) | Built · needs Figma |
 | 061 | [Insight v2 — team-level risk instead of named flight risks, succession, recommendations with falsifiers; Analytics becomes Explore](./061-insight-v2.md) | Built · needs Figma |
+| 062 | [Home v2 — one clock and one streak, "Waiting on you" in place of nine product tiles, and a team snapshot that keeps the check-in promise](./062-home-v2.md) | Built · needs Figma |

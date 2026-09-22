@@ -12,6 +12,7 @@
 import { Suspense } from "react";
 import { Shell } from "../shell";
 import { HomeContent } from "./HomeContent";
+import { todayLong } from "@/lib/home";
 
 function greetingFor(hour: number) {
   if (hour < 12) return "Good morning";
@@ -22,12 +23,14 @@ function greetingFor(hour: number) {
 export default function HomePage() {
   // Computed here so the clock is read once, on the server — a client-side
   // read would risk a hydration mismatch on the greeting.
-  const greeting = greetingFor(new Date().getHours());
+  const now = new Date();
+  const greeting = greetingFor(now.getHours());
+  const today = todayLong(now);
   return (
     <Shell active="Home" breadcrumb="Home">
       {/* useSearchParams needs a Suspense boundary of its own */}
       <Suspense fallback={null}>
-        <HomeContent greeting={greeting} />
+        <HomeContent greeting={greeting} today={today} />
       </Suspense>
     </Shell>
   );

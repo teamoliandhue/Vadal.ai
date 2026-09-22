@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays } from "lucide-react";
 import { canAccess } from "@/lib/access";
 import { LAST_WEEK, LAST_WEEK_LINE, WEEK_AHEAD, WHATS_NEW, YESTERDAY, forRole, type DigestLine } from "@/lib/digest";
+import { dayFrom } from "@/lib/home";
 import { useViewAs } from "../useViewAs";
 import { usePoints } from "../usePointsMode";
 
@@ -87,17 +88,18 @@ export function LastWeekWidget() {
 export function WeekAheadWidget() {
   const [role] = useViewAs();
   const items = forRole(WEEK_AHEAD, role).filter((i) => !i.section || canAccess(role, i.section));
-  const days = [...new Set(items.map((i) => i.day))];
+  const offsets = [...new Set(items.map((i) => i.inDays))].sort((a, b) => a - b);
   return (
     <WidgetCard eyebrow="Your week ahead" title="What's coming">
       <ol className="mt-3 flex flex-col gap-3">
-        {days.map((d) => {
-          const today = items.filter((i) => i.day === d);
+        {offsets.map((n) => {
+          const day = dayFrom(n);
+          const today = items.filter((i) => i.inDays === n);
           return (
-            <li key={d} className="flex gap-3">
+            <li key={day.key} className="flex gap-3">
               <span className="w-12 shrink-0 pt-2.5 text-center">
-                <span className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-faint">{d}</span>
-                <span className="block text-[12px] tabular-nums text-muted">{today[0].date.split(" ")[0]}</span>
+                <span className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-faint">{day.short}</span>
+                <span className="block text-[12px] tabular-nums text-muted">{day.date}</span>
               </span>
               <ul className="min-w-0 flex-1 space-y-1.5">
                 {today.map((i) => (
@@ -108,7 +110,7 @@ export function WeekAheadWidget() {
                       <CalendarDays className="h-4 w-4 shrink-0 text-faint" />,
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[14px] font-semibold text-ink">{i.title}</span>
-                        <span className="block truncate text-[12px] text-faint">{i.meta}</span>
+                        <span className="block truncate text-[13px] text-faint">{i.meta}</span>
                       </span>,
                       i.href ? <ArrowRight className="h-4 w-4 shrink-0 text-faint transition group-hover:translate-x-0.5 group-hover:text-[var(--purple)]" /> : null,
                     )}

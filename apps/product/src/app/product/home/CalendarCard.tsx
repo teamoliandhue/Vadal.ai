@@ -32,7 +32,7 @@ export function CalendarCard() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="truncate text-[14px] font-semibold">{e.title}</span>
-                  {e.now && <span className="rounded-full bg-[color-mix(in_srgb,var(--danger)_16%,transparent)] px-1.5 py-0.5 text-[11px] font-bold text-[var(--danger)]">Now</span>}
+                  {e.now && <span className="rounded-full bg-[color-mix(in_srgb,var(--danger)_16%,transparent)] px-1.5 py-0.5 text-[12px] font-bold text-[var(--danger)]">Now</span>}
                 </div>
                 <div className="text-[12px] text-faint">{e.mins} min · {e.with}</div>
               </div>

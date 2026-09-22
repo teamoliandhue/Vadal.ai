@@ -19,7 +19,9 @@ export function MoodCheck({ firstTime = false }: { firstTime?: boolean }) {
   const [logged, setLogged] = usePersistentState<{ mood: string } | null>("vadal:mood", null);
   const [selected, setSelected] = React.useState<string | null>(null);
   const [note, setNote] = React.useState("");
-  const streak = (firstTime ? 0 : me.streak) + 1;
+  /* me.streak counts today once it is logged — the same number the You
+     widget shows, so Home never claims two different streaks at once. */
+  const streak = firstTime ? 1 : me.streak;
 
   /* Open Vadal to talk it through — the conversational follow-up (Amber-style). */
   function talkItThrough(mood: string, why?: string) {
@@ -49,7 +51,7 @@ export function MoodCheck({ firstTime = false }: { firstTime?: boolean }) {
               Logged — feeling {mood?.emoji} {logged.mood.toLowerCase()}
             </p>
             <p className="mt-0.5 text-[14px] text-faint">
-              Private to you · {me.streak + 1}-day streak ·{" "}
+              Private to you · {streak}-day streak ·{" "}
               <button onClick={() => { setLogged(null); setSelected(null); setNote(""); }} className="relative font-semibold text-[var(--purple)] after:absolute after:-inset-x-2 after:-inset-y-3 after:content-[''] hover:underline lg:after:hidden">
                 Change
               </button>

@@ -12,17 +12,16 @@
 import * as React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowRight, Award, Clock, Gift, Heart, Trophy } from "lucide-react";
+import { ArrowRight, Award, Check, Clock, Gift, Heart, Trophy } from "lucide-react";
 import { Avatar, Badge, Button, Trend } from "@vadal/design-system";
 import { Sparkline } from "@/components/charts";
-import { org, me, myRecognition, communities, myDay, engagementTrend, myCalendar } from "@/lib/data";
+import { me, myRecognition, communities, engagementTrend, myCalendar } from "@/lib/data";
 import { BADGES, MY_RECOGNITION } from "@/lib/points";
 import { useWallet } from "../kudos/useWallet";
 import { usePoints } from "../usePointsMode";
 import { MoodCheck } from "./MoodCheck";
 import { MyDay } from "./MyDay";
 import { TourResume } from "../get-started/TourResume";
-import { ProductGrid } from "../ProductGrid";
 import { QuickPoll } from "./QuickPoll";
 import { Feed } from "./Feed";
 import { AskAi } from "./AskAi";
@@ -36,6 +35,10 @@ import { LastWeekWidget, WeekAheadWidget, WhatsNewWidget, YesterdayWidget } from
 import type { Role } from "@/lib/auth";
 import { orderHome, type HomeSection } from "@/lib/ai/engines/personalize";
 import { useProfile } from "../useProfile";
+import { useViewAs } from "../useViewAs";
+import { usePersistentState } from "@/lib/usePersistentState";
+import { canAccess } from "@/lib/access";
+import { waitingFor, waitingNote } from "@/lib/home";
 
 const MGR: Role[] = ["manager", "admin", "superadmin"];
 
@@ -88,26 +91,95 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-faint">{children}</p>;
 }
 
-export function HomeContent({ greeting }: { greeting: string }) {
+/** Home counts the work once. The hero and the list read the same rows, and the
+    same "Not now" dismissals, so they cannot disagree the way the greeting and
+    the check-in streak used to. */
+function useWaiting(firstTime = false) {
+  const [role] = useViewAs();
+  const [done, setDone] = usePersistentState<string[]>("vadal:home-waiting-done", []);
+  /* A joiner on day one owes nobody a compliance refresher. The first-run Home
+     shows the empty state and fills as the week starts. */
+  const items = firstTime ? [] : waitingFor(role, done).filter((w) => canAccess(role, w.section));
+  return { items, dismiss: (id: string) => setDone((d) => [...d, id]) };
+}
+
+export function HomeContent({ greeting, today }: { greeting: string; today: string }) {
   // Home §1–7: client-brand band, conversational mood, calendar, hooks, view-as role.
   const firstTime = useSearchParams().get("view") === "new";
   const profile = useProfile();
+  /* One copy of the list, shared: two useWaiting() calls would keep two copies
+     of the dismissals and disagree the moment someone pressed "Not now". */
+  const waiting = useWaiting(firstTime);
   return (
     <>
-      <RitualHero firstTime={firstTime} greeting={greeting} />
-      {/* the nine, straight after the greeting — every product one tap away,
-          each showing a live fragment of itself */}
-      <section aria-label="Products" className="mt-6">
-        <ProductGrid mode="nav" idPrefix="home" />
-      </section>
+      <RitualHero firstTime={firstTime} greeting={greeting} today={today} waiting={waiting.items.length} />
+      {/* What used to be nine product tiles with a number on each. The sidebar
+          already lists the modules; this is the work. */}
+      <WaitingOnYou firstTime={firstTime} waiting={waiting} />
       <TourResume />
       <WidgetBoard widgets={widgetsFor(firstTime)} defaults={defaultLayoutFor(orderHome(profile))} />
     </>
   );
 }
 
+/* ── Waiting on you — the short list, straight under the greeting ── */
+function WaitingOnYou({ firstTime, waiting }: { firstTime: boolean; waiting: ReturnType<typeof useWaiting> }) {
+  const { items, dismiss } = waiting;
+
+  return (
+    <section aria-labelledby="waiting-h" className="mt-6 card-lift relative overflow-hidden rounded-[26px] border border-line bg-card p-6 sm:p-7">
+      <span aria-hidden className="ai-grad absolute inset-x-0 top-0 h-[2px] opacity-70" />
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <Eyebrow>Waiting on you</Eyebrow>
+          <h2 id="waiting-h" className="mt-1.5 text-[18px] font-bold tracking-tight">{items.length === 0 ? "Nothing is waiting" : `${items.length} to finish`}</h2>
+        </div>
+        <Link href="/product/for-you" className="flex min-h-[44px] items-center gap-1 text-[13px] font-semibold text-[var(--purple)] transition hover:gap-1.5 lg:min-h-0">
+          For you <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="mt-4 flex flex-col items-center gap-2 rounded-2xl border border-dashed border-line px-6 py-8 text-center">
+          <Check className="h-6 w-6 text-faint" aria-hidden />
+          <p className="text-[15px] font-semibold text-ink">{firstTime ? "Nothing yet" : "All clear"}</p>
+          <p className="max-w-[420px] text-[14px] leading-relaxed text-muted">
+            {firstTime ? "Things you need to finish will land here as your first week starts." : "Nothing is yours to finish today. The rest of Home is news, not work."}
+          </p>
+        </div>
+      ) : (
+        <ul className="mt-4 flex flex-col divide-y divide-[var(--line)]">
+          {items.map((w) => (
+            <li key={w.id} className="flex flex-wrap items-center gap-3 py-3.5 first:pt-1 last:pb-0">
+              <div className="min-w-0 flex-1">
+                <p className="flex flex-wrap items-center gap-2 text-[15px] font-semibold text-ink">
+                  {w.title}
+                  {w.late && <Badge tone="warning" size="sm">Overdue</Badge>}
+                </p>
+                <p className="mt-0.5 text-[13px] text-faint">{w.meta}{w.takes ? ` · ${w.takes}` : ""}</p>
+              </div>
+              <div className="flex shrink-0 items-center gap-1">
+                <Link href={w.href}>
+                  <Button variant="secondary" size="sm" className="min-h-[44px] lg:min-h-[36px]">{w.action}</Button>
+                </Link>
+                <button
+                  onClick={() => dismiss(w.id)}
+                  className="min-h-[44px] rounded-full px-3 text-[13px] font-semibold text-muted transition hover:bg-soft hover:text-ink lg:min-h-[36px]"
+                >
+                  Not now
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="mt-4 text-[13px] text-faint">{waitingNote}</p>
+    </section>
+  );
+}
+
 /* ── 1 · Ritual hero — greeting + mood, with a focal "Up next" ── */
-function RitualHero({ firstTime, greeting }: { firstTime: boolean; greeting: string }) {
+function RitualHero({ firstTime, greeting, today, waiting }: { firstTime: boolean; greeting: string; today: string; waiting: number }) {
   const upNext = myCalendar.find((e) => e.now) ?? myCalendar.find((e) => e.prep) ?? myCalendar[0];
   return (
     <header className="rise relative overflow-hidden rounded-[28px] border border-line bg-card shadow-[0_1px_2px_rgba(20,20,40,0.04),0_18px_42px_-26px_rgba(20,20,40,0.22)]">
@@ -123,17 +195,26 @@ function RitualHero({ firstTime, greeting }: { firstTime: boolean; greeting: str
       </div>
       <div className="relative grid gap-8 px-7 pb-7 pt-4 sm:px-9 sm:pb-9 lg:grid-cols-[1.25fr_0.85fr] lg:items-start lg:gap-12">
         <div>
-          <Eyebrow>{org.date}</Eyebrow>
+          <Eyebrow>{today}</Eyebrow>
           <h1 className="mt-3 text-[clamp(30px,4.4vw,46px)] font-bold leading-[1.03] tracking-[-0.025em]">
             {firstTime ? "Welcome" : greeting}, <MyFirstName /> <span aria-hidden>👋</span>
           </h1>
+          {/* The streak lives in the check-in card, and only there — the two of
+              them disagreed by a day for as long as both printed it. */}
           <p className="mt-3 max-w-md text-[16px] leading-relaxed text-muted">
             {firstTime ? (
               <>Let’s set up your day — start with a quick mood check-in. We’ll fill the rest as you go.</>
             ) : (
-              <>You’ve got <b className="font-semibold text-ink">{myDay.length} things</b> today, and you’re on a <b className="font-semibold text-ink">{me.streak}-day</b> streak. 🔥</>
+              waiting === 0
+                ? <>Nothing is waiting on you today. The rest of Home is news, not work.</>
+                : <><b className="font-semibold text-ink">{waiting} thing{waiting === 1 ? "" : "s"}</b> {waiting === 1 ? "is" : "are"} waiting on you today. Nothing else here needs doing.</>
             )}
           </p>
+          {!firstTime && (
+            <Link href="/product/for-you" className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 text-[14px] font-semibold text-[var(--purple)] transition hover:gap-2 lg:min-h-0">
+              See the whole day in For you <ArrowRight className="h-4 w-4" />
+            </Link>
+          )}
         </div>
         <div className="lg:border-l lg:border-line lg:pl-12">
           <MoodCheck firstTime={firstTime} />
@@ -148,7 +229,7 @@ function RitualHero({ firstTime, greeting }: { firstTime: boolean; greeting: str
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <Eyebrow>Up next</Eyebrow>
-                <span className="flex items-center gap-1 text-[11px] font-medium text-faint"><span aria-hidden>📅</span> Google Calendar</span>
+                <span className="flex items-center gap-1 text-[12px] font-medium text-faint"><span aria-hidden>📅</span> Google Calendar</span>
               </div>
               <p className="truncate text-[14px] font-semibold">
                 {upNext.title} <span className="font-normal text-faint">· {upNext.time} · {upNext.with}</span>
