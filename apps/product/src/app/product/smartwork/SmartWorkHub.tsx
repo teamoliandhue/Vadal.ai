@@ -3,7 +3,7 @@
 
    What the platform means by SmartWork: HR Queries · Automated Resolution ·
    Smart Escalation · Policy Answers. The section that used to live here — the
-   wellbeing companion, counsellors and crisis lines — moved to /product/support
+   wellbeing companion, counsellors and crisis lines — moved to /product/icare
    with its route, its brief and its promises intact. They were two different
    products sharing one name, and the name belongs to this one.
 

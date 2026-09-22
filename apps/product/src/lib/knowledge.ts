@@ -224,7 +224,7 @@ export type CorrectionReason = (typeof CORRECTION_REASONS)[number]["key"];
 export const whoToAsk = [
   { label: "Your manager", detail: "Anything about your own role, workload or team", href: "/product/home" },
   { label: "The People team", detail: "Pay, leave, policy and anything contractual · people@oliandhue.com", href: "mailto:people@oliandhue.com" },
-  { label: "One-to-One Help", detail: "If it is personal, and you would rather it stayed private", href: "/product/support" },
+  { label: "One-to-One Help", detail: "If it is personal, and you would rather it stayed private", href: "/product/icare" },
 ];
 
 export const usage = { questions: "6,240", resolved: 78, views: "18.4K", searchSuccess: 84 };

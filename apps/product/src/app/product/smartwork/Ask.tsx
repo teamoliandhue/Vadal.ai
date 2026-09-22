@@ -187,7 +187,7 @@ export function Ask({ onDone, onAnswered, onEscalate }: {
 
       <p className="flex items-start gap-2 text-[13px] leading-relaxed text-faint">
         <UserRound className="mt-[2px] h-4 w-4 shrink-0" />
-        Anything personal — your health, your money, how you are doing — belongs in <Link href="/product/support" className="inline-flex min-h-[44px] items-center font-semibold text-[var(--purple)] hover:underline lg:min-h-0">Support</Link>, where it stays between you and a counsellor.
+        Anything personal — your health, your money, how you are doing — belongs in <Link href="/product/icare" className="inline-flex min-h-[44px] items-center font-semibold text-[var(--purple)] hover:underline lg:min-h-0">iCare</Link>, where it stays between you and a counsellor.
       </p>
     </div>
   );

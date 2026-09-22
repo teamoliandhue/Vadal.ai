@@ -1,9 +1,9 @@
 import { Shell } from "../shell";
 import { HelpHub } from "./HelpHub";
 
-export default function SupportPage() {
+export default function ICarePage() {
   return (
-    <Shell active="Support" breadcrumb="Support">
+    <Shell active="iCare" breadcrumb="iCare">
       <HelpHub />
     </Shell>
   );

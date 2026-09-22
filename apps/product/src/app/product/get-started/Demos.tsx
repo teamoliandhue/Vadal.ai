@@ -351,7 +351,7 @@ function Help() {
           <p className="truncate text-[13.5px] font-semibold">{c.name}</p>
           <p className="truncate text-[11.5px] text-faint">{c.credentials} · next {c.nextAvailable}</p>
         </div>
-        <Link href="/product/support" className="flex min-h-[44px] items-center gap-1 rounded-full px-3 text-[13px] font-semibold text-[var(--client-brand,var(--purple))] lg:min-h-[36px]">Talk to a person <ArrowRight className="h-3.5 w-3.5" /></Link>
+        <Link href="/product/icare" className="flex min-h-[44px] items-center gap-1 rounded-full px-3 text-[13px] font-semibold text-[var(--client-brand,var(--purple))] lg:min-h-[36px]">Talk to a person <ArrowRight className="h-3.5 w-3.5" /></Link>
       </div>
       <div className="flex flex-wrap gap-1.5 border-t border-line px-4 py-3">
         {WAYS_IN.slice(0, 3).map((w) => <span key={w} className="rounded-full bg-soft px-2.5 py-1 text-[12px] text-muted">“{w}”</span>)}

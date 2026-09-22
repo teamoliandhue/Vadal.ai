@@ -1,18 +1,18 @@
-# 051 — SmartWork: the HR desk (and Support keeps the help pillar)
+# 051 — SmartWork: the HR desk (and iCare keeps the help pillar)
 
-**Routes:** `/product/smartwork` (rebuilt) · `/product/support` (new home for the old content)
-**Code:** `apps/product/src/app/product/smartwork/` (`SmartWorkHub`, `Ask`, `Requests`, `Desk`), `apps/product/src/app/product/support/` · **Data:** `apps/product/src/lib/smartwork.ts`
+**Routes:** `/product/smartwork` (rebuilt) · `/product/icare` (new home for the old content)
+**Code:** `apps/product/src/app/product/smartwork/` (`SmartWorkHub`, `Ask`, `Requests`, `Desk`), `apps/product/src/app/product/icare/` · **Data:** `apps/product/src/lib/smartwork.ts`
 **Status:** Built · needs Figma
 
 ## Why
 The platform taxonomy defines SmartWork as **HR Queries · Automated Resolution · Smart Escalation · Policy Answers**, in Digital Workplace. The product's SmartWork was something else entirely: the one-to-one wellbeing pillar — crisis lines, an AI companion that triages, counsellor booking, a resource library — sitting under Wellbeing. Two products, one name.
 
-The wellbeing pillar keeps everything (route `/product/support`, brief and promises intact, never gated). SmartWork is now the HR desk.
+The wellbeing pillar keeps everything, renamed **iCare** (route `/product/icare`, brief and promises intact, never gated). SmartWork is now the HR desk.
 
 ## Navigation
 - New group **Digital workplace**: SmartWork · iLearn · Knowledge (was "Learn").
-- **Wellbeing**: iThrive · **Support** (the moved pillar, heart icon).
-- Links that mean "talk to a human privately" (iThrive, Get Started, Knowledge's "who to ask") now point at Support.
+- **Wellbeing**: iThrive · **iCare** (the moved pillar, heart icon).
+- Links that mean "talk to a human privately" (iThrive, Get Started, Knowledge's "who to ask") now point at iCare.
 
 ## SmartWork — three views
 Header: eyebrow **Digital workplace** · H1 **SmartWork** · "Your HR desk. Ask about pay, leave, insurance or policy and get an answer from the company's own documents — or have the whole thing done for you." Underline tabs: **Ask · My requests (N) · Desk** (Desk is People-team only).
@@ -24,7 +24,7 @@ Header: eyebrow **Digital workplace** · H1 **SmartWork** · "Your HR desk. Ask 
 - **"Did that answer it?"** → *Yes, done* (logged as answered) or *No — get me a person* (escalates).
 - **No answer**: "No policy covers this one" — says plainly that guessing is worse, and offers the person. The answer becomes a document so the next person gets it instantly.
 - **Things I can finish now** — six instant actions as cards: payslip, employment letter, leave balance, insurance e-card, address change, tax declaration. Each shows what you end up holding and how long it takes.
-- Footer line: anything personal belongs in **Support**.
+- Footer line: anything personal belongs in **iCare**.
 
 ### 2. My requests
 One row per request, in three kinds, each with its own colour and icon:

@@ -28,7 +28,7 @@ const DOMAIN: Record<string, string> = {
   Pulse: "Listen", Sentiment: "Listen", "Always-on listening": "Listen",
   SmartWork: "Digital workplace", iLearn: "Digital workplace", Knowledge: "Digital workplace",
   Insight: "Insight", Analytics: "Insight",
-  iThrive: "Wellbeing", Support: "Wellbeing",
+  iThrive: "Wellbeing", iCare: "Wellbeing",
   "Manager hub": "Operations", Onboard: "Operations", Alumni: "Operations", Flow: "Operations",
   Link: "Platform", Trust: "Platform", Launch: "Platform",
   Settings: "Account",

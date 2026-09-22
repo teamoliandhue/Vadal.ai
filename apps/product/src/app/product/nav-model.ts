@@ -77,7 +77,7 @@ export const NAV: NavGroupModel[] = [
     label: "Wellbeing",
     items: [
       { label: "iThrive", icon: HeartPulse, href: "/product/ithrive" },
-      { label: "Support", icon: Heart, href: "/product/support" },
+      { label: "iCare", icon: Heart, href: "/product/icare" },
     ],
   },
   {

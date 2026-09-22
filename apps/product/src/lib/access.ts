@@ -74,7 +74,7 @@ export const SECTION_ACCESS: Record<string, Role[]> = {
   Amplify: ALL_ROLES,
   SmartWork: ALL_ROLES,
   // One-to-one help: crisis resources must never be gated.
-  Support: ALL_ROLES,
+  iCare: ALL_ROLES,
 
   Insight: MANAGER_UP,
   Sentiment: MANAGER_UP,

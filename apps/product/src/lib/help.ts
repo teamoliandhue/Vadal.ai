@@ -1,5 +1,5 @@
 /**
- * One-to-One Help — Pillar 7 (route /product/support).
+ * One-to-One Help — Pillar 7 (route /product/icare).
  *
  * "A private first door to support, with a real person always one step away."
  *
