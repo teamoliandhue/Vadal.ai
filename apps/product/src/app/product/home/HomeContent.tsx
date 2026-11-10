@@ -22,6 +22,7 @@ import { usePoints } from "../usePointsMode";
 import { MoodCheck } from "./MoodCheck";
 import { MyDay } from "./MyDay";
 import { TourResume } from "../get-started/TourResume";
+import { ProductGrid } from "../ProductGrid";
 import { QuickPoll } from "./QuickPoll";
 import { Feed } from "./Feed";
 import { AskAi } from "./AskAi";
@@ -113,12 +114,35 @@ export function HomeContent({ greeting, today }: { greeting: string; today: stri
   return (
     <>
       <RitualHero firstTime={firstTime} greeting={greeting} today={today} waiting={waiting.items.length} />
-      {/* What used to be nine product tiles with a number on each. The sidebar
-          already lists the modules; this is the work. */}
+      {/* The work leads. The nine follow it, because a directory is what you
+          want after you know what is yours to finish — never instead of it. */}
       <WaitingOnYou firstTime={firstTime} waiting={waiting} />
+      <TheNine />
       <TourResume />
       <WidgetBoard widgets={widgetsFor(firstTime)} defaults={defaultLayoutFor(orderHome(profile))} />
     </>
+  );
+}
+
+/* ── The nine — the whole product, under the work ──
+   The same grid Get Started uses, in `nav` mode: a card opens its product, a
+   locked one stays visible and says so, and the set is filtered by the role
+   you are viewing as. It sits below "Waiting on you" on purpose — Home opens
+   with what is yours to finish, and only then shows everything there is. */
+function TheNine() {
+  return (
+    <section aria-labelledby="nine-h" className="mt-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <Eyebrow>Everything in Vadal</Eyebrow>
+          <h2 id="nine-h" className="mt-1.5 text-[18px] font-bold tracking-tight">The nine</h2>
+        </div>
+        <p className="text-[13px] text-faint">Each card carries a live piece of its product.</p>
+      </div>
+      <div className="mt-4">
+        <ProductGrid mode="nav" idPrefix="home" />
+      </div>
+    </section>
   );
 }
 

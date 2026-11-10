@@ -81,3 +81,4 @@ here for the product designer, so Figma stays in sync with the built product.
 | 063 | [Settings v2 — the anonymity floor cannot be lowered, retention and AI read the same source as Trust, and every control is reachable on a phone](./063-settings-v2.md) | Built · needs Figma |
 | 064 | [Marketplace — orders with states and refunds, approvals that need a reason, stock and limits, and what points cost the company](./064-marketplace.md) | Built · needs Figma |
 | 065 | [Marketplace as its own section under My space, rebuilt as a storefront — banner with search, category bento, numbered rails](./065-marketplace-section.md) | Built · needs Figma |
+| 066 | [Home — the nine return, under the work rather than instead of it](./066-home-the-nine-returns.md) | Built · needs Figma |
